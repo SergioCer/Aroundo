@@ -201,7 +201,7 @@ function createIcon(color) {
 
 const icons = {};
 categories.forEach(cat => {
-  icons[cat.mc_slug] = createIcon(cat.mc_colore);
+  icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
 });
   
 // 📍 EVENTI SPAZIATI (mock realistico Sicilia occidentale)
@@ -211,55 +211,55 @@ const events = [
     name: "Live Jazz Night",
     lat: 38.0176,
     lng: 12.5365,
-    type: "music"
+    type: 1
   },
   {
     name: "Karaoke",
     lat: 38.0156,
     lng: 12.5465,
-    type: "music"
+    type: 1
   },
   {
     name: "Street Food Festival",
     lat: 37.9676,
     lng: 12.7481,
-    type: "food"
+    type: 2
   },
   {
     name: "Sagra della Salsiccia",
     lat: 37.9176,
     lng: 12.7281,
-    type: "food"
+    type: 2
   },
   {
     name: "Museum Exhibition",
     lat: 37.7933,
     lng: 12.4389,
-    type: "culture"
+    type: 8
   },
   {
     name: "Beach Yoga Session",
     lat: 37.9330,
     lng: 12.8700,
-    type: "sport"
+    type: 3
   },
   {
     name: "Night DJ Set",
     lat: 37.8030,
     lng: 12.4470,
-    type: "nightlife"
+    type: 5
   },
   {
     name: "Kids Playground Event",
     lat: 37.8900,
     lng: 12.6500,
-    type: "family"
+    type: 10
   },
   {
     name: "Outdoor Trekking Group",
     lat: 38.0500,
     lng: 12.6200,
-    type: "outdoor"
+    type: 11
   }
 ];
 
