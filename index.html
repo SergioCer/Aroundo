@@ -197,18 +197,13 @@ function createIcon(color) {
   });
 }
 
-// 🎭 CATEGORIE (colori semantici Aroundo)
+// 🎭 CATEGORIE
 
-const icons = {
-  music: createIcon("#ff4d6d"),        // rosso energia
-  food: createIcon("#ffb703"),         // caldo food
-  culture: createIcon("#8ecae6"),      // culturale/mare
-  sport: createIcon("#06d6a0"),        // verde energia
-  nightlife: createIcon("#8338ec"),    // viola notte
-  family: createIcon("#f4a261"),       // soft arancio
-  outdoor: createIcon("#52b788"),      // natura
-};
-
+const icons = {};
+categories.forEach(cat => {
+  icons[cat.mc_slug] = createIcon(cat.mc_colore);
+});
+  
 // 📍 EVENTI SPAZIATI (mock realistico Sicilia occidentale)
 
 const events = [
