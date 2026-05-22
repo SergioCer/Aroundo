@@ -156,7 +156,7 @@ async function buildCategoryMenu() {
   });
 
   const toggleBtn = document.getElementById('menu-toggle');
-  toggleBtn.addEventListener('click', () => {
+  .addEventListener('click', () => {
     menuItemsDiv.style.display = menuItemsDiv.style.display === 'none' ? 'block' : 'none';
   });
 }
@@ -176,7 +176,6 @@ async function buildCategoryMenu() {
 
   // 4. map markers
   renderEvents();
-  await buildCategoryMenu();
 });
   
   // 🌿 Base map più calda (meno grigia)
@@ -190,6 +189,9 @@ async function buildCategoryMenu() {
   ).addTo(map);
 
  // 🎨 ICON SET PER CATEGORIE
+
+function renderEvents() {
+}  
 
 function createIcon(color) {
   return L.divIcon({
@@ -206,15 +208,6 @@ function createIcon(color) {
     iconSize: [20, 20]
   });
 }
-
-function renderEvents() {
-  events.forEach(e => {
-    L.marker([e.lat, e.lng], {
-      icon: icons[e.type]
-    })
-    .addTo(map)
-    .bindPopup(`<b>${e.name}</b>`);
-  });
 }  
 
 // 🎭 CATEGORIE
@@ -276,16 +269,6 @@ const events = [
     type: 11
   }
 ];
-
-// RENDER MARKERS
-
-events.forEach(e => {
-  L.marker([e.lat, e.lng], { icon: icons[e.type] })
-    .addTo(map)
-    .bindPopup(`<b>${e.name}</b>`);
-});
-
-  
 
 </script>
 
