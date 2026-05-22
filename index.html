@@ -205,7 +205,7 @@ async function buildCategoryMenu() {
 
 function renderEvents() {
   events.forEach(e => {
-    L.marker([e.lat, e.lng], {
+    L.marker([e.ev_lat, e.ev_lng], {
       icon: icons[e.type]
     })
     .addTo(map)
