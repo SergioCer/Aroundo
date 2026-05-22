@@ -112,7 +112,9 @@
 
 <script type="module">
   import { supabase } from './supabase.js';
-
+  let categories = [];
+  let icons = {};
+  
   async function fetchCategories() {
     const { data, error } = await supabase
       .from('MacroCategorie')
@@ -128,11 +130,6 @@
     return data;
   }
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    const categories = await fetchCategories();
-    const menuItemsDiv = document.getElementById('menu-items');
-  });
-  
   // Coordinate: Sicilia occidentale
   const map = L.map('map', {
     zoomControl: true
@@ -140,7 +137,6 @@
 
   // Popola i filtri delle categorie
 async function buildCategoryMenu() {
-  const categories = await fetchCategories();
   const menuItemsDiv = document.getElementById('menu-items');
 
   categories.forEach(cat => {
@@ -166,6 +162,20 @@ async function buildCategoryMenu() {
 }
 
   document.addEventListener('DOMContentLoaded', async () => {
+    // 1. prendi categorie
+  categories = await fetchCategories();
+
+  // 2. crea icone
+  icons = {};
+  categories.forEach(cat => {
+    icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
+  });
+
+  // 3. menu UI
+  buildCategoryMenu();
+
+  // 4. map markers
+  renderEvents();
   await buildCategoryMenu();
 });
   
@@ -197,13 +207,17 @@ function createIcon(color) {
   });
 }
 
-// 🎭 CATEGORIE
+function renderEvents() {
+  events.forEach(e => {
+    L.marker([e.lat, e.lng], {
+      icon: icons[e.type]
+    })
+    .addTo(map)
+    .bindPopup(`<b>${e.name}</b>`);
+  });
+}  
 
-const icons = {};
-categories.forEach(cat => {
-  icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
-});
-  
+// 🎭 CATEGORIE
 // 📍 EVENTI SPAZIATI (mock realistico Sicilia occidentale)
 
 const events = [
