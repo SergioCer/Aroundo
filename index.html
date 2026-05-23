@@ -562,12 +562,32 @@ function filterEvents() {
     timeStart: startSlider.value,
     timeEnd: endSlider.value
   });
-}
+}  
 
 // init
 updateDateUI();
 updateTimeLabel();  
+const slider = document.getElementById('time-range');
+const label = document.getElementById('time-range-label');
 
+noUiSlider.create(slider, {
+  start: [0, 24],
+  connect: true,
+  step: 1,
+  range: {
+    min: 0,
+    max: 24
+  }
+});
+
+slider.noUiSlider.on('update', function(values) {
+  const start = Math.round(values[0]);
+  const end = Math.round(values[1]);
+
+  label.innerText = `${start.toString().padStart(2,'0')}:00 - ${end.toString().padStart(2,'0')}:00`;
+
+  filterEvents(start, end);
+});
   
 </script>
 </body>
