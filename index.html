@@ -125,16 +125,13 @@
       margin-right: 6px;
       border: 2px solid white;
       box-sizing: border-box;
-      background: transparent;
+      background: rgba(255,255,255,0.95);
       transition: all 0.2s;
     }
 
     /* Testo leggermente opaco se non selezionato */
     .category-checkbox:not(:checked) + .category-label {
     opacity: 0.7;
-    }
-    .category-checkbox:checked + .category-label::before {
-    background: rgba(255,255,255,0.9);
     }
     .category-checkbox:not(:checked) + .category-label::before {
     background: transparent;
