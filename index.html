@@ -133,50 +133,37 @@
     return data;
   }
 
-async function fetchEvents() {
-  const { data, error } = await supabase
-    .from('Eventi')
-    .select('*');
-  if (error) {
-    console.error("Errore caricamento eventi:", error);
+  async function fetchEvents() {
+    const { data, error } = await supabase
+      .from('Eventi')
+      .select('*');
+    if (error) {
+      console.error("Errore caricamento eventi:", error);
     return [];
+    }
+    return data;
   }
-  return data;
-}
-  
 
   // Coordinate: Sicilia occidentale
   const map = L.map('map', {
     zoomControl: true
   }).setView([38.0, 12.6], 12); /* sopra/sotto destra/sinistra il'12 indica lo zoom della mappa dalla posizione centrale (Trapani 38.0 12.5) */
 
-  // Popola i filtri delle categorie
-async function buildCategoryMenu() {
-  const menuItemsDiv = document.getElementById('menu-items');
-
-  categories.forEach(cat => {
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.id = cat.id_macro_categoria;         // ID univoco
-    cb.checked = cat.mc_attiva;  // boolean dal DB
-
-    const label = document.createElement('label');
-    label.htmlFor = cat.mc_slug;
-    label.style.marginRight = '10px';
-    label.textContent = cat.mc_descrizione; // testo leggibile
-
-    menuItemsDiv.appendChild(cb);
-    menuItemsDiv.appendChild(label);
-    menuItemsDiv.appendChild(document.createElement('br'));
-  });
-
   const toggleBtn = document.getElementById('menu-toggle');
-
   toggleBtn.addEventListener('click', () => {
     menuItemsDiv.style.display =
       menuItemsDiv.style.display === 'none' ? 'block' : 'none';
-});
-}
+  });
+  const marker = L.marker([e.ev_lat, e.ev_lng], {
+  icon: icons[e.ev_categoria]
+  })
+  .addTo(map)
+  .bindPopup(`<b>${e.ev_titolo}</b><br>${e.ev_descrizione || ''}`);
+  markers.push({
+  marker,
+  category: e.ev_categoria
+  });
+  }
 
   document.addEventListener('DOMContentLoaded', async () => {
   // 1. prendi categorie
