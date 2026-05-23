@@ -103,7 +103,7 @@
 
 <div class="map-overlay2" id="category-menu">
   <button id="menu-toggle">Filtra per categorie ▼</button>
-  <input type="checkbox" id="select-all-toggle" title="Seleziona/deseleziona tutte" style="margin-left:8px;">
+  <input type="checkbox" id="select-all-toggle" title="Seleziona/deseleziona tutte" style="margin-left:8px;";checked>
   <div id="menu-items" style="display:none; margin-top:6px;"></div>
 </div>
   
@@ -167,6 +167,8 @@
   buildCategoryMenu();
   // 5. markers della mappa
   renderEvents();
+  // 6. inizializza checkbox select-all
+  document.getElementById('select-all-toggle').checked = true;  
 });
   
   // 🌿 Base map più calda (meno grigia)
