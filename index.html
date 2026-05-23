@@ -162,6 +162,74 @@
     #select-all-toggle:checked {
       background: #555; /* invertito per visibilità */
     }
+
+.top-timebar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  padding: 10px 16px;
+  border-radius: 16px;
+
+  background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.date-box {
+  text-align: center;
+  min-width: 120px;
+}
+
+.date-day {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2f2f2f;
+}
+
+.date-full {
+  font-size: 12px;
+  color: #666;
+}
+
+.nav-btn {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  color: #333;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.nav-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* SLIDER ORARIO */
+.time-slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.time-label {
+  font-size: 11px;
+  color: #555;
+}
+
+/* doppio slider look semplice */
+.time-slider input[type=range] {
+  width: 120px;
+}
+    
   </style>
 </head>
 
@@ -182,6 +250,25 @@
 </div>
   
 <div id="map"></div>
+
+<div class="top-timebar">
+  <!-- SINISTRA FRECCIA -->
+  <button class="nav-btn" id="prev-day">‹</button>
+  <!-- CENTRO DATA -->
+  <div class="date-box">
+    <div class="date-day" id="day-text">23</div>
+    <div class="date-full" id="date-text">Maggio 2026</div>
+  </div>
+  <!-- DESTRA FRECCIA -->
+  <button class="nav-btn" id="next-day">›</button>
+  <!-- SLIDER ORARIO -->
+  <div class="time-slider">
+    <span class="time-label" id="time-range-label">00 - 24</span>
+    <input type="range" id="time-start" min="0" max="24" value="0">
+    <input type="range" id="time-end" min="0" max="24" value="24">
+  </div>
+</div>  
+  
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -388,6 +475,70 @@ function updateSelectAllToggle() {
 }
   menuItemsDiv.addEventListener('change', updateSelectAllToggle);
 }
+
+let currentDate = new Date(2026, 4, 23); // maggio = 4
+
+const dayText = document.getElementById("day-text");
+const dateText = document.getElementById("date-text");
+
+const monthNames = [
+  "Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
+  "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"
+];
+
+function updateDateUI() {
+  dayText.innerText = currentDate.getDate();
+  dateText.innerText =
+    monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
+
+  // QUI poi collegherai filtro eventi Supabase
+  console.log("Data cambiata:", currentDate);
+}
+
+document.getElementById("prev-day").addEventListener("click", () => {
+  currentDate.setDate(currentDate.getDate() - 1);
+  updateDateUI();
+  filterEvents();
+});
+
+document.getElementById("next-day").addEventListener("click", () => {
+  currentDate.setDate(currentDate.getDate() + 1);
+  updateDateUI();
+  filterEvents();
+});
+
+// TIME SLIDER
+const startSlider = document.getElementById("time-start");
+const endSlider = document.getElementById("time-end");
+const label = document.getElementById("time-range-label");
+
+function updateTimeLabel() {
+  let s = parseInt(startSlider.value);
+  let e = parseInt(endSlider.value);
+
+  if (s > e) [s, e] = [e, s];
+
+  label.innerText = `${s}:00 - ${e}:00`;
+
+  filterEvents();
+}
+
+startSlider.addEventListener("input", updateTimeLabel);
+endSlider.addEventListener("input", updateTimeLabel);
+
+function filterEvents() {
+  // QUI collegherai Supabase / markers Leaflet
+  console.log("Filtro attivo:", {
+    date: currentDate,
+    timeStart: startSlider.value,
+    timeEnd: endSlider.value
+  });
+}
+
+// init
+updateDateUI();
+updateTimeLabel();  
+
   
 </script>
 </body>
