@@ -2,7 +2,8 @@
 <html>
 <head>
   <title>Aroundo - Territory Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/> /* il link per la mappa */
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css"> /* il link per la barra dell'orario */
   <style>
     body {
       margin: 0;
@@ -229,6 +230,34 @@
 .time-slider input[type=range] {
   width: 120px;
 }
+
+#time-range {
+  width: 160px;
+  margin-top: 6px;
+}
+
+.noUi-target {
+  background: rgba(255,255,255,0.3);
+  border: none;
+  backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+}
+
+.noUi-connect {
+  background: rgba(30, 30, 30, 0.4);
+}
+
+.noUi-handle {
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #333;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.noUi-handle:before,
+.noUi-handle:after {
+  display: none;
+}    
     
   </style>
 </head>
@@ -262,15 +291,15 @@
   <!-- DESTRA FRECCIA -->
   <button class="nav-btn" id="next-day">›</button>
   <!-- SLIDER ORARIO -->
-  <div class="time-slider">
-    <span class="time-label" id="time-range-label">00 - 24</span>
-    <input type="range" id="time-start" min="0" max="24" value="0">
-    <input type="range" id="time-end" min="0" max="24" value="24">
-  </div>
+<div class="time-slider">
+  <div id="time-range"></div>
+  <div class="time-label" id="time-range-label">00:00 - 24:00</div>
+</div>
 </div>  
   
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 
 <script type="module">
   import { supabase } from './supabase.js';
