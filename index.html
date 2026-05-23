@@ -156,16 +156,14 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  appearance: none;
-  -webkit-appearance: none;
-  background: #888; /* grigio quando non selezionato */
   border: 2px solid #555;
+  background: #fff;
   cursor: pointer;
   vertical-align: middle;
 }
 #select-all-toggle:checked {
-  background: #fff; /* colore del check attivo */
-}    
+  background: #555; /* invertito per visibilità */
+}
   </style>
 </head>
 
@@ -323,12 +321,14 @@ function createIcon(color) {
   });
 }  
 
-  function filterMarkers() {
+function filterMarkers() {
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
   const activeCategories = [];
   checkboxes.forEach(cb => {
+    // Estrae solo il numero dall'id tipo "cat-5"
+    const catId = parseInt(cb.id.replace('cat-', ''));
     if (cb.checked) {
-      activeCategories.push(parseInt(cb.id));
+      activeCategories.push(catId);
     }
   });
   markers.forEach(obj => {
@@ -380,11 +380,11 @@ toggleBtn.addEventListener('click', () => {
     filterMarkers();
   });
   // aggiorna lo stato del checkbox minimalista in base ai singoli
-  function updateSelectAllToggle() {
-    const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
-    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-    selectAllToggle.checked = allChecked;
-  }
+function updateSelectAllToggle() {
+  const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+  const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+  selectAllToggle.checked = allChecked;
+}
   menuItemsDiv.addEventListener('change', updateSelectAllToggle);
 }
   
