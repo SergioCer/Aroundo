@@ -148,11 +148,6 @@
     zoomControl: true
   }).setView([38.0, 12.6], 12); /* sopra/sotto destra/sinistra il'12 indica lo zoom della mappa dalla posizione centrale (Trapani 38.0 12.5) */
 
-  const toggleBtn = document.getElementById('menu-toggle');
-  toggleBtn.addEventListener('click', () => {
-    menuItemsDiv.style.display =
-      menuItemsDiv.style.display === 'none' ? 'block' : 'none';
-  });
   document.addEventListener('DOMContentLoaded', async () => {
   // 1. prendi categorie
   categories = await fetchCategories();
@@ -252,12 +247,13 @@ function buildCategoryMenu() {
     menuItemsDiv.appendChild(document.createElement('br'));
   });
 
-  // toggle menu
-  document.getElementById('menu-toggle').addEventListener('click', () => {
+  // Toggle menu
+  const toggleBtn = document.getElementById('menu-toggle');
+  toggleBtn.addEventListener('click', () => {
     menuItemsDiv.style.display =
       menuItemsDiv.style.display === 'none' ? 'block' : 'none';
   });
-
+  
   // FILTRO LIVE
   menuItemsDiv.addEventListener('change', () => {
     filterMarkers();
