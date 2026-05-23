@@ -102,9 +102,8 @@
 </div>
 
 <div class="map-overlay2" id="category-menu">
-  <button id="menu-toggle">Filtra per categoria ▼</button>
-  <button id="select-all">Seleziona tutto</button>
-  <button id="select-none">Deseleziona tutto</button>
+  <button id="menu-toggle">Filtra per categorie ▼</button>
+  <input type="checkbox" id="select-all-toggle" title="Seleziona/deseleziona tutte" style="margin-left:8px;">
   <div id="menu-items" style="display:none; margin-top:6px;"></div>
 </div>
   
@@ -235,7 +234,8 @@ function createIcon(color) {
 
 function buildCategoryMenu() {
   const menuItemsDiv = document.getElementById('menu-items');
-
+  
+  // checkbox per ogni categoria
   categories.forEach(cat => {
     const cb = document.createElement('input');
     cb.type = 'checkbox';
@@ -256,25 +256,27 @@ function buildCategoryMenu() {
       menuItemsDiv.style.display === 'none' ? 'block' : 'none';
   });
 
-  // 🔥 FILTRO LIVE
-  menuItemsDiv.addEventListener('change', filterMarkers);
+  // FILTRO LIVE
+  menuItemsDiv.addEventListener('change', () => {
+    filterMarkers();
+    updateSelectAllToggle();
+  });
 
-  // 🔥 SELECT ALL
-  document.getElementById('select-all').addEventListener('click', () => {
-    menuItemsDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.checked = true;
-    });
+  // checkbox minimalista Seleziona/Togli tutto
+  const selectAllToggle = document.getElementById('select-all-toggle');
+  selectAllToggle.addEventListener('change', () => {
+    const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
     filterMarkers();
   });
 
-  // 🔥 SELECT NONE
-  document.getElementById('select-none').addEventListener('click', () => {
-    menuItemsDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.checked = false;
-    });
-    filterMarkers();
-  });
-}  
+  // aggiorna lo stato del checkbox minimalista
+  function updateSelectAllToggle() {
+    const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    selectAllToggle.checked = allChecked;
+  }
+}
   
 </script>
 </body>
