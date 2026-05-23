@@ -339,6 +339,67 @@
   font-weight: bold;
   color: #3b82f6;
 }
+
+/* entro 2 ore */
+.pulse.soon {
+  animation: hopSlow 2s infinite;
+}
+
+/* entro 1 ora */
+.pulse.very-soon {
+  animation: hopMedium 1.2s infinite;
+}
+
+/* entro 30 min */
+.pulse.imminent {
+  animation: hopFast 0.6s infinite;
+}
+
+/* entro 15 min */
+.pulse.critical {
+  animation: hopCrazy 0.35s infinite;
+}
+
+/* evento iniziato */
+.pulse.live::after {
+  animation: pulseLive 0.8s infinite;
+}
+
+/* SALTI */
+@keyframes hopSlow {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes hopMedium {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes hopFast {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes hopCrazy {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+
+/* LIVE */
+@keyframes pulseLive {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
     
   </style>
 </head>
@@ -491,11 +552,20 @@ function renderEvents() {
   // pulizia markers precedenti
   markers.forEach(m => map.removeLayer(m.marker));
   markers = [];
-
+  
+  const stateClass = getEventState(
+  new Date(e.ev_inizio)
+);
+  
   events.forEach(e => {
 
     const marker = L.marker([e.ev_lat, e.ev_lng], {
-      icon: icons[e.ev_categoria]
+      icon: createIcon(
+  categories.find(c =>
+    c.id_macro_categoria === e.ev_categoria
+  )?.mc_colore || '#999',
+  stateClass
+)
     })
 .bindPopup(`
   <div style="min-width:180px">
@@ -541,15 +611,18 @@ function renderEvents() {
   filterEvents();
 }  
 
-  function createIcon(color) {
+function createIcon(color, extraClass = '') {
   return L.divIcon({
     className: '',
     html: `
-      <div class="pulse" style="--c:${color}"></div>
-      `,
+      <div
+        class="pulse ${extraClass}"
+        style="--c:${color}">
+      </div>
+    `,
     iconSize: [20, 20]
   });
-}  
+}
 
 function filterMarkers() {
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
@@ -735,6 +808,28 @@ function formatTime(dateString) {
     minute: '2-digit'
   });
 }  
+
+function getEventState(startDate) {
+  const now = new Date();
+  const diffMinutes =
+    (startDate - now) / 1000 / 60;
+  if (diffMinutes <= 0) {
+    return 'live';
+  }
+  if (diffMinutes <= 15) {
+    return 'critical';
+  }
+  if (diffMinutes <= 30) {
+    return 'imminent';
+  }
+  if (diffMinutes <= 60) {
+    return 'very-soon';
+  }
+  if (diffMinutes <= 120) {
+    return 'soon';
+  }
+  return '';
+}
   
 </script>
 </body>
