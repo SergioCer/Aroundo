@@ -536,7 +536,7 @@ document.getElementById("next-day").addEventListener("click", () => {
   filterEvents();
 });
 
-function filterEvents() {
+function filterEvents(startHour = 0, endHour = 24) {
   // QUI collegherai Supabase / markers Leaflet
   console.log("Filtro attivo:", {
     date: currentDate,
