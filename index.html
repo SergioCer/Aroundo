@@ -49,6 +49,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 6px;
       margin-bottom: 8px;
     }
 
@@ -146,6 +147,27 @@
       cursor: pointer;
       font-size: 12px;
     }
+    #menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(59,130,246,0.25);
+      transition: all 0.15s ease;
+    }  
+
+  #menu-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.35);
+    }
+    
     /* Checkbox rotondo per 'seleziona tutto' */
     #select-all-toggle {
       appearance: none;
