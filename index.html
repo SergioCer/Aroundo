@@ -154,17 +154,6 @@
     menuItemsDiv.style.display =
       menuItemsDiv.style.display === 'none' ? 'block' : 'none';
   });
-  const marker = L.marker([e.ev_lat, e.ev_lng], {
-  icon: icons[e.ev_categoria]
-  })
-  .addTo(map)
-  .bindPopup(`<b>${e.ev_titolo}</b><br>${e.ev_descrizione || ''}`);
-  markers.push({
-  marker,
-  category: e.ev_categoria
-  });
-  }
-
   document.addEventListener('DOMContentLoaded', async () => {
   // 1. prendi categorie
   categories = await fetchCategories();
@@ -195,7 +184,7 @@
 
 function renderEvents() {
   events.forEach(e => {
-    L.marker([e.ev_lat, e.ev_lng], {
+    const marker = L.marker([e.ev_lat, e.ev_lng], {
       icon: icons[e.ev_categoria]
     })
     .addTo(map)
