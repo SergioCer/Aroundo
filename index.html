@@ -77,10 +77,10 @@
       opacity: 0.6;
       animation: pulse 1.8s infinite;
     }
-    /* Checkbox rotondi colorati */
-.category-checkbox {
+    /* Checkbox rotondi colorati ------- da cancellare ?  */ 
+/* .category-checkbox {
   display: none; /* Nascondiamo il checkbox reale */
-}
+ } */
 
 /* Checkbox reale nascosta ma ancora cliccabile tramite label */
 .category-checkbox {
@@ -339,7 +339,6 @@ function buildCategoryMenu() {
     label.style.borderColor = cat.mc_colore;
     menuItemsDiv.appendChild(cb);
     menuItemsDiv.appendChild(label);
-    // menuItemsDiv.appendChild(document.createElement('br')); // da cancellare
   });
   // toggle menu
 const toggleBtn = document.getElementById('menu-toggle');
