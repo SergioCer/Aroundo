@@ -553,11 +553,11 @@ function renderEvents() {
   markers.forEach(m => map.removeLayer(m.marker));
   markers = [];
   
-  const stateClass = getEventState(
-  new Date(e.ev_inizio)
-);
-  
   events.forEach(e => {
+
+    const stateClass = getEventState(
+    new Date(e.ev_inizio)
+    );
 
     const marker = L.marker([e.ev_lat, e.ev_lng], {
       icon: createIcon(
