@@ -801,7 +801,8 @@ function updateDateUI() {
 document.getElementById("prev-day").addEventListener("click", () => {
   currentDate.setDate(currentDate.getDate() - 1);
   updateDateUI();
-
+  renderEvents();
+  
   const values = slider.noUiSlider.get();
   filterEvents(
     Math.round(values[0]),
@@ -812,12 +813,20 @@ document.getElementById("prev-day").addEventListener("click", () => {
 document.getElementById("next-day").addEventListener("click", () => {
   currentDate.setDate(currentDate.getDate() + 1);
   updateDateUI();
-
+  renderEvents();
+  
   const values = slider.noUiSlider.get();
   filterEvents(
     Math.round(values[0]),
     Math.round(values[1])
   );
+});
+
+document.getElementById("reset-day").addEventListener("click", () => {
+  currentDate = new Date(); // oggi
+  updateDateUI();
+  filterEvents();
+  renderEvents();
 });
 
 function filterEvents(startHour = 0, endHour = 24) {
@@ -882,12 +891,6 @@ slider.noUiSlider.on('update', function(values) {
   filterEvents(start, end);
 });
   
-document.getElementById("reset-day").addEventListener("click", () => {
-  currentDate = new Date(); // oggi
-  updateDateUI();
-  filterEvents();
-});
-
 function formatTime(dateString) {
   const d = new Date(dateString);
 
