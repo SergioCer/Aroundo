@@ -513,34 +513,33 @@ label {
       .select('*')
       .eq('mc_attiva', true)
       .order('mc_descrizione', { ascending: true });
-    if (error) {
+      if (error) {
       console.error("Errore caricamento categorie:", error);
       return [];
-    }
-    console.log(data);
-    return data;
-  }
-
-let showPastEvents = false;  
+      }
+      console.log(data);
+      return data;
+      }
+  
+  let showPastEvents = false;  
   async function fetchEvents() {
-    const now = new Date().toISOString();
+  const now = new Date().toISOString();
     
-//    const { data, error } = await supabase
+  //    const { data, error } = await supabase
     let query = supabase      
       .from('eventi')
       .select('*')
       .eq('ev_attivo', true);
-      
     if (!showPastEvents) {
       query = query.gte('ev_inizio', now);
       }
-const { data, error } = await query;  //     
+    const { data, error } = await query;  //     
     if (error) {
       console.error("Errore caricamento eventi:", error);
     return [];
     }
     return data;
-  }
+    }
 
   // Coordinate di default (Sicilia occidentale)
   const defaultLat = 38.0;
@@ -549,7 +548,7 @@ const { data, error } = await query;  //
 
   const map = L.map('map', {
     zoomControl: true,
-    minZoom: 8, // evita zoom troppo lontano, 0 = mappa mondiale, 10 = area di circa una regione.
+    minZoom: 7, // evita zoom troppo lontano, 0 = mappa mondiale, 10 = area di circa una regione.
     maxZoom: 18 // evita zoom troppo vicino, il massimo zoom è 18 - 19
     }).setView([defaultLat, defaultLng], defaultZoom);
 
