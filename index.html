@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html>
 <head>
   <title>Aroundo - Territory Map</title>
@@ -152,12 +152,10 @@
 
       /* Testo leggermente opaco se non selezionato */
     .category-checkbox:not(:checked) + .category-label::before {
-      background: currentColor;
-      }
+      background: currentColor; }
     .category-checkbox:not(:checked) + .category-label {
       background: transparent;
-      opacity: 0.7;
-     }
+      opacity: 0.7; }
     
     #menu-toggle, #select-all-toggle {
       display: inline-block;
@@ -646,13 +644,14 @@ function createIcon(color, extraClass = '', intensity = 1) {
 function filterMarkers() {
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
   const activeCategories = [];
+  
   checkboxes.forEach(cb => {
-    // Estrae solo il numero dall'id tipo "cat-5"
     const catId = parseInt(cb.id.replace('cat-', ''));
     if (cb.checked) {
       activeCategories.push(catId);
     }
   });
+  
   markers.forEach(obj => {
     if (activeCategories.includes(obj.category)) {
       obj.marker.addTo(map);
@@ -681,34 +680,34 @@ function buildCategoryMenu() {
     label.style.setProperty('--cat-color', cat.mc_colore);
     menuItemsDiv.appendChild(cb);
     menuItemsDiv.appendChild(label);
-  });
-  // toggle menu
-const toggleBtn = document.getElementById('menu-toggle');
-toggleBtn.addEventListener('click', () => {
-  if (menuItemsDiv.style.display === 'none' || menuItemsDiv.style.display === '') {
+    });
+    // toggle menu
+    const toggleBtn = document.getElementById('menu-toggle');
+    toggleBtn.addEventListener('click', () => {
+    if (menuItemsDiv.style.display === 'none' || menuItemsDiv.style.display === '') {
     menuItemsDiv.style.display = 'block';
-  } else {
+    } else {
     menuItemsDiv.style.display = 'none';
-  }
-});
-  // FILTRO LIVE
-  menuItemsDiv.addEventListener('change', filterMarkers);
-  // checkbox minimalista Seleziona/Togli tutto
-  const selectAllToggle = document.getElementById('select-all-toggle');
-  selectAllToggle.checked = true; // all'inizio selezionato
-  selectAllToggle.addEventListener('change', () => {
+    }
+    });
+    // FILTRO LIVE
+    menuItemsDiv.addEventListener('change', filterMarkers);
+    // checkbox minimalista Seleziona/Togli tutto
+    const selectAllToggle = document.getElementById('select-all-toggle');
+    selectAllToggle.checked = true; // all'inizio selezionato
+    selectAllToggle.addEventListener('change', () => {
     const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
     filterMarkers();
-  });
-  // aggiorna lo stato del checkbox minimalista in base ai singoli
-function updateSelectAllToggle() {
-  const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
-  const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-  selectAllToggle.checked = allChecked;
-}
-  menuItemsDiv.addEventListener('change', updateSelectAllToggle);
-}
+    });
+    // aggiorna lo stato del checkbox minimalista in base ai singoli
+    function updateSelectAllToggle() {
+    const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    selectAllToggle.checked = allChecked;
+    }
+    menuItemsDiv.addEventListener('change', updateSelectAllToggle);
+    }
 
 let currentDate = new Date(); // Data odierna
 
@@ -741,7 +740,6 @@ document.getElementById("next-day").addEventListener("click", () => {
   currentDate.setDate(currentDate.getDate() + 1);
   updateDateUI();
   renderEvents();
-  
   const values = slider.noUiSlider.get();
   filterEvents(
     Math.round(values[0]),
@@ -757,70 +755,55 @@ document.getElementById("reset-day").addEventListener("click", () => {
 });
 
 function filterEvents(startHour = 0, endHour = 24) {
-
   const selectedDate = new Date(currentDate);
   selectedDate.setHours(0,0,0,0);
-
   markers.forEach(obj => {
-
     // evento attivo?
-    if (!obj.active) {
-      map.removeLayer(obj.marker);
-      return;
-    }
-
+    if (!obj.active) { map.removeLayer(obj.marker); return; }
     const evDate = new Date(obj.start);
     evDate.setHours(0,0,0,0);
-
     // stessa data?
     const sameDay =
       evDate.getTime() === selectedDate.getTime();
-
     // ora evento
     const eventHour = obj.start.getHours();
-
     // compatibilità oraria
     const inTimeRange =
       eventHour >= startHour &&
       eventHour <= endHour;
-
     if (sameDay && inTimeRange) {
       obj.marker.addTo(map);
     } else {
       map.removeLayer(obj.marker);
     }
-  });
-}
+    });
+  }
 
-// init
-updateDateUI();
-const slider = document.getElementById('time-range');
-const label = document.getElementById('time-range-label');
+  // init
+  updateDateUI();
+  const slider = document.getElementById('time-range');
+  const label = document.getElementById('time-range-label');
 
-noUiSlider.create(slider, {
-  start: [0, 24],
-  connect: true,
-  step: 1,
-  range: {
+  noUiSlider.create(slider, {
+    start: [0, 24],
+    connect: true,
+    step: 1,
+    range: {
     min: 0,
     max: 24
-  }
-});
+    }
+  });
 
-slider.noUiSlider.on('update', function(values) {
-
+  slider.noUiSlider.on('update', function(values) {
   const start = Math.round(values[0]);
   const end = Math.round(values[1]);
-
   label.innerText =
-    `${start.toString().padStart(2,'0')} - ${end.toString().padStart(2,'0')}`;
-
+  `${start.toString().padStart(2,'0')} - ${end.toString().padStart(2,'0')}`;
   filterEvents(start, end);
 });
   
-function formatTime(dateString) {
+  function formatTime(dateString) {
   const d = new Date(dateString);
-
   return d.toLocaleTimeString('it-IT', {
     hour: '2-digit',
     minute: '2-digit'
@@ -830,27 +813,15 @@ function formatTime(dateString) {
 function getEventState(startDate, endDate) {
   const now = new Date();
   // evento concluso → niente animazione
-  if (endDate && now > endDate) {
-    return { state: 'finished' };
-  }
+  if (endDate && now > endDate) { return { state: 'finished' }; }
   const diffMinutes = (startDate - now) / 1000 / 60;
   // LIVE
-  if (diffMinutes <= 0) {
-    return { state: 'live', intensity: 3 };
-  }
+  if (diffMinutes <= 0) { return { state: 'live', intensity: 3 }; }
   // molto vicino
-  if (diffMinutes <= 180) {
-    return { state: 'critical', intensity: 3 };
-  }
-  if (diffMinutes <= 360) {
-    return { state: 'imminent', intensity: 2.5 };
-  }
-  if (diffMinutes <= 720) {
-    return { state: 'very-soon', intensity: 2 };
-  }
-  if (diffMinutes <= 1440) {
-    return { state: 'soon', intensity: 1.5 };
-  }
+  if (diffMinutes <= 180) { return { state: 'critical', intensity: 3 }; }
+  if (diffMinutes <= 360) { return { state: 'imminent', intensity: 2.5 }; }
+  if (diffMinutes <= 720) { return { state: 'very-soon', intensity: 2 }; }
+  if (diffMinutes <= 1440) { return { state: 'soon', intensity: 1.5 }; }
   return { state: '', intensity: 1 };
 }
 
