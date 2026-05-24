@@ -751,13 +751,13 @@ function buildCategoryMenu() {
     menuItemsDiv.addEventListener('change', filterMarkers);
     // checkbox minimalista Seleziona/Togli tutto
     const selectAllToggle = document.getElementById('select-all-toggle');
-    selectAllToggle.checked = true; // all'inizio selezionato
+    selectAllToggle.checked = true;
     selectAllToggle.addEventListener('change', () => {
     const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
     filterMarkers();
     });
-    // aggiorna lo stato del checkbox minimalista in base ai singoli
+    // aggiorna lo stato del checkbox
     function updateSelectAllToggle() {
     const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
