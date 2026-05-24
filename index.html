@@ -400,6 +400,38 @@
     opacity: 0;
   }
 }
+
+#togglePast {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.15);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* stato ON */
+#togglePast:checked {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-color: white;
+}
+
+/* pallino interno */
+#togglePast:checked::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
     
   </style>
 </head>
@@ -427,8 +459,8 @@
   <button class="nav-btn" id="prev-day">‹</button>
   <!-- CENTRO DATA -->
   <div class="date-box">
-    <div class="date-day" id="day-text">24</div>
-    <div class="date-full" id="date-text">Maggio 2026</div>
+    <div class="date-day" id="day-text"></div>
+    <div class="date-full" id="date-text"></div>
     <button class="nav-btn reset-btn" id="reset-day">•</button>
     <div>
     <label>
@@ -718,7 +750,7 @@ function updateSelectAllToggle() {
   menuItemsDiv.addEventListener('change', updateSelectAllToggle);
 }
 
-let currentDate = new Date(2026, 4, 24); // maggio = 4
+let currentDate = new Date(); // Data odierna
 
 const dayText = document.getElementById("day-text");
 const dateText = document.getElementById("date-text");
