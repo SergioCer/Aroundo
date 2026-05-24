@@ -620,29 +620,30 @@ if (navigator.geolocation) {
  // 🎨 ICON SET PER CATEGORIE
 
 function renderEvents() {
-
   // pulizia markers precedenti
   markers.forEach(m => map.removeLayer(m.marker));
   markers = [];
-  
   events.forEach(e => {
+    
+const stateData = getEventState(
+  new Date(e.ev_inizio),
+  new Date(e.ev_fine)
+);
+const stateClass = stateData.state;
+const intensity = stateData.intensity;
+const marker = L.marker([e.ev_lat, e.ev_lng], {
 
-  const stateClass = getEventState(
-    new Date(e.ev_inizio),
-    new Date(e.ev_fine)
-  );
-
-    const marker = L.marker([e.ev_lat, e.ev_lng], {
-      icon: createIcon(
+  icon: createIcon(
   categories.find(c =>
     c.id_macro_categoria === e.ev_categoria
   )?.mc_colore || '#999',
-  stateClass
+  stateClass,
+  intensity
 )
     })
+
 .bindPopup(`
   <div style="min-width:180px">
-
     <div style="
       font-weight:700;
       font-size:14px;
@@ -882,30 +883,31 @@ function formatTime(dateString) {
   });
 }  
 
-function getEventState(startDate) {
+function getEventState(startDate, endDate) {
   const now = new Date();
-  // evento già concluso
+  // evento concluso → niente animazione
   if (endDate && now > endDate) {
-  return ''; // niente animazione
+    return { state: '', intensity: 0 };
   }
-  const diffMinutes =
-    (startDate - now) / 1000 / 60;
+  const diffMinutes = (startDate - now) / 1000 / 60;
+  // LIVE
   if (diffMinutes <= 0) {
-    return 'live';
+    return { state: 'live', intensity: 3 };
   }
-  if (diffMinutes <= 15) {
-    return 'critical';
-  }
+  // molto vicino
   if (diffMinutes <= 30) {
-    return 'imminent';
+    return { state: 'critical', intensity: 3 };
   }
   if (diffMinutes <= 60) {
-    return 'very-soon';
+    return { state: 'imminent', intensity: 2.5 };
   }
   if (diffMinutes <= 120) {
-    return 'soon';
+    return { state: 'very-soon', intensity: 2 };
   }
-  return '';
+  if (diffMinutes <= 240) {
+    return { state: 'soon', intensity: 1.5 };
+  }
+  return { state: '', intensity: 1 };
 }
 
 </script>
