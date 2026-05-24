@@ -537,40 +537,37 @@ label {
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
 
-      document.addEventListener('DOMContentLoaded', async () => {
-      // 1. prendi categorie
-      categories = await fetchCategories();
-      // 2. icone categorie
-      icons = {};
-      categories.forEach(cat => {
-        icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
-      });
-      // 3. eventi (DA DB)
-      events = await fetchEvents();
-      // 4. menu UI
-      buildCategoryMenu();
-      // 5. markers della mappa
-      // c'era render evnts
-      // 6. inizializza checkbox select-all
-      document.getElementById('select-all-toggle').checked = true;
-      updateDateUI(); // aggiunto 
-      renderEvents();
-      });
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. prendi categorie
+  categories = await fetchCategories();
+  // 2. icone categorie
+  icons = {};
+  categories.forEach(cat => {
+  icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
+  });
+  // 3. eventi (DA DB)
+  events = await fetchEvents();
+  // 4. menu UI
+  buildCategoryMenu();
+  // 5. markers della mappa
+  // c'era render evnts
+  // 6. inizializza checkbox select-all
+  document.getElementById('select-all-toggle').checked = true;
+  updateDateUI(); // aggiunto 
+  renderEvents();
+});
       
-      // attiva eventi passati 
-      document
-      .getElementById('togglePast')
-      .addEventListener('change', async (e) => {
-      // stato checkbox
-      showPastEvents = e.target.checked;
-      // ricarica eventi dal DB
-      events = await fetchEvents();
-      // ridisegna marker
-      renderEvents();
-      });
+  // attiva eventi passati 
+document.getElementById('togglePast')
+  .addEventListener('change', async (e) => {
+  // stato checkbox
+  showPastEvents = e.target.checked;
+  // ricarica eventi dal DB
+  events = await fetchEvents();
+  // ridisegna marker
+  renderEvents();
+});
   
-// 🎨 ICON SET PER CATEGORIE
-
 document.getElementById("prev-day").addEventListener("click", () => {
   currentDate.setDate(currentDate.getDate() - 1);
   updateDateUI();
@@ -588,8 +585,8 @@ document.getElementById("next-day").addEventListener("click", () => {
   renderEvents();
   const values = slider.noUiSlider.get();
   filterEvents(
-    Math.round(values[0]),
-    Math.round(values[1])
+  Math.round(values[0]),
+  Math.round(values[1])
   );
 });
 
@@ -599,9 +596,6 @@ document.getElementById("reset-day").addEventListener("click", () => {
   filterEvents();
   renderEvents();
 });
-
-  // init
-  // updateDateUI(); disabilitato per provare cosa accade
 
   noUiSlider.create(slider, {
     start: [0, 24],
