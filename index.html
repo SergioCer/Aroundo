@@ -321,14 +321,19 @@
 
 /* mancherebbe un .pulse.null sopra le 12h */
 .pulse.finished { animation: finished; }    
-/* entro 12h */
-.pulse.soon { animation: hopSlow 3s infinite; }
-/* entro 6h */
-.pulse.very-soon { animation: hopMedium 1.5s infinite; }
-/* entro 3h */
-.pulse.imminent { animation: hopFast 0.8s infinite; }
-/* entro 1h 30' */
-.pulse.starting-soon { animation: hopCrazy 0.4s infinite; }
+.pulse {
+  animation: none;
+}
+.pulse.active {
+  animation: hopMedium 1.5s infinite;
+}
+.pulse.critical {
+  animation: hopFast 0.6s infinite;
+}
+    .pulse.live::after {
+  animation: pulseLive 0.4s infinite;
+}
+    
 /* evento started 30' */
 .pulse.started::after { animation: pulseLive 0.3s infinite; }
 .pulse.finished::after { display: none; animation: none !important; opacity: 0 !important; }
@@ -460,7 +465,15 @@ label {
   let markers = [];
   let showPastEvents = false; 
   let currentDate = new Date(); // Data odierna
-
+  let className = 'pulse';
+if (diffMinutes <= 0) {
+  className += ' live';
+} else if (diffMinutes <= 120) {
+  className += ' critical';
+} else if (diffMinutes <= 360) {
+  className += ' active';
+}
+  
   // costanti
   // Coordinate di default (Sicilia occidentale)
   const defaultLat = 37.55; /* 37.55 */
