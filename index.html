@@ -622,7 +622,53 @@ document.getElementById("reset-day").addEventListener("click", () => {
   updateMarkerVisibility(start, end);
 });
 
-  // Calcola stato temporale, crea Marker Leaflet, crea popup HTML, salva metadati in markers, richiama (updateMarkerVisibility)
+function renderEvents() {
+  // pulizia markers precedenti
+  markers.forEach(m => map.removeLayer(m.marker));
+  markers = [];
+  events.forEach(e => {
+    // 🔵 STATO EVENTO (tempo reale)
+    const stateData = getEventState(
+      new Date(e.ev_inizio),
+      e.ev_fine ? new Date(e.ev_fine) : null
+    );
+    const stateClass = stateData.state;
+    const intensity = stateData.intensity;
+    // 🎨 ICONA
+    const marker = L.marker([e.ev_lat, e.ev_lng], {
+      icon: createIcon(
+        categories.find(c =>
+          c.id_macro_categoria === e.ev_categoria
+        )?.mc_colore || '#999',
+        stateClass,
+        intensity
+      )
+    }).bindPopup(`
+      <div style="min-width:180px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">
+          ${e.ev_titolo}
+        </div>
+        <div style="font-size:12px;color:#3b82f6;margin-bottom:6px;font-weight:600;">
+          ${formatTime(e.ev_inizio)}
+          ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+        </div>
+        <div style="font-size:12px;color:#555;line-height:1.35;">
+          ${e.ev_descrizione || ''}
+        </div>
+      </div>
+    `);
+    // 📦 STORAGE DATI (NO LOGICA)
+    markers.push({
+      marker,
+      category: parseInt(e.ev_categoria),
+      start: new Date(e.ev_inizio),
+      end: e.ev_fine ? new Date(e.ev_fine) : null,
+      active: e.ev_attivo
+    });
+  });
+}
+  
+  /* DISABILITATA TEMPORANEAMENTE Calcola stato temporale, crea Marker Leaflet, crea popup HTML, salva metadati in markers, richiama (updateMarkerVisibility)
 function renderEvents() {
   // pulizia markers precedenti
   markers.forEach(m => map.removeLayer(m.marker));
@@ -681,7 +727,7 @@ function renderEvents() {
   });
   });
   updateMarkerVisibility();
-}  
+} */
 
   // Crea icone L.divIcon() con colore, classe CSS, dimensione variabile, intensità animazione
 function createIcon(color, extraClass = '', intensity = 1) {
