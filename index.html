@@ -731,7 +731,26 @@ function renderEvents() {
   updateMarkerVisibility();
 } */
 
-  // Crea icone L.divIcon() con colore, classe CSS, dimensione variabile, intensità animazione
+function createIcon(color, state, intensity) {
+  const isFinished = state === 'finished';
+  const isDormant =
+    state === 'future-deep' || intensity === 0;
+  const isCritical = state === 'imminent';
+  const size = isFinished
+    ? 10
+    : Math.max(8, Math.min(32, 10 * intensity));
+  return L.divIcon({
+    className: '',
+    html: `
+      <div class="pulse ${state}"
+        style="--c:${color};width:${size}px;height:${size}px;">
+      </div>
+    `,
+    iconSize: [size, size]
+  });
+}
+  
+  /* DISABILITATA TEMPORANEAMENTE Crea icone L.divIcon() con colore, classe CSS, dimensione variabile, intensità animazione
 function createIcon(color, extraClass = '', intensity = 1) {
   const isFinished = extraClass === 'finished';
   // se vero, dimensione 10 altrimenti prosegue
@@ -747,7 +766,7 @@ function createIcon(color, extraClass = '', intensity = 1) {
    `,
    iconSize: [size, size]
    });
-}
+} */
 
 /* NUOVA Mostra o nasconde i Marker delle categorie  */
 function updateMarkerVisibility(startHour = 0, endHour = 24) {
@@ -905,28 +924,51 @@ function formatTime(dateString) {
 
 function getEventState(startDate, endDate) {
   const now = new Date();
-  // evento concluso
+  // evento finito
   if (endDate && now > endDate) {
     return { state: 'finished', intensity: 0 };
   }
   const diffMinutes = (startDate - now) / 1000 / 60;
-  // evento in corso o già iniziato
+  // evento in corso
   if (diffMinutes <= 0) {
-    return { state: 'started', intensity: 3 };
+    return {
+      state: 'started',
+      intensity: 3
+    };
   }
-  if (diffMinutes <= 90) {
-    return { state: 'starting-soon', intensity: 2.5 };
+  // 🧊 dormiente
+  if (diffMinutes > 1440) {
+    return {
+      state: 'future-deep',
+      intensity: 0
+    };
   }
-  if (diffMinutes <= 180) {
-    return { state: 'imminent', intensity: 2 };
+  // 🌫 debole
+  if (diffMinutes > 720) {
+    return {
+      state: 'future-far',
+      intensity: 0.7
+    };
   }
-  if (diffMinutes <= 360) {
-    return { state: 'very-soon', intensity: 1.5 };
+  // 🌊 attivo
+  if (diffMinutes > 360) {
+    return {
+      state: 'future-medium',
+      intensity: 1.2
+    };
   }
-  if (diffMinutes <= 720) {
-    return { state: 'soon', intensity: 1 };
+  // ⚡ vicino
+  if (diffMinutes > 120) {
+    return {
+      state: 'future-near',
+      intensity: 2
+    };
   }
-  return { state: 'future', intensity: 0.5 };
+  // 🔴 critico
+  return {
+    state: 'imminent',
+    intensity: 2.8
+  };
 }
   
 /* DISABILITATA MOMENTANEAMENTE Calcola stato evento, intensità animazione
