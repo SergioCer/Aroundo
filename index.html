@@ -903,7 +903,30 @@ function formatTime(dateString) {
   });
 }  
 
-/* Calcola stato evento, intensità animazione */   
+function getEventState(startDate, endDate) {
+  const now = new Date();
+  // evento concluso
+  if (endDate && now > endDate) {
+    return { state: 'finished', intensity: 0 };
+  }
+  const diffMinutes = (startDate - now) / 1000 / 60;
+  // evento già iniziato
+  if (diffMinutes <= 0) {
+    return { state: 'started', intensity: 3 };
+  }
+  // 🔵 NORMALIZZAZIONE CONTINUA
+  const maxRange = 720; // 12 ore
+  const proximity = Math.max(0, Math.min(1, 1 - diffMinutes / maxRange));
+  const intensity = 1 + proximity * 3;
+  // 🟣 classificazione solo per CSS
+  let state = 'future';
+  if (diffMinutes <= 120) state = 'imminent';
+  else if (diffMinutes <= 360) state = 'soon';
+  else if (diffMinutes <= 720) state = 'later';
+  return { state, intensity };
+}
+  
+/* DISABILITATA MOMENTANEAMENTE Calcola stato evento, intensità animazione
 function getEventState(startDate, endDate) {
   const now = new Date();
   if (endDate && now > endDate) { return { state: 'finished', intensity: 0 }; }
@@ -914,7 +937,7 @@ function getEventState(startDate, endDate) {
   if (diffMinutes <= 360) { return { state: 'very-soon', intensity: 1.5 }; }
   if (diffMinutes <= 720) { return { state: 'soon', intensity: 1 }; }
   return { state: 'future', intensity: 0.5 };
-}
+} */
 
 </script>
 </body>
