@@ -820,7 +820,7 @@ function getEventState(startDate, endDate) {
   if (diffMinutes <= 180) { return { state: 'imminent', intensity: 2 }; }
   if (diffMinutes <= 360) { return { state: 'very-soon', intensity: 1.5 }; }
   if (diffMinutes <= 720) { return { state: 'soon', intensity: 1 }; }
-  return { state: 'future', intensity: 0.5 };
+  return { state: '', intensity: 0.5 };
 }
 
 </script>
