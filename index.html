@@ -813,7 +813,7 @@ function formatTime(dateString) {
 /* Calcola stato evento, intensità animazione */   
 function getEventState(startDate, endDate) {
   const now = new Date();
-  if (endDate && now > endDate) { return { state: 'finished' }, intensity: 0; }
+  if (endDate && now > endDate) { return { state: 'finished', intensity: 0; }
   const diffMinutes = (startDate - now) / 1000 / 60;
   if (diffMinutes <= 0) { return { state: 'started', intensity: 3 }; }
   if (diffMinutes <= 90) { return { state: 'starting-soon', intensity: 2.5 }; }
