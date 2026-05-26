@@ -696,7 +696,17 @@ function updateMarkerVisibility(startHour = 0, endHour = 24) {
     const categoryVisible =
       activeCategories.includes(obj.category);
     // range date (UI)
-    const startDate = new Date(obj.start);
+    const eventStart = new Date(obj.start);
+    const inTimelineRange =
+      eventStart >= timelineStart &&
+      eventStart <= timelineEnd;
+    if (categoryVisible && inTimelineRange) {
+      obj.marker.addTo(map);
+    } else {
+      map.removeLayer(obj.marker);
+    }
+});    
+   /* DISABILITATA const startDate = new Date(obj.start);
     startDate.setHours(0,0,0,0);
     const endDate = obj.end
       ? new Date(obj.end)
@@ -717,7 +727,7 @@ function updateMarkerVisibility(startHour = 0, endHour = 24) {
       map.removeLayer(obj.marker);
     }
   });
-}
+} */
   
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
 function buildCategoryMenu() {
