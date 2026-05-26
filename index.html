@@ -314,23 +314,63 @@
     .nav-btn:hover {
       background: rgba(0,0,0,0.05);
     }
+  /* Timeline Slider */
+  .time-slider {
+    position: relative;
+    width: 320px;
+    padding-top: 12px;
+  }
 
-    /* SLIDER ORARIO */
-    .time-slider {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-    
-    .time-label {
+  /* TIMELINE VISIVA */
+  #timeline {
+    position: relative;
+    width: 100%;
+    height: 16px;
+    margin-bottom: 10px;
+  }
+
+  /* linea base */
+  #track {
+    position: absolute;
+    top: 7px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 999px;
+  }
+
+  /* indicatore mezzanotte */
+  #midnight {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 16px;
+    background: #ffffff;
+    opacity: 0.9;
+    border-radius: 999px;
+  }
+
+  /* indicatore NOW */
+  #now {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 6px;
+    height: 20px;
+    border-radius: 999px;
+    background: #3b82f6;
+    box-shadow: 0 0 12px rgba(59,130,246,0.5);
+  }
+
+  /* SLIDER */
+  #time-range {
+    width: 100%;
+    margin-top: 2px;
+  }    
+      .time-label {
       font-size: 11px;
       color: #555;
-    }
-    
-    /* doppio slider look semplice */
-    .time-slider input[type=range] {
-      width: 100px;
     }
     
     .noUi-target {
@@ -649,7 +689,7 @@ function renderEvents() {
       )
     })
       
-    // Visualizza i dettagli dell'evento selezionato
+    // Visualizza i dettagli dell'evento selezionato //
     .bindPopup(`
     <div style="min-width:180px">
     <div style="font-weight:700;font-size:14px;margin-bottom:4px;">
@@ -673,27 +713,10 @@ function renderEvents() {
     </div>
     </div>
   `);      
+    
   marker.on('mouseover', function () {this.openPopup();});
   marker.on('mouseout', function () {this.closePopup();});
 
-    
-      /* DISABILITATA Vecchia versione con click 
-      .bindPopup(`
-      <div style="min-width:180px">
-        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">
-          ${e.ev_titolo}
-        </div>
-        <div style="font-size:12px;color:#3b82f6;margin-bottom:6px;font-weight:600;">
-          ${formatTime(e.ev_inizio)}
-          ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
-        </div>
-        <div style="font-size:12px;color:#555;line-height:1.35;">
-          ${e.ev_descrizione || ''}
-        </div>
-      </div>
-    `);
-    */
-    
     // 📦 STORAGE DATI (NO LOGICA)
     markers.push({
       marker,
@@ -851,51 +874,6 @@ function buildCategoryMenu() {
     // 🔴 critico Inizia tra meno di 2h
     return { state: 'imminent', intensity: 2.8 };}
 
-  /* // Restituisce gli eventi da (adesso) fino a (domani ore 23:59)
-  function getTimelineRange() {
-    const now = new Date();
-    // LIVE MODE
-    if (isLiveMode) {
-    const start = new Date(now);
-    const end = new Date(now);
-    end.setDate(end.getDate() + 1);
-    end.setHours(23, 59, 59, 999);
-    return { start, end };
-    }
-    // CALENDAR MODE
-    else {
-    const start = new Date(currentDate);
-    start.setHours(0,0,0,0);
-    const end = new Date(currentDate);
-    end.setHours(23,59,59,999);
-    return { start, end };
-    }
-  } */
-
-  /* / Gestione Timeline dinamica 
-  function getTimelineRange() {
-    const now = new Date();
-    const start = new Date(now); 
-    const end = new Date(now);
-    // inizio = ora attuale
-    start.setMinutes(0, 0, 0);
-    // fine = +24h (o +36h se vuoi includere domani pieno)
-    end.setHours(now.getHours() + 24);
-    end.setMinutes(59, 59, 999);
-    return { start, end };
-  } */ 
-  
-  /* / Calcola la posizione della Mezzanotte Timeline
-  function getMidnightPosition() {
-    const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24,0,0,0);
-    const timeline = getTimelineRange();
-    const total = timeline.end - timeline.start;
-    const pos = (midnight - timeline.start) / total;
-    return pos; // 0 → 1
-  } */
-
   // calcola il range della Timeline
   function getTimelineRange() {
     const now = new Date();
@@ -929,6 +907,18 @@ function buildCategoryMenu() {
     (midnightPos * 100) + "%";
     document.getElementById("now").style.left =
     (nowPos * 100) + "%";
+  }
+
+  function updateTimelineUI() {
+    const now = new Date();
+    // ore mancanti alla mezzanotte
+    const hoursToMidnight =
+    24 - now.getHours() - (now.getMinutes() / 60);
+    // percentuale posizione
+    const midnightPercent =
+    (hoursToMidnight / 48) * 100;
+    document.getElementById('midnight').style.left =
+    `${midnightPercent}%`;
   }
   
 </script>
