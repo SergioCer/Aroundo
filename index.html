@@ -441,6 +441,7 @@ label {
   let markers = [];
   let showFinishedEvents = false; 
   let currentDate = new Date(); // Data odierna
+  let isLiveMode = true; // Verifica se è attiva la nuova Time line
   
   // costanti
   // Coordinate di default (Sicilia occidentale)
@@ -568,6 +569,7 @@ document.getElementById("prev-day").addEventListener("click", () => {
 });
 
 document.getElementById("next-day").addEventListener("click", () => {
+  isLiveMode = false;
   currentDate.setDate(currentDate.getDate() + 1);
   updateDateUI();
   renderEvents();
@@ -579,6 +581,7 @@ document.getElementById("next-day").addEventListener("click", () => {
 });
 
 document.getElementById("reset-day").addEventListener("click", () => {
+  isLiveMode = false;
   currentDate = new Date(); // oggi
   updateDateUI();
   updateMarkerVisibility();
@@ -650,68 +653,6 @@ function renderEvents() {
     updateMarkerVisibility();
 }
   
-  
-  /* DISABILITATA TEMPORANEAMENTE Calcola stato temporale, crea Marker Leaflet, crea popup HTML, salva metadati in markers, richiama (updateMarkerVisibility)
-function renderEvents() {
-  // pulizia markers precedenti
-  markers.forEach(m => map.removeLayer(m.marker));
-  markers = [];
-  events.forEach(e => {
-  const stateData = getEventState(
-  new Date(e.ev_inizio),
-  new Date(e.ev_fine)
-  );
-  const stateClass = stateData.state;
-  const intensity = stateData.intensity;
-    // Crea tutti i Markers
-  const marker = L.marker([e.ev_lat, e.ev_lng], {
-  icon: createIcon(
-  categories.find(c =>
-    c.id_macro_categoria === e.ev_categoria
-  )?.mc_colore || '#999',
-  stateClass,
-  intensity
-  )
-  })
-  /* Questa è la finestra dell'evento quando si fa un click 
-  .bindPopup(`
-  <div style="min-width:180px">
-  <div style="
-  font-weight:700;
-  font-size:14px;
-  margin-bottom:4px;
-  ">
-  ${e.ev_titolo}
-  </div>
-  <div style="
-  font-size:12px;
-  color:#3b82f6;
-  margin-bottom:6px;
-  font-weight:600;
-  ">
-  ${formatTime(e.ev_inizio)}
-  ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
-  </div>
-  <div style="
-  font-size:12px;
-  color:#555;
-  line-height:1.35;
-  ">
-  ${e.ev_descrizione || ''}
-  </div>
-  </div>
-  `)
-  markers.push({
-  marker,
-  category: e.ev_categoria,
-  start: new Date(e.ev_inizio),
-  end: e.ev_fine ? new Date(e.ev_fine) : null, // se data non presente corregge eventuali errori
-  active: e.ev_attivo
-  });
-  });
-  updateMarkerVisibility();
-} */
-
 function createIcon(color, state, intensity) {
   const isFinished = state === 'finished';
   const size = isFinished
@@ -728,24 +669,6 @@ function createIcon(color, state, intensity) {
   });
 }
   
-  /* DISABILITATA TEMPORANEAMENTE Crea icone L.divIcon() con colore, classe CSS, dimensione variabile, intensità animazione
-function createIcon(color, extraClass = '', intensity = 1) {
-  const isFinished = extraClass === 'finished';
-  // se vero, dimensione 10 altrimenti prosegue
-  const size = isFinished
-  ? 10
-  : Math.max(8, Math.min(30, 10 * intensity));
-  return L.divIcon({
-  className: '',
-  html: `
-  <div class="pulse ${extraClass}"
-  style="--c:${color};width:${size}px;height:${size}px;">
-  </div>
-   `,
-   iconSize: [size, size]
-   });
-} */
-
 /* NUOVA Mostra o nasconde i Marker delle categorie  */
 function updateMarkerVisibility(startHour = 0, endHour = 24) {
   const selectedDate = new Date(currentDate);
@@ -790,52 +713,6 @@ function updateMarkerVisibility(startHour = 0, endHour = 24) {
   });
 }
   
-/* DISABILITATA MOMENTANEAMENTE  Mostra o nasconde i Marker delle categorie 
-function updateMarkerVisibility(startHour = 0, endHour = 24) {
-  const selectedDate = new Date(currentDate);
-  selectedDate.setHours(0,0,0,0);
-  const checkboxes = document.querySelectorAll(
-    '#menu-items input[type="checkbox"]'
-  );
-  const activeCategories = [];
-  checkboxes.forEach(cb => {
-    const catId = parseInt(cb.id.replace('cat-', ''));
-    if (cb.checked) {
-      activeCategories.push(catId);
-    }
-  });
-  markers.forEach(obj => {
-    if (!obj.active) {
-      map.removeLayer(obj.marker);
-      return;
-    }
-    // filtro categoria
-    const categoryVisible =
-      activeCategories.includes(obj.category);
-    // date multiday
-    const startDate = new Date(obj.start);
-    startDate.setHours(0,0,0,0);
-    const endDate = obj.end
-      ? new Date(obj.end)
-      : new Date(obj.start);
-    endDate.setHours(23,59,59,999);
-    const sameDay =
-      selectedDate >= startDate &&
-      selectedDate <= endDate;
-    // filtro orario
-    const eventHour = obj.start.getHours();
-    const inTimeRange =
-      eventHour >= startHour &&
-      eventHour <= endHour;
-    // decisione finale unica
-    if (categoryVisible && sameDay && inTimeRange) {
-      obj.marker.addTo(map);
-    } else {
-      map.removeLayer(obj.marker);
-    }
-  });
-} */
-
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
 function buildCategoryMenu() {
    const menuItemsDiv = document.getElementById('menu-items');
@@ -923,19 +800,6 @@ function getEventState(startDate, endDate) {
     // 🔴 critico Inizia tra meno di 2h
   return { state: 'imminent', intensity: 2.8 };}
   
-/* DISABILITATA MOMENTANEAMENTE Calcola stato evento, intensità animazione
-function getEventState(startDate, endDate) {
-  const now = new Date();
-  if (endDate && now > endDate) { return { state: 'finished', intensity: 0 }; }
-  const diffMinutes = (startDate - now) / 1000 / 60;
-  if (diffMinutes <= 0) { return { state: 'started', intensity: 3 }; }
-  if (diffMinutes <= 90) { return { state: 'starting-soon', intensity: 2.5 }; }
-  if (diffMinutes <= 180) { return { state: 'imminent', intensity: 2 }; }
-  if (diffMinutes <= 360) { return { state: 'very-soon', intensity: 1.5 }; }
-  if (diffMinutes <= 720) { return { state: 'soon', intensity: 1 }; }
-  return { state: 'future', intensity: 0.5 };
-} */
-
 </script>
 </body>
 </html>
