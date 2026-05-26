@@ -920,6 +920,26 @@ function buildCategoryMenu() {
     document.getElementById('midnight').style.left =
     `${midnightPercent}%`;
   }
+
+  function setupTimeline() {
+    const now = new Date();
+    // minuti trascorsi oggi
+    const minutesNow =
+    now.getHours() * 60 + now.getMinutes();
+    // minuti mancanti alla mezzanotte
+    const minutesToMidnight =
+    (24 * 60) - minutesNow;
+    // timeline totale = 48h
+    const totalMinutes = 48 * 60;
+    // posizione mezzanotte %
+    const midnightPercent =
+    (minutesToMidnight / totalMinutes) * 100;
+    // sposta la linea
+    document.getElementById('midnight').style.left =
+    `${midnightPercent}%`;
+    // NOW sempre all'inizio
+    document.getElementById('now').style.left = `0%`;
+  }
   
 </script>
 </body>
