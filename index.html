@@ -598,6 +598,8 @@ document.getElementById("reset-day").addEventListener("click", () => {
     }
   });
 
+  setupTimeline();
+
   slider.noUiSlider.on('update', function(values) {
   const start = Math.round(values[0]);
   const end = Math.round(values[1]);
@@ -799,6 +801,35 @@ function getEventState(startDate, endDate) {
   if (diffMinutes <= 0) { return { state: 'started', intensity: 3 }; }
     // 🔴 critico Inizia tra meno di 2h
   return { state: 'imminent', intensity: 2.8 };}
+
+// Separe la modalità Live dalla modalità Calendario
+function setupTimeline() {
+  const now = new Date();
+  // MODALITÀ LIVE
+  if (isLiveMode) {
+    const currentHour = now.getHours();
+    slider.noUiSlider.updateOptions({
+      range: {
+        min: currentHour,
+        max: 48
+      }
+    });
+    slider.noUiSlider.set([
+      currentHour,
+      48
+    ]);
+  }
+  // MODALITÀ CALENDARIO
+  else {
+    slider.noUiSlider.updateOptions({
+      range: {
+        min: 0,
+        max: 24
+      }
+    });
+    slider.noUiSlider.set([0, 24]);
+  }
+}
   
 </script>
 </body>
