@@ -558,6 +558,7 @@ document.getElementById('togglePast')
 });
   
 document.getElementById("prev-day").addEventListener("click", () => {
+  setupTimeline();
   currentDate.setDate(currentDate.getDate() - 1);
   updateDateUI();
   renderEvents();
