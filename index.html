@@ -674,8 +674,47 @@ function createIcon(color, state, intensity) {
     iconSize: [size, size]
   });
 }
-  
+
+
 /* NUOVA Mostra o nasconde i Marker delle categorie  */
+function updateMarkerVisibility() {
+  const checkboxes = document.querySelectorAll(
+    '#menu-items input[type="checkbox"]'
+  );
+  const activeCategories = [];
+  checkboxes.forEach(cb => {
+    const catId = parseInt(cb.id.replace('cat-', ''));
+    if (cb.checked) {
+      activeCategories.push(catId);
+    }
+  });
+  // intervallo reale timeline
+  const timeline = getTimelineRange();
+  markers.forEach(obj => {
+    // marker disattivato
+    if (!obj.active) {
+      map.removeLayer(obj.marker);
+      return;
+    }
+    // filtro categoria
+    const categoryVisible =
+      activeCategories.includes(obj.category);
+    // data/ora reale evento
+    const eventStart = new Date(obj.start);
+    // dentro finestra timeline
+    const inTimelineRange =
+      eventStart >= timeline.start &&
+      eventStart <= timeline.end;
+    // visibilità finale
+    if (categoryVisible && inTimelineRange) {
+      obj.marker.addTo(map);
+    } else {
+      map.removeLayer(obj.marker);
+    }
+  });
+}  
+
+  /* DISABILITATA  VECCHIA Mostra o nasconde i Marker delle categorie  
 function updateMarkerVisibility(startHour = 0, endHour = 24) {
   const selectedDate = new Date(currentDate);
   selectedDate.setHours(0,0,0,0);
@@ -717,7 +756,7 @@ function updateMarkerVisibility(startHour = 0, endHour = 24) {
       map.removeLayer(obj.marker);
     }
   });
-} 
+} */
   
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
 function buildCategoryMenu() {
