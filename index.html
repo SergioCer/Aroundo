@@ -500,8 +500,7 @@ label {
   const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
   const slider = document.getElementById('time-range');
 
-  
-  // Preleva le Categorie da supabase
+    // Preleva le Categorie da supabase
   async function fetchCategories() {
     const { data, error } = await supabase
       .from('macrocategorie')
@@ -911,6 +910,7 @@ function buildCategoryMenu() {
   }
 
 function setupTimeline() {
+  if (slider.noUiSlider) { slider.noUiSlider.destroy(); }
   const now = new Date();
   const currentHour = now.getHours();
   const remainingToday = 24 - currentHour;
