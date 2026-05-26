@@ -156,15 +156,18 @@
     .category-checkbox:not(:checked) + .category-label {
       background: transparent;
       opacity: 0.7; }
+    
     /* Timeline */
     #timeline {
       position: relative;
-      height: 6px;
+      width: 220px;
+      height: 18px;
+      margin-bottom: 10px;
       background: #ddd;
       border-radius: 10px;
     }
 
-    #midnight, #now {
+    #midnight, {
       position: absolute;
       top: -4px;
       width: 2px;
@@ -332,11 +335,12 @@
   /* linea base */
   #track {
     position: absolute;
-    top: 7px;
+    top: 8px;
     left: 0;
+    right: 0;
     width: 100%;
-    height: 2px;
-    background: rgba(255,255,255,0.35);
+    height: 3px;
+    background: rgba(255,255,255,0.25);
     border-radius: 999px;
   }
 
@@ -344,23 +348,13 @@
   #midnight {
     position: absolute;
     top: 0;
-    width: 1px;
-    height: 16px;
-    background: rgba(255,255,255,0.45);
+    width: 2px;
+    height: 18px;
+    background: #3b82f6;
+    border-radius: 2px;
     opacity: 0.9;
     border-radius: 999px;
-  }
-
-  /* indicatore NOW */
-  #now {
-    position: absolute;
-    top: -2px;
-    left: 0;
-    width: 6px;
-    height: 20px;
-    border-radius: 999px;
-    background: #3b82f6;
-    box-shadow: 0 0 12px rgba(59,130,246,0.5);
+    z-index: 5;
   }
 
   /* SLIDER */
@@ -384,6 +378,17 @@
     .noUi-connect {
       background: linear-gradient(90deg, #3b82f6, #60a5fa);
       opacity: 0.85;
+    }
+
+    .handle-label {
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #444;
+      font-weight: 600;
+      white-space: nowrap;
     }
     
     .noUi-handle {
@@ -477,7 +482,6 @@ label {
 <div id="timeline">
   <div id="track"></div>
   <div id="midnight"></div>
-  <div id="now"></div>
 </div>
 <div id="time-range"></div>
 </div>
@@ -921,25 +925,53 @@ function buildCategoryMenu() {
     `${midnightPercent}%`;
   }
 
-  function setupTimeline() {
-    const now = new Date();
-    // minuti trascorsi oggi
-    const minutesNow =
-    now.getHours() * 60 + now.getMinutes();
-    // minuti mancanti alla mezzanotte
-    const minutesToMidnight =
-    (24 * 60) - minutesNow;
-    // timeline totale = 48h
-    const totalMinutes = 48 * 60;
-    // posizione mezzanotte %
-    const midnightPercent =
-    (minutesToMidnight / totalMinutes) * 100;
-    // sposta la linea
-    document.getElementById('midnight').style.left =
+function setupTimeline() {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const remainingToday = 24 - currentHour;
+  // timeline reale:
+  // da ORA → fino a domani alle 24
+  noUiSlider.create(slider, {
+    start: [0, 24],
+    connect: true,
+    step: 1,
+    range: {
+      min: 0,
+      max: remainingToday + 24
+    }
+  });
+  // posizione grafica mezzanotte
+  const totalHours = remainingToday + 24;
+  const midnightPercent =
+    (remainingToday / totalHours) * 100;
+  document.getElementById('midnight').style.left =
     `${midnightPercent}%`;
-    // NOW sempre all'inizio
-    document.getElementById('now').style.left = `0%`;
-  }
+  // aggiorna label dinamiche
+  slider.noUiSlider.on('update', function(values) {
+    const startOffset = Math.round(values[0]);
+    const endOffset = Math.round(values[1]);
+    const startDate =
+      new Date(now.getTime() + startOffset * 3600000);
+    const endDate =
+      new Date(now.getTime() + endOffset * 3600000);
+    const startHour =
+      startDate.getHours().toString().padStart(2,'0');
+    const endHour =
+      endDate.getHours().toString().padStart(2,'0');
+    // labels maniglie
+    document.querySelectorAll('.noUi-handle').forEach((h, i) => {
+      let label = h.querySelector('.handle-label');
+      if (!label) {
+        label = document.createElement('div');
+        label.className = 'handle-label';
+        h.appendChild(label);
+      }
+      label.innerText =
+        i === 0 ? startHour : endHour;
+    });
+    updateMarkerVisibility(startOffset, endOffset);
+  });
+}
   
 </script>
 </body>
