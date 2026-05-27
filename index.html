@@ -17,7 +17,25 @@
       width: 100%;
     }
 
-    /* Rettangolo Aroundo trasparente */
+    /* --- OVERLAY PRINCIPALI --- */
+    /* -- Rettangolo Presentazione eredita stessa grafica .map-overlay */
+    /* Titolo */
+    .title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #3f3f3f;
+      text-align: center;
+    }
+
+    /* Sotto titolo */
+    .subtitle {
+      font-size: 12px;
+      color: #6b6b6b;
+      margin-top: 2px;
+      text-align: center;
+    }    
+    
+    /* -- Rettangolo Aroundo trasparente */
     .map-overlay {
       position: absolute;
       top: 10px;
@@ -30,7 +48,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    /* Rettangolo filtro categorie */
+    /* -- Rettangolo filtro categorie */
     .map-overlay2 {
       position: absolute;
       top: 80px;      /* spostato sotto title/subtitle */
@@ -47,7 +65,26 @@
       max-height: 60vh;   /* limita altezza */
       overflow-y: auto;   /* scroll verticale se tante categorie */
     }
-      /* Menù a discesa */
+      
+    /* -- Rettangolo barra temporale */
+    .top-timebar {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 998;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 16px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    /* --- MENU & FILTRI --- */
+    /* -- Menù a discesa */
     .menu-header {
       display: flex;
       align-items: center;
@@ -56,61 +93,13 @@
       margin-bottom: 8px;
     }
 
-      #menu-items {
+    /* Elementi del menu */ 
+    #menu-items {
       max-height: 45vh;
       overflow-y: auto;
     }
-    
-    .title {
-      font-weight: 600;
-      font-size: 14px;
-      color: #3f3f3f;
-      text-align: center;
-    }
-
-    .subtitle {
-      font-size: 12px;
-      color: #6b6b6b;
-      margin-top: 2px;
-      text-align: center;
-    }
-    
-    /* marker base animato */
-    .pulse {
-      border-radius: 50%;
-      position: relative;
-       z-index: 990;
-    }
-
-    /* centro marker */
-    .pulse::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: var(--c);
-      z-index: 990;
-    }
-    
-    .pulse::after {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      border-radius: 50%;
-      background: var(--c);
-      z-index: 980;
-      opacity: 0.25;
-      transform: scale(0.6);
-    }
-    
-      /* animazione vera */
-    @keyframes pulse {
-      0% { transform: scale(0.6);opacity: 0.5; }
-      70% { transform: scale(1.6); opacity: 0; }
-      100% { opacity: 0; }
-    }
-    
-      /* Checkbox reale nascosta ma ancora cliccabile tramite label */
+          
+    /* Checkbox Categorie */
     .category-checkbox {
       position: absolute;
       background: transparent;
@@ -119,7 +108,11 @@
       height: 0;
     }
 
-      /* Label delle categorie */
+    /* Checkbox e Label testo leggermente opaca se non selezionato */
+    .category-checkbox:not(:checked) + .category-label::before { background: currentColor; }
+    .category-checkbox:not(:checked) + .category-label { background: transparent; opacity: 0.5; }
+
+    /* Label delle categorie */
     .category-label {
       white-space: nowrap;
       display: flex;
@@ -136,7 +129,37 @@
       transition: opacity 0.2s;
     }
 
-      /* Cerchietto prima del testo */
+    /* --- PULSAZIONI & SALTI MARKER --- */
+    /* Marker pulsazioni base */
+    .pulse { border-radius: 50%; position: relative; z-index: 990; }
+    .pulse::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--c); z-index: 990; }
+    .pulse::after { content: ""; position: absolute; inset: -40%; border-radius: 50%; background: var(--c); z-index: 990; opacity: 0.25; transform: scale(0.6); }
+    /* Marker pulsazioni in base al tempo */
+    .pulse.future-deep { animation: none; }
+    .pulse.future-deep::after { animation: none; opacity: 0; }    
+    .pulse.future-far { animation: hopSlow 3s infinite; }
+    .pulse.future-medium { animation: hopMedium 2s infinite; }
+    .pulse.future-near { animation: hopFast 1s infinite; }
+    .pulse.imminent { animation: hopCrazy 0.5s infinite; }
+    .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; opacity: 0.45; }
+    .pulse.started { animation: hopCrazy 0.3s infinite; }    
+    .pulse.started::after { animation: pulseLive 0.3s infinite; }
+    .pulse.running { animation: none; }
+    .pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; }
+    .pulse.finished { animation: finished 1s ease forwards; }    
+    .pulse.finished::after { display: none; animation: none !important; opacity: 0 !important; }
+    
+    /* SALTI */
+    @keyframes hopSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); }}
+    @keyframes hopMedium { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); }}
+    @keyframes hopFast { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); }}
+    @keyframes hopCrazy { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); }}
+    @keyframes pulseLive { 0% { transform: scale(1); opacity: 0.7; } 70% { transform: scale(2); opacity: 0; } 100% { transform: translateY(-10px); opacity: 0; }}
+    @keyframes finished { 0%,100% { transform: translateY(0); } 50% { transform: translateY(0px); }}
+    @keyframes pulse { 0% { transform: scale(0.6);opacity: 0.5; } 70% { transform: scale(1.6); opacity: 0; } 100% { opacity: 0; }}
+    
+
+    /* Cerchietto prima del testo */
     .category-label::before {
       content: '';
       display: inline-block;
@@ -151,14 +174,7 @@
       transform 0.2s ease;
       opacity 0.2s ease
     }
-
-      /* Testo leggermente opaco se non selezionato */
-    .category-checkbox:not(:checked) + .category-label::before {
-      background: currentColor; }
-    .category-checkbox:not(:checked) + .category-label {
-      background: transparent;
-      opacity: 0.7; }
-  
+ 
     #menu-toggle {
       display: inline-flex;
       vertical-align: middle;
@@ -225,23 +241,6 @@
       transform: translate(-50%, -50%);
     }
     
-    /* Rettangolo barra temporale */    
-    .top-timebar {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 998;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      border-radius: 16px;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
-      backdrop-filter: blur(8px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    }
-
     .date-box {
       text-align: center;
       min-width: 100px;
@@ -363,29 +362,6 @@
       font-weight: bold;
       color: #3b82f6;
       }
-
-/* Pulsazioni ed animazioni Marker */
-.pulse.future-deep { animation: none; }
-.pulse.future-deep::after { animation: none; opacity: 0; }    
-.pulse.future-far { animation: hopSlow 3s infinite; }
-.pulse.future-medium { animation: hopMedium 2s infinite; }
-.pulse.future-near { animation: hopFast 1s infinite; }
-.pulse.imminent { animation: hopCrazy 0.5s infinite; }
-.pulse.imminent::after { animation: pulse 0.6s infinite ease-out; opacity: 0.45; }
-.pulse.started { animation: hopCrazy 0.4s infinite; }    
-.pulse.started::after { animation: pulseLive 0.3s infinite; }
-.pulse.running { animation: none; }
-.pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; }
-.pulse.finished { animation: finished 1s ease forwards; }    
-.pulse.finished::after { display: none; animation: none !important; opacity: 0 !important; }
-    
-/* SALTI */
-@keyframes hopSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); }}
-@keyframes hopMedium { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); }}
-@keyframes hopFast { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); }}
-@keyframes hopCrazy { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); }}
-@keyframes pulseLive { 0% { transform: scale(1); opacity: 0.7; } 70% { transform: scale(2); opacity: 0; } 100% { transform: translateY(-10px); opacity: 0; }}
-@keyframes finished { 0%,100% { transform: translateY(0); } 50% { transform: translateY(0px); }}
 
 label {
   display: inline-flex;
