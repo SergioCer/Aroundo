@@ -735,26 +735,19 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 48) {
     const categoryVisible = activeCategories.includes(obj.category);
     // data reale evento
 
-    // NUOVA VERSIONE 
+    // Prende la data 
+    let inTimeRange =
+    eventStart <= endTime &&
+    eventEnd >= startTime;
     const now = new Date();
+    
     const isPast = obj.end
     ? obj.end < now
     : eventStart < now;
     
     const eventStart = new Date(obj.start);
     const eventEnd = obj.end ? new Date(obj.end) : eventStart;
-    // OVERLAP LOGICO
-    let inTimeRange =
-    eventStart <= endTime &&
-    eventEnd >= startTime;
 
-    /* --- DISABILITATO 
-    const eventStart = new Date(obj.start);
-    // filtro timeline
-    let inTimeRange =
-    eventStart.getTime() >= startTime.getTime() &&
-    eventStart.getTime() <= endTime.getTime(); DISABILITATO --- */
-      
       // se checkbox conclusi attiva, mostro anche quelli già terminati
       if (showFinishedEvents) { const now = new Date();
       if (obj.end && obj.end < now) { inTimeRange = true; }}
@@ -859,8 +852,6 @@ function buildCategoryMenu() {
     return { start, end, now };
   }
 
-  
-
   // Trasforma il tempo in una percentuale Timeline
   function getTimePosition(date) {
     const { start, end } = getTimelineRange();
@@ -960,6 +951,7 @@ function setupTimeline() {
     return currentDate
   }
 
+  // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
   function getContrastColor(hex) {
     hex = hex.replace('#', '');
     const r = parseInt(hex.substr(0,2),16);
