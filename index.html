@@ -736,6 +736,8 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 48) {
     // data reale evento
 
     // Prende la data 
+    const eventStart = new Date(obj.start);
+    const eventEnd = obj.end ? new Date(obj.end) : eventStart;
     let inTimeRange =
     eventStart <= endTime &&
     eventEnd >= startTime;
@@ -744,9 +746,6 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 48) {
     const isPast = obj.end
     ? obj.end < now
     : eventStart < now;
-    
-    const eventStart = new Date(obj.start);
-    const eventEnd = obj.end ? new Date(obj.end) : eventStart;
 
       // se checkbox conclusi attiva, mostro anche quelli già terminati
       if (showFinishedEvents) { const now = new Date();
