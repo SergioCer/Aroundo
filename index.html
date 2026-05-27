@@ -870,24 +870,19 @@ function buildCategoryMenu() {
 
   // Posiziona la mezzanotte Timeline
 function getMidnightPosition(totalHours) {
-  let start;
+  const { start, end } = getTimelineRange();
+  let nextMidnight;
   if (isLiveMode) {
-    start = new Date();
+    // prossima mezzanotte reale
+    nextMidnight = new Date(start);
+    nextMidnight.setHours(24, 0, 0, 0);
   } else {
-    start = new Date(currentDate);
-    start.setHours(0, 0, 0, 0);
+    // mezzanotte del giorno selezionato
+    nextMidnight = new Date(currentDate);
+    nextMidnight.setHours(0, 0, 0, 0);
   }
-  const nextMidnight = new Date(start);
-  nextMidnight.setHours(24, 0, 0, 0);
-  const end = new Date(start.getTime() + totalHours * 3600000);
   return (nextMidnight - start) / (end - start);
 }
-  /* const now = getTimelineBaseTime();
-  const nextMidnight = new Date(now);
-  nextMidnight.setHours(24, 0, 0, 0);
-  const start = now;
-  const end = new Date(now.getTime() + totalHours * 3600000);
-  return (nextMidnight - start) / (end - start); */
 
 
   // Genera la timeline
