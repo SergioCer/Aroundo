@@ -892,11 +892,21 @@ function getMidnightPosition(totalHours) {
     slider.noUiSlider.destroy();
     slider.noUiSlider = null;
     }
-    const now = getTimelineBaseTime();
-    const currentHour = now.getHours();
-    // Calcola da adesso → fino a domani notte
-    const remainingToday = 24 - currentHour;
-    const totalHours = remainingToday + 24;
+    // Live Mode
+    if (isLiveMode) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const remainingToday = 24 - currentHour;
+      const totalHours = remainingToday + 24;
+      startBase = now;
+     }
+
+      // Day Mode
+    else {
+      startBase = new Date(currentDate);
+      startBase.setHours(0,0,0,0):
+      totalHours = 24;
+      }
     // Crea lo slider con doppia maniglia
     noUiSlider.create(slider, {
     start: [0, totalHours],
@@ -915,8 +925,8 @@ function getMidnightPosition(totalHours) {
   function updateHandles(values) {
     const startOffset = Math.round(values[0]);
     const endOffset = Math.round(values[1]);
-    const startDate = new Date(now.getTime() + startOffset * 3600000);
-    const endDate = new Date(now.getTime() + endOffset * 3600000);
+    const startDate = new Date(startBase.getTime() + startOffset * 3600000);
+    const endDate = new Date(startBase.getTime() + endOffset * 3600000);
     const startHour = startDate.getHours()
         .toString()
         .padStart(2,'0');
