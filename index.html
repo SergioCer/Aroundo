@@ -163,7 +163,7 @@
       font-size: 12px;
       position: relative;
       transition:
-        background: 0.2s ease;
+        background 0.2s ease;
         transform 0.2s ease;
         opacity 0.2s ease
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
@@ -217,10 +217,22 @@
       box-sizing: border-box;
       background: transparent;
       transition:
-        background: 0.2s ease;
+        background 0.2s ease;
         transform 0.2s ease;
         opacity 0.2s ease
     }
+
+    /* Categoria disattiva */
+    .category-checkbox:not(:checked) + .category-label {
+      opacity: 0.45;
+      background: transparent;
+    }
+
+    /* Pallino categoria disattiva */
+    .category-checkbox:not(:checked) + .category-label::before {
+      background: currentColor;
+    }
+      
     
     /* --- PULSAZIONI & SALTI MARKER --- */
     /* Marker pulsazioni base */
@@ -269,7 +281,7 @@
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(59,130,246,0.25);
       transition:
-        background: 0.15s ease;
+        background 0.15s ease;
         transform 0.15s ease;
         opacity 0.15s ease
     }  
