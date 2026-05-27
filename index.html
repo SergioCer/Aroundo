@@ -106,13 +106,16 @@
     .vertical-toggles {
       display: flex;
       flex-direction: column;
+      width: 120px; /* largezza */
       gap: 6px;
     }
+    
     /* Bordino intorno a checkbox e label */
     .toggle-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      width: 100%;
       padding: 4px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.18);
@@ -252,8 +255,10 @@
       vertical-align: middle;
       align-items: center;
       justify-content: center;
+      width: 120px; /* larghezza */
       padding: 6px 10px;
       border-radius: 999px;
+      text-allign: center;
       font-size: 12px;
       font-weight: 500;
       background: linear-gradient(90deg, #3b82f6, #60a5fa);
@@ -410,13 +415,13 @@
 
 <div class="map-overlay2" id="category-menu">
   <div class="menu-header vertical-toggles">
+  <label class="toggle-pill" title="Visualizza gli eventi conclusi." >
+  <input type="checkbox" id="togglePast" class="toggle-checkbox"> Eventi conclusi </label>
   <label class="toggle-pill" title="Visualizza tutte le categorie di eventi." >
   <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked> Tutte le Categorie </label>
-  <label class="toggle-pill" title="Visualizza gli eventi conclusi." >
-  <input type="checkbox" id="togglePast" class="toggle-checkbox" title="Eventi Conclusi"> Eventi conclusi </label>
   </div>
   <div class="menu-header">
-  <button id="menu-toggle">Filtra categorie ▼</button>
+  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Filtra categorie ▼</button>
   </div>
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
 </div>
