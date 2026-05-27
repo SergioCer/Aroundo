@@ -150,10 +150,6 @@
       transform: translate(-50%, -50%);
     }
     
-    /* Checkbox e Label testi leggermente opachi se non selezionato */
-    .toggle-checkbox:not(:checked) + .category-label::before { background: currentColor; }
-    .toggle-checkbox:not(:checked) + .category-label { background: transparent; opacity: 0.5; }
-
     /* Label delle categorie */
     .category-label {
       white-space: nowrap;
@@ -378,8 +374,8 @@
 
 <div class="map-overlay2" id="category-menu">
   <div class="menu-header">
-  <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" title="Tutte le Categorie" checked> <label for="select-all-toggle" class="category-label"> Tutte </label>
-  <input type="checkbox" id="togglePast" class="toggle-checkbox "title="Eventi Conclusi"> <label for="togglePast" class="category-label"> Conclusi </label>
+  <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" title="Tutte le Categorie" checked> Tutte
+  <input type="checkbox" id="togglePast" class="toggle-checkbox "title="Eventi Conclusi"> Conclusi
   </div>
   <div class="menu-header">
   <button id="menu-toggle">Filtra categorie ▼</button>
