@@ -494,7 +494,7 @@
       .from('macrocategorie')
       .select('*')
       .eq('mc_attiva', true)
-      .order('mc_descrizione', { ascending: true });
+      .order('mc_ordine', { ascending: true });
       if (error) {
       console.error("Errore caricamento categorie:", error);
       return [];
