@@ -417,6 +417,25 @@
     gap: 6px;
     font-size: 12px;
   }
+
+/* NUOVO MENU checkbox integrata */
+/* Contenitore checkbox + pulsante in una riga */
+.filter-all-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+/* Mantieni il checkbox rotondo come gli altri */
+.filter-all-container .toggle-pill {
+  width: 28px;           /* piccolo quadrato per il pallino */
+  min-height: 28px;
+  padding: 0;            /* nessun padding extra */
+  border-radius: 50%;    /* cerchio perfetto */
+  justify-content: center;
+}
+    
    
 </style>
 </head>
@@ -431,12 +450,25 @@
   <div class="menu-header vertical-toggles">
   <label class="toggle-pill" title="Visualizza gli eventi conclusi." >
   <input type="checkbox" id="togglePast" class="toggle-checkbox"> Eventi conclusi </label>
+</div
+
+<!-- nuovo codice -->
+<div class="menu-header filter-all-container">
+  <label class="toggle-pill" title="Seleziona tutte le categorie">
+    <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
+  </label>
+  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Filtra categorie ▼</button>
+</div>
+  
+  <!--  
   <label class="toggle-pill" title="Visualizza tutte le categorie di eventi." >
   <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked> Tutte le Categorie </label>
   </div>
   <div class="menu-header">
   <button id="menu-toggle" title="Apri/chiudi filtro categorie">Filtra categorie ▼</button>
   </div>
+  -->
+  
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
 </div>
 <div id="map"></div>
