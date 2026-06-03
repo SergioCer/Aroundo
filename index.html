@@ -443,7 +443,42 @@
   transform: translateX(2px);
 }
 
-    
+#timeline-wrapper {
+  position: relative; /* serve per posizionare prev/next/day/full */
+}
+
+#prev-day {
+  position: absolute;
+  top: 0;           /* regolabile */
+  left: -12px;      /* leggermente a sinistra della maniglia */
+}
+
+#next-day {
+  position: absolute;
+  top: 0;
+  right: -12px;     /* leggermente a destra della maniglia */
+}
+
+#day-text {
+  position: absolute;
+  top: -24px;       /* sopra lo slider */
+  left: 40%;        /* circa tra maniglia sinistra e midnight, poi si affina */
+  transform: translateX(-50%);
+}
+
+#date-text {
+  position: absolute;
+  top: 36px;        /* sotto lo slider */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#reset-day {
+  position: absolute;
+  top: 56px;        /* sotto date-full */
+  left: 50%;
+  transform: translateX(-50%);
+}    
    
 </style>
 </head>
@@ -453,14 +488,11 @@
   <div class="title">Aroundo</div>
   <div class="subtitle">Discover what’s around you</div>
 </div>
-
 <div class="map-overlay2" id="category-menu">
   <div class="menu-header vertical-toggles">
   <label class="toggle-pill" title="Visualizza gli eventi conclusi." >
   <input type="checkbox" id="togglePast" class="toggle-checkbox"> Eventi conclusi </label>
   </div>
-
-<!-- nuovo codice -->
 <div class="menu-header filter-all-container">
   <label class="toggle-pill" title="Seleziona tutte le categorie">
     <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
@@ -470,7 +502,6 @@
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
 </div>
 <div id="map"></div>
-
 <div class="top-timebar">
   <!-- SINISTRA FRECCIA -->
   <button class="nav-btn" id="prev-day">‹</button>
