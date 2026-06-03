@@ -937,7 +937,7 @@ function getMidnightPosition(totalHours) {
   let nextMidnight;
   if (isLiveMode) {
     // prossima mezzanotte reale
-    nextMidnight = new Date(start);
+    nextMidnight = new Date(currentDate); // modificato prima era : new Date(start);
     nextMidnight.setHours(24, 0, 0, 0);
   } else {
     // mezzanotte del giorno selezionato
