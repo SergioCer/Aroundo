@@ -992,9 +992,6 @@ function getMidnightPosition(totalHours) {
  
   // Genera la timeline
   function setupTimeline() {
-    /* midnightPercent = getMidnightPosition(totalHours);
-    const midnight = document.getElementById('midnight');
-    midnight.style.left = `${midnightPercent * 100}%`; */
     //-- distrugge vecchio slider per ricrearlo da zero
     if (slider.noUiSlider) {
     slider.noUiSlider.destroy();
@@ -1033,9 +1030,15 @@ function getMidnightPosition(totalHours) {
       }
     });
     //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
-  midnightPercent = getMidnightPosition(totalHours);
-  const midnight = document.getElementById('midnight');
-  midnight.style.left = `${midnightPercent * 100}%`;
+    const midnight = document.getElementById('midnight');
+    if (isLiveMode) {
+    midnightPercent = getMidnightPosition(totalHours);
+    midnight.style.display = "block"; 
+    midnight.style.left = `${midnightPercent * 100}%`;
+    } else {
+    // nascondi barra in day mode
+    midnight.style.display = "none";
+    }      
     
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
