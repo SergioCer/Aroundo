@@ -552,6 +552,7 @@
   let isLiveMode = true; // Verifica se è attiva la nuova Time line
   let timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 'live' | 'day'
   let midnightPercent = 0; // Barra della mezzanotte
+  let timelineState = {mode: 'live', anchorDate: new Date()}; // live | past | day 
   
   // Costanti
   // Coordinate di default (Sicilia occidentale)
@@ -567,9 +568,9 @@
   if (isLiveMode) timelineMode = 'live';
   else timelineMode = 'day';
 
-  function isLiveModeActive() {
-  return timelineMode === 'live';
-}
+  function isLiveModeActive() {return timelineMode === 'live';} // Restituisce la modalità attiva
+  function getTimelineMode(now, currentDate)
+  
     // Preleva le Categorie da supabase
   async function fetchCategories() {
     const { data, error } = await supabase
