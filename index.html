@@ -562,7 +562,7 @@
       console.error("Errore caricamento categorie:", error);
       return [];
       }
-      console.log(data);
+      // console.log(data);
       return data;
       }
 
@@ -932,24 +932,33 @@ function buildCategoryMenu() {
     return value / total; // 0 → 1
   }
 
-  // Posiziona la mezzanotte Timeline
-function getMidnightPosition(totalHours) {
+  // Posiziona la mezzanotte nella Timeline
+  function getMidnightPosition(totalHours) {
+  if (isLiveMode) {
+    const now = new Date();
+    const hoursPassed = now.getHours() + now.getMinutes() / 60;
+    return hoursPassed / totalHours;
+  } else {
+    // Giorno selezionato: mezzanotte a sinistra o nascosta
+    return 0;
+  }
+}
+ 
+  /* VECCHIA DA CANCELLARE function getMidnightPosition(totalHours) {
   const { start, end } = getTimelineRange();
   let nextMidnight;
   if (isLiveMode) {
     // prossima mezzanotte reale
-    nextMidnight = new Date(currentDate); // modificato prima era : new Date(start);
+    nextMidnight = new Date();
     nextMidnight.setHours(24, 0, 0, 0);
   } else {
     // mezzanotte del giorno selezionato
     nextMidnight = new Date(currentDate);
     nextMidnight.setHours(0, 0, 0, 0);
-  //
-console.log({start,end,nextMidnight,diffMidnight: (nextMidnight - start) / 3600000,diffTotal: (end - start) / 3600000});
-  //
   }
   return (nextMidnight - start) / (end - start);
 }
+*/
 
 
   // Genera la timeline
