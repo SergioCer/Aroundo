@@ -917,11 +917,6 @@ function buildCategoryMenu() {
       end = new Date(currentDate);
       end.setHours(24,0,0,0);
       return { start, end, now: start };
-    /* const now = getTimelineBaseTime();
-    const start = new Date(now);      // adesso
-    const end = new Date(now);        // +24h
-    end.setHours(now.getHours() + 24, 0, 0, 0);
-    return { start, end, now }; */
   }
 
   // Trasforma il tempo in una percentuale Timeline
@@ -989,16 +984,22 @@ function getMidnightPosition(totalHours) {
     
     //-- Posizionamento di #date-day
     if (isLiveMode) {
-    // metà strada tra handle sinistro (0%) e mezzanotte
+      // Calcolo delle posizioni percentuali
       const currentDayPercent = midnightPercent / 2;
-      const nextDayPercent =
-      midnightPercent + (1 - midnightPercent) / 2;
-      document.getElementById('day-text')
-      .style.left = `${currentDayPercent * 100}%`;
-      document.getElementById('day-next-text')
-      .style.left = `${nextDayPercent * 100}%`;
-  }
-  
+      const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
+      const currentDayEl = document.getElementById('day-text');
+      const nextDayEl = document.getElementById('day-next-text');
+      // Giorno attuale (rimane come prima)
+      currentDayEl.style.left = `${currentDayPercent * 100}%`;
+      currentDayEl.innerText = currentDate.getDate(); // solo numero del giorno
+      // Giorno successivo
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(currentDate.getDate() + 1); // passa al giorno successivo
+      // Ottieni abbreviazione del giorno della settimana in base alla lingua del browser
+      const nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      nextDayEl.style.left = `${nextDayPercent * 100}%`;
+      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`; // esempio: "Lun 5" o "Mon 5"
+    }  
       /*
     let dateDayPercent;
     if (isLiveMode) {
