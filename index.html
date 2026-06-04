@@ -692,8 +692,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEvents();
 });
   
-document.getElementById("prev-day").addEventListener("click", () => {
-  isLiveMode = false;
+document.getElementById("prev-day").addEventListener("click", () => {prevDay();
   currentDate.setDate(currentDate.getDate() - 1);
   updateTimelineMode();
   updateDateUI();
@@ -706,8 +705,7 @@ document.getElementById("prev-day").addEventListener("click", () => {
   renderEvents();
   });
 
-document.getElementById("next-day").addEventListener("click", () => {
-  isLiveMode = false;
+document.getElementById("next-day").addEventListener("click", () => {nextDay();
   currentDate.setDate(currentDate.getDate() + 1);
   updateTimelineMode();
   updateDateUI();
