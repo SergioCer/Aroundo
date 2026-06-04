@@ -463,7 +463,7 @@
 #day-text {
   position: absolute;
   top: 6px;       /* sopra lo slider */
-  left: 20%;        /* circa tra maniglia sinistra e midnight, poi si affina */
+  /* left: 20%;        /* ANNULLATO Usa posizione variabile ...circa tra maniglia sinistra e midnight, poi si affina */
   transform: translateX(-50%);
 }
 
@@ -1011,7 +1011,7 @@ function getMidnightPosition(totalHours) {
     // giorno selezionato → centro della timeline
     dateDayPercent = 0.5;
     }
-    const dateDay = document.getElementById('date-day');
+    const dateDay = document.getElementById('day-text');
     dateDay.style.left = `${dateDayPercent * 100}%`;
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
