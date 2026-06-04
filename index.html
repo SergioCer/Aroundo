@@ -460,7 +460,8 @@
   right: -2px;     /* leggermente a destra della maniglia */
 }
 
-#day-text {
+#day-text,
+#day-next-text {
   position: absolute;
   top: 10px;       /* sopra lo slider */
 }
@@ -507,6 +508,7 @@
   <!-- CENTRO DATA -->
   <!-- <div class="date-box"> -->
     <div class="date-day" id="day-text"></div>
+    <div class="date-day" id="day-next-text"></div>
     <div class="date-full" id="date-text"></div>
     <button class="nav-btn reset-btn" id="reset-day">•</button>
   <!-- </div> -->
@@ -940,23 +942,6 @@ function getMidnightPosition(totalHours) {
   return 0;
 }
  
-  /* VECCHIA DA CANCELLARE function getMidnightPosition(totalHours) {
-  const { start, end } = getTimelineRange();
-  let nextMidnight;
-  if (isLiveMode) {
-    // prossima mezzanotte reale
-    nextMidnight = new Date();
-    nextMidnight.setHours(24, 0, 0, 0);
-  } else {
-    // mezzanotte del giorno selezionato
-    nextMidnight = new Date(currentDate);
-    nextMidnight.setHours(0, 0, 0, 0);
-  }
-  return (nextMidnight - start) / (end - start);
-}
-*/
-
-
   // Genera la timeline
   function setupTimeline() {
     //-- distrugge vecchio slider per ricrearlo da zero
@@ -1000,10 +985,23 @@ function getMidnightPosition(totalHours) {
   const midnightPercent = getMidnightPosition(totalHours);
   const midnight = document.getElementById('midnight');
   midnight.style.left = `${midnightPercent * 100}%`;
+    
+    
     //-- Posizionamento di #date-day
-    let dateDayPercent;
     if (isLiveMode) {
     // metà strada tra handle sinistro (0%) e mezzanotte
+      const currentDayPercent = midnightPercent / 2;
+      const nextDayPercent =
+      midnightPercent + (1 - midnightPercent) / 2;
+      document.getElementById('day-text')
+      .style.left = `${currentDayPercent * 100}%`;
+      document.getElementById('day-next-text')
+      .style.left = `${nextDayPercent * 100}%`;
+  }
+  
+      /*
+    let dateDayPercent;
+    if (isLiveMode) {
     dateDayPercent = midnightPercent / 2;
     } else {
     // giorno selezionato → centro della timeline
@@ -1011,6 +1009,8 @@ function getMidnightPosition(totalHours) {
     }
     const dateDay = document.getElementById('day-text');
     dateDay.style.left = `${dateDayPercent * 100}%`;
+*/
+    
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
     //-- Offset
