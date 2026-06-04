@@ -548,7 +548,7 @@
   let showFinishedEvents = false; 
   let currentDate = new Date(); // Data odierna
   let isLiveMode = true; // Verifica se è attiva la nuova Time line
-var timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 'live' | 'day'
+  let timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 'live' | 'day'
   let midnightPercent = 0; // Barra della mezzanotte
   let timelineState = {mode: 'live', anchorDate: new Date()}; // live | past | day 
   
@@ -589,7 +589,6 @@ var timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 
     else {
       timelineMode = 'day';
     }
-console.log(selectedDay, todayDay, diffDays, timelineMode)    
   }
   
   function getTimelineMode(now, currentDate) {return timelineMode;}
