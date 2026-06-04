@@ -982,25 +982,31 @@ function getMidnightPosition(totalHours) {
   midnight.style.left = `${midnightPercent * 100}%`;
     
     
-    //-- Posizionamento di #date-day
+    //-- Iniziali Maiuscole
+    function capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    // -- Posizionamento di #date-day
     if (isLiveMode) {
-      // Calcolo delle posizioni percentuali
       const currentDayPercent = midnightPercent / 2;
       const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
       const currentDayEl = document.getElementById('day-text');
       const nextDayEl = document.getElementById('day-next-text');
-      // Giorno attuale (rimane come prima)
+      // Giorno attuale
+      let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
+      currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
       currentDayEl.style.left = `${currentDayPercent * 100}%`;
-      currentDayEl.innerText = currentDate.getDate(); // solo numero del giorno
       // Giorno successivo
       const nextDate = new Date(currentDate);
-      nextDate.setDate(currentDate.getDate() + 1); // passa al giorno successivo
-      // Ottieni abbreviazione del giorno della settimana in base alla lingua del browser
-      const nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      nextDate.setDate(currentDate.getDate() + 1);
+      let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
+      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
       nextDayEl.style.left = `${nextDayPercent * 100}%`;
-      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`; // esempio: "Lun 5" o "Mon 5"
-    }  
-      /*
+    }
+    
+    /*
     let dateDayPercent;
     if (isLiveMode) {
     dateDayPercent = midnightPercent / 2;
@@ -1077,6 +1083,8 @@ function getMidnightPosition(totalHours) {
     ? '#111'
     : '#fff';
   }
+
+  
   
 </script>
 </body>
