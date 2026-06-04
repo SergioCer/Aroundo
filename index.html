@@ -1140,12 +1140,17 @@ function getMidnightPosition(totalHours) {
   }
 
   function prevDay() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
   if (timelineMode === 'live') {
     // Primo prev-day da live
     /* currentDate.setDate(currentDate.getDate() - 1); */
     currentDate = new Date(today);
     timelineMode = 'past';
     updateTimelineMode();
+    updateDateUI();
+    setupTimeline();
+    renderEvents();
     return;
   }
   // Gli altri casi: spostamento effettivo indietro di un giorno
