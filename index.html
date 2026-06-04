@@ -1142,7 +1142,7 @@ function getMidnightPosition(totalHours) {
   function prevDay() {
   if (timelineMode === 'live') {
     // Primo prev-day da live
-    currentDate.setDate(currentDate.getDate() - 1);
+    /* currentDate.setDate(currentDate.getDate() - 1); */
     timelineMode = 'past';
     updateTimelineMode();
     return;
