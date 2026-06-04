@@ -304,7 +304,7 @@
     }
     
     .date-full {
-      font-size: 16px;
+      font-size: 14px;
       color: #666;
     }
 
@@ -377,13 +377,7 @@
       font-weight: bold;
       color: #3b82f6;
       pointer-events: none;
-      /* z-index: 998;
-      opacity: 1; */
     }
-    
-/*  #midnight-label {
-/*  background-color: #3b82f6;   /* Colore di sfondo */
-/*  #midnight .fixed-label #{24}; /* Includi la variabile Num */
     
     /* SLIDER */
     #time-range { width: 100%; margin-top: 2px; }    
@@ -886,6 +880,29 @@ function buildCategoryMenu() {
     function updateDateUI() {
       dayText.innerText = currentDate.getDate();
       dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
+          //-- Iniziali Maiuscole
+    function capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    // -- Posizionamento di -day
+    if (isLiveMode) {
+      const currentDayPercent = midnightPercent / 2;
+      const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
+      const currentDayEl = document.getElementById('day-text');
+      const nextDayEl = document.getElementById('day-next-text');
+      // Giorno attuale
+      let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
+      currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+      currentDayEl.style.left = `${currentDayPercent * 100}%`;
+      // Giorno successivo
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(currentDate.getDate() + 1);
+      let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
+      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
+      nextDayEl.style.left = `${nextDayPercent * 100}%`;
+    }
   }
 
     /* OK non toccare. Formatta la data in stile Italiano 00:00 */   
@@ -996,31 +1013,6 @@ function getMidnightPosition(totalHours) {
   const midnightPercent = getMidnightPosition(totalHours);
   const midnight = document.getElementById('midnight');
   midnight.style.left = `${midnightPercent * 100}%`;
-    
-    
-    //-- Iniziali Maiuscole
-    function capitalizeFirst(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-    // -- Posizionamento di -day
-    if (isLiveMode) {
-      const currentDayPercent = midnightPercent / 2;
-      const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
-      const currentDayEl = document.getElementById('day-text');
-      const nextDayEl = document.getElementById('day-next-text');
-      // Giorno attuale
-      let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
-      currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
-      currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
-      currentDayEl.style.left = `${currentDayPercent * 100}%`;
-      // Giorno successivo
-      const nextDate = new Date(currentDate);
-      nextDate.setDate(currentDate.getDate() + 1);
-      let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
-      nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
-      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
-      nextDayEl.style.left = `${nextDayPercent * 100}%`;
-    }
     
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
