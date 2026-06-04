@@ -882,7 +882,11 @@ function buildCategoryMenu() {
       dayText.innerText = currentDate.getDate();
       dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
     // -- Posizionamento di -day
-     capitalizeFirst() 
+    //-- Iniziali Maiuscole
+    function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
     if (isLiveMode) {
       const currentDayPercent = midnightPercent / 2;
       const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
@@ -1081,13 +1085,6 @@ function getMidnightPosition(totalHours) {
     : '#fff';
   }
 
-    //-- Iniziali Maiuscole
-    function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-  
-  
-  
 </script>
 </body>
 </html>
