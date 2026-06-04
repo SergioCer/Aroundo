@@ -366,19 +366,20 @@
       opacity: 0.4;
     }
 
-  .midnight-label {
+  #midnight-label {
     background-color: #3b82f6;   /* Colore di sfondo */
-    color: yellow;          /* Testo giallo brillante */
+    /* color: yellow;          /* Testo giallo brillante */
     font-family: 'Georgia', 'Times New Roman';  /* Font scelto */
     font-size: 18px;           /* Dimensioni del testo */
     text-align: center;      /* Centratura */
-    padding: 10px;          /* Spessore interno */
-    border-radius: 12px;      /* Angoli arrotondati */
-    position: absolute;      /* Posizionata centralmente */
+    /* padding: 10px;          /* Spessore interno */
+    border-radius: 2px;      /* Angoli arrotondati */
+    /* position: absolute;      /* Posizionata centralmente */
     z-index: 997;          /* Mantenere alta visibilità */
     pointer-events: none;     /* Disabilitare il clic del cursore per evitare interferenze con altri elementi */
     opacity: 0.4;          /* Trasparenza moderata */
   }
+  #midnight .fixed-label #{24}; /* Includi la variabile Num */
     
     /* SLIDER */
     #time-range { width: 100%; margin-top: 2px; }    
