@@ -893,8 +893,6 @@ function buildCategoryMenu() {
     if (isLiveMode) {
       const currentDayPercent = midnightPercent / 2;
       const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
-      const currentDayEl = document.getElementById('day-text');
-      const nextDayEl = document.getElementById('day-next-text');
       // Giorno attuale
       let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
       currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
@@ -926,11 +924,12 @@ function buildCategoryMenu() {
     currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
     }
   }
-    /* OK non toccare. Formatta la data in stile Italiano 00:00 */   
+  
+    /* Formatta la data in stile Italiano 00:00 */   
     function formatTime(dateString) {
       const d = new Date(dateString);
       return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-    }  
+    } 
 
   function getEventState(startDate, endDate) {
     const now = new Date();
