@@ -904,7 +904,21 @@ function buildCategoryMenu() {
       nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
       nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
       nextDayEl.style.left = `${nextDayPercent * 100}%`;
-    }
+    } else { 
+      // Day mode
+          // nasconde next day
+    nextDayEl.style.display = "none";
+    // centra day-text
+    currentDayEl.style.display = "block";
+    currentDayEl.style.left = "50%";
+    currentDayEl.style.transform = "translateX(-50%)";
+    let currentDayName =
+      currentDate.toLocaleDateString(navigator.language, {
+        weekday: 'short'
+      });
+    currentDayName = capitalizeFirst(currentDayName);
+    currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+  }
   }
 
     /* OK non toccare. Formatta la data in stile Italiano 00:00 */   
