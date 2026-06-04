@@ -901,14 +901,15 @@ function buildCategoryMenu() {
     // 🔴 critico Inizia tra meno di 2h
     return { state: 'imminent', intensity: 2.5 };}
 
-  // calcola il range della Timeline
+  // Calcola il range della Timeline
   function getTimelineRange() {
     let start , end;
     if (isLiveMode) {
       const now = new Date();
       start = new Date(now);
-      end = new Date(now);
-      end.setHours(now.getHours() +24,0,0,0);
+      end = new Date(now.getTime() + 24 * 3600000);
+      // end = new Date(now);
+      // end.setHours(now.getHours() +24,0,0,0);
       return { start, end, now };
       }
       start = new Date(currentDate);
@@ -950,14 +951,15 @@ function getMidnightPosition(totalHours) {
 
   // Genera la timeline
   function setupTimeline() {
-    // distrugge slider precedente
+    //-- distrugge vecchio slider per ricrearlo da zero
     if (slider.noUiSlider) {
     slider.noUiSlider.destroy();
     slider.noUiSlider = null;
     }
+    //-- Definisce intervallo temporale
     let startBase;
     let totalHours;
-    // Live Mode
+    //-- Modalità Live: calcola il numero di ore mancanti alle 24 di oggi
     if (isLiveMode) {
       const now = new Date();
       const currentHour = now.getHours();
@@ -965,19 +967,18 @@ function getMidnightPosition(totalHours) {
       totalHours = remainingToday + 24;
       startBase = now;
      }
-    // Day
+    //-- Modalità Day: calcola le sole 24 ore del giorno
     else {
       startBase = new Date(currentDate);
       startBase.setHours(0,0,0,0);
       totalHours = 24;
       }
-
+    //-- Controllo di sicurezza per evitare errori.
     if (!totalHours || isNaN(totalHours)) {
     console.error("Invalid timeline range", totalHours);
     return;
     }
-    
-    // Crea lo slider con doppia maniglia
+    //-- Crea lo slider con doppia maniglia
     noUiSlider.create(slider, {
     start: [0, totalHours],
     connect: true,
@@ -987,23 +988,26 @@ function getMidnightPosition(totalHours) {
       max: totalHours
       }
     });
-  // posizione mezzanotte
+    //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
   const midnightPercent = getMidnightPosition(totalHours);
   const midnight = document.getElementById('midnight');
   midnight.style.left = `${midnightPercent * 100}%`;
-  // Aggiorna labels
+    //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
+    //-- Offset
     const startOffset = Math.round(values[0]);
     const endOffset = Math.round(values[1]);
+    //-- Calcola le date reali 
     const startDate = new Date(startBase.getTime() + startOffset * 3600000);
     const endDate = new Date(startBase.getTime() + endOffset * 3600000);
+    //-- Estrae le ore
     const startHour = startDate.getHours()
         .toString()
         .padStart(2,'0');
     const endHour = endDate.getHours()
         .toString()
         .padStart(2,'0');
-    // I due cursori della timeline e crea etichette
+    //-- Crea le etichette delle maniglie
     const handles =
       slider.querySelectorAll('.noUi-handle');
     handles.forEach((h, i) => {
@@ -1016,23 +1020,24 @@ function getMidnightPosition(totalHours) {
           'handle-label';
         h.appendChild(label);
       }
-      // Ora di inizio e di fine
+      //-- Inserisce ora di inizio e di fine
       label.innerText =
         i === 0
           ? startHour
           : endHour;
     });
+    //-- Aggiorna i marker della mappa in base ad orari inizio-fine
     updateMarkerVisibility(
       startOffset,
       endOffset
       );
     }
-    // Ad ogni movimento dello slider agiorna la mappa
+    //-- Ad ogni movimento dello slider agiorna la mappa
     slider.noUiSlider.on(
     'update',
     updateHandles
     );
-    // forza primo update
+    //-- forza primo update
     updateHandles([0, totalHours]);
   }
 
