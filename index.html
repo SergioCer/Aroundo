@@ -360,7 +360,6 @@
       height: 24px;
       background: #3b82f6;
       border-radius: 2px;
-      /* CANCELLARE ??? transform: translateX(-50%); */ 
       z-index: 997;
       pointer-events: none;
       opacity: 0.4;
@@ -381,7 +380,6 @@
     
     /* SLIDER */
     #time-range { width: 100%; margin-top: 2px; }    
-    /* CANCELLARE ??? .time-label { font-size: 11px; color: #555; } */
       
     .noUi-target {
       background: rgba(255,255,255,0.18);
@@ -550,7 +548,7 @@
   let showFinishedEvents = false; 
   let currentDate = new Date(); // Data odierna
   let isLiveMode = true; // Verifica se è attiva la nuova Time line
-  let timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 'live' | 'day'
+var timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 'live' | 'day'
   let midnightPercent = 0; // Barra della mezzanotte
   let timelineState = {mode: 'live', anchorDate: new Date()}; // live | past | day 
   
@@ -591,6 +589,7 @@
     else {
       timelineMode = 'day';
     }
+console.log(selectedDay, todayDay, diffDays, timelineMode)    
   }
   
   function getTimelineMode(now, currentDate) {return timelineMode;}
