@@ -1141,6 +1141,34 @@ function getMidnightPosition(totalHours) {
     : '#fff';
   }
 
+  function prevDay() {
+  if (timelineMode === 'live') {
+    // Primo prev-day da live
+    timelineMode = 'past';
+    updateTimeline();
+    return;
+  }
+  // Gli altri casi: spostamento effettivo indietro di un giorno
+  currentDate.setDate(currentDate.getDate() - 1);
+  timelineMode = 'past';
+  updateTimeline();
+}
+
+function nextDay() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  if (timelineMode === 'past' && currentDate.getTime() === today.getTime()) {
+    // Torna in live se raggiunge la data odierna
+    timelineMode = 'live';
+    updateTimeline();
+    return;
+  }
+  currentDate.setDate(currentDate.getDate() + 1);
+  timelineMode = 'day';
+  updateTimeline();
+}
+  
+
 </script>
 </body>
 </html>
