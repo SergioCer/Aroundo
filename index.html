@@ -676,7 +676,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
   
 document.getElementById("prev-day").addEventListener("click", () => {prevDay();
-  //////////////////////////////////////////////////////////////////////////////////    updateTimelineMode();
   updateDateUI();
   setupTimeline();
   const values = slider.noUiSlider.get();
@@ -731,14 +730,19 @@ function renderEvents() {
   markers.forEach(m => map.removeLayer(m.marker));
   markers = [];
   events.forEach(e => {
-    // 🔵 STATO EVENTO (tempo reale)
+    //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
+    const formatDay = (dateString) => {
+    const d = new Date(dateString);
+    const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+    return `${days[d.getDay()]} ${d.getDate()}`;
+    };
     const stateData = getEventState(
       new Date(e.ev_inizio),
       e.ev_fine ? new Date(e.ev_fine) : null
     );
     const stateClass = stateData.state;
     const intensity = stateData.intensity;
-    // 🎨 ICONA
+    //-- 🎨 ICONA
     const marker = L.marker([e.ev_lat, e.ev_lng], {
       icon: createIcon(
         categories.find(c =>
@@ -748,8 +752,7 @@ function renderEvents() {
         intensity
       )
     })
-      
-    // Visualizza i dettagli dell'evento selezionato //
+    //-- Visualizza i dettagli dell'evento selezionato //
     .bindPopup(`
     <div style="min-width:180px">
     <div style="font-weight: 700;font-size: 14px;margin-bottom: 4px;">
@@ -761,6 +764,14 @@ function renderEvents() {
     margin-bottom:6px;
     font-weight:600;
     ">
+    <div style="
+    font-size:12px;
+    color:#666;
+    margin-bottom:4px;
+    font-weight:600;
+    ">
+  ${formatDay(e.ev_inizio)}
+</div>
     ${formatTime(e.ev_inizio)}
     ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
     </div>
@@ -775,7 +786,7 @@ function renderEvents() {
   `);      
   marker.on('mouseover', function () {this.openPopup();});
   marker.on('mouseout', function () {this.closePopup();});
-    // 📦 STORAGE DATI (NO LOGICA)
+    //-- 📦 STORAGE DATI (NO LOGICA)
     markers.push({
       marker,
       category: parseInt(e.ev_categoria),
@@ -1120,8 +1131,6 @@ function getMidnightPosition(totalHours) {
   function prevDay() {
   if (timelineMode === 'live') {
     timelineMode = 'past';
-    /* currentDate.setDate(currentDate.getDate() - 1);
-    /* updateTimelineMode(); */
     updateDateUI();
     setupTimeline();
     renderEvents();
