@@ -1228,7 +1228,7 @@ function nextDay() {
   
   function getNow(date = null) {const d = new Date(date); d.setHours(0,0,0,0); return d;}
 
-  function getUpcomingEvents(hours = 4) {
+  function getUpcomingEvents(hours = 6) {
   const now = new Date();
   const limit = new Date(now.getTime() + hours * 3600000);
   return events.filter(e => {
