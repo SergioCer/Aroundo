@@ -565,9 +565,9 @@
 
   function updateTimelineMode() {
     const currentDay = new Date(currentDate);
-    selectedDay.setHours(0,0,0,0);
+    currentDay.setHours(0,0,0,0);
     const today = new Date();
-    todayDay.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
     const diffDays =
       Math.round((currentDay - today) / (1000 * 60 * 60 * 24) );
     if (diffDays < 0) {
