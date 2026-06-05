@@ -489,6 +489,22 @@
   left: 50%;
   transform: translateX(-50%);
 }    
+
+.pulse.running-strong::after {
+  animation: pulse 2.5s infinite ease-out;
+  opacity: 0.25;
+}
+
+.pulse.running-medium::after {
+  animation: hopSlow 3s infinite;
+  opacity: 0.12;
+}
+
+.pulse.running-soft::after {
+  animation: none;
+  opacity: 0;
+}
+    
    
 </style>
 </head>
@@ -952,26 +968,26 @@ function buildCategoryMenu() {
     if (endDate && now > endDate) { return { state: 'finished', intensity: 0 }; }
     // evento già in corso da oltre 30'
     /* SOSTITUITO CON VEDI SOTTO if (minutesFromStart > 30) { return { state: 'running', intensity: 0.6 }; } */ 
-    if (minutesFromStart > 30) {
-    let intensity = 0.6; // fallback
+    
+    if (minutesFromStart > 0) { // evento iniziato
+    let state = 'running-soft';
+    let intensity = 0.4;
     if (durationMinutes) {
     const progress = minutesFromStart / durationMinutes;
-    if (progress < 0.05) {
-    // appena iniziato → ancora forte
+    if (progress < 0.05) { // primi minuti
+    state = 'running-strong';
     intensity = 3;
-    } else if (progress < 0.25) {
-    // fase di decadimento
-    intensity = 3 - ((progress - 0.05) / 0.2) * 2.4;
-    } else {
-    // evento già ben avviato → presenza bassa ma stabile
+    } else if (progress < 0.25) { // primo quarto della durata
+    state = 'running-medium';
+    intensity = 1.2;
+    } else { // dopo 1/4 della durata fino alla fine
+    state = 'running-soft';
     intensity = 0.4;
     }
     }
-    return {
-    state: 'running',
-    intensity: Math.max(0.3, intensity)
-    };
+    return { state, intensity };
   }
+    
     // Inizia tra 12h
     if (diffMinutes > 720) { return { state: 'distant', intensity: 0.2 }; }
     // Inizia tra 8h
