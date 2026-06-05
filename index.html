@@ -232,7 +232,7 @@
       background: white;
      }
       
-    /* --- PULSAZIONI & SALTI MARKER --- */
+    /* PULSAZIONI dei Marker */
     /* Marker pulsazioni base */
     .pulse { border-radius: 50%; position: relative; z-index: 990; }
     .pulse::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--c); z-index: 990; }
@@ -254,7 +254,7 @@
     .pulse.finished { animation: finished 0.5s ease forwards; }    
     .pulse.finished::after { display: none; animation: none ; opacity: 0 ; }
     
-    /* SALTI correlati alle pulsazioni */
+    /* SALTI dei Marker correlati alle Pulsazioni */
     @keyframes pulse { 0% { transform: scale(0.6);opacity: 0.5; } 70% { transform: scale(1.6); opacity: 0; } 100% { opacity: 0; }}
     @keyframes hopSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); }}
     @keyframes hopMedium { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); }}
@@ -941,6 +941,7 @@ function buildCategoryMenu() {
       return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
     } 
 
+  /* Temporizzazione dei Marker */
   function getEventState(startDate, endDate) {
     const now = new Date();
     const diffMinutes = (startDate - now) / 1000 / 60;
@@ -948,13 +949,13 @@ function buildCategoryMenu() {
     // evento terminato 
     if (endDate && now > endDate) { return { state: 'finished', intensity: 0 }; }
     // evento già in corso da oltre 30'
-    if (minutesFromStart > 30) { return { state: 'running', intensity: 1 }; }
+    if (minutesFromStart > 30) { return { state: 'running', intensity: 0.6 }; }
     // Inizia tra 12h
-    if (diffMinutes > 720) { return { state: 'distant', intensity: 0 }; }
+    if (diffMinutes > 720) { return { state: 'distant', intensity: 0.2 }; }
     // Inizia tra 8h
-    if (diffMinutes > 480) { return { state: 'future-deep', intensity: 0.3 }; }
+    if (diffMinutes > 480) { return { state: 'future-deep', intensity: 0.4 }; }
     // Inizia tra 6h
-    if (diffMinutes > 360) { return { state: 'future-far', intensity: 0.7 }; }
+    if (diffMinutes > 360) { return { state: 'future-far', intensity: 0.8 }; }
     // Inizia tra 4h
     if (diffMinutes > 240) { return { state: 'future-medium', intensity: 1.2 }; }
     // Inizia tra 2h
