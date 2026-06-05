@@ -601,6 +601,10 @@
   const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
   const slider = document.getElementById('time-range');
 
+  // Aggiorna ogni 1 minuto
+  setInterval(updateMarkerVisibility, 60 * 1000);
+  setInterval(updateTicker, 60000);
+  
   function updateTimelineMode() {
     const currentDay = new Date(currentDate);
     currentDay.setHours(0,0,0,0);
@@ -844,10 +848,6 @@ function createIcon(color, state, intensity) {
   });
 }
 
-// Aggiorna ogni 1 minuto
-setInterval(updateMarkerVisibility, 60 * 1000);
-setInterval(updateTicker, 60000);
-  
 /* NUOVA Mostra o nasconde i Marker delle categorie */
 function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   const now = new Date(); // <<--- ora è definita
