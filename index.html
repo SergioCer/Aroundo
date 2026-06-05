@@ -560,8 +560,10 @@
   const slider = document.getElementById('time-range');
 
   function updateTimelineMode() {
-    const currentDay = getNow(currentDate);
-    const today = getNow(new Date());
+    const currentDay = new Date(currentDate);
+    currentDay.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
     const diffDays = Math.round((currentDay - today) / 86400000);
     if (diffDays < 0) {
     timelineMode = 'past';
@@ -1012,6 +1014,7 @@ function getMidnightPosition(totalHours) {
     //-- Modalità Live: calcola il numero di ore mancanti alle 24 di oggi
     if (timelineMode === 'live') {
       const now = new Date();
+      now.setSeconds(0,0);
       const currentHour = now.getHours();
       const remainingToday = 24 - currentHour;
       totalHours = remainingToday + 24;
