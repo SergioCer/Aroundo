@@ -815,7 +815,9 @@ function createIcon(color, state, intensity) {
   });
 }
 
-/* NUOVA Mostra o nasconde i Marker delle categorie  Modificato endOffset prima era 48 ***********/
+setInterval(updateMarkerVisibility, 60 * 1000);
+  
+/* NUOVA Mostra o nasconde i Marker delle categorie */
 function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   // checkbox categorie attive
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
