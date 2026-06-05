@@ -1118,10 +1118,16 @@ function getMidnightPosition(totalHours) {
   }
 
   function prevDay() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const currentDay = new Date(currentDate);
+  currentDay.setHours(0,0,0,0);
   if (timelineMode === 'live') {
     // Primo prev-day da live
-    currentDate.setDate(currentDate.getDate() - 1);
-    timelineMode = 'past';
+    /* currentDate.setDate(currentDate.getDate() - 1); */
+    currentDate = new Date(today);
+    timelineMode = 'day';
+    /* timelineMode = 'past'; */
     updateTimelineMode();
     return;
   }
