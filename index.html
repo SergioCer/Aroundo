@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
   
 document.getElementById("prev-day").addEventListener("click", () => {prevDay();
-  updateTimelineMode();
+  //////////////////////////////////////////////////////////////////////////////////    updateTimelineMode();
   updateDateUI();
   setupTimeline();
   const values = slider.noUiSlider.get();
@@ -1118,16 +1118,9 @@ function getMidnightPosition(totalHours) {
   }
 
   function prevDay() {
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const currentDay = new Date(currentDate);
-  currentDay.setHours(0,0,0,0);
   if (timelineMode === 'live') {
-    // Primo prev-day da live
-    currentDate = new Date(today);
-    currentDate.setHours(0,0,0,0);
     timelineMode = 'past';
-    currentDate.setDate(currentDate.getDate() - 1);
+    /* currentDate.setDate(currentDate.getDate() - 1);
     /* updateTimelineMode(); */
     updateDateUI();
     setupTimeline();
