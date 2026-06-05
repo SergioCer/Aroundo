@@ -822,7 +822,7 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 48) {
   checkboxes.forEach(cb => { const catId = parseInt(cb.id.replace('cat-', ''));
     if (cb.checked) { activeCategories.push(catId); }});
   // base timeline reale
-  const timeline = getTimelineRange();
+  const timeline = getTimelineRange(currentDate);
   // finestra slider relativa alla timeline
   const startTime = new Date( timeline.start.getTime() + startOffset * 3600000 );
   const endTime = new Date( timeline.start.getTime() + endOffset * 3600000 );
@@ -980,16 +980,16 @@ function buildCategoryMenu() {
     return { state: 'imminent', intensity: 2.5 };}
 
   // Calcola il range della Timeline
-  function getTimelineRange() {
+  function getTimelineRange(date = currentDate) {
     let start , end;
     if (timelineMode === 'live') {
       const now = new Date();
       start = new Date(now);
       end = new Date(now.getTime() + 24 * 3600000);
-      return { start, end, now };
+      return { start, end, now: start };
       }
-      start = getNow(currentDate);
-      end = new Date(currentDate);
+      start = getNow(date);
+      end = new Date(date);
       end.setHours(24,0,0,0);
       return { start, end, now: start };
   }
@@ -1155,7 +1155,7 @@ function nextDay() {
   updateTimelineMode();
 }
   
-  function getNow() {const d = new Date(); d.setHours(0,0,0,0); return d;}
+  function getNow() {const d = new Date(date); d.setHours(0,0,0,0); return d;}
   
 </script>
 </body>
