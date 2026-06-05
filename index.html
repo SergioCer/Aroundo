@@ -560,21 +560,13 @@
   const slider = document.getElementById('time-range');
 
   function updateTimelineMode() {
-    const currentDay = new Date(currentDate);
-    currentDay.setHours(0,0,0,0);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const diffDays =
-      Math.round((currentDay - today) / (1000 * 60 * 60 * 24) );
-    if (diffDays < 0) {
-      timelineMode = 'past';
-    }
-    else if (diffDays === 0) {
-      timelineMode = 'live';
-    }
-    else {
-      timelineMode = 'day';
-    }
+    const currentDay = getNow(currentDate);
+    const today = getNow()
+    const diffDays = (currentDay - today) / 86400000;
+    timelineMode =
+    diffDays < 0 ? 'past' :
+    diffDays === 0 ? 'live' :
+    'day';
   }
   
   function getTimelineMode(now, currentDate) {return timelineMode;}
@@ -980,8 +972,7 @@ function buildCategoryMenu() {
       end = new Date(now.getTime() + 24 * 3600000);
       return { start, end, now };
       }
-      start = new Date(currentDate);
-      start.setHours(0,0,0,0);
+      start = getNow(currentDate);
       end = new Date(currentDate);
       end.setHours(24,0,0,0);
       return { start, end, now: start };
@@ -1025,8 +1016,7 @@ function getMidnightPosition(totalHours) {
      }
     //-- Modalità Day: calcola le sole 24 ore del giorno
     else {
-      startBase = new Date(currentDate);
-      startBase.setHours(0,0,0,0);
+      startBase = getNow(currentDate);
       totalHours = 24;
       }
     //-- Controllo di sicurezza per evitare errori.
@@ -1136,8 +1126,7 @@ function getMidnightPosition(totalHours) {
 }
 
 function nextDay() {
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  const today = getNow();
   if (timelineMode === 'past' && currentDate.getTime() === today.getTime()) {
     // Torna in live se raggiunge la data odierna
     timelineMode = 'live';
@@ -1149,7 +1138,8 @@ function nextDay() {
   updateTimelineMode();
 }
   
-
+  function getNow() {const d = new Date(); d.setHours(0,0,0,0); return d;}
+  
 </script>
 </body>
 </html>
