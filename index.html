@@ -526,7 +526,7 @@
 
 @keyframes tickerScroll{
   from{
-    transform:translateX(100%);
+    transform:translateX(0%);
   }
   to{
     transform:translateX(-100%);
@@ -602,9 +602,11 @@
   const slider = document.getElementById('time-range');
 
   // Aggiorna ogni 1 minuto
-  setInterval(updateMarkerVisibility, 60 * 1000);
+  setInterval(updateMarkerVisibility, 60000);
+  updateMarkerVisibility();
   setInterval(updateTicker, 60000);
-  
+  updateTicker();
+    
   function updateTimelineMode() {
     const currentDay = new Date(currentDate);
     currentDay.setHours(0,0,0,0);
