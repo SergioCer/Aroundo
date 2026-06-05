@@ -1128,7 +1128,10 @@ function getMidnightPosition(totalHours) {
     currentDate = new Date(today);
     timelineMode = 'day';
     /* timelineMode = 'past'; */
-    updateTimelineMode();
+    /* updateTimelineMode(); */
+    updateDateUI();
+    setupTimeline();
+    renderEvents();
     return;
   }
   // Gli altri casi: spostamento effettivo indietro di un giorno
