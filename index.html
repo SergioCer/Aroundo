@@ -759,28 +759,27 @@ function renderEvents() {
     <div style="font-weight: 700;font-size: 14px;margin-bottom: 4px;">
     ${e.ev_titolo}
     </div>
-    <div style="
-    font-size: 12px;
-    color:#3b82f6;
-    margin-bottom:6px;
-    font-weight:600;
-    ">
-    <div style="
-    font-size:12px;
-    color:#666;
-    margin-bottom:4px;
-    font-weight:600;
-    ">
-  ${formatDay(e.ev_inizio)}
-</div>
-    ${formatTime(e.ev_inizio)}
-    ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+    <div style="font-size: 12px; color:#3b82f6; margin-bottom:6px; font-weight:600; ">
+     ${(() => {
+        const startDate = new Date(e.ev_inizio);
+        const now = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(now.getDate() + 1);
+        tomorrow.setHours(0,0,0,0);
+        const isToday = startDate.toDateString() === now.toDateString();
+        const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
+        const color = isToday ? '#3b82f6' : (isTomorrow ? '#dc3545' : '#666');
+        const align = isToday ? 'left' : (isTomorrow ? 'right' : 'left');
+        return `
+          <div style="color:${color}; text-align:${align}">
+            ${formatDay(e.ev_inizio)} ${formatTime(e.ev_inizio)}
+            ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+          </div>
+        `;
+      })()}
+    
     </div>
-    <div style="
-    font-size: 12px;
-    color:#555;
-    line-height:1.35;
-    ">
+    <div style="font-size: 12px; color:#555; line-height:1.35; ">
     ${e.ev_descrizione || ''}
     </div>
     </div>
