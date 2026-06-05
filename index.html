@@ -946,10 +946,32 @@ function buildCategoryMenu() {
     const now = new Date();
     const diffMinutes = (startDate - now) / 1000 / 60;
     const minutesFromStart =  (now - startDate) / 1000 / 60;
+    const durationMinutes = endDate ? (endDate - startDate) / 1000 / 60 : null; // calcola durata dell'evento
+    const progress = durationMinutes ? minutesFromStart / durationMinutes : 0; // ottiene la progressione dell'evento 
     // evento terminato 
     if (endDate && now > endDate) { return { state: 'finished', intensity: 0 }; }
     // evento già in corso da oltre 30'
-    if (minutesFromStart > 30) { return { state: 'running', intensity: 0.6 }; }
+    /* SOSTITUITO CON VEDI SOTTO if (minutesFromStart > 30) { return { state: 'running', intensity: 0.6 }; } */ 
+    if (minutesFromStart > 30) {
+    let intensity = 0.6; // fallback
+    if (durationMinutes) {
+    const progress = minutesFromStart / durationMinutes;
+    if (progress < 0.05) {
+    // appena iniziato → ancora forte
+    intensity = 3;
+    } else if (progress < 0.25) {
+    // fase di decadimento
+    intensity = 3 - ((progress - 0.05) / 0.2) * 2.4;
+    } else {
+    // evento già ben avviato → presenza bassa ma stabile
+    intensity = 0.4;
+    }
+    }
+    return {
+    state: 'running',
+    intensity: Math.max(0.3, intensity)
+    };
+  }
     // Inizia tra 12h
     if (diffMinutes > 720) { return { state: 'distant', intensity: 0.2 }; }
     // Inizia tra 8h
