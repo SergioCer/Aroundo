@@ -485,8 +485,8 @@
 
 #reset-day {
   position: absolute;
-  top: 2px;        /* sotto date-full */
-  left: 50%;
+  top: -12px;
+  left: 12%;
   transform: translateX(-50%);
 }    
    
@@ -546,7 +546,7 @@
   let events = [];
   let markers = [];
   let showFinishedEvents = false; 
-  let currentDate = new Date(); // Data odierna
+  let currentDate = new Date(); // Data odierna di riferimento per tutte le date
   let timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 'live' | 'day'
   let midnightPercent = 0; // Barra della mezzanotte
   let timelineState = {mode: 'live', anchorDate: new Date()}; // live | past | day 
@@ -560,19 +560,16 @@
   const dateText = document.getElementById("date-text");
   const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
   const slider = document.getElementById('time-range');
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  /* CANCELLARE const today = new Date();
+  today.setHours(0,0,0,0); */
 
   function updateTimelineMode() {
-    const selectedDay = new Date(currentDate);
+    const currentDay = new Date(currentDate);
     selectedDay.setHours(0,0,0,0);
-    const todayDay = new Date();
+    const today = new Date();
     todayDay.setHours(0,0,0,0);
     const diffDays =
-      Math.round(
-        (selectedDay - todayDay) /
-        (1000 * 60 * 60 * 24)
-      );
+      Math.round((currentDay - today) / (1000 * 60 * 60 * 24) );
     if (diffDays < 0) {
       timelineMode = 'past';
     }
