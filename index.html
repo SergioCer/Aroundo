@@ -1243,8 +1243,15 @@ function nextDay() {
   function updateTicker(){
   const list = getUpcomingEvents(10);
   const html = list.map(e => {
-    return `
-      <span style="margin-right:60px;">
+  const color = categories.find(c => c.id_macro_categoria == e.ev_categoria)?.mc_colore || '#999999';
+  return `
+      <span style="margin-right:20px;
+          padding:2px 8px;
+          border-radius:12px;
+          background:${color}33;
+          border:1px solid ${color}66;
+          white-space:nowrap;
+      ">
         ⏰ ${formatTime(e.ev_inizio)}
         • ${e.ev_luogo}
         • ${e.ev_titolo}
