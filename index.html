@@ -547,11 +547,9 @@
   let markers = [];
   let showFinishedEvents = false; 
   let currentDate = new Date(); // Data odierna di riferimento per tutte le date
-  let timelineMode = 'live'; // Questa sarà la nuova timeline per tutto 'past' | 'live' | 'day'
+  let timelineMode = 'live'; // Nuova timeline per tutto 'past' | 'live' | 'day'
   let midnightPercent = 0; // Barra della mezzanotte
-  let timelineState = {mode: 'live', anchorDate: new Date()}; // live | past | day 
   
-  // Costanti
   // Coordinate di default (Sicilia occidentale)
   const defaultLat = 37.55; /* 37.55 */
   const defaultLng = 14.1; /* 14.1 */
@@ -560,8 +558,6 @@
   const dateText = document.getElementById("date-text");
   const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
   const slider = document.getElementById('time-range');
-  /* CANCELLARE const today = new Date();
-  today.setHours(0,0,0,0); */
 
   function updateTimelineMode() {
     const currentDay = new Date(currentDate);
@@ -982,8 +978,6 @@ function buildCategoryMenu() {
       const now = new Date();
       start = new Date(now);
       end = new Date(now.getTime() + 24 * 3600000);
-      // end = new Date(now);
-      // end.setHours(now.getHours() +24,0,0,0);
       return { start, end, now };
       }
       start = new Date(currentDate);
