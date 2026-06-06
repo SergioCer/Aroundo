@@ -603,11 +603,13 @@
   const daysLong  = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
   const slider = document.getElementById('time-range');
 
-  // Aggiorna ogni 1 minuto
+  // Aggiorna ogni minuto
   setInterval(updateMarkerVisibility, 60000);
   updateMarkerVisibility();
   setInterval(updateTicker, 60000);
   updateTicker();
+  setInterval(getEventState, 60000);
+  getEventState()
     
   function updateTimelineMode() {
     const currentDay = new Date(currentDate);
