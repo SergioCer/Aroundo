@@ -873,7 +873,8 @@ function updateMarkerVisibility(startOffset = 0) {
   const endOffset = (midnight - now) / 3600000; // mezzanotte del giorno successivo
   } else {
     midnight.setHours(24, 0, 0, 0);
-    const endOffset = (now) / 3600000; // mezzanotte di oggi
+    const endOffset = new Date(currentDate) / 3600000;
+    // const endOffset = (now) / 3600000; // mezzanotte di oggi
   }
 
   // Visualizza su console
