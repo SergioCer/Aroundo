@@ -635,7 +635,6 @@
       console.error("Errore caricamento categorie:", error);
       return [];
       }
-      console.log(data); // Visualizza su console
       return data;
       }
 
@@ -851,20 +850,18 @@ function createIcon(color, state, intensity) {
 }
 
 /* NUOVA Mostra o nasconde i Marker delle categorie */
-function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
-  const now = new Date();
-  console.log (now) // Visualizza su console
+function updateMarkerVisibility(startOffset = 0) {
+  const now = new Date(); //****** la data di riferimento è errata ******
   const midnight = new Date(now);
   if (timelineMode === 'live') {
-    // mezzanotte del giorno successivo
-    midnight.setHours(24, 0, 0, 0);
-    midnight.setDate(midnight.getDate() + 1);
-    endOffset = (midnight - now) / 3600000;
+    midnight.setHours(48, 0, 0, 0); // mezzanotte del giorno successivo
   } else {
-    // mezzanotte di oggi
-    midnight.setHours(24, 0, 0, 0);
-    endOffset = (midnight - now) / 3600000;
+    midnight.setHours(24, 0, 0, 0); // mezzanotte di oggi
   }
+  const endOffset = (midnight - now) / 3600000;
+  // Visualizza su console
+  console.log (now)
+  console.log (currentDate)
 
   // checkbox categorie attive
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
