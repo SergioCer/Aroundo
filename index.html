@@ -652,7 +652,6 @@
       console.error("Errore caricamento eventi:", error);
     return [];
     }
-console.log("EVENTI DA SUPABASE:", data.length);
     return data;
   }
   
@@ -772,7 +771,6 @@ function renderEvents() {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
     const d = new Date(dateString);
-    //  CANCELLARE const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab']; /////
     return `${daysShort[d.getDay()]} ${d.getDate()}`;
     };
     const stateData = getEventState(
@@ -876,15 +874,6 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
     endOffset = 24;
     // const endOffset = (now) / 3600000; // mezzanotte di oggi
   }
-
-  // Visualizza su console
-  console.log ("Data Corrente:",currentDate)
-  console.log ("Mezzanotte:",midnight)
-  console.log ("Inizio:",startOffset)
-  console.log ("Fine:",endOffset)  
-  console.log ("Adesso:",now)
-  console.log ("Modalità:",timelineMode)
-
   // checkbox categorie attive
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
   const activeCategories = [];
