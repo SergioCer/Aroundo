@@ -798,7 +798,7 @@ function renderEvents() {
         const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
         const color = isToday ? '#3b82f6' : (isTomorrow ? '#dc3545' : '#666');
         const fullDate = formatDay(e.ev_inizio); // es: "Sab 6"
-        const dayLabel = isToday ? 'Oggi' ${fullDate}` : (isTomorrow ? 'Domani' ${fullDate}`: fullDate);
+        const dayLabel = isToday ? 'Oggi ${fullDate}' : (isTomorrow ? 'Domani' ${fullDate}': fullDate);
         const align = isToday ? 'flex-start' : (isTomorrow ? 'flex-end' : 'center');
       marker.bindPopup(`
     <div style="min-width:180px; font-size:12px; line-height:1.3;">
