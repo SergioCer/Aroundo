@@ -599,6 +599,8 @@
   const dayText = document.getElementById("day-text");
   const dateText = document.getElementById("date-text");
   const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+  const daysShort = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const daysLong  = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
   const slider = document.getElementById('time-range');
 
   // Aggiorna ogni 1 minuto
@@ -770,8 +772,8 @@ function renderEvents() {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
     const d = new Date(dateString);
-    const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-    return `${days[d.getDay()]} ${d.getDate()}`;
+    //  CANCELLARE const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab']; /////
+    return `${daysShort[d.getDay()]} ${d.getDate()}`;
     };
     const stateData = getEventState(
       new Date(e.ev_inizio),
@@ -894,18 +896,6 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
     let inTimeRange =
     eventStart <= endTime &&
     eventEnd >= startTime;
-    // const now = getNow(currentDate);
-    
-    // Determina se l'evento è finito rispetto a now
-    // const isPast = obj.end
-    // ? obj.end < now
-    // : eventStart < now;
-
-    // Se showfinishedevents = Vero visualizza
-    // const timeVisible = isPast
-    // ? showFinishedEvents
-    // : inTimeRange;
-    
     // se soddisfa le due condizioni OK altrimenti rimuove il marker
     if (categoryVisible && inTimeRange) {
     obj.marker.addTo(map);
@@ -913,7 +903,6 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
     else { map.removeLayer(obj.marker); }});
   }
 
-  
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
 function buildCategoryMenu() {
    const menuItemsDiv = document.getElementById('menu-items');
