@@ -766,6 +766,17 @@ function renderEvents() {
   // pulizia markers precedenti
   markers.forEach(m => map.removeLayer(m.marker));
   markers = [];
+
+  // verifica numero elementi 
+  console.log("TOTAL:", events.length);
+let rendered = 0;
+events.forEach(e => {
+  if (!e.ev_lat || !e.ev_lng) return;
+  rendered++;
+});
+console.log("RENDERED MARKERS:", rendered);
+ // Fine verifica
+  
   events.forEach(e => {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
