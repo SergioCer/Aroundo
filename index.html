@@ -865,13 +865,12 @@ function createIcon(color, state, intensity) {
 }
 
 /* NUOVA Mostra o nasconde i Marker delle categorie */
-function updateMarkerVisibility(startOffset = 0) {
+function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   const now = new Date(currentDate); //****** la data di riferimento è errata, cambiata da () a (currentDate) ******
   const midnight = new Date(currentDate);
-  const endOffset = 24
   if (timelineMode === 'live') {
     midnight.setHours(48, 0, 0, 0);
-  const endOffset = (midnight - now) / 3600000;
+  const startOffset = (midnight - now) / 3600000;
   } else {
     midnight.setHours(24, 0, 0, 0);
     const endOffset = 24;
