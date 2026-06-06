@@ -767,13 +767,14 @@ function renderEvents() {
   markers.forEach(m => map.removeLayer(m.marker));
   markers = [];
 
-  // verifica numero elementi deve corrispondere a prelievo da Supabase
+  // CANCELLARE ***** verifica numero elementi deve corrispondere a prelievo da Supabase
   console.log("TOTAL:", events.length);
 let rendered = 0;
 events.forEach(e => {
   if (!e.ev_lat || !e.ev_lng) return;
   rendered++;
 });
+// CANCELLARE ***** verifica numero markers 
 console.log("RENDERED MARKERS:", rendered);
  // Fine verifica
   
@@ -877,7 +878,8 @@ function updateMarkerVisibility(startOffset = 0) {
   console.log (currentDate)
   console.log (midnight)
   console.log (startOffset)
-  console.log (endOffset)
+  console.log (endOffset)  
+  console.log (now)
 
   // checkbox categorie attive
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
