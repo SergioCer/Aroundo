@@ -1340,34 +1340,30 @@ class Particle {
 
 class Firework {
   constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.particles = [];
-    this.exploded = false;
+    this.x = x; // coordinata orizzontale
+    this.y = y; // posizione iniziale
+    this.startY = y // quota di partenza
+    this.maxHeight = 300 // quota massima raggiungibile
+    this.particles = []; // perticelle dopo esplosione
+    this.exploded = false; // esploso si/no
     this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    this.vy = -8 - Math.random() * 4; // getto verso l'alto
-    this.vx = (Math.random() - 0.5) * 2;
-    this.currentY = y;
-    this.trail = []; // array per scia
+    this.vy = -8 - Math.random() * 4; // velocità verticale
+    this.vx = (Math.random() - 0.5) * 2; // deriva laterale
+    this.currentY = y; // quota corrente
+    this.trail = []; // punti della scia
   }
 
   update() {
     if (!this.exploded) {
-      // Salita del razzo
-      this.currentY += this.vy;
+      this.currentY += this.vy; // Salita del razzo
       this.vy += 0.15; // gravità
-      this.trail.push({ x: this.x, y: this.currentY });
-      if (this.trail.length > 20) this.trail.shift(); // mantieni scia corta
-
-      if (this.vy >= 0) {
-        this.exploded = true;
-        this.createParticles();
-      }
+      this.trail.push({ x: this.x, y: this.currentY }); 
+      if (this.trail.length > 6) this.trail.shift(); // mantieni scia con 6 punti
+      if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } // esplode quando raggiunge la quota stabilita (300px)
     }
-
     // Aggiorna particelle esplose
-    this.particles.forEach(p => p.update());
-    this.particles = this.particles.filter(p => p.life > 0);
+    this.particles.forEach(p => p.update()); // aggiorna le particelle
+    this.particles = this.particles.filter(p => p.life > 0); // elimina particelle morte
   }
 
   createParticles() {
@@ -1389,9 +1385,9 @@ class Firework {
     ctx.save();
     for (let i = 0; i < this.trail.length; i++) {
       const p = this.trail[i];
-      ctx.globalAlpha = i / this.trail.length * 0.6;
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
+      ctx.globalAlpha = i / this.trail.length * 0.35; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
+      ctx.fillStyle = this.color; // colore della scia
+      ctx.beginPath(); // disegna pinto luminoso
       ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
       ctx.fill();
     }
