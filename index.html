@@ -1340,7 +1340,7 @@ class Firework {
     this.particles = this.particles.filter(p => p.life > 0);
   }
   createParticles() {
-    const count = 30 + Math.floor(Math.random() * 20);
+    const count = 30 + Math.floor(Math.random() * 30);
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * 2 * Math.PI;
       const speed = Math.random() * 4 + 2;
@@ -1384,8 +1384,14 @@ animateFX();
 // se lo stato è countdown  
 function updateMarkerState(marker, state, latLng) {
   marker.state = state;
-  if (state === 'countdown') { triggerFirework(latLng); 
-  }
+  if (state === 'countdown' && !marker.fireworkInterval) {
+  triggerFirework(latLng);
+  marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 1000);
+}
+if (state !== 'countdown' && marker.fireworkInterval) {
+  clearInterval(marker.fireworkInterval);
+  marker.fireworkInterval = null;
+}
 }
   
   
