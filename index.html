@@ -1023,44 +1023,35 @@ function buildCategoryMenu() {
     const diffMinutes = (startDate - now) / 1000 / 60;
     const minutesFromStart =  (now - startDate) / 1000 / 60;
     const durationMinutes = endDate ? (endDate - startDate) / 1000 / 60 : null; // calcola durata dell'evento
-    const progress = durationMinutes ? minutesFromStart / durationMinutes : 0; // ottiene la progressione dell'evento 
+    // CANCELLARE const progress = durationMinutes ? minutesFromStart / durationMinutes : 0; // ottiene la progressione dell'evento 
     // evento terminato 
-    if (endDate && now > endDate) { return { state: 'finished', intensity: 0 }; }
+    if (endDate && now > endDate) return {state: 'finished' };
+    let state;
     // evento già in corso da oltre 30'
-    if (minutesFromStart > 0) { // evento iniziato
-    let state = 'running-soft';
-    let intensity = 0.4;
+    if (minutesFromStart > 0) {
+    state = 'running-soft' ;
     if (durationMinutes) {
     const progress = minutesFromStart / durationMinutes;
-    if (progress < 0.05) { // primi minuti
+    if (progress < 0.05) { 
     state = 'running-strong';
-    intensity = 3;
-    } else if (progress < 0.25) { // primo quarto della durata
+    } else if (progress < 0.25) { 
     state = 'running-medium';
-    intensity = 1.2;
-    } else { // dopo 1/4 della durata fino alla fine
+    } else { 
     state = 'running-soft';
-    intensity = 0.4;
     }
     }
-    return { state, intensity };
-console.log("Aggiorno getEventState", new Date().toLocaleTimeString());
+    console.log("Aggiorno getEventState", new Date().toLocaleTimeString());
+    return { state };
   }
    
-    // Inizia tra 12h
-    if (diffMinutes > 720) return { state: 'distant'};
-    // Inizia tra 8h
-    if (diffMinutes > 480) { return { state: 'future-deep', intensity: 0.4 }; }
-    // Inizia tra 6h
-    if (diffMinutes > 360) { return { state: 'future-far', intensity: 0.8 }; }
-    // Inizia tra 4h
-    if (diffMinutes > 240) { return { state: 'future-medium', intensity: 1.2 }; }
-    // Inizia tra 2h
-    if (diffMinutes > 120) { return { state: 'future-near', intensity: 2 }; }
-    // evento in corso
-    if (diffMinutes <= 0) { return { state: 'started', intensity: 3 }; }
-    // 🔴 critico Inizia tra meno di 2h
-    return { state: 'imminent', intensity: 2.5 };}
+    // Inizia tra 12 - 8 - 6 - 4 - 2 h - in corso < 2 ore
+    if (diffMinutes > 720) return { state: 'distant' };
+    if (diffMinutes > 480) return { state: 'future-deep' };
+    if (diffMinutes > 360) return { state: 'future-far' };
+    if (diffMinutes > 240) return { state: 'future-medium' };
+    if (diffMinutes > 120) return { state: 'future-near' };
+    if (diffMinutes <= 0) return { state: 'started' };
+    return { state: 'imminent' };
 
   // Calcola il range della Timeline
   function getTimelineRange(date = currentDate) {
