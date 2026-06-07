@@ -1346,7 +1346,7 @@ class Firework {
     this.x = x; // coordinata orizzontale
     this.y = y; // posizione iniziale
     this.startY = y // quota di partenza
-    this.maxHeight = 300 // quota massima raggiungibile
+    this.maxHeight = 210 // quota massima raggiungibile
     this.particles = []; // perticelle dopo esplosione
     this.exploded = false; // esploso si/no
     this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
@@ -1361,8 +1361,8 @@ class Firework {
       this.currentY += this.vy; // Salita del razzo
       this.vy += 0.15; // gravità
       this.trail.push({ x: this.x, y: this.currentY }); 
-      if (this.trail.length > 6) this.trail.shift(); // mantieni scia con 6 punti
-      if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } // esplode quando raggiunge la quota stabilita (300px)
+      if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
+      if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } // esplode quando raggiunge la quota stabilita (210px)
     }
     // Aggiorna particelle esplose
     this.particles.forEach(p => p.update()); // aggiorna le particelle
@@ -1370,7 +1370,7 @@ class Firework {
   }
 
   createParticles() {
-    const count = 30 + Math.floor(Math.random() * 30);
+    const count = 10 + Math.floor(Math.random() * 15); // Numero di stelline che esplodono
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * 2 * Math.PI;
       const speed = Math.random() * 4 + 2;
@@ -1378,7 +1378,7 @@ class Firework {
       const vy = Math.sin(angle) * speed;
       const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
       this.particles.push(
-        new Particle(this.x, this.currentY, color, vx, vy, 60 + Math.random() * 30)
+        new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20) // Quanti frame vive una particella
       );
     }
   }
@@ -1388,7 +1388,7 @@ class Firework {
     ctx.save();
     for (let i = 0; i < this.trail.length; i++) {
       const p = this.trail[i];
-      ctx.globalAlpha = i / this.trail.length * 0.35; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
+      ctx.globalAlpha = i / this.trail.length * 0.25; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
       ctx.fillStyle = this.color; // colore della scia
       ctx.beginPath(); // disegna pinto luminoso
       ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
