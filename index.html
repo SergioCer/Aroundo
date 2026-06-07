@@ -17,6 +17,14 @@
       width: 100%;
     }
 
+    #fx-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
     /* Titolo */
     .title {
       font-weight: 600;
@@ -551,6 +559,7 @@
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
 </div>
 <div id="map"></div>
+<canvas id="fx-canvas"></canvas>  
 <div class="top-timebar">
   <!-- Sinistra -->
   <button class="nav-btn" id="prev-day">‹</button>
@@ -578,6 +587,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 
 <script type="module">
+const canvas = document.getElementById('fx-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() {
+  const rect = map.getContainer().getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+map.on('move zoom resize', resizeCanvas);
+  
   import { supabase } from './supabase.js';
     
   // variabili [] Array (lista di valori ordinati)  {} Oggetto (insieme di proprietà)
@@ -1260,6 +1282,21 @@ function nextDay() {
   }).join('');
   document.getElementById('eventTickerContent').innerHTML = html;
 }
+
+function latLngToCanvasXY(lat, lng) {
+  const point = map.latLngToContainerPoint([lat, lng]);
+  return { x: point.x, y: point.y };
+}
+
+function animateFX() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // qui dopo metteremo le particelle
+
+  requestAnimationFrame(animateFX);
+}
+
+animateFX();
   
 </script>
 </body>
