@@ -602,7 +602,21 @@
   const daysShort = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
   const daysLong  = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
   const slider = document.getElementById('time-range');
+  const markerSizes = {
+  'finished': 10,
+  'distant': 10,
+  'future-deep': 11,
+  'future-far': 13,
+  'future-medium': 15,
+  'future-near': 18,
+  'imminent': 22,
+  'started': 26,
+  'running-soft': 14,
+  'running-medium': 20,
+  'running-strong': 28
+};
 
+  
   // Aggiorna ogni minuto
   setInterval(renderEvents, 60000);
   // setInterval(updateTicker, 60000);
@@ -718,10 +732,6 @@ document.getElementById("prev-day").addEventListener("click", () => {prevDay();
   updateDateUI();
   setupTimeline();
   const values = slider.noUiSlider.get();
-  // CANCELLARE updateMarkerVisibility(
-  // Math.round(values[0]),
-  // Math.round(values[1])
-  // );
   renderEvents();
   });
 
@@ -730,10 +740,6 @@ document.getElementById("next-day").addEventListener("click", () => {nextDay();
   updateDateUI();
   setupTimeline();
   const values = slider.noUiSlider.get();
-  // CANCELLARE updateMarkerVisibility(
-  // Math.round(values[0]),
-  // Math.round(values[1])
-  // );
   renderEvents();
   });
 
@@ -850,12 +856,16 @@ marker.bindPopup(`
   });
     updateMarkerVisibility();
 }
-  
+
+// Dimensione dei Markers  
 function createIcon(color, state, intensity) {
-  const isFinished = state === 'finished';
-  const size = isFinished
-  ? 10
-  : Math.max(8, Math.min(32, 10 * intensity));
+  // CANCELLARE 
+  // const isFinished = state === 'finished';
+  // const size = isFinished
+  // ? 10
+  // : Math.max(10, Math.min(30, 10 * intensity));
+  const size = markerSizes[state] || 10;
+  // Sopra è la nuova cancellare // 
   return L.divIcon({
   className: '',
   html: `
@@ -943,7 +953,6 @@ function buildCategoryMenu() {
     selectAllToggle.addEventListener('change', () => {
     const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
-    // CANCELLARE ***** updateMarkerVisibility();
     });
     // aggiorna lo stato del checkbox
     function updateSelectAllToggle() {
@@ -1265,7 +1274,6 @@ function nextDay() {
   }).join('');
   document.getElementById('eventTickerContent').innerHTML = html;
 }
-  
   
 </script>
 </body>
