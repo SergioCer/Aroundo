@@ -1310,14 +1310,27 @@ class Particle {
     this.life -= 1;
     this.alpha = Math.max(0, this.life / 60);
   }
-  draw(ctx) {
-    ctx.globalAlpha = this.alpha;
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+draw(ctx) {
+  ctx.save();
+  ctx.globalAlpha = this.alpha;
+  ctx.fillStyle = this.color;
+  ctx.translate(this.x, this.y);
+  const spikes = 5;
+  const outer = 4;
+  const inner = 2;
+  ctx.beginPath();
+  for (let i = 0; i < spikes * 2; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const angle = (Math.PI / spikes) * i;
+    const px = Math.cos(angle) * r;
+    const py = Math.sin(angle) * r;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
   }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
 }
 class Firework {
   constructor(x, y) {
