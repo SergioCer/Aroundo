@@ -1149,8 +1149,7 @@ function getMidnightPosition(totalHours) {
       max: totalHours
       }
     });
-  }
-    
+      
     //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
     const midnight = document.getElementById('midnight');
     if (timelineMode === 'live') {
@@ -1160,7 +1159,8 @@ function getMidnightPosition(totalHours) {
     } else {
     // nascondi barra in day mode
     midnight.style.display = "none";
-    }      
+    }
+    }
     
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
