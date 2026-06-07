@@ -1354,6 +1354,7 @@ class Firework {
     this.vx = (Math.random() - 0.5) * 2; // deriva laterale
     this.currentY = y; // quota corrente
     this.trail = []; // punti della scia
+    isDead() { return this.exploded && this.particles.length === 0;}
   }
 
   update() {
@@ -1426,6 +1427,12 @@ function animateFX() {
     fw.update();
     fw.draw(ctx);
   });
+    // elimina fuochi terminati
+  for (let i = fireworks.length - 1; i >= 0; i--) {
+    if (fireworks[i].isDead()) {
+      fireworks.splice(i, 1);
+    }
+    }
   requestAnimationFrame(animateFX);
 }
 animateFX();
