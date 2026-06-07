@@ -21,6 +21,8 @@
       position: absolute;
       top: 0;
       left: 0;
+      height: 100vh;
+      width: 100%;
       pointer-events: none;
       z-index: 9999;
     }
@@ -1063,8 +1065,8 @@ function buildCategoryMenu() {
     if (diffMinutes > 360) return { state: 'future-far' };
     if (diffMinutes > 240) return { state: 'future-medium' };
     if (diffMinutes > 120) return { state: 'future-near' };
-    if (diffMinutes > 30) return { state: 'countdown' };
-    if (diffMinutes > 0) return { state: 'imminent' };
+    if (diffMinutes > 30) return { state: 'imminent' };
+    if (diffMinutes > 0) return { state: 'countdown' };
     return { state: 'started' };
 }
   
