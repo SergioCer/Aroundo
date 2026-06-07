@@ -974,8 +974,7 @@ function buildCategoryMenu() {
     checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
 // CANCELLARE
  console.log("Click su Checkbox dovrei aggiornare...");    
- function renderEvents()
-      // CANCELLARE SOPRA
+// CANCELLARE SOPRA
     });
     // aggiorna lo stato del checkbox
     function updateSelectAllToggle() {
@@ -985,7 +984,9 @@ function buildCategoryMenu() {
     }
     menuItemsDiv.addEventListener('change', updateSelectAllToggle);
   }
-    
+
+  function renderEvents()
+  
   /* Compone il giorno ed il mese corrente nel rettangolo */  
     function updateDateUI() {
       dayText.innerText = currentDate.getDate();
