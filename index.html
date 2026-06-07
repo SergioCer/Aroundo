@@ -587,19 +587,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 
 <script type="module">
-const canvas = document.getElementById('fx-canvas');
-const ctx = canvas.getContext('2d');
-function resizeCanvas() {
-  const rect = map.getContainer().getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  canvas.style.width = rect.width + 'px';
-  canvas.style.height = rect.height + 'px';
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-map.on('move zoom resize', resizeCanvas);
-  
   import { supabase } from './supabase.js';
     
   // variabili [] Array (lista di valori ordinati)  {} Oggetto (insieme di proprietà)
@@ -639,13 +626,60 @@ map.on('move zoom resize', resizeCanvas);
   'running-strong': 26
 };
 
+  const map = L.map('map', {
+    zoomControl: true,
+    minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
+    maxZoom: 19 // evita zoom troppo vicino, il massimo zoom è 18 - 19
+    }).setView([defaultLat, defaultLng], defaultZoom);
+
+// 🌿 Base Mappa
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    { attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }
+    ).addTo(map);
+
+// Prova a ottenere la posizione dell'utente
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+      (pos) => {
+      const userLat = pos.coords.latitude;
+      const userLng = pos.coords.longitude;
+      // Calcolo approssimativo dello zoom in base agli eventi vicini
+      const nearbyEvents = events.filter(e => {
+      const distance = map.distance([userLat, userLng], [e.ev_lat, e.ev_lng]);
+      return distance <= 10000; // 10 km
+      });
+      let zoomLevel = 12;
+      if (nearbyEvents.length > 100) zoomLevel = 13;
+      else if (nearbyEvents.length > 50) zoomLevel = 12;
+      else zoomLevel = 11;
+      map.setView([userLat, userLng], zoomLevel);
+      },
+      (err) => {
+      console.warn("Per una migliore fruizione si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
+      map.setView([defaultLat, defaultLng], defaultZoom);
+      }
+      );
+    } else {
+      console.warn("Browser non supporta geolocalizzazione");
+      map.setView([defaultLat, defaultLng], defaultZoom);
+      }
   
+const canvas = document.getElementById('fx-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() {
+  const rect = map.getContainer().getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+map.on('move zoom resize', resizeCanvas);
+
   // Aggiorna ogni minuto
   setInterval(renderEvents, 60000);
-  // setInterval(updateTicker, 60000);
-  // updateTicker();
-  // setInterval(getEventState, 60000);
-  // getEventState()
     
   function updateTimelineMode() {
     const currentDay = new Date(currentDate);
@@ -693,45 +727,6 @@ map.on('move zoom resize', resizeCanvas);
     return data;
   }
   
-  const map = L.map('map', {
-    zoomControl: true,
-    minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
-    maxZoom: 19 // evita zoom troppo vicino, il massimo zoom è 18 - 19
-    }).setView([defaultLat, defaultLng], defaultZoom);
-
-// 🌿 Base Mappa
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    { attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }
-    ).addTo(map);
-
-// Prova a ottenere la posizione dell'utente
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-      (pos) => {
-      const userLat = pos.coords.latitude;
-      const userLng = pos.coords.longitude;
-      // Calcolo approssimativo dello zoom in base agli eventi vicini
-      const nearbyEvents = events.filter(e => {
-      const distance = map.distance([userLat, userLng], [e.ev_lat, e.ev_lng]);
-      return distance <= 10000; // 10 km
-      });
-      let zoomLevel = 12;
-      if (nearbyEvents.length > 100) zoomLevel = 13;
-      else if (nearbyEvents.length > 50) zoomLevel = 12;
-      else zoomLevel = 11;
-      map.setView([userLat, userLng], zoomLevel);
-      },
-      (err) => {
-      console.warn("Per una migliore fruizione si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
-      );
-    } else {
-      console.warn("Browser non supporta geolocalizzazione");
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
-
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. prendi categorie
   categories = await fetchCategories();
