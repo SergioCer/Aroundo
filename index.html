@@ -1043,7 +1043,6 @@ function buildCategoryMenu() {
     console.log("Aggiorno getEventState", new Date().toLocaleTimeString());
     return { state };
   }
-   
     // Inizia tra 12 - 8 - 6 - 4 - 2 h - in corso < 2 ore
     if (diffMinutes > 720) return { state: 'distant' };
     if (diffMinutes > 480) return { state: 'future-deep' };
@@ -1052,7 +1051,8 @@ function buildCategoryMenu() {
     if (diffMinutes > 120) return { state: 'future-near' };
     if (diffMinutes <= 0) return { state: 'started' };
     return { state: 'imminent' };
-
+}
+  
   // Calcola il range della Timeline
   function getTimelineRange(date = currentDate) {
     let start , end;
