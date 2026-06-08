@@ -1160,7 +1160,6 @@ function getMidnightPosition(totalHours) {
     // nascondi barra in day mode
     midnight.style.display = "none";
     }
-    }
     
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
@@ -1203,16 +1202,12 @@ function getMidnightPosition(totalHours) {
       );
 }        
     //-- Ad ogni movimento dello slider agiorna la mappa
-    slider.noUiSlider.on(
-    'update',
-    updateHandles
-    );
-    //-- forza primo update
+    slider.noUiSlider.on('update', updateHandles); //-- forza primo update
     updateHandles([0, totalHours]);
-
   
   function getTimelineBaseTime() {
     return currentDate
+    }
   }
 
   // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
