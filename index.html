@@ -13,7 +13,7 @@
     }
 
     #map {
-      height: 100vh;
+      height: 100dvh;
       width: 100%;
     }
 
@@ -21,7 +21,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      height: 100vh;
+      height: 100dvh;
       width: 100%;
       pointer-events: none; /* Non blocca i click sulla mappa */
       z-index: 9999; /* Tenere basso ??? */
@@ -707,9 +707,6 @@
     minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
     maxZoom: 19 // evita zoom troppo vicino, il massimo zoom è 18 - 19
     }).setView([defaultLat, defaultLng], defaultZoom);
-
-
-console.log(window.innerWidth, window.innerHeight); / Visualizza le dimensioni dello schermo del cellulare
 
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Crhome
 L.tileLayer(
