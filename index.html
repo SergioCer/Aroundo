@@ -723,6 +723,7 @@
   // Preleva gli Eventi da supabase
   async function fetchEvents() {
     console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
+    console.trace(); // mostra da dove è stata chiamata
     const now = new Date().toISOString();
     let query = supabase      
       .from('eventi')
@@ -798,6 +799,7 @@ document.getElementById("reset-day").addEventListener("click", () => {
 // Quindi evitare di richiamare updateMarkerVisibility() se si richiama renderEvente().
 function renderEvents() {
   console.log("Aggiorno Markers", new Date().toLocaleTimeString());
+  console.trace(); // mostra da dove è stata chiamata
   // pulizia markers precedenti
   markers.forEach(m => map.removeLayer(m.marker));
   markers = [];
@@ -903,6 +905,7 @@ function createIcon(color, state, intensity) {
 /* NUOVA Mostra o nasconde i Marker delle categorie */
 function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   console.log("Aggiorno Visibilità Markers", new Date().toLocaleTimeString());
+  console.trace(); // mostra da dove è stata chiamata
   const now = new Date(currentDate); 
   const midnight = new Date(currentDate);
   if (timelineMode === 'live') {
@@ -945,6 +948,7 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
 function buildCategoryMenu() {
   console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
+  console.trace(); // mostra da dove è stata chiamata
   const menuItemsDiv = document.getElementById('menu-items');
   // checkbox per ogni categoria
   categories.forEach(cat => {
@@ -993,6 +997,7 @@ function buildCategoryMenu() {
   /* Compone il giorno ed il mese corrente nel rettangolo */  
     function updateDateUI() {
       console.log("Aggiorno Data e mese", new Date().toLocaleTimeString());
+      console.trace(); // mostra da dove è stata chiamata
       dayText.innerText = currentDate.getDate();
       dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
     // -- Posizionamento di -day
@@ -1084,6 +1089,7 @@ function buildCategoryMenu() {
   // Calcola il range della Timeline
   function getTimelineRange(date = currentDate) {
   console.log("Aggiorno Range Time Line", new Date().toLocaleTimeString());
+  console.trace(); // mostra da dove è stata chiamata
     let start , end;
     if (timelineMode === 'live') {
       const now = new Date();
@@ -1169,6 +1175,7 @@ function getMidnightPosition(totalHours) {
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
   console.log("Aggiorno Slider", new Date().toLocaleTimeString());
+  console.trace(); // mostra da dove è stata chiamata
     //-- Offset
     const startOffset = Math.round(values[0]);
     const endOffset = Math.round(values[1]);
@@ -1260,6 +1267,7 @@ function nextDay() {
 
   function getUpcomingEvents(hours = 12) {
   console.log("Aggiorno gli eventi delle News", new Date().toLocaleTimeString());
+  console.trace(); // mostra da dove è stata chiamata
   const now = new Date();
   const limit = new Date(now.getTime() + hours * 3600000);
   return events.filter(e => {
@@ -1272,6 +1280,7 @@ function nextDay() {
 
   function updateTicker(){
   console.log("Aggiorno News", new Date().toLocaleTimeString());
+  console.trace(); // mostra da dove è stata chiamata
   const list = getUpcomingEvents(10); // Numero di eventi da visualizzare
   const html = list.map(e => {
   const color = categories.find(c => c.id_macro_categoria == e.ev_categoria)?.mc_colore || '#999999';
