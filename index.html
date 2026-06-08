@@ -672,18 +672,18 @@
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
   
-const canvas = document.getElementById('fx-canvas');
-const ctx = canvas.getContext('2d');
-function resizeCanvas() {
-  const rect = map.getContainer().getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  canvas.style.width = rect.width + 'px';
-  canvas.style.height = rect.height + 'px';
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-map.on('move zoom resize', resizeCanvas);
+// const canvas = document.getElementById('fx-canvas');
+// const ctx = canvas.getContext('2d');
+// function resizeCanvas() {
+//   const rect = map.getContainer().getBoundingClientRect();
+//   canvas.width = rect.width;
+//   canvas.height = rect.height;
+//   canvas.style.width = rect.width + 'px';
+//   canvas.style.height = rect.height + 'px';
+// }
+// resizeCanvas();
+// window.addEventListener('resize', resizeCanvas);
+// map.on('move zoom resize', resizeCanvas);
 
   // Aggiorna ogni minuto
   setInterval(renderEvents, 60000);
