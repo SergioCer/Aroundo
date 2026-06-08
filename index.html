@@ -1360,7 +1360,7 @@ class Firework {
   update() {
     if (!this.exploded) {
       this.currentY += this.vy; // Salita del razzo
-      this.vy += 0.15; // gravità
+      this.vy += 0.35; // gravità
       this.trail.push({ x: this.x, y: this.currentY }); 
       if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
       if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } // esplode quando raggiunge la quota stabilita (210px)
@@ -1391,7 +1391,7 @@ class Firework {
       const p = this.trail[i];
       ctx.globalAlpha = i / this.trail.length * 0.25; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
       ctx.fillStyle = this.color; // colore della scia
-      ctx.beginPath(); // disegna pinto luminoso
+      ctx.beginPath(); // disegna punto luminoso
       ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
       ctx.fill();
     }
