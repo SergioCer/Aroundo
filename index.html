@@ -545,37 +545,34 @@
   }
 }
 
-/* Mobile piccolo: circa 360px di larghezza */
+/* MOBILE */
 @media (max-width: 380px) {
-  .map-overlay {
-    top: 6px;
-    left: 6px;
-    padding: 6px 10px;
-    font-size: 16px; /* titolo */
+  .title {
+    font-size: 18px;
+  }
+  .subtitle {
+    font-size: 14px;
   }
 
-  .subtitle {
-    font-size: 12px;
+  .map-overlay {
+    top: 5px;
+    left: 5px;
+    padding: 6px 10px;
   }
 
   .map-overlay2 {
-    top: 50px;
+    top: 60px;
     left: 5px;
-    width: 90%;
-    max-width: 330px;
-    padding: 6px 8px;
+    padding: 6px 10px;
+    min-width: 120px;
+    max-width: 90%;
   }
 
   .top-timebar {
     flex-direction: column;
-    padding: 8px 6px;
     gap: 6px;
+    padding: 12px 10px;
     font-size: 14px;
-    top: 6px; /* distanza dal bordo superiore */
-  }
-
-  .time-slider {
-    width: 90%;
   }
 
   .nav-btn {
@@ -588,7 +585,27 @@
   }
 
   .date-full {
-    font-size: 12px;
+    font-size: 14px;
+  }
+
+  #menu-toggle {
+    font-size: 14px;
+    width: auto;
+    padding: 4px 8px;
+  }
+
+  .time-slider {
+    width: 90%;
+  }
+
+  .toggle-pill {
+    min-height: 26px;
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .category-label {
+    font-size: 11px;
   }
 
   #eventTicker {
