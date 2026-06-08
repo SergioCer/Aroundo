@@ -50,7 +50,7 @@
       left: 50px;
       z-index: 1000;
       background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
-      padding: 10px 14px;
+      padding: 2px 2px;
       border-radius: 12px;
       backdrop-filter: blur(4px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -63,13 +63,13 @@
       left: 10px;
       z-index: 999;
       background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
-      padding: 8px 12px; /* Contenitore */
+      padding: 2px 2px; /* Contenitore */
       border-radius: 14px;
       backdrop-filter: blur(8px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.08);
       min-width: 140px;
       width: fit-content;
-      max-width: 240px;
+      max-width: 200px;
       max-height: 60vh;   /* limita altezza della sezione in verticale */
       overflow-y: auto;   /* scroll verticale se tante categorie */
     }
@@ -575,6 +575,9 @@
     padding: 2px 2px;
     min-width: 120px;
     max-width: 90%;
+    max-height: 70vh;  /* leggermente più alta rispetto a desktop */
+    min-height: 150px; /* garantisce che non sia troppo piccola */
+    overflow-y: auto;  /* scroll verticale se tanti elementi */
   }
   
   .menu-header {
