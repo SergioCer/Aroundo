@@ -1374,6 +1374,9 @@ class Firework {
 
   update() {
     if (!this.exploded) {
+      /// CANCELLARE ???
+      this.x += this.vx; 
+      // FINE CANCELLARE
       this.currentY += this.vy; // Salita del razzo
       this.vy += 0.35; // gravità
       this.trail.push({ x: this.x, y: this.currentY }); 
@@ -1386,7 +1389,7 @@ class Firework {
   }
 
   createParticles() {
-    const count = 10 + Math.floor(Math.random() * 15); // Numero di stelline che esplodono
+    const count = 10 + Math.floor(Math.random() * 10); // Numero di stelline che esplodono
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * 2 * Math.PI;
       const speed = Math.random() * 4 + 2;
