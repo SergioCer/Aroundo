@@ -74,22 +74,29 @@
       overflow-y: auto;   /* scroll verticale se tante categorie */
     }
       
-    /* -- Rettangolo barra temporale */
-    .top-timebar {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 998;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      padding: 40px 34px;
-      border-radius: 16px;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
-      backdrop-filter: blur(8px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    }
+/* -- Rettangolo barra temporale */
+.top-timebar {
+  position: absolute;
+  top: 10px;                     /* distanza dal bordo superiore */
+  left: 50%;                     /* centro orizzontale */
+  transform: translateX(-50%);   /* centraggio reale */
+  z-index: 998;
+
+  display: flex;
+  flex-direction: row;           /* elementi in riga su desktop */
+  align-items: center;
+  justify-content: center;       /* centrare internamente */
+  gap: 10px;                     /* distanza tra elementi interni */
+
+  width: 320px;                  /* dimensione reale del contenitore */
+  height: 120px;                 /* altezza fissa per contenuto */
+  padding: 12px 14px;            /* spazio interno */
+  border-radius: 16px;
+
+  background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
 
     /* Pallino torna alla data di oggi */
     .reset-btn { font-size: 18px; font-weight: bold; color: #3b82f6; }
@@ -575,13 +582,14 @@
   }
 
   .top-timebar {
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    flex-direction: column;
+    top: 48px;                   /* centro verticale circa + spostamento */
+    width: 90%;                   /* si adatta allo schermo */
+    height: auto;                 /* altezza flessibile */
+    flex-direction: column;       /* impila elementi verticalmente */
+    align-items: center;
     gap: 2px;
-    padding: 2px 2px;
-    font-size: 12px;
+    padding: 2px 20px;
+    font-size: 12px;              /* testi ridotti */
   }
 
   .nav-btn {
