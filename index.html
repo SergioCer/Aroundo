@@ -638,11 +638,23 @@
     maxZoom: 19 // evita zoom troppo vicino, il massimo zoom è 18 - 19
     }).setView([defaultLat, defaultLng], defaultZoom);
 
-// 🌿 Base Mappa
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    { attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }
-    ).addTo(map);
+
+
+
+  // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Crhome
+L.tileLayer(
+  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { 
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19
+  }
+).addTo(map);
+  
+  // 🌿 Base Mappa
+  // L.tileLayer(
+//     'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+//    { attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }
+//    ).addTo(map);
 
 // Prova a ottenere la posizione dell'utente
     if (navigator.geolocation) {
