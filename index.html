@@ -1065,16 +1065,16 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   console.log("Aggiorno Visibilità Markers", new Date().toLocaleTimeString());
   console.log("ENTRATA", startOffset, endOffset);
   // console.trace(); // mostra da dove è stata chiamata
-  const now = new Date(currentDate); 
-  const midnight = new Date(currentDate);
-  if (timelineMode === 'live') {
-    midnight.setHours(48, 0, 0, 0);
-    endOffset = (midnight - now) / 3600000;
-  } else {
-    midnight.setHours(24, 0, 0, 0);
-    endOffset = 24;
+//  const now = new Date(currentDate); 
+//  const midnight = new Date(currentDate);
+//  if (timelineMode === 'live') {
+//    midnight.setHours(48, 0, 0, 0);
+//    endOffset = (midnight - now) / 3600000;
+//  } else {
+//    midnight.setHours(24, 0, 0, 0);
+//    endOffset = 24;
     // const endOffset = (now) / 3600000; // mezzanotte di oggi
-  }
+//  }
   // checkbox categorie attive
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
   const activeCategories = [];
