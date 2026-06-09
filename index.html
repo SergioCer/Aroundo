@@ -837,7 +837,65 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&cop
     setInterval(renderEvents, 60000);
     // Preleva nuovamente eventi ogni 5 minuti
     setInterval(async () => { const data = await fetchEvents(); if (data) events = data; }, 5 * 60 * 1000);
+
+// DOM  
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. prendi categorie con relative icone e colore
+  categories = await fetchCategories();
+  icons = {};
+  categories.forEach(cat => {
+  icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
+  });
+  events = await fetchEvents();
+  // 2. Crea il menu Categorie
+  buildCategoryMenu();
+  // 3. inizializza checkbox con tutti selezionati
+  document.getElementById('select-all-toggle').checked = true;
+  setupTimeline();
+  renderEvents();
+  updateDateUI(); 
+});
+      
+  noUiSlider.create(slider, {
+    start: [0, 24],
+    connect: true,
+    step: 1,
+    range: {
+    min: 0,
+    max: 24
+    }
+  });
+
+// Eventi UI
+  slider.noUiSlider.on('update', function(values) {
+  const start = Math.round(values[0]);
+  const end = Math.round(values[1]);
+  updateMarkerVisibility(start, end);
+});
   
+  document.getElementById("prev-day").addEventListener("click", () => {prevDay();
+  updateDateUI();
+  setupTimeline();
+  const values = slider.noUiSlider.get();
+  renderEvents();
+  });
+
+document.getElementById("next-day").addEventListener("click", () => {nextDay();
+  updateTimelineMode();
+  updateDateUI();
+  setupTimeline();
+  const values = slider.noUiSlider.get();
+  renderEvents();
+  });
+
+document.getElementById("reset-day").addEventListener("click", () => {
+  currentDate = new Date(); // oggi
+  updateTimelineMode();
+  updateDateUI();
+  setupTimeline();
+  renderEvents();
+  });
+
   function updateTimelineMode() {
     const currentDay = new Date(currentDate);
     currentDay.setHours(0,0,0,0);
@@ -886,65 +944,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&cop
     }
     return data;
   }
-  
-document.addEventListener('DOMContentLoaded', async () => {
-  // 1. prendi categorie
-  categories = await fetchCategories();
-  // 2. icone categorie
-  icons = {};
-  categories.forEach(cat => {
-  icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
-  });
-  // 3. eventi lad DB)
-  events = await fetchEvents();
-  // 4. menu UI
-  buildCategoryMenu();
-  // 6. inizializza checkbox select-all
-  document.getElementById('select-all-toggle').checked = true;
-  setupTimeline();
-  renderEvents();
-  updateDateUI(); 
-});
-      
-document.getElementById("prev-day").addEventListener("click", () => {prevDay();
-  updateDateUI();
-  setupTimeline();
-  const values = slider.noUiSlider.get();
-  renderEvents();
-  });
-
-document.getElementById("next-day").addEventListener("click", () => {nextDay();
-  updateTimelineMode();
-  updateDateUI();
-  setupTimeline();
-  const values = slider.noUiSlider.get();
-  renderEvents();
-  });
-
-document.getElementById("reset-day").addEventListener("click", () => {
-  currentDate = new Date(); // oggi
-  updateTimelineMode();
-  updateDateUI();
-  setupTimeline();
-  renderEvents();
-  });
-
-  noUiSlider.create(slider, {
-    start: [0, 24],
-    connect: true,
-    step: 1,
-    range: {
-    min: 0,
-    max: 24
-    }
-  });
-
-  slider.noUiSlider.on('update', function(values) {
-  const start = Math.round(values[0]);
-  const end = Math.round(values[1]);
-  updateMarkerVisibility(start, end);
-});
-
+    
 // Ricrea i markers 
 function renderEvents() {
   console.log("Aggiorno Markers", new Date().toLocaleTimeString());
