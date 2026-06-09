@@ -1074,7 +1074,7 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
     const eventStart = new Date(obj.start);
     const eventEnd = obj.end ? new Date(obj.end) : eventStart;
     // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
-    let inTimeRange = eventStart >= startTime && eventStart <= endTime; // PRECEDENTE eventStart <= endTime &&  eventEnd >= startTime;
+    let inTimeRange = eventStart <= endTime &&  eventEnd >= startTime;
     // se soddisfa le due condizioni OK altrimenti rimuove il marker
     if (categoryVisible && inTimeRange) {obj.marker.addTo(map);} 
     else { map.removeLayer(obj.marker); }});
@@ -1118,8 +1118,7 @@ function buildCategoryMenu() {
     selectAllToggle.addEventListener('change', () => {
     const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
-    // CANCELLARE O VERIFICARE
-       // updateMarkerVisibility();
+    updateMarkerVisibility();
     });
     // aggiorna lo stato del checkbox
     function updateSelectAllToggle() {
@@ -1290,6 +1289,7 @@ function getMidnightPosition(totalHours) {
     console.error("Invalid timeline range", totalHours);
     return;
     }
+   
     //-- Crea lo slider con doppia maniglia
     noUiSlider.create(slider, {
     start: [0, totalHours],
@@ -1392,9 +1392,11 @@ console.log("START:", startOffset,"END:", endOffset);
 }
 
 function nextDay() {
-  const today = getNow();
-  if (timelineMode === 'past' && currentDate.getTime() === today.getTime()) {
-    // Torna in live se raggiunge la data odierna
+  // Torna in live se raggiunge la data odierna
+  // const today = getNow();
+  // if (timelineMode === 'past' && currentDate.getTime() === today.getTime()) 
+  if (timelineMode === 'past' && getNow(currentDate).getTime() === getNow().getTime())
+  {
     timelineMode = 'live';
     updateTimelineMode();
     return;
