@@ -844,7 +844,6 @@ L.tileLayer(
 
     // Aggiorna ogni minuto
     setInterval(renderEvents, 60000);
-    updateMarkerVisibility()
     // Preleva nuovamente eventi ogni 5 minuti
     setInterval(async () => { const data = await fetchEvents(); if (data) events = data; }, 5 * 60 * 1000);
   
@@ -1241,6 +1240,7 @@ function buildCategoryMenu() {
       start = getNow(date);
       end = new Date(date);
       end.setHours(24,0,0,0);
+updateMarkerVisibility()  // POSIZIONE CORRETTA ???????????
       return { start, end, now: start };
   }
 
