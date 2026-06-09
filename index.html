@@ -881,7 +881,7 @@ L.tileLayer(
   // Preleva gli Eventi da supabase
   async function fetchEvents() {
     console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
-    console.trace(); // mostra da dove è stata chiamata
+    // console.trace(); // IMPORTANTE mostra da dove è stata chiamata
     const now = new Date().toISOString();
     let query = supabase      
       .from('eventi')
