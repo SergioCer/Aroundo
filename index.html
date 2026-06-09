@@ -870,7 +870,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   slider.noUiSlider.on('update', function(values) {
   const start = Math.round(values[0]);
   const end = Math.round(values[1]);
-  // updateMarkerVisibility(start, end); DISABILITATA VEDIAMO SE FUNZIONA 
+  updateMarkerVisibility(start, end);
 });
   
   document.getElementById("prev-day").addEventListener("click", () => {prevDay();
