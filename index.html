@@ -953,7 +953,7 @@ document.getElementById("reset-day").addEventListener("click", () => {
   updateMarkerVisibility(start, end);
 });
 
-// Aggiorna i markers (NOTA: Alla fine richiama updateMarkerVisibility(). 
+// Ricrea i markers (NOTA: Alla fine richiama updateMarkerVisibility(). 
 // Quindi evitare di richiamare updateMarkerVisibility() se si richiama renderEvente().
 function renderEvents() {
   console.log("Aggiorno Markers", new Date().toLocaleTimeString());
@@ -1043,7 +1043,7 @@ marker.bindPopup(`
       active: e.ev_attivo
     });
   });
-    updateMarkerVisibility();
+    // updateMarkerVisibility();
 }
 
 // Dimensione dei Markers  
@@ -1060,7 +1060,7 @@ function createIcon(color, state, intensity) {
   });
 }
 
-/* NUOVA Mostra o nasconde i Marker delle categorie */
+/* Mostra o nasconde i Marker delle categorie */
 function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   console.log("Aggiorno Visibilità Markers", new Date().toLocaleTimeString());
   // console.trace(); // mostra da dove è stata chiamata
