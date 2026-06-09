@@ -1227,6 +1227,7 @@ function buildCategoryMenu() {
       const now = new Date();
       start = new Date(now);
       end = new Date(now.getTime() + 24 * 3600000);
+    console.log("LIVE mode → start:", start.toLocaleString(), "end:", end.toLocaleString());
       return { start, end, now: start };
       }
       start = getNow(date);
