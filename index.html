@@ -1227,13 +1227,14 @@ function buildCategoryMenu() {
       const now = new Date();
       start = new Date(now);
       end = new Date(now.getTime() + 24 * 3600000);
-    console.log("LIVE mode → start:", start.toLocaleString(), "end:", end.toLocaleString());
+      end.setHours(0, 0, 0, 0);
+    console.log("Mode: LIVE → start:", start.toLocaleString(), "end:", end.toLocaleString());
       return { start, end, now: start };
       }
       start = getNow(date);
       end = new Date(date);
       end.setHours(24,0,0,0);
-    console.log("DAY/PAST mode → start:", start.toLocaleString(), "end:", end.toLocaleString());
+    console.log("Mode: DAY/PAST → start:", start.toLocaleString(), "end:", end.toLocaleString());
       return { start, end, now: start };
   }
 
@@ -1402,7 +1403,7 @@ function nextDay() {
   function getNow(date = null) {const d = new Date(date); d.setHours(0,0,0,0); return d;}
 
   function getUpcomingEvents(hours = 12) {
-  console.log("Aggiorno eventi News", new Date().toLocaleTimeString());
+  console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
   // console.trace(); // mostra da dove è stata chiamata
   const now = new Date();
   const limit = new Date(now.getTime() + hours * 3600000);
