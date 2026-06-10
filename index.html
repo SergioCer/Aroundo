@@ -939,8 +939,6 @@ document.getElementById("reset-day").addEventListener("click", () => {
     }
   }
   
-  function getTimelineMode(now, currentDate) {return timelineMode;}
-  
     // Preleva le Categorie da supabase
   async function fetchCategories() {
     console.log("Creo le Categorie", new Date().toLocaleTimeString());
@@ -960,7 +958,6 @@ document.getElementById("reset-day").addEventListener("click", () => {
   async function fetchEvents() {
     console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
     // console.trace(); // IMPORTANTE mostra da dove è stata chiamata
-    const now = new Date().toISOString();
     let query = supabase      
       .from('eventi')
       .select('*')
@@ -1330,6 +1327,7 @@ function getMidnightPosition(totalHours) {
     //-- Offset
     const startOffset = Math.round(values[0]);
     const endOffset = Math.round(values[1]);
+    
     const { start: baseTime } = getTimelineRange();
     const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
     const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
@@ -1388,11 +1386,15 @@ console.log("START:", startDate,"END:", endDate);
 }
 
 function nextDay() {
-  if (timelineMode === 'past' && getNow(currentDate).getTime() === getNow().getTime())
-  {
-    timelineMode = 'live';
-    updateTimelineMode();
-    return;
+ const today = new Date();
+  today.setHours(0,0,0,0);
+  const current = new Date(currentDate);
+  current.setHours(0,0,0,0);
+  if (timelineMode === 'past' &&
+    current.getTime() === today.getTime()) {   
+  timelineMode = 'live';
+  updateTimelineMode();
+  return;
   }
   currentDate.setDate(currentDate.getDate() + 1);
   timelineMode = 'day';
@@ -1404,8 +1406,11 @@ function nextDay() {
   function getUpcomingEvents(hours = 12) {
   console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
   // console.trace(); // mostra da dove è stata chiamata
-  const now = getNow(currentDate);
-  const limit = new Date(now.getTime() + hours * 3600000);
+  const now = timelineMode === 'live'
+      ? getAppTime('live')
+      : getAppTime('startOfDay');
+  const limit = new Date(now);
+  limit.setHours(limit.getHours() + hours);    
   return events.filter(e => {
     const start = new Date(e.ev_inizio);
     return start > now && start <= limit;
