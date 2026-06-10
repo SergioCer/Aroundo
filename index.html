@@ -133,7 +133,7 @@
     /* Pallino torna alla data di oggi */
     .reset-btn { font-size: 30px; font-weight: bold; color: #3b82f6; background: transparent; border: none; padding: 2px 2px; transition: transform 0.15s ease;}
 
-    .reset-btn:hover { transform: translateY(-1px) scale(1.08); }    
+    .reset-btn:hover { transform: translateX(-50%) translateY(-1px) scale(1.08); }    
         
     /* --- MENU & FILTRI --- */
     /* -- Menù a discesa */
@@ -542,6 +542,7 @@
   top: 70px;
   left: 50%;
   transform: translateX(-50%);
+  transition: transform 0.15s ease;
 }    
 
 .pulse.running-strong::after {
