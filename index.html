@@ -811,7 +811,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&cop
     // Aggiorna ogni minuto
     setInterval(renderEvents, 60000);
     // Preleva nuovamente eventi ogni 5 minuti
-    setInterval(async () => { const data = await fetchEvents(); if (data) events = data; }, 5 * 60 * 1000);
+    setInterval(async () => { const data = await fetchEvents(); if (data) { events = data; renderEvents(); } }, 5 * 60 * 1000);
 
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
