@@ -1245,10 +1245,9 @@ function buildCategoryMenu() {
 }
   
   // Calcola il range della Timeline
-  function getTimelineRange {
+  function getTimelineRange () {
     let start , end;
-    if (timelineMode === 'live') 
-      {
+    if (timelineMode === 'live') {
       start = getAppTime('live'); // Ora corrente
       end = new Date(start);
       end.setDate(end.getDate() + 1) ; // Domani
