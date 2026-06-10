@@ -869,7 +869,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
 // Eventi UI
-  slider.noUiSlider.on('update', function(values) {
+  slider.noUiSlider.on('set', function(values) {
   const start = Math.round(values[0]);
   const end = Math.round(values[1]);
   updateMarkerVisibility(start, end);
