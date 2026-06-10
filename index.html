@@ -1091,21 +1091,16 @@ function updateMarkerVisibility() {
   const activeCategories = [];
   checkboxes.forEach(cb => {const catId = parseInt(cb.id.replace('cat-', ''));
   if (cb.checked) { activeCategories.push(catId); }});
-  // base timeline reale
-  const timeline = getTimelineRange(currentDate);
-  // finestra slider relativa alla timeline
-  const startTime = new Date( timeline.start.getTime() + startOffset * 3600000 );
-  const endTime = new Date( timeline.start.getTime() + endOffset * 3600000 );
   // Seleziona solo i markers che hanno la categoria attiva
-    markers.forEach(obj => {const categoryVisible = activeCategories.includes(obj.category);
-    // Preleva eventStart ed eventEnd dai markers
-    const eventStart = new Date(obj.start);
-    const eventEnd = obj.end ? new Date(obj.end) : eventStart;
-    // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
-    let inTimeRange = eventStart <= endTime &&  eventEnd >= startTime;
-    // se soddisfa le due condizioni OK altrimenti rimuove il marker
-    if (categoryVisible && inTimeRange) {obj.marker.addTo(map);} 
-    else { map.removeLayer(obj.marker); }});
+  markers.forEach(obj => {const categoryVisible = activeCategories.includes(obj.category);
+  // Preleva eventStart ed eventEnd dai markers
+  const eventStart = obj.start;
+  const eventEnd = obj.end || obj.start;
+  // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
+  const inTimeRange = eventStart <= end &&  eventEnd >= start;
+  // se soddisfa le due condizioni OK altrimenti rimuove il marker
+  if (categoryVisible && inTimeRange) {obj.marker.addTo(map);} 
+  else { map.removeLayer(obj.marker); }});
   updateTicker(); // Aggiorna le News
 }
 
