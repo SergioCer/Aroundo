@@ -1086,8 +1086,10 @@ function createIcon(color, state, intensity) {
       checkboxes.forEach(cb => {const catId = parseInt(cb.id.replace('cat-', ''));
       if (cb.checked) { activeCategories.push(catId); }});
       // Preleva eventStart ed eventEnd dai markers      
-      const eventStart = obj.start;
-      const eventEnd = obj.end || obj.start;
+      markers.forEach(marker => {
+      const categoryVisible = activeCategories.includes(marker.category);
+      const eventStart = new Date(marker.start);
+      const eventEnd = marker.end ? new Date(marker.end) : eventStart;
       // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
       const inTimeRange = eventStart <= endTime &&  eventEnd >= startTime;
       // se soddisfa le due condizioni OK altrimenti rimuove il marker
@@ -1096,15 +1098,6 @@ function createIcon(color, state, intensity) {
       updateTicker(); // Aggiorna le News
     }
 
-  function getVisibleEvents() {
-    const { start, end } = getTimelineRange();
-    return allEvents.filter(event => {
-        const evtTime = new Date(event.start);
-        return evtTime >= start && evtTime <= end;
-    });
-  }
-
-  
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
 function buildCategoryMenu() {
   console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
