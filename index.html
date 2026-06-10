@@ -1056,6 +1056,17 @@ function createIcon(color, state, intensity) {
 /* Mostra o nasconde i Marker delle categorie */
 function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   console.log("Aggiorno Visibilità Markers", new Date().toLocaleTimeString());
+
+  console.log("CHECK RANGE:", startTime, endTime);
+markers.forEach(obj => {
+  console.log(
+    "EVENT:",
+    obj.start,
+    obj.end,
+    obj.marker._leaflet_id
+  );
+});
+  
   // checkbox categorie attive
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
   const activeCategories = [];
