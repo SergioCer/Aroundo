@@ -972,10 +972,17 @@ document.getElementById("reset-day").addEventListener("click", () => {
 // Ricrea i markers 
 function renderEvents() {
   console.log("Aggiorno Markers", new Date().toLocaleTimeString());
-  // console.trace(); // mostra da dove è stata chiamata
   // pulizia markers precedenti
-  markers.forEach(m => map.removeLayer(m.marker));
+  markers.forEach(m => {
+  // ferma eventuali fireworks attivi
+  if (m.marker.fireworkInterval) {
+    clearInterval(m.marker.fireworkInterval);
+    m.marker.fireworkInterval = null;
+  }
+  map.removeLayer(m.marker);
+  });
   markers = [];
+  
   events.forEach(e => {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
