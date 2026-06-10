@@ -804,12 +804,13 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&cop
       // Calcolo approssimativo dello zoom in base agli eventi vicini
       const nearbyEvents = events.filter(e => {
       const distance = map.distance([userLat, userLng], [e.ev_lat, e.ev_lng]);
+    console.log(e.id,(distance / 1000).toFixed(2) + " km");
       return distance <= 100000; // 100 km
       });
-      let zoomLevel = 9; // Provincia
-      if (nearbyEvents.length > 100) zoomLevel = 8; // Comune
-      else if (nearbyEvents.length > 50) zoomLevel = 9; // Provincia
-      else zoomLevel = 10; // Regione
+      let zoomLevel = 10; // Provincia
+      if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
+      else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
+      else zoomLevel = 9; // Regione
       console.warn("Posizione ottenuta, Eventi presenti in zona <100Km:", nearbyEvents.length);
       map.setView([userLat, userLng], zoomLevel);
       },
