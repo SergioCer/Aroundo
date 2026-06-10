@@ -1344,26 +1344,22 @@ function getMidnightPosition(totalHours) {
     }
   }
     
-    //-- Se slider si muove, aggiorna orari labels in base a posizione slider
+   //-- Se slider si muove, aggiorna orari labels in base a posizione slider
   function updateHandles(values) {
   console.log("Aggiorno Slider", new Date().toLocaleTimeString());
   // console.trace(); // mostra da dove è stata chiamata
     //-- Offset
     const startOffset = Math.round(values[0]);
     const endOffset = Math.round(values[1]);
-    //-- Calcola le date reali 
-    const startDate = new Date(startBase.getTime() + startOffset * 3600000);
-    const endDate = new Date(startBase.getTime() + endOffset * 3600000);
+    const { start: baseTime } = getTimelineRange();
+    const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
+    const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
     //-- Estrae le ore
-    const startHour = startDate.getHours()
-        .toString()
-        .padStart(2,'0');
-    const endHour = endDate.getHours()
-        .toString()
-        .padStart(2,'0');
+    
+    const startHour = startDate.getHours().toString().padStart(2,'0');
+    const endHour = endDate.getHours().toString().padStart(2,'0');
     //-- Crea le etichette delle maniglie
-    const handles =
-      slider.querySelectorAll('.noUi-handle');
+    const handles = slider.querySelectorAll('.noUi-handle');
     handles.forEach((h, i) => {
       let label =
         h.querySelector('.handle-label');
@@ -1381,13 +1377,12 @@ function getMidnightPosition(totalHours) {
           : endHour;
     });
     //-- Aggiorna i marker della mappa in base ad orari inizio-fine
-    updateMarkerVisibility(
-      startOffset,
-      endOffset
+    updateMarkerVisibility(startOffset,endOffset
       );
 console.log("START:", startOffset,"END:", endOffset);
-  }        
-    //-- Ad ogni movimento dello slider agiorna la mappa
+  }       
+    
+  //-- Ad ogni movimento dello slider agiorna la mappa
     slider.noUiSlider.on('update', updateHandles); //-- forza primo update
     slider.noUiSlider.set([0, totalHours]);
     // CANCELLARE ??? updateHandles([0, totalHours]);
