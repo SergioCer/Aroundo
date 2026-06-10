@@ -810,7 +810,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&cop
       if (nearbyEvents.length > 100) zoomLevel = 8; // Comune
       else if (nearbyEvents.length > 50) zoomLevel = 9; // Provincia
       else zoomLevel = 10; // Regione
-      console.log("Posizione ottenuta, Eventi presenti in zona:", nearbyEvents);
+      console.warn("Posizione ottenuta, Eventi presenti in zona:", nearbyEvents);
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
