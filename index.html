@@ -1081,15 +1081,23 @@ function createIcon(color, state, intensity) {
 
     /* Mostra o nasconde i Marker delle categorie */
     function updateMarkerVisibility(start, end) {
+        // Se non vengono passati parametri, usa il range corrente della timeline
+      if (!start || !end) {
+      const range = getTimelineRange();
+      start = range.start;
+      end = range.end;
+      }
       const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
       const activeCategories = [];
       checkboxes.forEach(cb => {const catId = parseInt(cb.id.replace('cat-', ''));
       if (cb.checked) { activeCategories.push(catId); }});
+      
       // Preleva eventStart ed eventEnd dai markers      
       markers.forEach(marker => {
       const categoryVisible = activeCategories.includes(marker.category);
       const eventStart = new Date(marker.start);
       const eventEnd = marker.end ? new Date(marker.end) : eventStart;
+
       // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
       const inTimeRange = eventStart <= end &&  eventEnd >= start;
       // se soddisfa le due condizioni OK altrimenti rimuove il marker
