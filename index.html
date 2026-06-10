@@ -1079,7 +1079,12 @@ function createIcon(color, state, intensity) {
 }
 
 /* Mostra o nasconde i Marker delle categorie */
-function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
+function updateMarkerVisibility() {
+  const { start, end } = getTimelineRange();
+  markers.forEach(marker => {
+  const evtTime = new Date(marker.time);
+  marker.visible = evtTime >= start && evtTime <= end;
+  });
   console.log("Aggiorno Visibilità Markers", new Date().toLocaleTimeString());
   // checkbox categorie attive
   const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
@@ -1104,6 +1109,15 @@ function updateMarkerVisibility(startOffset = 0, endOffset = 24) {
   updateTicker(); // Aggiorna le News
 }
 
+  function getVisibleEvents() {
+    const { start, end } = getTimelineRange();
+    return allEvents.filter(event => {
+        const evtTime = new Date(event.start);
+        return evtTime >= start && evtTime <= end;
+    });
+  }
+
+  
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
 function buildCategoryMenu() {
   console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
@@ -1246,7 +1260,7 @@ function buildCategoryMenu() {
   
   // Calcola il range della Timeline
   function getTimelineRange () {
-    let start , end;
+    let start, end;
     if (timelineMode === 'live') {
       start = getAppTime('live'); // Ora corrente
       end = new Date(start);
