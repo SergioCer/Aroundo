@@ -790,10 +790,10 @@
     }).setView([defaultLat, defaultLng], defaultZoom);
 
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
+  // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
   
   // 🌿 Base Mappa NEUTRA BUONA
-  // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
  
    const canvas = document.getElementById('fx-canvas');
    const ctx = canvas.getContext('2d');
@@ -1601,11 +1601,24 @@ requestAnimationFrame(animateFX);
 animateFX();
 
 // se lo stato è countdown  
-function updateMarkerState(marker, state, latLng) {
+function updateMarkerState(marker, state, latLng, evFine) {
   marker.state = state;
+  // Calcola se l'evento è finito
+  const now = new Date();
+  const eventoFinito = evFine && now >= new Date(evFine);
+  if (eventoFinito) {
+    // Evento concluso → pulisci intervallo fuochi e imposta stato a 'done'
+    if (marker.fireworkInterval) {
+      clearInterval(marker.fireworkInterval);
+      marker.fireworkInterval = null;
+    }
+    marker.state = 'done';
+    return;
+  }
+  // Evento attuale, fuochi solo se in countdown
   if (state === 'countdown' && !marker.fireworkInterval) {
   triggerFirework(latLng);
-  marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 3000); // Un fuoco ogni X secondi 1=1000
+  marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2500); // Un fuoco ogni X secondi 1=1000
 }
 if (state !== 'countdown' && marker.fireworkInterval) {
   clearInterval(marker.fireworkInterval);
