@@ -1008,7 +1008,7 @@ function renderEvents() {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
     const d = new Date(dateString);
-    return `${daysShort[d.getDay()]} ${d.getDate()}`;
+    return `${daysLong[d.getDay()]} ${d.getDate()}`;
     };
     const stateData = getEventState(
       new Date(e.ev_inizio),
@@ -1041,9 +1041,9 @@ function renderEvents() {
         // Formatta la data per il popup
         let dayLabel;
         if (isToday) {
-          dayLabel = `Oggi ${daysShort[startDate.getDay()]} ${startDate.getDate()}`;
+          dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
         } else if (isTomorrow) {
-          dayLabel = `Domani ${daysShort[startDate.getDay()]} ${startDate.getDate()}`;
+          dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
         } else {
           dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
         }
