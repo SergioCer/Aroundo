@@ -302,6 +302,7 @@
     .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; opacity: 0.8; }
     .pulse.started { animation: hopLive 2s infinite; }    
     .pulse.started::after { animation: pulseLive 0.3s infinite; }
+    .pulse.running::before { background: var(--c); opacity: 0.25; border: 1px solid white; /* facoltativo, per contrasto */ } /* questo è nuovo */ 
     .pulse.running { animation: none; }
     .pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; }
     .pulse.finished { animation: finished 0.5s ease forwards; }    
@@ -1148,7 +1149,7 @@ function buildCategoryMenu() {
     const label = document.createElement('label');
     label.htmlFor = `cat-${cat.id_macro_categoria}`;
     label.className = 'category-label';
-    label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo 
+    label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo link per icone : https://www.svgrepo.com/
     // label.textContent = cat.mc_descrizione; // questa è solo descrizione 
     // Applichiamo il colore dell’evento
     label.style.backgroundColor = cat.mc_colore;
