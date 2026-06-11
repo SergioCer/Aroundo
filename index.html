@@ -310,11 +310,9 @@
     .pulse.running-medium::after { animation: hopSlow 2.5s infinite; opacity: 0.12;}
     .pulse.running-soft { animation: running-soft 3s infinite ease-in-out;}
     .pulse.running-soft::after { animation: none; opacity: 0;}
-    .pulse.finished::before { content: ""; position: absolute; width: 2px;/* dimensione pallino */
-    height: 2px; border-radius: 50%; opacity: 0.12; /* colore pallino */
-    top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;}
     .pulse.finished { animation: finished 0.5s ease forwards; }    
-    .pulse.finished::after { display: none; animation: none ; opacity: 0 ; }
+    /* .pulse.finished::after { display: none; animation: none ; opacity: 0 ; } */
+    .pulse.finished::after { content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9;}
 
 
     
