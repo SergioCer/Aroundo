@@ -800,8 +800,8 @@
   'imminent': 30,
   'countdown': 30,
   'started': 22,
-  'running-soft': 18,
-  'running-medium': 22,
+  'running-soft': 14,
+  'running-medium': 20,
   'running-strong': 26
   };
   const map = L.map('map', {
@@ -1250,7 +1250,7 @@ function buildCategoryMenu() {
     state = 'running-soft' ;
     if (durationMinutes) {
     const progress = minutesFromStart / durationMinutes;
-    if (progress < 0.05) { 
+    if (progress < 0.125) { 
     state = 'running-strong';
     } else if (progress < 0.25) { 
     state = 'running-medium';
