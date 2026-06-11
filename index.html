@@ -1148,8 +1148,8 @@ function buildCategoryMenu() {
     const label = document.createElement('label');
     label.htmlFor = `cat-${cat.id_macro_categoria}`;
     label.className = 'category-label';
-    // label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo 
-    label.textContent = cat.mc_descrizione; // questa è solo descrizione 
+    label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo 
+    // label.textContent = cat.mc_descrizione; // questa è solo descrizione 
     // Applichiamo il colore dell’evento
     label.style.backgroundColor = cat.mc_colore;
     label.style.color = getContrastColor(cat.mc_colore);
