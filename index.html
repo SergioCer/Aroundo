@@ -817,8 +817,10 @@
     minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
     maxZoom: 19 // evita zoom troppo vicino, il massimo zoom è 18 - 19
     attributionControl: true // default true
-    map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
     }).setView([defaultLat, defaultLng], defaultZoom);
+
+    map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
+    map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
   // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
