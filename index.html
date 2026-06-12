@@ -605,6 +605,38 @@
   animation:tickerScroll 120s linear infinite; /* Velocità di scrolling */
 }
 
+    /* Pulsante base */
+    .action-btn {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+      display: inline-block;
+      cursor: pointer;
+      margin-left: 4px; /* piccolo spazio tra pulsanti */
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Varianti colore */
+    .buy-btn {
+      background: #28a745; /* verde */
+    }
+
+    .book-btn {
+      background: #1d4ed8; /* blu */
+    }
+
+    .map-btn {
+      background: #f59e0b; /* arancione */
+    }
+    
+
 @keyframes tickerScroll{
   from{
     transform:translateX(0%);
@@ -864,7 +896,7 @@
     const loginBtn = document.getElementById('loginBtn');
     // Aggiungi un click listener
     loginBtn.addEventListener('click', function() {
-      alert('In costruzione!');
+      alert('In Progress!');
     // In futuro, per andare a una pagina:
     // window.location.href = 'pagina-login.html';
   });
@@ -1153,20 +1185,30 @@ marker.bindPopup(`
         target="_blank"
         style="background:#007bff; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Map </a>
       </div>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-         ${Number(e.ev_costo) > 0 ? `
-        <div style="font-weight:bold;">
-          Ingresso €: ${e.ev_costo || '0'}
-        </div>
-        <!-- DISABILITATO  a href="${e.ev_link_acquisto || '#'}" target="_blank"
-           style="background:#28a745; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Buy </a -->
-        <a href="#" onclick="alert('In costruzione!'); return false;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'"
-        style="background:#28a745; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600; transition:opacity .15s ease;"> Buy </a>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+        ${Number(e.ev_costo) > 0 ? `
+          <div style="font-weight:bold;">
+            Ingresso €: ${e.ev_costo}
+          </div>
+            <div>
+            <a href="#"
+               class="action-btn buy-btn"
+               onclick="alert('In Progress!'); return false;">
+              Buy
+            </a>
+            <a href="#"
+               class="action-btn book-btn"
+               onclick="alert('In Progress!'); return false;">
+              Book
+            </a>
+          </div>
         ` : `
-        <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Event </div>
+          <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Event </div>
         `}
-        </div><hr>
-        ${ e.ev_copertina ? `
+      </div><hr>
+
+      ${ e.ev_copertina ? `
         <div style="text-align:center;">
         <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; ">
         </div>
