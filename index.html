@@ -17,6 +17,14 @@
       width: 100%;
     }
 
+    /* Riduce attributi Leaflet */
+    .leaflet-control-attribution {
+      font-size: 10px;        /* più piccolo */
+      opacity: 0.6;           /* meno invadente */
+      background: rgba(255,255,255,0.7); /* leggermente trasparente */
+      padding: 2px 4px;
+    }
+    
     #fx-canvas {
       position: absolute;
       top: 0;
@@ -808,14 +816,18 @@
     zoomControl: false, // Visualizza o nasconde i controlli dello ZOOM integrati
     minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
     maxZoom: 19 // evita zoom troppo vicino, il massimo zoom è 18 - 19
+    attributionControl: true // default true
     }).setView([defaultLat, defaultLng], defaultZoom);
+    // Modifica riferimento OMS della mappa//
+    map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
 
+  
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
   // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
   
   // 🌿 Base Mappa NEUTRA BUONA
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
- 
+
    const canvas = document.getElementById('fx-canvas');
    const ctx = canvas.getContext('2d');
    function resizeCanvas() {
