@@ -1340,7 +1340,6 @@ function buildCategoryMenu() {
     const diffMinutes = (startDate - now) / 1000 / 60;
     const minutesFromStart =  (now - startDate) / 1000 / 60;
     const durationMinutes = endDate ? (endDate - startDate) / 1000 / 60 : null; // calcola durata dell'evento
-    // CANCELLARE const progress = durationMinutes ? minutesFromStart / durationMinutes : 0; // ottiene la progressione dell'evento 
     // evento terminato 
     if (endDate && now > endDate) return {state: 'finished' };
     let state;
@@ -1457,13 +1456,9 @@ function getMidnightPosition(totalHours) {
 
      // baseTime coerente con la modalità timeline
     const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
-    // const { start: baseTime } = getTimelineRange(); // VECCHIA VERSIONE CANCELLARE
     const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
     const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
-    //-- Estrae le ore
-    
-    // const startHour = startDate.getHours().toString().padStart(2,'0');
-    // const endHour = endDate.getHours().toString().padStart(2,'0');
+   
     //-- Crea le etichette delle maniglie
     const formatTime = (date) =>
     date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
