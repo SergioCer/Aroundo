@@ -1028,7 +1028,6 @@ function renderEvents() {
     })
     updateMarkerState(marker, stateClass, { lat: e.ev_lat, lng: e.ev_lng }); // Fuochi d'artificio
     
-    let popupOpen = false; // Imposta stato Falso su apertura popup
     //-- Visualizza i dettagli dell'evento selezionato con Popup //
         const startDate = new Date(e.ev_inizio);
         const now = new Date();
@@ -1080,12 +1079,8 @@ marker.bindPopup(`
     `);      
   // marker.on('mouseover', function () {this.openPopup();});
   // marker.on('mouseout', function () {this.closePopup();});
-    marker.on('popupclose', function () {popupOpen = false;}); // Reset 
-    marker.on('click', function () { 
-      if (!popupOpen) { this.openPopup();
-    popupOpen = true;
-  }
-    }); 
+  //    marker.on('popupclose', function () {popupOpen = false;}); // Reset 
+    marker.on('click', function () { this.openPopup();
   marker.on('popupopen', function() {
   const btn = document.getElementById(`details-${e.id}`);
   const m = this; // <-- salva il marker in una variabile locale
