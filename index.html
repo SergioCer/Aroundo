@@ -1078,6 +1078,7 @@ marker.bindPopup(`
     `);      
   // marker.on('mouseover', function () {this.openPopup();});
   // marker.on('mouseout', function () {this.closePopup();});
+    marker.on('popupclose', function () {popupOpen = false;});
     marker.on('click', function () { 
       if (!popupOpen) { this.openPopup();
     popupOpen = true;
@@ -1099,8 +1100,6 @@ marker.bindPopup(`
   }
 });
 
-    marker.on('popupclose', function () {popupOpen = false;});
-    
     //-- 📦 STORAGE DATI (NO LOGICA)
     markers.push({
       marker,
