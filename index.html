@@ -1074,14 +1074,14 @@ marker.bindPopup(`
       ${e.ev_organizzatore || ''}
       </div>
       <!-- BOTTONE DETTAGLI -->
-      <button id="details-${e.id}" style="margin-top:6px;">Dettagli</button>
+      <button id="details-${e.id}" style="margin-top:6px;">More...</button>
       </div>
     `);      
   // marker.on('mouseover', function () {this.openPopup();});
   // marker.on('mouseout', function () {this.closePopup();});
   //  marker.on('popupclose', function () {popupOpen = false;}); // Reset 
   //  marker.on('click', function () { this.openPopup();
-  // Associa il click al btn 'Dettagli'
+  // Associa il click al btn 'More...'
   marker.on('popupopen', function() {
   const btn = document.getElementById(`details-${e.id}`);
   const m = this; // <-- salva il marker in una variabile locale
@@ -1091,11 +1091,11 @@ marker.bindPopup(`
       .setLatLng(m.getLatLng()) // usa la variabile locale del marker
       .setContent(`
         <div style="min-width:220px;font-size:12px;">
-          <b>Dettagli avanzati</b><br><br>
-          ID evento: ${e.id || 'n/d'}<br>
-          Categoria: ${e.ev_categoria}<br>
-          Stato: ${stateClass}<br>
-          Intensità: ${intensity}<br>
+          <b>Dettagli</b><br><br>
+          Latitudine: ${ev.lat || 'n/d'}<br>
+          Longitudine: ${ev_lng}<br>
+          Luogo: ${ev_luogo}<br>
+          Copertina: ${ev_copertina}<br>
           <hr>
           ${e.ev_descrizione || ''}
         </div>
