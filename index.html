@@ -99,7 +99,7 @@
     /* -- Rettangolo filtro categorie */
     .map-overlay2 {
       position: absolute;
-      top: 80px;      /* spostato sotto title/subtitle */
+      top: 6px;
       left: 10px;
       z-index: 999;
       background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
@@ -117,7 +117,7 @@
 /* -- Rettangolo barra temporale */
 .top-timebar {
   position: absolute;
-  top: 10px;                     /* distanza dal bordo superiore */
+  top: 6px;                     /* distanza dal bordo superiore */
   left: 50%;                     /* centro orizzontale */
   transform: translateX(-50%);   /* centraggio reale */
   z-index: 998;
@@ -128,7 +128,7 @@
   justify-content: center;       /* centrare internamente */
   gap: 10px;                     /* distanza tra elementi interni */
 
-  width: 300px;                  /* dimensione reale del contenitore */
+  width: 330px;                  /* dimensione reale del contenitore */
   height: 90px;                 /* altezza fissa per contenuto */
   padding: 2px 2px;            /* spazio interno */
   border-radius: 16px;
@@ -139,9 +139,8 @@
 }
 
     /* Pallino torna alla data di oggi */
-    .reset-btn { font-size: 30px; font-weight: bold; color: #3b82f6; background: transparent; border: none; padding: 2px 2px; transition: transform 0.15s ease;}
-
-    .reset-btn:hover { transform: translateX(-50%) translateY(-1px) scale(1.08); }    
+    .reset-btn { font-size: 32px; font-weight: bold; color: #3b82f6; background: transparent; border: none; padding: 2px 2px; transition: transform 0.15s ease; display: inline-block; position: rlative;}
+    .reset-btn:hover { transform: translate(-50%, -50px) scale(1.08); }    
         
     /* --- MENU & FILTRI --- */
     /* -- Menù a discesa */
@@ -535,13 +534,13 @@
 #prev-day {
   position: absolute;
   top: 8;           /* regolabile */
-  left: -2px;      /* leggermente a sinistra della maniglia */
+  left: 8px;      /* leggermente a sinistra della maniglia */
 }
 
 #next-day {
   position: absolute;
   top: 8;
-  right: -2px;     /* leggermente a destra della maniglia */
+  right: 8px;     /* leggermente a destra della maniglia */
 }
 
 #day-text,
