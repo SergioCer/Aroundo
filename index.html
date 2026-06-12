@@ -1079,8 +1079,9 @@ marker.bindPopup(`
     `);      
   // marker.on('mouseover', function () {this.openPopup();});
   // marker.on('mouseout', function () {this.closePopup();});
-  //    marker.on('popupclose', function () {popupOpen = false;}); // Reset 
-    marker.on('click', function () { this.openPopup();
+  //  marker.on('popupclose', function () {popupOpen = false;}); // Reset 
+  //  marker.on('click', function () { this.openPopup();
+  // Associa il click al btn 'Dettagli'
   marker.on('popupopen', function() {
   const btn = document.getElementById(`details-${e.id}`);
   const m = this; // <-- salva il marker in una variabile locale
