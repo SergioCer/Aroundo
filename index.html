@@ -1095,8 +1095,8 @@ marker.bindPopup(`
           Latitudine: ${e.ev_lat}<br>
           Longitudine: ${e.ev_lng}<br>
           Luogo: ${e.ev_luogo}<br>
-          Costo: ${e.ev_costo}<br>
-          /* <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; "> */
+          Costo: ${e.ev_costo || '0'}<br>
+          <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; ">
           <hr>
           ${e.ev_descrizione || ''}
         </div>
