@@ -1151,16 +1151,18 @@ marker.bindPopup(`
         </div>
         <a href="https://www.google.com/maps/dir/?api=1&destination=${e.ev_lat},${e.ev_lng}"
         target="_blank"
-        style="background:#007bff; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Naviga </a>
+        style="background:#007bff; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Map </a>
       </div>
     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+         ${e.ev_costo > 0 ? `
         <div style="font-weight:bold;">
           Ingresso €: ${e.ev_costo || '0'}
         </div>
         <!-- DISABILITATO  a href="${e.ev_link_acquisto || '#'}" target="_blank"
-           style="background:#28a745; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Acquista </a -->
+           style="background:#28a745; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Buy </a -->
         <a href="#" onclick="alert('In costruzione!'); return false;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'"
-        style="background:#28a745; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600; transition:opacity .15s ease;"> Acquista </a>
+        style="background:#28a745; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600; transition:opacity .15s ease;"> Buy </a>
+        ` : ''}
         </div><hr>
         ${ e.ev_copertina ? `
         <div style="text-align:center;">
