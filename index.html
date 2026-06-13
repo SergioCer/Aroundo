@@ -607,11 +607,12 @@
 
     /* Pulsante base */
     .action-btn {
+      min-width: 52px;
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 11px;
       font-weight: 600;
-      color: white;
+      color: white !important;
       text-decoration: none;
       transition: opacity 0.15s ease;
       display: inline-block;
@@ -619,22 +620,12 @@
       margin-left: 4px; /* piccolo spazio tra pulsanti */
     }
 
-    .action-btn:hover {
-      opacity: 0.9;
-    }
+    .action-btn:hover {opacity: 0.85;}
 
-    /* Varianti colore */
-    .buy-btn {
-      background: #28a745; /* verde */
-    }
-
-    .book-btn {
-      background: #f97316; /* arancione */
-    }
-
-    .map-btn {
-      background: #1d4ed8; /* blu */
-    }
+    /* colori */
+    .buy-btn  { background:#16a34a; }  /* verde moderno */
+    .book-btn { background:#f97316; }  /* arancione */
+    .map-btn  { background:#3b82f6; }  /* blu standard */
     
 
 @keyframes tickerScroll{
@@ -1176,27 +1167,24 @@ marker.bindPopup(`
       .setLatLng(m.getLatLng()) // usa la variabile locale del marker
       .setContent(`
         <div style="min-width:220px;font-size:12px;">
-        <b>Dettagli</b><br><hr>
+        <b>Event Info</b><br><hr>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-        <div>
-        Luogo: ${e.ev_luogo || ''}
-        </div>
+        <div> Location: ${e.ev_luogo || ''} </div>
         <a href="https://www.google.com/maps/dir/?api=1&destination=${e.ev_lat},${e.ev_lng}"
         target="_blank"
-        style="background:#007bff; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Map </a>
+        style="background:#3b82f6; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Map </a>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
         ${Number(e.ev_costo) > 0 ? `
-        <div style="font-weight:bold;"> Ingresso €: ${e.ev_costo} </div>
+        <div Price €: <span style="font-weight:bold;"> ${e.ev_costo} </span></div>
             <a href="#" class="action-btn buy-btn" onclick="alert('In Progress!'); return false;"> Buy </a>
         ` : `
-          <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Event </div>
-        </div>
+          <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Entry </div>
         `}
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-      <div style="font-weight:600; color:#111;"> I'll be there </div>
+      <div style="font-weight:600; color:#111;"> I'll be there ! </div>
       <a href="#" class="action-btn book-btn" onclick="alert('In Progress!'); return false;"> Book </a>
       </div>
       <hr>
