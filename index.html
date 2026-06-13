@@ -629,11 +629,11 @@
     }
 
     .book-btn {
-      background: #1d4ed8; /* blu */
+      background: #f97316; /* arancione */
     }
 
     .map-btn {
-      background: #f59e0b; /* arancione */
+      background: #1d4ed8; /* blu */
     }
     
 
@@ -1188,26 +1188,18 @@ marker.bindPopup(`
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
         ${Number(e.ev_costo) > 0 ? `
-          <div style="font-weight:bold;">
-            Ingresso €: ${e.ev_costo}
-          </div>
-            <div>
-            <a href="#"
-               class="action-btn buy-btn"
-               onclick="alert('In Progress!'); return false;">
-              Buy
-            </a>
-            <a href="#"
-               class="action-btn book-btn"
-               onclick="alert('In Progress!'); return false;">
-              Book
-            </a>
-          </div>
+        <div style="font-weight:bold;"> Ingresso €: ${e.ev_costo} </div>
+            <a href="#" class="action-btn buy-btn" onclick="alert('In Progress!'); return false;"> Buy </a>
         ` : `
           <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Event </div>
+        </div>
         `}
-      </div><hr>
-
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+      <div style="font-weight:600; color:#111;"> ... verrò !!! </div>
+      <a href="#" class="action-btn book-btn" onclick="alert('In Progress!'); return false;"> Book </a>
+      </div>
+      <hr>
       ${ e.ev_copertina ? `
         <div style="text-align:center;">
         <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; ">
