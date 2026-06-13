@@ -607,7 +607,10 @@
 
     /* Pulsante base */
     .action-btn {
-      min-width: 52px;
+      min-width: 48px;
+      display: inline-flex;       /* ⭐ fondamentale */
+      justify-content: center;    /* ⭐ centra orizzontale */
+      align-items: center;        /* ⭐ centra verticale */
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 11px;
@@ -1171,8 +1174,7 @@ marker.bindPopup(`
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
         <div> Location: ${e.ev_luogo || ''} </div>
         <a href="https://www.google.com/maps/dir/?api=1&destination=${e.ev_lat},${e.ev_lng}"
-        target="_blank"
-        style="background:#3b82f6; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:600;"> Map </a>
+        target="_blank" class="action-btn map-btn"> Map </a>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
