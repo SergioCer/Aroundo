@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <aside class="sidebar">
+      <h2>Admin Panel</h2>
+
+      <nav>
+        <a href="pages/comuni.html">Comuni</a>
+        <a href="pages/eventi.html">Eventi</a>
+        <a href="pages/luoghi.html">Luoghi</a>
+        <a href="pages/macrocategorie.html">Macrocategorie</a>
+        <a href="pages/subcategorie.html">Subcategorie</a>
+        <a href="pages/organizzatori.html">Organizzatori</a>
+      </nav>
+
+    </aside>
+
+    <main class="content">
+      <h1>Dashboard</h1>
+      <p>Seleziona una tabella dal menu.</p>
+    </main>
+
+  </div>
+
+</body>
+</html>
