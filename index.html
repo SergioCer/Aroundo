@@ -888,13 +888,16 @@
 
     // Seleziona il div "Login"
     const loginBtn = document.getElementById('loginBtn');
-    // Aggiungi un click listener
+    // Click sinistro
     loginBtn.addEventListener('click', function() {
-    //alert('In Progress!');
-    // Per andare a una pagina:
+    alert('In Progress!');
+  });      
+    // Click destro
+    loginBtn.addEventListener('contextmenu', function(event) {
+    event.preventDefault(); // blocca il menu del browser
     window.location.href = 'tabelle.html';
   });
-
+    
   const canvas = document.getElementById('fx-canvas');
    const ctx = canvas.getContext('2d');
    function resizeCanvas() {
