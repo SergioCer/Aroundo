@@ -12,6 +12,16 @@
     <aside class="sidebar">
       <h2>Admin Panel</h2>
 
+    // Seleziona il div "Login"
+    const loginBtn = document.getElementById('loginBtn');
+    // Aggiungi un click listener
+    loginBtn.addEventListener('click', function() {
+    //alert('In Progress!');
+    // Per andare a una pagina:
+    window.location.href = 'tabelle.html';
+  });
+
+      
       <nav>
         <a href="pages/comuni.html">Comuni</a>
         <a href="pages/eventi.html">Eventi</a>
