@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Luoghi</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<h1>Luoghi</h1>
+
+<table id="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Lat</th>
+      <th>Lng</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script type="module">
+import { supabase } from '../js/supabase.js';
+
+async function load() {
+  const { data } = await supabase
+    .from('luoghi')
+    .select('*')
+    .order('id_luogo', { ascending: false });
+
+  const tbody = document.querySelector("tbody");
+
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.id_luogo}</td>
+      <td>${row.lu_nome ?? ''}</td>
+      <td>${row.lu_lat}</td>
+      <td>${row.lu_lng}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
