@@ -1,27 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-  <title>Luoghi</title>
+  <meta charset="UTF-8">
+  <title>Luoghi - Admin</title>
   <link rel="stylesheet" href="../css/styletabelle.css">
 </head>
 <body>
 
-<h1>Luoghi</h1>
+<h1>Gestione Luoghi</h1>
 
-<table id="table">
+<button onclick="showForm()">+ Nuovo Luogo</button>
+
+<table border="1" width="100%">
   <thead>
     <tr>
       <th>ID</th>
       <th>Nome</th>
       <th>Lat</th>
       <th>Lng</th>
+      <th>Comune</th>
+      <th>Azioni</th>
     </tr>
   </thead>
-  <tbody></tbody>
+  <tbody id="tbody"></tbody>
 </table>
+
+<!-- FORM -->
+<div id="formBox" style="display:none; margin-top:20px;">
+  <h3>Luogo</h3>
+
+  <input type="hidden" id="id_luogo">
+
+  <input id="lu_nome" placeholder="Nome"><br><br>
+  <input id="lu_lat" placeholder="Lat"><br><br>
+  <input id="lu_lng" placeholder="Lng"><br><br>
+
+  <select id="lu_comune"></select><br><br>
+
+  <textarea id="lu_descrizione" placeholder="Descrizione"></textarea><br><br>
+  <textarea id="lu_note" placeholder="Note"></textarea><br><br>
+
+  <input id="lu_capacita_massima" placeholder="Capacità"><br><br>
+
+  <button onclick="save()">Salva</button>
+</div>
 
 <script type="module">
 import { supabase } from '../supabase.js';
+
+let comuniMap = [];
+
+async function loadComuni() {
+  const { data } = await supabase
+    .from('comuni')
+    .select('id_comune, co_descrizione')
+    .order('co_descrizione');
+
+  comuniMap = data;
+
+  const sel = document.getElementById("lu_comune");
+  sel.innerHTML = `<option value="">-- seleziona --</option>`;
+
+  data.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id_comune;
+    opt.textContent = c.co_descrizione;
+    sel.appendChild(opt);
+  });
+}
 
 async function load() {
   const { data } = await supabase
@@ -29,21 +75,77 @@ async function load() {
     .select('*')
     .order('id_luogo', { ascending: false });
 
-  const tbody = document.querySelector("tbody");
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
 
   data.forEach(row => {
+
+    const comune = comuniMap.find(c => c.id_comune === row.lu_comune);
+
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
       <td>${row.id_luogo}</td>
       <td>${row.lu_nome ?? ''}</td>
       <td>${row.lu_lat}</td>
       <td>${row.lu_lng}</td>
+      <td>${comune ? comune.co_descrizione : ''}</td>
+      <td>
+        <button onclick='edit(${JSON.stringify(row)})'>Modifica</button>
+      </td>
     `;
+
     tbody.appendChild(tr);
   });
 }
 
-load();
+window.showForm = function() {
+  document.getElementById("formBox").style.display = "block";
+}
+
+window.edit = function(row) {
+  showForm();
+
+  document.getElementById("id_luogo").value = row.id_luogo;
+  document.getElementById("lu_nome").value = row.lu_nome || "";
+  document.getElementById("lu_lat").value = row.lu_lat || "";
+  document.getElementById("lu_lng").value = row.lu_lng || "";
+  document.getElementById("lu_comune").value = row.lu_comune || "";
+  document.getElementById("lu_descrizione").value = row.lu_descrizione || "";
+  document.getElementById("lu_note").value = row.lu_note || "";
+  document.getElementById("lu_capacita_massima").value = row.lu_capacita_massima || "";
+}
+
+window.save = async function() {
+
+  const id = document.getElementById("id_luogo").value;
+
+  const payload = {
+    lu_nome: document.getElementById("lu_nome").value,
+    lu_lat: parseFloat(document.getElementById("lu_lat").value),
+    lu_lng: parseFloat(document.getElementById("lu_lng").value),
+    lu_comune: document.getElementById("lu_comune").value || null,
+    lu_descrizione: document.getElementById("lu_descrizione").value,
+    lu_note: document.getElementById("lu_note").value,
+    lu_capacita_massima: parseInt(document.getElementById("lu_capacita_massima").value)
+  };
+
+  if (id) {
+    await supabase.from('luoghi')
+      .update(payload)
+      .eq('id_luogo', id);
+  } else {
+    await supabase.from('luoghi')
+      .insert(payload);
+  }
+
+  location.reload();
+}
+
+// init
+await loadComuni();
+await load();
+
 </script>
 
 </body>
