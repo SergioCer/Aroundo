@@ -319,8 +319,8 @@ function render() {
       if (k === 'note')
         return (r.lu_note || '').toLowerCase().includes(v);
       
-      // if (k === 'cap')
-        // return (r.lu_capacita_massima || '').toString().startsWith(v);
+      if (k === 'cap')
+        return (r.lu_capacita_massima || '').toString().startsWith(v);
 
       return true;
     });
