@@ -488,7 +488,7 @@ window.save = async () => {
     await supabase.from('luoghi')
       .insert(payload);
   }
-  closeModal(true);
+  // closeModal(true);
   load();
 };
 
@@ -549,14 +549,14 @@ function syncUI() {
   }
 }
 
-function closeModal(force = false) {
-  if (!force && state.dirty) {
-    const ok = confirm("Vuoi salvare le modifiche?");
-    if (ok) save();
-    return;
-  }
-  document.getElementById("modal").style.display = "none";
-}
+// function closeModal(force = false) {
+  // if (!force && state.dirty) {
+    // const ok = confirm("Vuoi salvare le modifiche?");
+    // if (ok) save();
+    // return;
+  // }
+  //document.getElementById("modal").style.display = "none";
+// } 
   
   
 </script>
