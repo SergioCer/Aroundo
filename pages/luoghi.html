@@ -410,17 +410,16 @@ window.sort = (field) => {
 
 // ---------------- MODAL ----------------
 window.openModal = (row=null) => {
-  originalData = {
-  lu_comune: row?.lu_comune || "",
-  lu_location: row?.lu_location || "",
-  lu_lat: row?.lu_lat || "",
-  lu_lng: row?.lu_lng || "",
-  lu_descrizione: row?.lu_descrizione || "",
-  lu_note: row?.lu_note || "",
-  lu_capacita_massima: row?.lu_capacita_massima || ""
+originalData = {
+  lu_comune: String(row?.lu_comune || ""),
+  lu_location: String(row?.lu_location || ""),
+  lu_lat: String(row?.lu_lat ?? ""),
+  lu_lng: String(row?.lu_lng ?? ""),
+  lu_descrizione: String(row?.lu_descrizione || ""),
+  lu_note: String(row?.lu_note || ""),
+  lu_capacita_massima: String(row?.lu_capacita_massima || "")
 };
   state.dirty = false;
-  state.editing = row;
   document.getElementById("modal").style.display = "flex";
   if (!row) {
     document.getElementById("id_luogo").value = "";
@@ -456,13 +455,13 @@ document.addEventListener("keydown", e => {
 // ---------------- DIRTY ----------------
 window.markDirty = () => {
   const current = {
-    lu_comune: document.getElementById("lu_comune").value,
-    lu_location: document.getElementById("lu_location").value,
-    lu_lat: document.getElementById("lu_lat").value,
-    lu_lng: document.getElementById("lu_lng").value,
-    lu_descrizione: document.getElementById("lu_descrizione").value,
-    lu_note: document.getElementById("lu_note").value,
-    lu_capacita_massima: document.getElementById("lu_capacita_massima").value
+    lu_comune: String(document.getElementById("lu_comune").value || ""),
+    lu_location: String(document.getElementById("lu_location").value || ""),
+    lu_lat: String(document.getElementById("lu_lat").value || ""),
+    lu_lng: String(document.getElementById("lu_lng").value || ""),
+    lu_descrizione: String(document.getElementById("lu_descrizione").value || ""),
+    lu_note: String(document.getElementById("lu_note").value || ""),
+    lu_capacita_massima: String(document.getElementById("lu_capacita_massima").value || "")
   };
 
   state.dirty = JSON.stringify(current) !== JSON.stringify(originalData);
@@ -488,7 +487,9 @@ window.save = async () => {
     await supabase.from('luoghi')
       .insert(payload);
   }
-  // closeModal(true);
+  state.dirty = false;
+  document.getElementById("modal").style.display = "none";
+  closeModal(true);
   load();
 };
 
