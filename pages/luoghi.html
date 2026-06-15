@@ -122,7 +122,6 @@ tr:hover {
   cursor: pointer;
 }
 
-/* MODAL */
 #modal {
   position: fixed;
   inset: 0;
@@ -130,6 +129,7 @@ tr:hover {
   display: none;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(3px);
 }
 
 #modalContent {
@@ -155,10 +155,6 @@ tr:hover {
   background: #ef4444;
   color: white;
 }
-
-#modal {
-  backdrop-filter: blur(3px);
-}  
 
 input, select, textarea {
   width: 100%;
@@ -321,7 +317,6 @@ let state = {
   sortField: null,
   sortDir: 'asc',
   dirty: false,
-  editing: null
 };
 
 // ---------------- COMUNI ----------------
