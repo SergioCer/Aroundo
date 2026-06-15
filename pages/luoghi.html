@@ -444,17 +444,6 @@ window.openModal = (row=null) => {
   }
 };
 
-// ---------------- CLOSE ----------------
-window.closeModal = (force=false) => {
-  if (!force && state.dirty) {
-    const ok = confirm("Salvare le modifiche?");
-    if (ok) save();
-    else state.dirty = false;
-    return;
-  }
-  document.getElementById("modal").style.display = "none";
-};
-
 // click outside
 document.getElementById("modal").addEventListener("click", (e) => {
   if (e.target.id === "modal") requestClose();
@@ -537,17 +526,7 @@ function syncUI() {
 }  
 
   function requestClose() {
-  if (!state.dirty) {
-    closeModal(true);
-    return;
-  }
-  const ok = confirm("Vuoi salvare le modifiche?");
-  if (ok) {
-    save();
-    return;
-  }
-  // ❗ annulla = NON deve chiudere direttamente senza controllo
-  state.dirty = false;
+    closeModal(false);
 }
 
 function closeModal(force = false) {
