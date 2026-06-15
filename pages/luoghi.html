@@ -84,10 +84,10 @@ async function load() {
 
     tr.innerHTML = `
       <td>${row.id_luogo}</td>
+      <td>${comune ? comune.co_descrizione : ''}</td>
       <td>${row.lu_location ?? ''}</td>
       <td>${row.lu_lat}</td>
       <td>${row.lu_lng}</td>
-      <td>${comune ? comune.co_descrizione : ''}</td>
       <td>
         <button onclick='edit(${JSON.stringify(row)})'>Modifica</button>
       </td>
@@ -105,10 +105,10 @@ window.edit = function(row) {
   showForm();
 
   document.getElementById("id_luogo").value = row.id_luogo;
+  document.getElementById("lu_comune").value = row.lu_comune || "";
   document.getElementById("lu_nome").value = row.lu_location || "";
   document.getElementById("lu_lat").value = row.lu_lat || "";
   document.getElementById("lu_lng").value = row.lu_lng || "";
-  document.getElementById("lu_comune").value = row.lu_comune || "";
   document.getElementById("lu_descrizione").value = row.lu_descrizione || "";
   document.getElementById("lu_note").value = row.lu_note || "";
   document.getElementById("lu_capacita_massima").value = row.lu_capacita_massima || "";
@@ -119,10 +119,10 @@ window.save = async function() {
   const id = document.getElementById("id_luogo").value;
 
   const payload = {
+    lu_comune: document.getElementById("lu_comune").value || null,
     lu_nome: document.getElementById("lu_location").value,
     lu_lat: parseFloat(document.getElementById("lu_lat").value),
     lu_lng: parseFloat(document.getElementById("lu_lng").value),
-    lu_comune: document.getElementById("lu_comune").value || null,
     lu_descrizione: document.getElementById("lu_descrizione").value,
     lu_note: document.getElementById("lu_note").value,
     lu_capacita_massima: parseInt(document.getElementById("lu_capacita_massima").value)
