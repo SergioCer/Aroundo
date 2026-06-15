@@ -79,12 +79,12 @@ th, td {
 
 /* SORT BUTTON */
 .sort-btn {
-  width: 26px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   background: #dbeafe;
   color: #1e3a8a;
@@ -348,10 +348,11 @@ function render() {
       <td>${r.lu_location || ''}</td>
       <td>${r.lu_lat}</td>
       <td>${r.lu_lng}</td>
+      <td>${r.lu_note}</td>
       <td>${r.lu_capacita_massima || ''}</td>
     `;
 
-    tbody.appendChild(tr);
+    .appendChild(tr);
   });
 }
 
