@@ -155,7 +155,9 @@ input, select, textarea {
       <th>
         <div class="col-header">
           <div class="col-title">ID</div>
-          <div class="col-tools"></div>
+          <div class="col-tools">
+            <button class="sort-btn" onclick="resetAll()">✕</button>
+          </div>
         </div>
       </th>
 
@@ -480,6 +482,15 @@ function updateSortButtons() {
         : '▲';
   });
 }
+
+window.resetAll = () => {
+  state.filters = {};
+  state.sortField = null;
+  state.sortDir = 'asc';
+  document.querySelectorAll('.filter').forEach(i => i.value = '');
+  updateSortButtons();
+  render();
+};
   
 </script>
 
