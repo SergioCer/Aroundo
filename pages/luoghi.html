@@ -110,6 +110,11 @@ th, td {
 .reset-btn:hover {
   background: #fecaca;
 }
+
+.reset-btn.active {
+  background: #ef4444;
+  color: white;
+}  
   
 /* TABLE ROW */
 tr:hover {
@@ -518,6 +523,7 @@ function updateResetButton() {
   const btn = document.querySelector('.reset-btn');
   if (!btn) return;
   btn.textContent = (hasFilters || hasSort) ? '✕' : '-';
+  btn.classList.toggle('active', hasFilters || hasSort);
 }
   
 window.resetAll = () => {
