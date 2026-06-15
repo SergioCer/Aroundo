@@ -141,12 +141,24 @@ tr:hover {
 }
 
 .closeX {
-  position: absolute;
-  right: 10px;
-  top: 8px;
-  cursor: pointer;
-  font-weight: bold;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #f3f4f6;
+  transition: 0.2s;
 }
+
+.closeX:hover {
+  background: #ef4444;
+  color: white;
+}
+
+#modal {
+  backdrop-filter: blur(3px);
+}  
 
 input, select, textarea {
   width: 100%;
@@ -270,7 +282,7 @@ td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
 <div id="modal">
   <div id="modalContent">
 
-    <div class="closeX" onclick="closeModal(true)">✕</div>
+    <div class="closeX" onclick="requestClose()">✕</div>
 
     <input type="hidden" id="id_luogo">
 
@@ -445,12 +457,12 @@ window.closeModal = (force=false) => {
 
 // click outside
 document.getElementById("modal").addEventListener("click", (e) => {
-  if (e.target.id === "modal") closeModal(false);
+  if (e.target.id === "modal") requestClose();
 });
 
 // ESC
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeModal(false);
+  if (e.key === "Escape") requestClose();
 });
 
 // ---------------- DIRTY ----------------
@@ -523,6 +535,30 @@ function syncUI() {
   updateSortButtons();
   updateResetButton();
 }  
+
+  function requestClose() {
+  if (!state.dirty) {
+    closeModal(true);
+    return;
+  }
+  const ok = confirm("Vuoi salvare le modifiche?");
+  if (ok) {
+    save();
+    return;
+  }
+  // ❗ annulla = NON deve chiudere direttamente senza controllo
+  state.dirty = false;
+}
+
+function closeModal(force = false) {
+  if (!force && state.dirty) {
+    const ok = confirm("Vuoi salvare le modifiche?");
+    if (ok) save();
+    return;
+  }
+  document.getElementById("modal").style.display = "none";
+}
+  
   
 </script>
 </body>
