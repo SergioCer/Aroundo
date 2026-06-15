@@ -44,6 +44,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   background: white;
+  table-layout: fixed;
 }
 
 th, td {
@@ -132,9 +133,21 @@ input, select, textarea {
   padding: 6px;
 }
 
-.col-lat, .col-lng {
-  width: 40px;
+th:nth-child(4),
+td:nth-child(4) {
+  width: 80px;
 }
+
+th:nth-child(5),
+td:nth-child(5) {
+  width: 80px;
+}
+
+td {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}  
   
 </style>
 </head>
