@@ -211,6 +211,23 @@ textarea {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }  
+
+.coord-btn {
+  margin-top: 6px;
+  width: 100%;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.coord-btn:hover {
+  background: #bfdbfe;
+}
   
 </style>
 </head>
@@ -330,6 +347,14 @@ textarea {
     <label>Lng</label>
     <input id="lu_lng" oninput="markDirty()">
     <label>Descrizione</label>
+  <div>
+    <label>Lng</label>
+    <input id="lu_lng" oninput="markDirty()">
+  </div>
+</div>
+<button class="sort-btn coord-btn" onclick="openCoords()">
+  Apri mappa
+</button>  
     <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
     <label>Note</label>
     <textarea id="lu_note" oninput="markDirty()"></textarea>
@@ -607,7 +632,17 @@ function requestClose() {
   // }
   //document.getElementById("modal").style.display = "none";
 // } 
-  
+
+window.openCoords = function () {
+  const lat = document.getElementById("lu_lat").value;
+  const lng = document.getElementById("lu_lng").value;
+  if (!lat || !lng) {
+    alert("Inserisci prima lat e lng");
+    return;
+  }
+  const url = `https://sergiocer.github.io/Coordinate/?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`;
+  window.open(url, "_blank");
+};  
   
 </script>
 </body>
