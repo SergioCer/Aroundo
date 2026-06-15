@@ -95,6 +95,22 @@ th, td {
   background: #bfdbfe;
 }
 
+.reset-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.reset-btn:hover {
+  background: #fecaca;
+}
+  
 /* TABLE ROW */
 tr:hover {
   background: #eef6ff;
@@ -387,7 +403,7 @@ window.sort = (field) => {
   }
   updateSortButtons();
   render();
-  updateResetButton()
+  updateResetButton();
 
 };
 
@@ -476,8 +492,8 @@ window.save = async () => {
 
 await loadComuni();
 await load();
-updateSortButtons()
-updateResetButton()
+updateSortButtons();
+updateResetButton();
   
 
 function updateSortButtons() {
@@ -492,6 +508,7 @@ function updateSortButtons() {
         ? '▼'
         : '▲';
   });
+  updateResetButton();
 }
 
 function updateResetButton() {
@@ -509,7 +526,7 @@ window.resetAll = () => {
   state.sortDir = 'asc';
   document.querySelectorAll('.filter').forEach(i => i.value = '');
   updateSortButtons();
-  updateResetButton()
+  updateResetButton();
   render();
 };
   
