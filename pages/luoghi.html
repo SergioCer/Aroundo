@@ -537,7 +537,16 @@ function syncUI() {
 }  
 
   function requestClose() {
-    closeModal(false);
+  if (!state.dirty) {
+    document.getElementById("modal").style.display = "none";
+    return;
+  }
+ const ok = confirm("Vuoi salvare le modifiche?");
+  if (ok) {
+    save();
+  } else {
+    document.getElementById("modal").style.display = "none";
+  }
 }
 
 function closeModal(force = false) {
