@@ -157,10 +157,11 @@ input, select, textarea {
 th:nth-child(1), td:nth-child(1) {width: 30px;}
 th:nth-child(2), td:nth-child(2) {width: 120px;}
 th:nth-child(3), td:nth-child(3) {width: 120px;}
-th:nth-child(4), td:nth-child(4) {width: 50px;}
+th:nth-child(4), td:nth-child(4) {width: 120px;}
 th:nth-child(5), td:nth-child(5) {width: 50px;}
-th:nth-child(6), td:nth-child(6) {width: 200px;}
-th:nth-child(7), td:nth-child(7) {width: 40px;}
+th:nth-child(6), td:nth-child(6) {width: 50px;}
+th:nth-child(7), td:nth-child(7) {width: 200px;}
+th:nth-child(8), td:nth-child(8) {width: 40px;}
 
 td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}  
   
@@ -209,6 +210,16 @@ td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
         </div>
       </th>
 
+      <th>
+        <div class="col-header">
+          <div class="col-title">Descrizione</div>
+          <div class="col-tools">
+            <input class="filter" oninput="setFilter('descrizione', this.value)">
+            <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">-</button>
+          </div>
+        </div>
+      </th>
+      
       <th>
         <div class="col-header">
           <div class="col-title">Lat</div>
@@ -332,6 +343,8 @@ function render() {
       }
       if (k === 'location')
         return (r.lu_location || '').toLowerCase().includes(v);
+      if (k === 'descrizione')
+        return (r.lu_descrizione || '').toLowerCase().includes(v);
       if (k === 'lat')
         return (r.lu_lat || '').toString().startsWith(v);
       if (k === 'lng')
@@ -364,6 +377,7 @@ function render() {
       <td>${r.id_luogo}</td>
       <td>${c ? c.co_descrizione : ''}</td>
       <td>${r.lu_location || ''}</td>
+      <td>${r.lu_descrizione || ''}</td>
       <td>${r.lu_lat}</td>
       <td>${r.lu_lng}</td>
       <td>${r.lu_note || ''}</td>
