@@ -164,7 +164,7 @@ input, select, textarea {
           <div class="col-title">Comune</div>
           <div class="col-tools">
             <input class="filter" oninput="setFilter('comune', this.value)">
-            <button class="sort-btn" onclick="sort('comune')">-</button>
+            <button class="sort-btn" data-filed="comune" onclick="sort('comune')">-</button>
           </div>
         </div>
       </th>
@@ -174,7 +174,7 @@ input, select, textarea {
           <div class="col-title">Location</div>
           <div class="col-tools">
             <input class="filter" oninput="setFilter('location', this.value)">
-            <button class="sort-btn" onclick="sort('location')">-</button>
+            <button class="sort-btn" data-filed="location" onclick="sort('location')">-</button>
           </div>
         </div>
       </th>
@@ -184,7 +184,7 @@ input, select, textarea {
           <div class="col-title">Lat</div>
           <div class="col-tools">
             <input class="filter" oninput="setFilter('lat', this.value)">
-            <button class="sort-btn" onclick="sort('lat')">-</button>
+            <button class="sort-btn" data-filed="lat" onclick="sort('lat')">-</button>
           </div>
         </div>
       </th>
@@ -194,7 +194,7 @@ input, select, textarea {
           <div class="col-title">Lng</div>
           <div class="col-tools">
             <input class="filter" oninput="setFilter('lng', this.value)">
-            <button class="sort-btn" onclick="sort('lng')">-</button>
+            <button class="sort-btn" data-filed="lng" onclick="sort('lng')">-</button>
           </div>
         </div>
       </th>
@@ -203,7 +203,7 @@ input, select, textarea {
         <div class="col-header">
           <div class="col-title">Note</div>
           <div class="col-tools">
-            <input class="filter" oninput="setFilter('note', this.value)">
+            <input class="filter" data-filed="note" oninput="setFilter('note', this.value)">
             <button class="sort-btn">-</button>
           </div>
         </div>
@@ -214,7 +214,7 @@ input, select, textarea {
           <div class="col-title">Capacità</div>
           <div class="col-tools">
             <input class="filter" oninput="setFilter('cap', this.value)">
-            <button class="sort-btn" onclick="sort('cap')">-</button>
+            <button class="sort-btn" data-filed="cap" onclick="sort('cap')">-</button>
           </div>
         </div>
       </th>
