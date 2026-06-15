@@ -392,7 +392,7 @@ function render() {
     if (!v) return;
     filtered = filtered.filter(r => {
       if (k === 'comune') {
-        const c = .find(x => x.id_comune === r.lu_comune);
+        const c = comuni.find(x => x.id_comune === r.lu_comune);
         return (c?.co_descrizione || '').toLowerCase().includes(v);
       }
       if (k === 'location')
