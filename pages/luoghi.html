@@ -30,7 +30,7 @@ body {
 .add-btn {
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 17px;
   border: none;
   background: #22c55e;
   color: white;
@@ -82,7 +82,7 @@ th, td {
 .sort-btn {
   width: 28px;
   height: 28px;
-  border-radius: 4px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
   font-size: 14px;
@@ -98,7 +98,7 @@ th, td {
 .reset-btn {
   width: 28px;
   height: 28px;
-  border-radius: 4px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
   font-size: 14px;
@@ -157,10 +157,10 @@ input, select, textarea {
 th:nth-child(1), td:nth-child(1) {width: 30px;}
 th:nth-child(2), td:nth-child(2) {width: 120px;}
 th:nth-child(3), td:nth-child(3) {width: 120px;}
-th:nth-child(4), td:nth-child(4) {width: 60px;}
-th:nth-child(5), td:nth-child(5) {width: 60px;}
-th:nth-child(6), td:nth-child(6) {width: 160px;}
-th:nth-child(7), td:nth-child(7) {width: 50px;}
+th:nth-child(4), td:nth-child(4) {width: 50px;}
+th:nth-child(5), td:nth-child(5) {width: 50px;}
+th:nth-child(6), td:nth-child(6) {width: 200px;}
+th:nth-child(7), td:nth-child(7) {width: 40px;}
 
 td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}  
   
@@ -305,10 +305,8 @@ let state = {
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
   comuni = res.data;
-
   const sel = document.getElementById("lu_comune");
   sel.innerHTML = `<option value="">--</option>`;
-
   comuni.forEach(c => {
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
@@ -323,45 +321,33 @@ async function load() {
 
 // ---------------- RENDER ----------------
 function render() {
-
   let filtered = [...data];
-
   Object.keys(state.filters).forEach(k => {
     const v = state.filters[k]?.toLowerCase();
     if (!v) return;
-
     filtered = filtered.filter(r => {
-
       if (k === 'comune') {
         const c = comuni.find(x => x.id_comune === r.lu_comune);
         return (c?.co_descrizione || '').toLowerCase().includes(v);
       }
-
       if (k === 'location')
         return (r.lu_location || '').toLowerCase().includes(v);
-
       if (k === 'lat')
         return (r.lu_lat || '').toString().startsWith(v);
-
       if (k === 'lng')
         return (r.lu_lng || '').toString().startsWith(v);
-
       if (k === 'note')
         return (r.lu_note || '').toLowerCase().includes(v);
-      
       if (k === 'cap')
         return (r.lu_capacita_massima || '').toString().startsWith(v);
-
       return true;
     });
   });
 
   if (state.sortField) {
     filtered.sort((a,b) => {
-
       let va = a['lu_' + state.sortField];
       let vb = b['lu_' + state.sortField];
-
       if (state.sortDir === 'asc') return va > vb ? 1 : -1;
       return va < vb ? 1 : -1;
     });
@@ -371,12 +357,9 @@ function render() {
   tbody.innerHTML = "";
 
   filtered.forEach(r => {
-
     const c = comuni.find(x => x.id_comune === r.lu_comune);
-
     const tr = document.createElement("tr");
     tr.onclick = () => openModal(r);
-
     tr.innerHTML = `
       <td>${r.id_luogo}</td>
       <td>${c ? c.co_descrizione : ''}</td>
@@ -386,7 +369,6 @@ function render() {
       <td>${r.lu_note || ''}</td>
       <td>${r.lu_capacita_massima || ''}</td>
     `;
-
     tbody.appendChild(tr);
   });
 }
@@ -399,7 +381,6 @@ window.setFilter = (k,v) => {
 
 // ---------------- SORT ----------------
 window.sort = (field) => {
-
   if (state.sortField !== field) {
     state.sortField = field;
     state.sortDir = 'asc';
@@ -409,17 +390,13 @@ window.sort = (field) => {
   updateSortButtons();
   render();
   updateResetButton();
-
 };
 
 // ---------------- MODAL ----------------
 window.openModal = (row=null) => {
-
   state.dirty = false;
   state.editing = row;
-
   document.getElementById("modal").style.display = "flex";
-
   if (!row) {
     document.getElementById("id_luogo").value = "";
     document.getElementById("lu_location").value = "";
@@ -443,14 +420,12 @@ window.openModal = (row=null) => {
 
 // ---------------- CLOSE ----------------
 window.closeModal = (force=false) => {
-
   if (!force && state.dirty) {
     const ok = confirm("Salvare le modifiche?");
     if (ok) save();
     else state.dirty = false;
     return;
   }
-
   document.getElementById("modal").style.display = "none";
 };
 
@@ -469,9 +444,7 @@ window.markDirty = () => state.dirty = true;
 
 // ---------------- SAVE ----------------
 window.save = async () => {
-
   const id = document.getElementById("id_luogo").value;
-
   const payload = {
     lu_comune: document.getElementById("lu_comune").value || null,
     lu_location: document.getElementById("lu_location").value,
@@ -481,7 +454,6 @@ window.save = async () => {
     lu_note: document.getElementById("lu_note").value,
     lu_capacita_massima: parseInt(document.getElementById("lu_capacita_massima").value)
   };
-
   if (id) {
     await supabase.from('luoghi')
       .update(payload)
@@ -490,7 +462,6 @@ window.save = async () => {
     await supabase.from('luoghi')
       .insert(payload);
   }
-
   closeModal(true);
   load();
 };
@@ -537,6 +508,5 @@ window.resetAll = () => {
 };
   
 </script>
-
 </body>
 </html>
