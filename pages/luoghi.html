@@ -376,7 +376,7 @@ window.sort = (field) => {
   } else {
     state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
   }
-
+  updateSortButtons();
   render();
 };
 
@@ -465,7 +465,22 @@ window.save = async () => {
 
 await loadComuni();
 await load();
+updateSortButtons()  
 
+function updateSortButtons() {
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    const field = btn.dataset.field;
+    if (field !== state.sortField) {
+      btn.textContent = '-';
+      return;
+    }
+    btn.textContent =
+      state.sortDir === 'asc'
+        ? '▼'
+        : '▲';
+  });
+}
+  
 </script>
 
 </body>
