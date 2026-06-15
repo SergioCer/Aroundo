@@ -277,32 +277,22 @@ td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
 <!-- MODAL -->
 <div id="modal">
   <div id="modalContent">
-
     <div class="closeX" onclick="requestClose()">✕</div>
-
     <input type="hidden" id="id_luogo">
-
     <label>Comune</label>
-    <select id="lu_comune"></select>
-
+    <select id="lu_comune" onchange="markDirty()"></select>
     <label>Location</label>
     <input id="lu_location" oninput="markDirty()">
-
     <label>Lat</label>
     <input id="lu_lat" oninput="markDirty()">
-
     <label>Lng</label>
     <input id="lu_lng" oninput="markDirty()">
-
     <label>Descrizione</label>
     <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
-
     <label>Note</label>
     <textarea id="lu_note" oninput="markDirty()"></textarea>
-
     <label>Capacità</label>
     <input id="lu_capacita_massima" oninput="markDirty()">
-
   </div>
 </div>
 
@@ -319,6 +309,11 @@ let state = {
   dirty: false,
 };
 
+
+let originalData = null;
+  
+
+  
 // ---------------- COMUNI ----------------
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
@@ -415,6 +410,15 @@ window.sort = (field) => {
 
 // ---------------- MODAL ----------------
 window.openModal = (row=null) => {
+  originalData = {
+  lu_comune: row?.lu_comune || "",
+  lu_location: row?.lu_location || "",
+  lu_lat: row?.lu_lat || "",
+  lu_lng: row?.lu_lng || "",
+  lu_descrizione: row?.lu_descrizione || "",
+  lu_note: row?.lu_note || "",
+  lu_capacita_massima: row?.lu_capacita_massima || ""
+};
   state.dirty = false;
   state.editing = row;
   document.getElementById("modal").style.display = "flex";
@@ -450,8 +454,20 @@ document.addEventListener("keydown", e => {
 });
 
 // ---------------- DIRTY ----------------
-window.markDirty = () => state.dirty = true;
+window.markDirty = () => {
+  const current = {
+    lu_comune: document.getElementById("lu_comune").value,
+    lu_location: document.getElementById("lu_location").value,
+    lu_lat: document.getElementById("lu_lat").value ? parseFloat(...) : null,
+    lu_lng: document.getElementById("lu_lng").value ? parseFloat(...) : null,
+    lu_descrizione: document.getElementById("lu_descrizione").value,
+    lu_note: document.getElementById("lu_note").value,
+    lu_capacita_massima: document.getElementById("lu_capacita_massima").value
+  };
 
+  state.dirty = JSON.stringify(current) !== JSON.stringify(originalData);
+};
+  
 // ---------------- SAVE ----------------
 window.save = async () => {
   const id = document.getElementById("id_luogo").value;
