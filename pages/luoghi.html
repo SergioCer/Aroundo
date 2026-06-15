@@ -277,7 +277,7 @@ td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
 <!-- MODAL -->
 <div id="modal">
   <div id="modalContent">
-    <div class="closeX" onclick="requestClose()">✕</div>
+    <div class="closeX" id="closeBtn">✕</div>
     <input type="hidden" id="id_luogo">
     <label>Comune</label>
     <select id="lu_comune" onchange="markDirty()"></select>
@@ -452,6 +452,9 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") requestClose();
 });
 
+// X
+document.getElementById("closeBtn").addEventListener("click", requestClose);
+  
 // ---------------- DIRTY ----------------
 window.markDirty = () => {
   const current = {
@@ -537,7 +540,7 @@ function syncUI() {
   updateResetButton();
 }  
 
-  function requestClose() {
+function requestClose() {
   if (!state.dirty) {
     document.getElementById("modal").style.display = "none";
     return;
