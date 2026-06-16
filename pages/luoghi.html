@@ -346,7 +346,7 @@ textarea {
   <tbody id="tbody"></tbody>
 </table>
 
-<!-- MODAL -->
+<!-- MODAL >
 <div id="modal">
   <div id="modalContent">
 <div class="modal-header">
@@ -377,7 +377,7 @@ textarea {
     <label>Capacità</label>
     <input id="lu_capacita_massima" oninput="markDirty()">
   </div>
-</div>
+</div -->
 
 <script type="module">
 import { supabase } from '../supabase.js';
@@ -392,10 +392,7 @@ let state = {
   dirty: false,
 };
 
-
 let originalData = null;
-  
-
   
 // ---------------- COMUNI ----------------
 async function loadComuni() {
@@ -496,7 +493,7 @@ window.sort = (field) => {
   syncUI();
 };
 
-// ---------------- MODAL ----------------
+/* ---------------- MODAL ----------------
 window.openModal = (row=null) => {
 originalData = {
   lu_comune: String(row?.lu_comune || ""),
@@ -542,7 +539,8 @@ document.addEventListener("keydown", e => {
 
 // X
 document.getElementById("closeBtn").addEventListener("click", requestClose);
-  
+
+ 
 // ---------------- DIRTY ----------------
 window.markDirty = () => {
   const current = {
@@ -584,6 +582,8 @@ window.save = async () => {
   load();
 };
 
+*/
+  
 await loadComuni();
 await load();
 updateSortButtons();
