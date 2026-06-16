@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dettaglio</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
+  color: #333;
+}
+
+/* HEADER */
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+}
+
+.back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+/* TITLE */
+.hero {
+  text-align: center;
+  background: white;
+  margin: 10px 15px 20px;
+  padding: 15px;
+  border-radius: 12px;
+  font-size: 22px;
+  font-weight: bold;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* CARD */
+.card {
+  background: white;
+  margin: 0 15px;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* ROW */
+.row {
+  display: flex;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.label {
+  width: 140px;
+  font-size: 12px;
+  color: #777;
+  text-transform: uppercase;
+}
+
+.value {
+  flex: 1;
+  font-size: 14px;
+}
+
+/* STATUS */
+.ok {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+/* FOOTER */
+.footer {
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <a class="back-btn" href="javascript:history.back()">←</a>
+</div>
+
+<div class="hero" id="title">Caricamento...</div>
+
+<div class="card">
+
+  <div class="row">
+    <div class="label">Comune:</div>
+    <div class="value" id="comune"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Location:</div>
+    <div class="value" id="location"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Descrizione:</div>
+    <div class="value" id="descrizione"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Lat:</div>
+    <div class="value" id="lat"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Lng:</div>
+    <div class="value" id="lng"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Note:</div>
+    <div class="value" id="note"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Capacità:</div>
+    <div class="value" id="cap"></div>
+  </div>
+
+</div>
+
+<div class="footer" id="created"></div>
+
+<script type="module">
+import { supabase } from '../supabase.js';
+
+const id = new URLSearchParams(window.location.search).get('id');
+
+async function load() {
+
+  const { data, error } = await supabase
+    .from('luoghi')
+    .select('*')
+    .eq('id_luogo', id)
+    .single();
+
+  if (error) return;
+
+  document.getElementById('title').textContent = data.lu_location || '';
+
+  document.getElementById('comune').textContent = data.lu_comune || '';
+  document.getElementById('location').textContent = data.lu_location || '';
+  document.getElementById('descrizione').textContent = data.lu_descrizione || '';
+  document.getElementById('lat').textContent = data.lu_lat || '';
+  document.getElementById('lng').textContent = data.lu_lng || '';
+  document.getElementById('note').textContent = data.lu_note || '';
+  document.getElementById('cap').textContent = data.lu_capacita_massima || '';
+
+  document.getElementById('created').textContent =
+    data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
+}
+
+load();
+</script>
+
+</body>
+</html>
