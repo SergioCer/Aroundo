@@ -1056,13 +1056,13 @@ document.getElementById("reset-day").addEventListener("click", () => {
       return data;
       }
 
-  // Preleva gli Eventi da supabase
+  // Preleva gli Eventi ed Organizzatori da supabase
   async function fetchEvents() {
     console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
     // console.trace(); // IMPORTANTE mostra da dove è stata chiamata
     let query = supabase      
       .from('eventi')
-      .select('*')
+      .select(`*,organizzatori (or_nome)`)
       .eq('ev_attivo', true);
     const { data, error } = await query;  //     
     if (error) {
@@ -1147,7 +1147,7 @@ marker.bindPopup(`
         <!-- DESCRIZIONE -->
         <div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_descrizione || ''} </div>
         <!-- Organizzatore -->
-        <div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_organizzatore || ''} </div>
+        <div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_organizzatori?.or_nome || ''} </div>
         <!-- BOTTONE DETTAGLI -->
         <button id="details-${e.id}" style="margin-top:6px;">More...</button>
         </div>
