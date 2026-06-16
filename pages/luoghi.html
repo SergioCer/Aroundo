@@ -394,7 +394,7 @@ let state = {
 
 let originalData = null;
   
-/* ---------------- COMUNI ----------------
+// ---------------- COMUNI ----------------
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
   comuni = res.data;
@@ -402,6 +402,8 @@ async function loadComuni() {
   comuni.sort((a, b) =>
     (a.co_descrizione || '').localeCompare(b.co_descrizione || '')
   );
+}
+  /*
   const sel = document.getElementById("lu_comune");
   sel.innerHTML = `<option value="">--</option>`;
   comuni.forEach(c => {
@@ -585,7 +587,7 @@ window.save = async () => {
 
 */
   
-// await loadComuni();
+await loadComuni();
 await load();
 updateSortButtons();
 updateResetButton();
