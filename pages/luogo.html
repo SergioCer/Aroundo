@@ -17,19 +17,20 @@ body {
   padding: 12px 15px;
 }
 
-/* BACK BUTTON NUOVO */
+/* BACK ICON ONLY */
 .back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   background: #22c55e;
-  color: white;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
   border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   transition: 0.2s;
 }
 
@@ -37,15 +38,21 @@ body {
   background: #f59e0b;
 }
 
-/* HERO */
+/* HERO LOCATION */
 .hero {
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  background: white;
   margin: 10px 15px 8px;
-  padding: 14px;
+  padding: 12px;
+  background: white;
   border-radius: 12px;
+}
+
+.hero input {
+  width: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  text-align: center;
+  background: transparent;
 }
 
 /* CARD */
@@ -56,23 +63,12 @@ body {
   border-radius: 12px;
 }
 
-/* ROW */
-.row {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.label {
-  width: 120px;
-  font-size: 12px;
+/* LABEL OUTSIDE */
+.section-title {
+  font-size: 11px;
   color: #777;
-  text-transform: capitalize;
-}
-
-.value {
-  flex: 1;
+  margin: 12px 0 4px;
+  text-transform: uppercase;
 }
 
 /* INPUT */
@@ -84,16 +80,7 @@ input, select, textarea {
   font-size: 13px;
 }
 
-/* COMUNE PIÙ IMPORTANTE */
-.hero-secondary {
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-/* COORDS + CAPACITY INLINE */
+/* INLINE ROW */
 .inline {
   display: flex;
   gap: 6px;
@@ -115,58 +102,50 @@ input, select, textarea {
   font-size: 12px;
   cursor: pointer;
 }
+
+/* BACK ICON STYLE DIFFERENT WHEN DIRTY */
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <button id="backBtn" class="back-btn" onclick="requestBack()">
-    ← Torna
-  </button>
+  <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
 </div>
 
-<div class="hero" id="lu_location"></div>
-
-<div class="hero-secondary" id="lu_comune"></div>
+<div class="hero">
+  <input id="lu_location" oninput="markDirty()">
+</div>
 
 <div class="card">
 
+  <!-- COMUNE -->
+  <div class="section-title">Comune</div>
+  <select id="lu_comune" oninput="markDirty()"></select>
+
+  <!-- LOCATION -->
+  <div class="section-title">Location</div>
+  <input id="lu_location2" oninput="markDirty()">
+
   <!-- DESCRIZIONE -->
-  <div class="row">
-    <div class="label">descrizione:</div>
-    <div class="value">
-      <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
-    </div>
-  </div>
+  <div class="section-title">Descrizione</div>
+  <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
 
   <!-- NOTE -->
-  <div class="row">
-    <div class="label">note:</div>
-    <div class="value">
-      <textarea id="lu_note" oninput="markDirty()"></textarea>
-    </div>
-  </div>
+  <div class="section-title">Note</div>
+  <textarea id="lu_note" oninput="markDirty()"></textarea>
 
   <!-- LAT LNG -->
-  <div class="row">
-    <div class="label">lat / lng:</div>
-    <div class="value">
-      <div class="inline">
-        <input id="lu_lat" class="small" oninput="markDirty()">
-        <input id="lu_lng" class="small" oninput="markDirty()">
-        <button class="map-btn" onclick="openCoords()">Map</button>
-      </div>
-    </div>
+  <div class="section-title">Lat / Lng</div>
+  <div class="inline">
+    <input id="lu_lat" class="small" oninput="markDirty()">
+    <input id="lu_lng" class="small" oninput="markDirty()">
+    <button class="map-btn" onclick="openCoords()">Map</button>
   </div>
 
   <!-- CAPACITÀ -->
-  <div class="row">
-    <div class="label">capacità:</div>
-    <div class="value">
-      <input id="lu_capacita_massima" class="small" oninput="markDirty()">
-    </div>
-  </div>
+  <div class="section-title">Capacità</div>
+  <input id="lu_capacita_massima" class="small" oninput="markDirty()">
 
 </div>
 
@@ -178,18 +157,35 @@ const id = new URLSearchParams(location.search).get('id');
 let original = {};
 let dirty = false;
 
+/* COMUNI */
+async function loadComuni() {
+  const { data } = await supabase.from('comuni').select('*');
+
+  const sorted = data.sort((a,b)=>
+    (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
+  );
+
+  const sel = document.getElementById("lu_comune");
+  sel.innerHTML = `<option value="">--</option>`;
+
+  sorted.forEach(c=>{
+    sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
+  });
+}
+
 /* LOAD */
 async function load() {
   const { data } = await supabase
     .from('luoghi')
-    .select('*')
+    .select('*, comuni(co_descrizione)')
     .eq('id_luogo', id)
     .single();
 
   original = JSON.stringify(data);
 
-  lu_location.textContent = data.lu_location || '';
-  lu_comune.textContent = data.lu_comune || '';
+  lu_location.value = data.lu_location || '';
+  lu_location2.value = data.lu_location || '';
+  lu_comune.value = data.lu_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
   lu_note.value = data.lu_note || '';
   lu_lat.value = data.lu_lat || '';
@@ -200,6 +196,8 @@ async function load() {
 /* DIRTY */
 window.markDirty = () => {
   const current = JSON.stringify({
+    lu_location: lu_location2.value,
+    lu_comune: lu_comune.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
     lu_lat: lu_lat.value,
@@ -217,6 +215,8 @@ window.markDirty = () => {
 async function save() {
   await supabase.from('luoghi')
     .update({
+      lu_location: lu_location2.value,
+      lu_comune: lu_comune.value,
       lu_descrizione: lu_descrizione.value,
       lu_note: lu_note.value,
       lu_lat: lu_lat.value,
@@ -246,6 +246,7 @@ window.openCoords = () => {
   );
 };
 
+loadComuni();
 load();
 </script>
 
