@@ -445,7 +445,8 @@ function render() {
   filtered.forEach(r => {
     const c = comuni.find(x => x.id_comune === r.lu_comune);
     const tr = document.createElement("tr");
-    tr.onclick = () => openModal(r);
+    tr.onclick = () => open("pages/luogo.html?id=" + r.id_luogo, "_self");
+    // tr.onclick = () => openModal(r);
     tr.innerHTML = `
       <td>${r.id_luogo}</td>
       <td>${c ? c.co_descrizione : ''}</td>
