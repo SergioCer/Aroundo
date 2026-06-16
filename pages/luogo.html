@@ -224,7 +224,7 @@ window.markDirty = () => {
 
 /* SAVE */
 async function save() {
-  await supabase.from('luoghi')
+  const { error } = await supabase.from('luoghi')
     .update({
       lu_location: lu_location.value,
       lu_comune: lu_comune.value,
@@ -236,7 +236,14 @@ async function save() {
     })
     .eq('id_luogo', id);
 
+  if (error) {
+    console.error(error);
+    alert("Errore salvataggio");
+    return false;
+  }
+
   dirty = false;
+  return true;
 }
 
 /* BACK */
@@ -244,9 +251,11 @@ window.requestBack = async () => {
   if (!dirty) return history.back();
 
   const ok = confirm("Vuoi salvare le modifiche?");
-  if (ok) await save();
-
-  history.back();
+if (ok) {
+  const success = await save();
+  if (!success) return;
+}
+history.back();
 };
 
 /* MAP */
