@@ -129,15 +129,6 @@ th {
   overflow: hidden;
 }
   
-/* th:nth-child(1), td:nth-child(1) {width: 30px;}
-// th:nth-child(2), td:nth-child(2) {width: 140px;}
-// th:nth-child(3), td:nth-child(3) {width: 160px;}
-// th:nth-child(4), td:nth-child(4) {width: 180px;}
-// th:nth-child(5), td:nth-child(5) {width: 60px;}
-// th:nth-child(6), td:nth-child(6) {width: 60px;}
-// th:nth-child(7), td:nth-child(7) {width: 140px;}
-// th:nth-child(8), td:nth-child(8) {width: 60px;} */
-
 td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}  
 
 #modalContent {
@@ -346,38 +337,7 @@ textarea {
   <tbody id="tbody"></tbody>
 </table>
 
-<!-- MODAL >
-<div id="modal">
-  <div id="modalContent">
-<div class="modal-header">
-<div class="modal-body">
-    <div class="closeX" id="closeBtn">✕</div>
-    <input type="hidden" id="id_luogo">
-    <label>Comune</label>
-    <select id="lu_comune" onchange="markDirty()"></select>
-<div class="grid-2">
-    <label>Location</label>
-    <input id="lu_location" oninput="markDirty()">
-    <label>Lat</label>
-    <input id="lu_lat" oninput="markDirty()">
-    <label>Lng</label>
-    <input id="lu_lng" oninput="markDirty()">
-    <label>Descrizione</label>
-  <div>
-    <label>Lng</label>
-    <input id="lu_lng" oninput="markDirty()">
-  </div>
-</div>
-<button class="sort-btn coord-btn" onclick="openCoords()">
-  Apri mappa
-</button>  
-    <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
-    <label>Note</label>
-    <textarea id="lu_note" oninput="markDirty()"></textarea>
-    <label>Capacità</label>
-    <input id="lu_capacita_massima" oninput="markDirty()">
-  </div>
-</div -->
+>
 
 <script type="module">
 import { supabase } from '../supabase.js';
@@ -398,19 +358,6 @@ let originalData = null;
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
   comuni = res.data;
-  // ORDINE ALFABETICO
-  // comuni.sort((a, b) =>
-  //   (a.co_descrizione || '').localeCompare(b.co_descrizione || '')
-  // );
-}
-  /*
-  const sel = document.getElementById("lu_comune");
-  sel.innerHTML = `<option value="">--</option>`;
-  comuni.forEach(c => {
-    sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
-  });
-}
-*/
 
 // ---------------- LOAD ----------------
 async function load() {
@@ -501,103 +448,11 @@ window.sort = (field) => {
   syncUI();
 };
 
-/* ---------------- MODAL ----------------
-window.openModal = (row=null) => {
-originalData = {
-  lu_comune: String(row?.lu_comune || ""),
-  lu_location: String(row?.lu_location || ""),
-  lu_lat: String(row?.lu_lat ?? ""),
-  lu_lng: String(row?.lu_lng ?? ""),
-  lu_descrizione: String(row?.lu_descrizione || ""),
-  lu_note: String(row?.lu_note || ""),
-  lu_capacita_massima: String(row?.lu_capacita_massima || "")
-};
-  state.dirty = false;
-  document.getElementById("modal").style.display = "flex";
-  if (!row) {
-    document.getElementById("id_luogo").value = "";
-    document.getElementById("lu_location").value = "";
-    document.getElementById("lu_lat").value = "";
-    document.getElementById("lu_lng").value = "";
-    document.getElementById("lu_descrizione").value = "";
-    document.getElementById("lu_note").value = "";
-    document.getElementById("lu_capacita_massima").value = "";
-    document.getElementById("lu_comune").value = "";
-  } else {
-    document.getElementById("id_luogo").value = row.id_luogo;
-    document.getElementById("lu_comune").value = row.lu_comune || "";
-    document.getElementById("lu_location").value = row.lu_location || "";
-    document.getElementById("lu_lat").value = row.lu_lat || "";
-    document.getElementById("lu_lng").value = row.lu_lng || "";
-    document.getElementById("lu_descrizione").value = row.lu_descrizione || "";
-    document.getElementById("lu_note").value = row.lu_note || "";
-    document.getElementById("lu_capacita_massima").value = row.lu_capacita_massima || "";
-  }
-};
-
-// click outside
-document.getElementById("modal").addEventListener("click", (e) => {
-  if (e.target.id === "modal") requestClose();
-});
-
-// ESC
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") requestClose();
-});
-
-// X
-document.getElementById("closeBtn").addEventListener("click", requestClose);
-
- 
-// ---------------- DIRTY ----------------
-window.markDirty = () => {
-  const current = {
-    lu_comune: String(document.getElementById("lu_comune").value || ""),
-    lu_location: String(document.getElementById("lu_location").value || ""),
-    lu_lat: String(document.getElementById("lu_lat").value || ""),
-    lu_lng: String(document.getElementById("lu_lng").value || ""),
-    lu_descrizione: String(document.getElementById("lu_descrizione").value || ""),
-    lu_note: String(document.getElementById("lu_note").value || ""),
-    lu_capacita_massima: String(document.getElementById("lu_capacita_massima").value || "")
-  };
-
-  state.dirty = JSON.stringify(current) !== JSON.stringify(originalData);
-};
-  
-// ---------------- SAVE ----------------
-window.save = async () => {
-  const id = document.getElementById("id_luogo").value;
-  const payload = {
-    lu_comune: document.getElementById("lu_comune").value || null,
-    lu_location: document.getElementById("lu_location").value,
-    lu_lat: parseFloat(document.getElementById("lu_lat").value),
-    lu_lng: parseFloat(document.getElementById("lu_lng").value),
-    lu_descrizione: document.getElementById("lu_descrizione").value,
-    lu_note: document.getElementById("lu_note").value,
-    lu_capacita_massima: parseInt(document.getElementById("lu_capacita_massima").value)
-  };
-  if (id) {
-    await supabase.from('luoghi')
-      .update(payload)
-      .eq('id_luogo', id);
-  } else {
-    await supabase.from('luoghi')
-      .insert(payload);
-  }
-  state.dirty = false;
-  document.getElementById("modal").style.display = "none";
-  // closeModal(true);
-  load();
-};
-
-*/
-  
 await loadComuni();
 await load();
 updateSortButtons();
 updateResetButton();
   
-
 function updateSortButtons() {
   document.querySelectorAll('.sort-btn').forEach(btn => {
     const field = btn.dataset.field;
@@ -636,40 +491,6 @@ function syncUI() {
   updateResetButton();
 }  
 
-/* 
-function requestClose() {
-  if (!state.dirty) {
-    document.getElementById("modal").style.display = "none";
-    return;
-  }
- const ok = confirm("Vuoi salvare le modifiche?");
-  if (ok) {
-    save();
-  } else {
-    document.getElementById("modal").style.display = "none";
-  }
-}
-
-// function closeModal(force = false) {
-  // if (!force && state.dirty) {
-    // const ok = confirm("Vuoi salvare le modifiche?");
-    // if (ok) save();
-    // return;
-  // }
-  //document.getElementById("modal").style.display = "none";
-// } 
-
-window.openCoords = function () {
-  const lat = document.getElementById("lu_lat").value;
-  const lng = document.getElementById("lu_lng").value;
-  if (!lat || !lng) {
-    alert("Inserisci prima lat e lng");
-    return;
-  }
-  const url = `https://sergiocer.github.io/Coordinate/?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`;
-  window.open(url, "_blank");
-};  
-  */
 </script>
 </body>
 </html>
