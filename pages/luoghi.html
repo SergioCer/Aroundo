@@ -394,7 +394,7 @@ let state = {
 
 let originalData = null;
   
-// ---------------- COMUNI ----------------
+/* ---------------- COMUNI ----------------
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
   comuni = res.data;
@@ -408,6 +408,7 @@ async function loadComuni() {
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
 }
+*/
 
 // ---------------- LOAD ----------------
 async function load() {
@@ -628,6 +629,7 @@ function syncUI() {
   updateResetButton();
 }  
 
+/* 
 function requestClose() {
   if (!state.dirty) {
     document.getElementById("modal").style.display = "none";
