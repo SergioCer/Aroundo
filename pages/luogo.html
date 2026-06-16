@@ -230,11 +230,12 @@ async function save() {
       lu_comune: lu_comune.value,
       lu_descrizione: lu_descrizione.value,
       lu_note: lu_note.value,
-      lu_lat: lu_lat.value,
-      lu_lng: lu_lng.value,
+      lu_lat: lu_lat.value ? parseFloat(lu_lat.value) : null,
+      lu_lng: lu_lng.value ? parseFloat(lu_lng.value) : null,
       lu_capacita_massima: lu_capacita_massima.value
-    })
-    .eq('id_luogo', id);
+        ? parseInt(lu_capacita_massima.value)
+        : null    })
+  .eq('id_luogo', id);
 
   if (error) {
     console.error(error);
