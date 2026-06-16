@@ -14,25 +14,27 @@ body {
 
 /* TOPBAR */
 .topbar {
-  display: flex;
-  align-items: center;
   padding: 12px 15px;
 }
 
-/* BACK BUTTON MIGLIORATO */
+/* BACK BUTTON NUOVO */
 .back-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
   background: #22c55e;
   color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.back-btn.dirty {
+  background: #f59e0b;
 }
 
 /* HERO */
@@ -41,10 +43,9 @@ body {
   font-size: 22px;
   font-weight: bold;
   background: white;
-  margin: 10px 15px 15px;
+  margin: 10px 15px 8px;
   padding: 14px;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
 /* CARD */
@@ -53,7 +54,6 @@ body {
   margin: 0 15px 20px;
   padding: 15px;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
 /* ROW */
@@ -68,14 +68,14 @@ body {
   width: 120px;
   font-size: 12px;
   color: #777;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 
 .value {
   flex: 1;
 }
 
-/* INPUTS */
+/* INPUT */
 input, select, textarea {
   width: 100%;
   border: 1px solid #ddd;
@@ -84,20 +84,29 @@ input, select, textarea {
   font-size: 13px;
 }
 
-/* COMPATTI */
-.small-input {
-  max-width: 140px;
+/* COMUNE PIÙ IMPORTANTE */
+.hero-secondary {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
 }
 
-/* MAP ROW */
-.map-row {
+/* COORDS + CAPACITY INLINE */
+.inline {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
+.small {
+  max-width: 120px;
+}
+
+/* MAP BUTTON */
 .map-btn {
-  width: 70px;
+  width: 60px;
   height: 30px;
   border-radius: 6px;
   border: none;
@@ -106,33 +115,26 @@ input, select, textarea {
   font-size: 12px;
   cursor: pointer;
 }
-
-/* FOOTER */
-.footer {
-  text-align: right;
-  font-size: 11px;
-  color: #888;
-  margin: 0 15px 15px;
-}
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <a class="back-btn" href="#" onclick="requestBack()">←</a>
+  <button id="backBtn" class="back-btn" onclick="requestBack()">
+    ← Torna
+  </button>
 </div>
 
-<div class="hero">
-  <input id="lu_location"
-         style="font-size:18px;text-align:center;font-weight:bold;border:none;background:transparent;">
-</div>
+<div class="hero" id="lu_location"></div>
+
+<div class="hero-secondary" id="lu_comune"></div>
 
 <div class="card">
 
   <!-- DESCRIZIONE -->
   <div class="row">
-    <div class="label">Descrizione</div>
+    <div class="label">descrizione:</div>
     <div class="value">
       <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
     </div>
@@ -140,66 +142,41 @@ input, select, textarea {
 
   <!-- NOTE -->
   <div class="row">
-    <div class="label">Note</div>
+    <div class="label">note:</div>
     <div class="value">
       <textarea id="lu_note" oninput="markDirty()"></textarea>
     </div>
   </div>
 
-  <!-- COMUNE -->
+  <!-- LAT LNG -->
   <div class="row">
-    <div class="label">Comune</div>
+    <div class="label">lat / lng:</div>
     <div class="value">
-      <select id="lu_comune" oninput="markDirty()"></select>
-    </div>
-  </div>
-
-  <!-- CAPACITÀ COMPATTA -->
-  <div class="row">
-    <div class="label">Capacità</div>
-    <div class="value small-input">
-      <input id="lu_capacita_massima" oninput="markDirty()">
-    </div>
-  </div>
-
-  <!-- LAT LNG + MAP -->
-  <div class="row">
-    <div class="label">Coords</div>
-    <div class="value">
-      <div class="map-row">
-        <input id="lu_lat" class="small-input" placeholder="lat" oninput="markDirty()">
-        <input id="lu_lng" class="small-input" placeholder="lng" oninput="markDirty()">
+      <div class="inline">
+        <input id="lu_lat" class="small" oninput="markDirty()">
+        <input id="lu_lng" class="small" oninput="markDirty()">
         <button class="map-btn" onclick="openCoords()">Map</button>
       </div>
     </div>
   </div>
 
-</div>
+  <!-- CAPACITÀ -->
+  <div class="row">
+    <div class="label">capacità:</div>
+    <div class="value">
+      <input id="lu_capacita_massima" class="small" oninput="markDirty()">
+    </div>
+  </div>
 
-<div class="footer" id="created"></div>
+</div>
 
 <script type="module">
 import { supabase } from '../supabase.js';
 
-let id = new URLSearchParams(location.search).get('id');
+const id = new URLSearchParams(location.search).get('id');
+
 let original = {};
 let dirty = false;
-let comuni = [];
-
-/* COMUNI */
-async function loadComuni() {
-  const { data } = await supabase.from('comuni').select('*');
-
-  comuni = data.sort((a,b)=>
-    (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
-  );
-
-  const sel = document.getElementById("lu_comune");
-  sel.innerHTML = `<option value="">--</option>`;
-  comuni.forEach(c=>{
-    sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
-  });
-}
 
 /* LOAD */
 async function load() {
@@ -211,58 +188,53 @@ async function load() {
 
   original = JSON.stringify(data);
 
-  lu_location.value = data.lu_location || '';
+  lu_location.textContent = data.lu_location || '';
+  lu_comune.textContent = data.lu_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
   lu_note.value = data.lu_note || '';
-  lu_capacita_massima.value = data.lu_capacita_massima || '';
   lu_lat.value = data.lu_lat || '';
   lu_lng.value = data.lu_lng || '';
-  lu_comune.value = data.lu_comune || '';
-
-  created.textContent =
-    data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
+  lu_capacita_massima.value = data.lu_capacita_massima || '';
 }
 
 /* DIRTY */
 window.markDirty = () => {
   const current = JSON.stringify({
-    lu_location: lu_location.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
-    lu_capacita_massima: lu_capacita_massima.value,
     lu_lat: lu_lat.value,
     lu_lng: lu_lng.value,
-    lu_comune: lu_comune.value
+    lu_capacita_massima: lu_capacita_massima.value
   });
 
   dirty = current !== original;
+
+  document.getElementById('backBtn')
+    .classList.toggle('dirty', dirty);
 };
 
 /* SAVE */
 async function save() {
   await supabase.from('luoghi')
     .update({
-      lu_location: lu_location.value,
       lu_descrizione: lu_descrizione.value,
       lu_note: lu_note.value,
-      lu_capacita_massima: lu_capacita_massima.value,
       lu_lat: lu_lat.value,
       lu_lng: lu_lng.value,
-      lu_comune: lu_comune.value
+      lu_capacita_massima: lu_capacita_massima.value
     })
     .eq('id_luogo', id);
 
   dirty = false;
 }
 
-/* BACK CONTROL */
+/* BACK */
 window.requestBack = async () => {
   if (!dirty) return history.back();
 
   const ok = confirm("Vuoi salvare le modifiche?");
-  if (ok) {
-    await save();
-  }
+  if (ok) await save();
+
   history.back();
 };
 
@@ -274,8 +246,7 @@ window.openCoords = () => {
   );
 };
 
-await loadComuni();
-await load();
+load();
 </script>
 
 </body>
