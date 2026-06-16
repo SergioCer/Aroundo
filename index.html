@@ -1062,7 +1062,10 @@ document.getElementById("reset-day").addEventListener("click", () => {
     // console.trace(); // IMPORTANTE mostra da dove è stata chiamata
     let query = supabase      
       .from('eventi')
-      .select(`*,organizzatori (or_nome)`)
+      .select(`
+      *,
+      organizzatori (or_nome)
+      `)
       .eq('ev_attivo', true);
     const { data, error } = await query;  //     
     if (error) {
