@@ -204,7 +204,6 @@ async function load() {
   original = JSON.stringify(data);
 
   lu_location.value = data.lu_location || '';
-  lu_location2.value = data.lu_location || '';
   lu_comune.value = data.lu_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
   lu_note.value = data.lu_note || '';
@@ -216,7 +215,7 @@ async function load() {
 /* DIRTY */
 window.markDirty = () => {
   const current = JSON.stringify({
-    lu_location: lu_location2.value,
+    lu_location: lu_location.value,
     lu_comune: lu_comune.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
@@ -235,7 +234,7 @@ window.markDirty = () => {
 async function save() {
   await supabase.from('luoghi')
     .update({
-      lu_location: lu_location2.value,
+      lu_location: lu_location.value,
       lu_comune: lu_comune.value,
       lu_descrizione: lu_descrizione.value,
       lu_note: lu_note.value,
