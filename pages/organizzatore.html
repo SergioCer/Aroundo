@@ -1,77 +1,147 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Organizzatore</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Organizzatore</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      color: #333;
-    }
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f2f4f7;
+    color: #333;
+  }
 
-    .container {
-      max-width: 700px;
-      margin: auto;
-    }
+  .container {
+    max-width: 720px;
+    margin: auto;
+    padding: 20px;
+  }
 
-    h1 {
-      margin-bottom: 5px;
-    }
+  /* HEADER */
+  .topbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
 
-    .box {
-      background: #f7f7f7;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-    }
+  .back-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #22c55e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+  }
 
-    .label {
-      font-size: 12px;
-      color: #777;
-      margin-top: 10px;
-    }
+  /* HEADER TITLE */
+  .title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
 
-    .value {
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
+  /* CARD */
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  }
 
-    a {
-      color: #333;
-    }
-  </style>
+  /* ROWS */
+  .row {
+    display: flex;
+    margin: 10px 0;
+    align-items: flex-start;
+  }
+
+  .label {
+    width: 120px;
+    font-size: 12px;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  /* STATUS */
+  .status-ok {
+    color: #22c55e;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: right;
+    font-size: 11px;
+    color: #888;
+    margin-top: 15px;
+  }
+
+  a {
+    color: #333;
+  }
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-  <a href="javascript:history.back()">← Indietro</a>
+  <!-- TOP -->
+  <div class="topbar">
+    <a class="back-btn" href="javascript:history.back()">←</a>
+  </div>
 
-  <h1 id="or_nome">Caricamento...</h1>
+  <!-- TITLE -->
+  <div class="title" id="or_nome">Caricamento...</div>
 
-  <div class="box">
+  <!-- CARD -->
+  <div class="card">
 
-    <div class="label">Descrizione</div>
-    <div class="value" id="or_descrizione"></div>
+    <div class="row">
+      <div class="label">Descrizione:</div>
+      <div class="value" id="or_descrizione"></div>
+    </div>
 
-    <div class="label">Email</div>
-    <div class="value" id="or_email"></div>
+    <div class="row">
+      <div class="label">Email:</div>
+      <div class="value" id="or_email"></div>
+    </div>
 
-    <div class="label">Telefono</div>
-    <div class="value" id="or_telefono"></div>
+    <div class="row">
+      <div class="label">Telefono:</div>
+      <div class="value" id="or_telefono"></div>
+    </div>
 
-    <div class="label">Sito web</div>
-    <div class="value" id="or_sito_web"></div>
+    <div class="row">
+      <div class="label">Sito web:</div>
+      <div class="value" id="or_sito_web"></div>
+    </div>
 
-    <div class="label">Stato</div>
-    <div class="value" id="or_attivo"></div>
+    <div class="row">
+      <div class="label">Stato:</div>
+      <div class="value status-ok" id="or_attivo"></div>
+    </div>
 
-    <div class="label">Creato il</div>
-    <div class="value" id="or_creato"></div>
+    <div class="footer" id="or_creato"></div>
 
   </div>
 
@@ -80,7 +150,6 @@
 <script type="module">
 import { supabase } from '../supabase.js';
 
-// prendi id dalla URL
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
 
@@ -103,9 +172,7 @@ async function loadOrganizzatore() {
     return;
   }
 
-  // popolamento dati
   document.getElementById('or_nome').textContent = data.or_nome || '';
-
   document.getElementById('or_descrizione').textContent = data.or_descrizione || '-';
 
   document.getElementById('or_email').innerHTML = data.or_email
@@ -118,11 +185,11 @@ async function loadOrganizzatore() {
     ? `<a href="${data.or_sito_web}" target="_blank">${data.or_sito_web}</a>`
     : '-';
 
-  document.getElementById('or_attivo').textContent =
-    data.or_attivo ? 'Attivo' : 'Non attivo';
+  document.getElementById('or_attivo').innerHTML =
+    data.or_attivo ? '✔' : '';
 
   document.getElementById('or_creato').textContent =
-    data.or_creato ? new Date(data.or_creato).toLocaleString() : '-';
+    data.or_creato ? new Date(data.or_creato).toLocaleString() : '';
 }
 
 loadOrganizzatore();
