@@ -83,7 +83,7 @@ input, select, textarea {
 /* INLINE ROW */
 .inline {
   display: flex;
-  gap: 6px;
+  gap: 20px;
   align-items: center;
 }
 
@@ -129,14 +129,6 @@ input, select, textarea {
 
 <div class="card">
 
-  <!-- COMUNE -->
-  <!-- div class="section-title">Comune</div>
-  <select id="lu_comune" oninput="markDirty()"></select -->
-
-  <!-- LOCATION -->
-  <div class="section-title">Location:</div>
-  <input id="lu_location2" oninput="markDirty()">
-
   <!-- DESCRIZIONE -->
   <div class="section-title">Descrizione:</div>
   <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
@@ -148,7 +140,7 @@ input, select, textarea {
  <div class="section-title">Capacità / Lat / Lng</div>
 
 <!-- RIGA 1: LABEL -->
-<div style="display:flex; gap:6px; margin-bottom:4px;">
+<div style="display:flex; gap:20px; margin-bottom:4px;">
   <div style="flex:1;">Capacità:</div>
   <div style="flex:1;">Lat:</div>
   <div style="flex:1;">Lng:</div>
@@ -156,7 +148,7 @@ input, select, textarea {
 </div>
 
 <!-- RIGA 2: VALORI + MAP -->
-<div style="display:flex; gap:6px; align-items:center;">
+<div style="display:flex; gap:20px; align-items:center;">
 
   <div style="flex:1;">
     <input id="lu_capacita_massima" oninput="markDirty()">
