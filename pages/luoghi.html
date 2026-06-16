@@ -62,6 +62,17 @@ th, td {
   gap: 4px;
 }
 
+.col-tools {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+
+.col-tools input {
+  min-width: 0;
+  width: 100%;
+}
+  
 .col-title {
   font-weight: bold;
   font-size: 14px;
@@ -496,7 +507,7 @@ window.sort = (field) => {
   syncUI();
 };
 
-// ---------------- MODAL ----------------
+/* ---------------- MODAL ----------------
 window.openModal = (row=null) => {
 originalData = {
   lu_comune: String(row?.lu_comune || ""),
@@ -531,9 +542,9 @@ originalData = {
 };
 
 // click outside
-document.getElementById("modal").addEventListener("click", (e) => {
-  if (e.target.id === "modal") requestClose();
-});
+// document.getElementById("modal").addEventListener("click", (e) => {
+//   if (e.target.id === "modal") requestClose();
+// });
 
 // ESC
 document.addEventListener("keydown", e => {
@@ -541,7 +552,7 @@ document.addEventListener("keydown", e => {
 });
 
 // X
-document.getElementById("closeBtn").addEventListener("click", requestClose);
+document.getElementById("closeBtn").addEventListener("click", requestClose); /
   
 // ---------------- DIRTY ----------------
 window.markDirty = () => {
@@ -583,6 +594,8 @@ window.save = async () => {
   // closeModal(true);
   load();
 };
+
+*/
 
 await loadComuni();
 await load();
