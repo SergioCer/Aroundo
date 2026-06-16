@@ -62,17 +62,6 @@ th, td {
   gap: 4px;
 }
 
-.col-tools {
-  display: flex;
-  gap: 4px;
-  min-width: 0;
-}
-
-.col-tools input {
-  min-width: 0;
-  width: 100%;
-}
-  
 .col-title {
   font-weight: bold;
   font-size: 14px;
@@ -374,21 +363,21 @@ textarea {
     <label>Lng</label>
     <input id="lu_lng" oninput="markDirty()">
     <label>Descrizione</label>
-  < div>
+  <div>
     <label>Lng</label>
     <input id="lu_lng" oninput="markDirty()">
   </div>
 </div>
 <button class="sort-btn coord-btn" onclick="openCoords()">
   Apri mappa
-</button >  
+</button>  
     <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
     <label>Note</label>
     <textarea id="lu_note" oninput="markDirty()"></textarea>
     <label>Capacità</label>
     <input id="lu_capacita_massima" oninput="markDirty()">
   </div>
-</div-->
+</div>
 
 <script type="module">
 import { supabase } from '../supabase.js';
@@ -507,7 +496,7 @@ window.sort = (field) => {
   syncUI();
 };
 
-/* ---------------- MODAL ----------------*/
+// ---------------- MODAL ----------------
 window.openModal = (row=null) => {
 originalData = {
   lu_comune: String(row?.lu_comune || ""),
@@ -542,9 +531,9 @@ originalData = {
 };
 
 // click outside
- document.getElementById("modal").addEventListener("click", (e) => {
-   if (e.target.id === "modal") requestClose();
- });
+document.getElementById("modal").addEventListener("click", (e) => {
+  if (e.target.id === "modal") requestClose();
+});
 
 // ESC
 document.addEventListener("keydown", e => {
@@ -552,7 +541,7 @@ document.addEventListener("keydown", e => {
 });
 
 // X
-document.getElementById("closeBtn").addEventListener("click", requestClose); /
+document.getElementById("closeBtn").addEventListener("click", requestClose);
   
 // ---------------- DIRTY ----------------
 window.markDirty = () => {
@@ -652,14 +641,14 @@ function requestClose() {
   }
 }
 
- function closeModal(force = false) {
-   if (!force && state.dirty) {
-     const ok = confirm("Vuoi salvare le modifiche?");
-     if (ok) save();
-     return;
-   }
-  document.getElementById("modal").style.display = "none";
- } 
+// function closeModal(force = false) {
+  // if (!force && state.dirty) {
+    // const ok = confirm("Vuoi salvare le modifiche?");
+    // if (ok) save();
+    // return;
+  // }
+  //document.getElementById("modal").style.display = "none";
+// } 
 
 window.openCoords = function () {
   const lat = document.getElementById("lu_lat").value;
