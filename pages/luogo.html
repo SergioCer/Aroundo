@@ -114,38 +114,65 @@ input, select, textarea {
 </div>
 
 <div class="hero">
-  <input id="lu_location" oninput="markDirty()">
+
+  <!-- COMUNE (EDITABILE) -->
+  <select id="lu_comune"
+          style="font-size:20px; font-weight:600; width:100%; border:none; background:transparent;"
+          oninput="markDirty()"></select>
+
+  <!-- LOCATION (EDITABILE) -->
+  <input id="lu_location"
+         style="font-size:16px; font-weight:bold; text-align:center; border:none; background:transparent;"
+         oninput="markDirty()">
+
 </div>
 
 <div class="card">
 
   <!-- COMUNE -->
-  <div class="section-title">Comune</div>
-  <select id="lu_comune" oninput="markDirty()"></select>
+  <!-- div class="section-title">Comune</div>
+  <select id="lu_comune" oninput="markDirty()"></select -->
 
   <!-- LOCATION -->
-  <div class="section-title">Location</div>
+  <div class="section-title">Location:</div>
   <input id="lu_location2" oninput="markDirty()">
 
   <!-- DESCRIZIONE -->
-  <div class="section-title">Descrizione</div>
+  <div class="section-title">Descrizione:</div>
   <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
 
   <!-- NOTE -->
-  <div class="section-title">Note</div>
+  <div class="section-title">Note:</div>
   <textarea id="lu_note" oninput="markDirty()"></textarea>
 
-  <!-- LAT LNG -->
-  <div class="section-title">Lat / Lng</div>
-  <div class="inline">
-    <input id="lu_lat" class="small" oninput="markDirty()">
-    <input id="lu_lng" class="small" oninput="markDirty()">
-    <button class="map-btn" onclick="openCoords()">Map</button>
+ <div class="section-title">Capacità / Lat / Lng</div>
+
+<!-- RIGA 1: LABEL -->
+<div style="display:flex; gap:6px; margin-bottom:4px;">
+  <div style="flex:1;">Capacità:</div>
+  <div style="flex:1;">Lat:</div>
+  <div style="flex:1;">Lng:</div>
+  <div style="width:70px;"></div>
+</div>
+
+<!-- RIGA 2: VALORI + MAP -->
+<div style="display:flex; gap:6px; align-items:center;">
+
+  <div style="flex:1;">
+    <input id="lu_capacita_massima" oninput="markDirty()">
   </div>
 
-  <!-- CAPACITÀ -->
-  <div class="section-title">Capacità</div>
-  <input id="lu_capacita_massima" class="small" oninput="markDirty()">
+  <div style="flex:1;">
+    <input id="lu_lat" oninput="markDirty()">
+  </div>
+
+  <div style="flex:1;">
+    <input id="lu_lng" oninput="markDirty()">
+  </div>
+
+  <div style="width:70px;">
+    <button class="map-btn" onclick="openCoords()">Map</button>
+  </div>
 
 </div>
 
