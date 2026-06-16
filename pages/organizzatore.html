@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Organizzatore</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    .box {
+      background: #f7f7f7;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .label {
+      font-size: 12px;
+      color: #777;
+      margin-top: 10px;
+    }
+
+    .value {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    a {
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <a href="javascript:history.back()">← Indietro</a>
+
+  <h1 id="or_nome">Caricamento...</h1>
+
+  <div class="box">
+
+    <div class="label">Descrizione</div>
+    <div class="value" id="or_descrizione"></div>
+
+    <div class="label">Email</div>
+    <div class="value" id="or_email"></div>
+
+    <div class="label">Telefono</div>
+    <div class="value" id="or_telefono"></div>
+
+    <div class="label">Sito web</div>
+    <div class="value" id="or_sito_web"></div>
+
+    <div class="label">Stato</div>
+    <div class="value" id="or_attivo"></div>
+
+    <div class="label">Creato il</div>
+    <div class="value" id="or_creato"></div>
+
+  </div>
+
+</div>
+
+<script type="module">
+import { supabase } from './supabase.js';
+
+// prendi id dalla URL
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+
+async function loadOrganizzatore() {
+
+  if (!id) {
+    document.body.innerHTML = "ID organizzatore mancante";
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('organizzatori')
+    .select('*')
+    .eq('id_organizzatore', id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    document.body.innerHTML = "Errore caricamento organizzatore";
+    return;
+  }
+
+  // popolamento dati
+  document.getElementById('or_nome').textContent = data.or_nome || '';
+
+  document.getElementById('or_descrizione').textContent = data.or_descrizione || '-';
+
+  document.getElementById('or_email').innerHTML = data.or_email
+    ? `<a href="mailto:${data.or_email}">${data.or_email}</a>`
+    : '-';
+
+  document.getElementById('or_telefono').textContent = data.or_telefono || '-';
+
+  document.getElementById('or_sito_web').innerHTML = data.or_sito_web
+    ? `<a href="${data.or_sito_web}" target="_blank">${data.or_sito_web}</a>`
+    : '-';
+
+  document.getElementById('or_attivo').textContent =
+    data.or_attivo ? 'Attivo' : 'Non attivo';
+
+  document.getElementById('or_creato').textContent =
+    data.or_creato ? new Date(data.or_creato).toLocaleString() : '-';
+}
+
+loadOrganizzatore();
+</script>
+
+</body>
+</html>
