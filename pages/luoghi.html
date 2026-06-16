@@ -280,7 +280,8 @@ let originalData = null;
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
   comuni = res.data;
-
+}
+  
 // ---------------- LOAD ----------------
 async function load() {
   const res = await supabase.from('luoghi').select('*');
