@@ -55,6 +55,7 @@ th, td {
 
 /* FILTER + SORT ROW */
 .col-header {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -122,16 +123,19 @@ tr:hover {
   cursor: pointer;
 }
 
-
+th {
+  white-space: nowrap;
+  overflow: hidden;
+}
   
 th:nth-child(1), td:nth-child(1) {width: 30px;}
-th:nth-child(2), td:nth-child(2) {width: 100px;}
-th:nth-child(3), td:nth-child(3) {width: 100px;}
-th:nth-child(4), td:nth-child(4) {width: 100px;}
-th:nth-child(5), td:nth-child(5) {width: 50px;}
-th:nth-child(6), td:nth-child(6) {width: 50px;}
-th:nth-child(7), td:nth-child(7) {width: 100px;}
-th:nth-child(8), td:nth-child(8) {width: 40px;}
+th:nth-child(2), td:nth-child(2) {width: 140px;}
+th:nth-child(3), td:nth-child(3) {width: 160px;}
+th:nth-child(4), td:nth-child(4) {width: 180px;}
+th:nth-child(5), td:nth-child(5) {width: 80px;}
+th:nth-child(6), td:nth-child(6) {width: 80px;}
+th:nth-child(7), td:nth-child(7) {width: 160px;}
+th:nth-child(8), td:nth-child(8) {width: 90px;}
 
 td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}  
 
