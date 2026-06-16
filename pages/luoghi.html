@@ -357,7 +357,7 @@ textarea {
   <tbody id="tbody"></tbody>
 </table>
 
-<!-- MODAL >
+<!-- MODAL -->
 <div id="modal">
   <div id="modalContent">
 <div class="modal-header">
@@ -374,7 +374,7 @@ textarea {
     <label>Lng</label>
     <input id="lu_lng" oninput="markDirty()">
     <label>Descrizione</label>
-  <!-- div>
+  < div>
     <label>Lng</label>
     <input id="lu_lng" oninput="markDirty()">
   </div>
@@ -507,7 +507,7 @@ window.sort = (field) => {
   syncUI();
 };
 
-/* ---------------- MODAL ----------------
+/* ---------------- MODAL ----------------*/
 window.openModal = (row=null) => {
 originalData = {
   lu_comune: String(row?.lu_comune || ""),
@@ -542,9 +542,9 @@ originalData = {
 };
 
 // click outside
-// document.getElementById("modal").addEventListener("click", (e) => {
-//   if (e.target.id === "modal") requestClose();
-// });
+ document.getElementById("modal").addEventListener("click", (e) => {
+   if (e.target.id === "modal") requestClose();
+ });
 
 // ESC
 document.addEventListener("keydown", e => {
@@ -594,8 +594,6 @@ window.save = async () => {
   // closeModal(true);
   load();
 };
-
-*/
 
 await loadComuni();
 await load();
@@ -654,14 +652,14 @@ function requestClose() {
   }
 }
 
-// function closeModal(force = false) {
-  // if (!force && state.dirty) {
-    // const ok = confirm("Vuoi salvare le modifiche?");
-    // if (ok) save();
-    // return;
-  // }
-  //document.getElementById("modal").style.display = "none";
-// } 
+ function closeModal(force = false) {
+   if (!force && state.dirty) {
+     const ok = confirm("Vuoi salvare le modifiche?");
+     if (ok) save();
+     return;
+   }
+  document.getElementById("modal").style.display = "none";
+ } 
 
 window.openCoords = function () {
   const lat = document.getElementById("lu_lat").value;
