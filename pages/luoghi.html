@@ -418,7 +418,7 @@ function updateResetButton() {
   const hasSort = state.sortField !== null;
   const btn = document.querySelector('.reset-btn');
   if (!btn) return;
-  btn.textContent = (hasFilters || hasSort) ? '✕' : '-';
+  btn.textContent = (hasFilters || hasSort) ? '✕' : '↕';
   btn.classList.toggle('active', hasFilters || hasSort);
 }
   
