@@ -164,101 +164,116 @@ textarea {
 <table>
 <colgroup>
   <col style="width: 30px;">
-  <col style="width: 120px;">
-  <col style="width: 120px;">
   <col style="width: 140px;">
-  <col style="width: 50px;">
-  <col style="width: 50px;">
+  <col style="width: 140px;">
+  <col style="width: 180px;">
   <col style="width: 100px;">
-  <col style="width: 50px;">
+  <col style="width: 100px;">
+  <col style="width: 160px;">
+  <col style="width: 120px;">
 </colgroup>
-  
-  <thead>
 
-    <tr>
-      <th>
-        <div class="col-header">
-          <div class="col-title">ID</div>
-          <div class="col-tools">
-            <button class="reset-btn" onclick="resetAll()">-</button>
-          </div>
-        </div>
-      </th>
+<thead>
 
-      <th>
-        <div class="col-header">
-          <div class="col-title">Comune</div>
-          <div class="col-tools">
-            <input class="filter" oninput="setFilter('comune', this.value)">
-            <button class="sort-btn" data-field="comune" onclick="sort('comune')">-</button>
-          </div>
-        </div>
-      </th>
+<tr>
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        ID
+        <button class="reset-btn" onclick="resetAll()">-</button>
+      </div>
+    </div>
+  </th>
 
-      <th>
-        <div class="col-header">
-          <div class="col-title">Location</div>
-          <div class="col-tools">
-            <input class="filter" oninput="setFilter('location', this.value)">
-            <button class="sort-btn" data-field="location" onclick="sort('location')">-</button>
-          </div>
-        </div>
-      </th>
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Comune
+        <button class="sort-btn" data-field="comune" onclick="sort('comune')">-</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('comune', this.value)">
+      </div>
+    </div>
+  </th>
 
-      <th>
-        <div class="col-header">
-          <div class="col-title">Descrizione</div>
-          <div class="col-tools">
-            <input class="filter" oninput="setFilter('descrizione', this.value)">
-            <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">-</button>
-          </div>
-        </div>
-      </th>
-      
-      <th>
-        <div class="col-header">
-          <div class="col-title">Lat</div>
-          <div class="col-tools">
-            <input class="filter" oninput="setFilter('lat', this.value)">
-            <button class="sort-btn" data-field="lat" onclick="sort('lat')">-</button>
-          </div>
-        </div>
-      </th>
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Location
+        <button class="sort-btn" data-field="location" onclick="sort('location')">-</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('location', this.value)">
+      </div>
+    </div>
+  </th>
 
-      <th>
-        <div class="col-header">
-          <div class="col-title">Lng</div>
-          <div class="col-tools">
-            <input class="filter" oninput="setFilter('lng', this.value)">
-            <button class="sort-btn" data-field="lng" onclick="sort('lng')">-</button>
-          </div>
-        </div>
-      </th>
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Descrizione
+        <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">-</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('descrizione', this.value)">
+      </div>
+    </div>
+  </th>
 
-      <th>
-        <div class="col-header">
-          <div class="col-title">Note</div>
-          <div class="col-tools">
-            <input class="filter" oninput="setFilter('note', this.value)">
-            <button class="sort-btn" data-field="note" onclick="sort('note')">-</button>
-          </div>
-        </div>
-      </th>
-      
-      <th>
-        <div class="col-header">
-          <div class="col-title">Capacità</div>
-          <div class="col-tools">
-            <input class="filter" oninput="setFilter('cap', this.value)">
-            <button class="sort-btn" data-field="cap" onclick="sort('cap')">-</button>
-          </div>
-        </div>
-      </th>
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Lat
+        <button class="sort-btn" data-field="lat" onclick="sort('lat')">-</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('lat', this.value)">
+      </div>
+    </div>
+  </th>
 
-    </tr>
-  </thead>
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Lng
+        <button class="sort-btn" data-field="lng" onclick="sort('lng')">-</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('lng', this.value)">
+      </div>
+    </div>
+  </th>
 
-  <tbody id="tbody"></tbody>
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Note
+        <button class="sort-btn" data-field="note" onclick="sort('note')">-</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('note', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Capacità
+        <button class="sort-btn" data-field="cap" onclick="sort('cap')">-</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('cap', this.value)">
+      </div>
+    </div>
+  </th>
+
+</tr>
+
+</thead>
+
+<tbody id="tbody"></tbody>
 </table>
 
 <script type="module">
