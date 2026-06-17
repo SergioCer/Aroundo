@@ -303,16 +303,24 @@ let state = {
   dirty: false,
 };
 
-let originalData = null;
+let comuniMap = {};  
+  
+const comuniMap = Object.fromEntries(
+  comuni.map(c => [c.id_comune, c.co_descrizione])
+);
   
 // ---------------- COMUNI ----------------
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
   comuni = res.data;
+    comuniMap = Object.fromEntries(
+    comuni.map(c => [c.id_comune, c.co_descrizione])
+  );
+  render()
 }
   
 // ---------------- LOAD ----------------
-async function load() {
+/* CANCELLARE  async function load() {
   const res = await supabase.from('luoghi').select('*');
   data = res.data;
   data.sort((a, b) => {
@@ -322,6 +330,7 @@ async function load() {
   });
   render();
 }
+*/
 
 // ---------------- RENDER ----------------
 function render() {
@@ -331,7 +340,7 @@ function render() {
     if (!v) return;
     filtered = filtered.filter(r => {
       if (k === 'comune') {
-        const c = comuni.find(x => x.id_comune === r.lu_comune);
+        comuniMap[r.lu_comune]
         return (c?.co_descrizione || '').toLowerCase().includes(v);
       }
       if (k === 'location')
@@ -365,10 +374,9 @@ function render() {
   tbody.innerHTML = "";
 
   filtered.forEach(r => {
-    const c = comuni.find(x => x.id_comune === r.lu_comune);
+    comuniMap[r.lu_comune]
     const tr = document.createElement("tr");
     tr.onclick = () => open("luogo.html?id=" + r.id_luogo, "_self");
-    // tr.onclick = () => openModal(r);
     tr.innerHTML = `
       <td>${r.id_luogo}</td>
       <td>${c ? c.co_descrizione : ''}</td>
