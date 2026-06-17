@@ -367,7 +367,6 @@ function render() {
   tbody.innerHTML = "";
 
   filtered.forEach(r => {
-    comuniMap[r.lu_comune]
     const tr = document.createElement("tr");
     tr.onclick = () => open("luogo.html?id=" + r.id_luogo, "_self");
     tr.innerHTML = `
