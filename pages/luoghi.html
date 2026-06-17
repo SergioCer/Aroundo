@@ -111,21 +111,25 @@ th, td {
   width: 28px;
   height: 28px;
   border-radius: 14px;
-  border: none;
+  border: 1px solid #d1d5db;
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
-  background: #fee2e2;
-  color: #991b1b;
+  background: #f3f4f6;
+  color: #374151;
+  transition: 0.2s;
+  opacity: 0.4;
 }
 
 .reset-btn:hover {
-  background: #fecaca;
+  background: #e5e7eb;
 }
 
 .reset-btn.active {
-  background: #ef4444;
-  color: white;
+  background: #fbbf24;
+  color: #111827;
+  border-color: #f59e0b;
+  opacity: 1;
 }  
   
 /* TABLE ROW */
@@ -423,7 +427,7 @@ function updateResetButton() {
   const hasSort = state.sortField !== null;
   const btn = document.querySelector('.reset-btn');
   if (!btn) return;
-  btn.textContent = (hasFilters || hasSort) ? '✕' : '-';
+  btn.textContent = (hasFilters || hasSort) ? '↺' : '•';
   btn.classList.toggle('active', hasFilters || hasSort);
 }
   
