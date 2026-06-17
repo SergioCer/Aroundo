@@ -307,8 +307,12 @@ let comuniMap = {};
   
 // ---------------- COMUNI ----------------
 async function loadComuni() {
-  const res = await supabase.from('comuni').select('*');
-  comuni = res.data;
+  const { data, error } = await supabase.from('comuni').select('*');
+  if (error) {
+    console.error(error);
+    return;
+  }
+    comuni = data || [];
     comuniMap = Object.fromEntries(
     comuni.map(c => [c.id_comune, c.co_descrizione])
   );
@@ -316,9 +320,13 @@ async function loadComuni() {
   
 // ---------------- LOAD ----------------
 async function load() {
-  const res = await supabase.from('luoghi').select('*');
-  data = res.data;
-  data.sort((a, b) =>
+  const { data, error } = await supabase.from('luoghi').select('*');
+  if (error) {
+    console.error(error);
+    return;
+  }
+  data = data || [];
+    data.sort((a, b) =>
     (comuniMap[a.lu_comune] || '').localeCompare(
       comuniMap[b.lu_comune] || ''
     )
