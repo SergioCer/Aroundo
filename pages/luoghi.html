@@ -305,10 +305,6 @@ let state = {
 
 let comuniMap = {};  
   
-const comuniMap = Object.fromEntries(
-  comuni.map(c => [c.id_comune, c.co_descrizione])
-);
-  
 // ---------------- COMUNI ----------------
 async function loadComuni() {
   const res = await supabase.from('comuni').select('*');
@@ -320,7 +316,7 @@ async function loadComuni() {
 }
   
 // ---------------- LOAD ----------------
-/* CANCELLARE  async function load() {
+async function load() {
   const res = await supabase.from('luoghi').select('*');
   data = res.data;
   data.sort((a, b) => {
@@ -330,7 +326,6 @@ async function loadComuni() {
   });
   render();
 }
-*/
 
 // ---------------- RENDER ----------------
 function render() {
@@ -340,8 +335,7 @@ function render() {
     if (!v) return;
     filtered = filtered.filter(r => {
       if (k === 'comune') {
-        comuniMap[r.lu_comune]
-        return (c?.co_descrizione || '').toLowerCase().includes(v);
+        return (comuniMap[r.lu_comune] || '').toLowerCase().includes(v);
       }
       if (k === 'location')
         return (r.lu_location || '').toLowerCase().includes(v);
@@ -379,7 +373,7 @@ function render() {
     tr.onclick = () => open("luogo.html?id=" + r.id_luogo, "_self");
     tr.innerHTML = `
       <td>${r.id_luogo}</td>
-      <td>${c ? c.co_descrizione : ''}</td>
+      <td>${comuniMap[r.lu_comune] || ''}</td>
       <td>${r.lu_location || ''}</td>
       <td>${r.lu_descrizione || ''}</td>
       <td>${r.lu_lat}</td>
