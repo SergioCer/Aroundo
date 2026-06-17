@@ -167,10 +167,10 @@ textarea {
   <col style="width: 140px;">
   <col style="width: 140px;">
   <col style="width: 180px;">
-  <col style="width: 100px;">
-  <col style="width: 100px;">
+  <col style="width: 70px;">
+  <col style="width: 70px;">
   <col style="width: 160px;">
-  <col style="width: 120px;">
+  <col style="width: 60px;">
 </colgroup>
 
 <thead>
@@ -188,7 +188,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Comune
+        Comune:
         <button class="sort-btn" data-field="comune" onclick="sort('comune')">-</button>
       </div>
       <div class="col-tools">
@@ -200,7 +200,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Location
+        Location:
         <button class="sort-btn" data-field="location" onclick="sort('location')">-</button>
       </div>
       <div class="col-tools">
@@ -212,7 +212,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Descrizione
+        Descrizione:
         <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">-</button>
       </div>
       <div class="col-tools">
@@ -224,7 +224,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Lat
+        Lat:
         <button class="sort-btn" data-field="lat" onclick="sort('lat')">-</button>
       </div>
       <div class="col-tools">
@@ -236,7 +236,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Lng
+        Lng:
         <button class="sort-btn" data-field="lng" onclick="sort('lng')">-</button>
       </div>
       <div class="col-tools">
@@ -248,7 +248,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Note
+        Note:
         <button class="sort-btn" data-field="note" onclick="sort('note')">-</button>
       </div>
       <div class="col-tools">
@@ -260,7 +260,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Capacità
+        Capacità:
         <button class="sort-btn" data-field="cap" onclick="sort('cap')">-</button>
       </div>
       <div class="col-tools">
@@ -337,11 +337,13 @@ function render() {
   });
 
   if (state.sortField) {
-    filtered.sort((a,b) => {
+    filtered.sort((a, b) => {
       let va = a['lu_' + state.sortField];
       let vb = b['lu_' + state.sortField];
-      if (state.sortDir === 'asc') return va > vb ? 1 : -1;
-      return va < vb ? 1 : -1;
+      va = (va ?? '').toString().toLowerCase();
+      vb = (vb ?? '').toString().toLowerCase();
+      if (state.sortDir === 'asc') return va.localeCompare(vb);
+      return vb.localeCompare(va);
     });
   }
 
