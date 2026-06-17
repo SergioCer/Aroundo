@@ -65,6 +65,11 @@ th, td {
 .col-title {
   font-weight: bold;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 /* input + sort inline */
@@ -180,7 +185,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         ID
-        <button class="reset-btn" onclick="resetAll()">-</button>
+        <button class="reset-btn" onclick="resetAll()">↕</button>
       </div>
     </div>
   </th>
@@ -189,7 +194,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         Comune:
-        <button class="sort-btn" data-field="comune" onclick="sort('comune')">-</button>
+        <button class="sort-btn" data-field="comune" onclick="sort('comune')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('comune', this.value)">
@@ -201,7 +206,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         Location:
-        <button class="sort-btn" data-field="location" onclick="sort('location')">-</button>
+        <button class="sort-btn" data-field="location" onclick="sort('location')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('location', this.value)">
@@ -213,7 +218,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         Descrizione:
-        <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">-</button>
+        <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('descrizione', this.value)">
@@ -225,7 +230,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         Lat:
-        <button class="sort-btn" data-field="lat" onclick="sort('lat')">-</button>
+        <button class="sort-btn" data-field="lat" onclick="sort('lat')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('lat', this.value)">
@@ -237,7 +242,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         Lng:
-        <button class="sort-btn" data-field="lng" onclick="sort('lng')">-</button>
+        <button class="sort-btn" data-field="lng" onclick="sort('lng')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('lng', this.value)">
@@ -249,7 +254,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         Note:
-        <button class="sort-btn" data-field="note" onclick="sort('note')">-</button>
+        <button class="sort-btn" data-field="note" onclick="sort('note')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('note', this.value)">
@@ -261,7 +266,7 @@ textarea {
     <div class="col-header">
       <div class="col-title">
         Capacità:
-        <button class="sort-btn" data-field="cap" onclick="sort('cap')">-</button>
+        <button class="sort-btn" data-field="cap" onclick="sort('cap')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('cap', this.value)">
