@@ -164,8 +164,9 @@ input, select, textarea {
 <script type="module">
 import { supabase } from '../supabase.js';
 
-const id = new URLSearchParams(location.search).get('id');
-const isNew = !id;
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const isNew = params.has('new') || !id;
   
 let original = "{}";
 let dirty = false;
