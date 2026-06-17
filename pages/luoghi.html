@@ -402,7 +402,7 @@ function updateSortButtons() {
   document.querySelectorAll('.sort-btn').forEach(btn => {
     const field = btn.dataset.field;
     if (field !== state.sortField) {
-      btn.textContent = '-';
+      btn.textContent = '↕';
       return;
     }
     btn.textContent =
