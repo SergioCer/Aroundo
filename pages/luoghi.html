@@ -171,7 +171,7 @@ textarea {
 <div class="header">
   <div class="title">
     Luoghi
-    <button class="add-btn" onclick="openModal()">+</button>
+    <button class="add-btn" onclick="open('luogo.html', '_self')">+</button>
   </div>
 </div>
 
@@ -320,12 +320,12 @@ async function loadComuni() {
   
 // ---------------- LOAD ----------------
 async function load() {
-  const { data, error } = await supabase.from('luoghi').select('*');
+  const { data: rows, error } = await supabase.from('luoghi').select('*');
   if (error) {
     console.error(error);
     return;
   }
-  data = data || [];
+  data = rows || [];
     data.sort((a, b) =>
     (comuniMap[a.lu_comune] || '').localeCompare(
       comuniMap[b.lu_comune] || ''
