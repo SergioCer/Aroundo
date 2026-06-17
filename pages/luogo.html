@@ -165,7 +165,8 @@ input, select, textarea {
 import { supabase } from '../supabase.js';
 
 const id = new URLSearchParams(location.search).get('id');
-
+const isNew = !id;
+  
 let original = {};
 let dirty = false;
 
@@ -187,11 +188,19 @@ async function loadComuni() {
 
 /* LOAD */
 async function load() {
-  const { data } = await supabase
+  if (isNew) {
+    original = JSON.stringify({}); // base vuoto
+    return;
+  }
+  const { data, error } = await supabase
     .from('luoghi')
-    .select('*, comuni(co_descrizione)')
+    .select('*')
     .eq('id_luogo', id)
     .single();
+  if (error) {
+    console.error(error);
+    return;
+  }
 
   original = JSON.stringify(data);
 
@@ -224,21 +233,33 @@ window.markDirty = () => {
 
 /* SAVE */
 async function save() {
-  const { error } = await supabase.from('luoghi')
-    .update({
-      lu_location: lu_location.value,
-      lu_comune: lu_comune.value,
-      lu_descrizione: lu_descrizione.value,
-      lu_note: lu_note.value,
-      lu_lat: lu_lat.value ? parseFloat(lu_lat.value) : null,
-      lu_lng: lu_lng.value ? parseFloat(lu_lng.value) : null,
-      lu_capacita_massima: lu_capacita_massima.value
-        ? parseInt(lu_capacita_massima.value)
-        : null    })
-  .eq('id_luogo', id);
+  const payload = {
+    lu_location: lu_location.value,
+    lu_comune: lu_comune.value,
+    lu_descrizione: lu_descrizione.value,
+    lu_note: lu_note.value,
+    lu_lat: lu_lat.value ? parseFloat(lu_lat.value) : null,
+    lu_lng: lu_lng.value ? parseFloat(lu_lng.value) : null,
+    lu_capacita_massima: lu_capacita_massima.value
+      ? parseInt(lu_capacita_massima.value)
+      : null
+  };
 
-  if (error) {
-    console.error(error);
+  let result;
+
+  if (isNew) {
+    result = await supabase
+      .from('luoghi')
+      .insert(payload);
+  } else {
+    result = await supabase
+      .from('luoghi')
+      .update(payload)
+      .eq('id_luogo', id);
+  }
+
+  if (result.error) {
+    console.error(result.error);
     alert("Errore salvataggio");
     return false;
   }
