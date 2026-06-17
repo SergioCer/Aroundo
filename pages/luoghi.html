@@ -360,16 +360,26 @@ function render() {
     });
   });
 
-  if (state.sortField) {
-    filtered.sort((a, b) => {
-      let va = a['lu_' + state.sortField];
-      let vb = b['lu_' + state.sortField];
-      va = (va ?? '').toString().toLowerCase();
-      vb = (vb ?? '').toString().toLowerCase();
-      if (state.sortDir === 'asc') return va.localeCompare(vb);
-      return vb.localeCompare(va);
-    });
-  }
+if (state.sortField) {
+  filtered.sort((a, b) => {
+    let va, vb;
+    // 🟡 caso speciale: comune (label da mappa)
+    if (state.sortField === 'comune') {
+      va = comuniMap[a.lu_comune] || '';
+      vb = comuniMap[b.lu_comune] || '';
+    } 
+    // 🔵 tutti gli altri campi
+    else {
+      va = a['lu_' + state.sortField];
+      vb = b['lu_' + state.sortField];
+    }
+    va = (va ?? '').toString().toLowerCase();
+    vb = (vb ?? '').toString().toLowerCase();
+    return state.sortDir === 'asc'
+      ? va.localeCompare(vb)
+      : vb.localeCompare(va);
+  });
+}
 
   const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
