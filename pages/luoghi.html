@@ -318,11 +318,11 @@ async function loadComuni() {
 async function load() {
   const res = await supabase.from('luoghi').select('*');
   data = res.data;
-  data.sort((a, b) => {
-    const ca = comuni.find(x => x.id_comune === a.lu_comune)?.co_descrizione || '';
-    const cb = comuni.find(x => x.id_comune === b.lu_comune)?.co_descrizione || '';
-    return ca.localeCompare(cb);
-  });
+  data.sort((a, b) =>
+    (comuniMap[a.lu_comune] || '').localeCompare(
+      comuniMap[b.lu_comune] || ''
+    )
+  );
   render()
 }
 
