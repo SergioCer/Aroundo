@@ -312,7 +312,6 @@ async function loadComuni() {
     comuniMap = Object.fromEntries(
     comuni.map(c => [c.id_comune, c.co_descrizione])
   );
-  render()
 }
   
 // ---------------- LOAD ----------------
@@ -324,7 +323,6 @@ async function load() {
     const cb = comuni.find(x => x.id_comune === b.lu_comune)?.co_descrizione || '';
     return ca.localeCompare(cb);
   });
-  render();
 }
 
 // ---------------- RENDER ----------------
