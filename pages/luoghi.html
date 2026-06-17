@@ -307,12 +307,12 @@ let comuniMap = {};
   
 // ---------------- COMUNI ----------------
 async function loadComuni() {
-  const { data, error } = await supabase.from('comuni').select('*');
+  const { data: rows, error } = await supabase.from('comuni').select('*');
   if (error) {
     console.error(error);
     return;
   }
-    comuni = data || [];
+    comuni = rows || [];
     comuniMap = Object.fromEntries(
     comuni.map(c => [c.id_comune, c.co_descrizione])
   );
