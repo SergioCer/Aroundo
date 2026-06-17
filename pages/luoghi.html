@@ -376,7 +376,9 @@ function render() {
 
   filtered.forEach(r => {
     const tr = document.createElement("tr");
-    tr.onclick = () => open("luogo.html?id=" + r.id_luogo, "_self");
+    tr.onclick = () => {
+      window.location.href = `luogo.html?id=${r.id_luogo}`;
+    };
     tr.innerHTML = `
       <td>${r.id_luogo}</td>
       <td>${comuniMap[r.lu_comune] || ''}</td>
