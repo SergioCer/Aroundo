@@ -98,6 +98,13 @@ input, select, textarea {
   cursor: pointer;
 }
 
+.footer {
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+  margin-top: 15px;
+}
+  
 /* BACK ICON STYLE DIFFERENT WHEN DIRTY */
 </style>
 </head>
@@ -159,6 +166,8 @@ input, select, textarea {
     <button class="map-btn" onclick="openCoords()">Map</button>
   </div>
 
+  <div class="footer" id="lu_creato"></div>
+
 </div>
 
 <script type="module">
@@ -212,6 +221,7 @@ async function load() {
   lu_lat.value = data.lu_lat || '';
   lu_lng.value = data.lu_lng || '';
   lu_capacita_massima.value = data.lu_capacita_massima || '';
+  document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
 }
 
 /* DIRTY */
