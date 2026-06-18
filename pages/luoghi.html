@@ -362,6 +362,7 @@ function render() {
   });
 
 if (state.sortField) {
+  const numericFields = ['cap', 'lat', 'lng'];
   filtered.sort((a, b) => {
     let va, vb;
     // 🟡 caso speciale: comune (label da mappa)
@@ -374,6 +375,14 @@ if (state.sortField) {
       va = a['lu_' + state.sortField];
       vb = b['lu_' + state.sortField];
     }
+    // 🔥 NUMERI
+    if (numericFields.includes(state.sortField)) {
+      va = Number(va ?? 0);
+      vb = Number(vb ?? 0);
+      return state.sortDir === 'asc'
+        ? va - vb
+        : vb - va;
+    }  
     va = (va ?? '').toString().toLowerCase();
     vb = (vb ?? '').toString().toLowerCase();
     return state.sortDir === 'asc'
