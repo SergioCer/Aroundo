@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Organizzatore</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
+}
+
+/* TOPBAR */
+.topbar {
+  padding: 12px 15px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: 0.2s;
+}
+
+.back-btn.dirty {
+  background: #f59e0b;
+}
+
+/* HERO TITLE */
+.hero {
+  margin: 10px 15px 8px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+}
+
+.hero input {
+  width: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  text-align: center;
+  background: transparent;
+}
+
+/* CARD */
+.card {
+  background: white;
+  margin: 0 15px 20px;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+/* LABEL */
+.section-title {
+  font-size: 11px;
+  color: #777;
+  margin: 12px 0 4px;
+}
+
+/* INPUT */
+input, textarea, select {
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* FOOTER */
+.footer {
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
+</div>
+
+<div class="hero">
+  <input id="or_nome" oninput="markDirty()">
+</div>
+
+<div class="card">
+
+  <div class="section-title">Descrizione</div>
+  <textarea id="or_descrizione" oninput="markDirty()"></textarea>
+
+  <div class="section-title">Email</div>
+  <input id="or_email" oninput="markDirty()">
+
+  <div class="section-title">Telefono</div>
+  <input id="or_telefono" oninput="markDirty()">
+
+  <div class="section-title">Sito web</div>
+  <input id="or_sito_web" oninput="markDirty()">
+
+  <div class="section-title">Attivo</div>
+  <select id="or_attivo" oninput="markDirty()">
+    <option value="true">Attivo</option>
+    <option value="false">Non attivo</option>
+  </select>
+
+  <div class="footer" id="or_creato"></div>
+
+</div>
+
+<script type="module">
+import { supabase } from '../supabase.js';
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const isNew = params.has('new') || !id;
+
+let original = "{}";
+let dirty = false;
+
+/* LOAD */
+async function load() {
+  if (isNew) {
+    original = JSON.stringify({});
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('organizzatori')
+    .select('*')
+    .eq('id_organizzatore', id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  original = JSON.stringify(data);
+
+  or_nome.value = data.or_nome || '';
+  or_descrizione.value = data.or_descrizione || '';
+  or_email.value = data.or_email || '';
+  or_telefono.value = data.or_telefono || '';
+  or_sito_web.value = data.or_sito_web || '';
+  or_attivo.value = String(data.or_attivo);
+  or_creato.textContent = data.or_creato
+    ? new Date(data.or_creato).toLocaleString()
+    : '';
+}
+
+/* DIRTY */
+window.markDirty = () => {
+  const current = JSON.stringify({
+    or_nome: or_nome.value,
+    or_descrizione: or_descrizione.value,
+    or_email: or_email.value,
+    or_telefono: or_telefono.value,
+    or_sito_web: or_sito_web.value,
+    or_attivo: or_attivo.value === 'true'
+  });
+
+  dirty = current !== original;
+
+  document.getElementById('backBtn')
+    .classList.toggle('dirty', dirty);
+};
+
+/* SAVE */
+async function save() {
+  const payload = {
+    or_nome: or_nome.value,
+    or_descrizione: or_descrizione.value,
+    or_email: or_email.value,
+    or_telefono: or_telefono.value,
+    or_sito_web: or_sito_web.value,
+    or_attivo: or_attivo.value === 'true'
+  };
+
+  let result;
+
+  if (isNew) {
+    result = await supabase
+      .from('organizzatori')
+      .insert(payload)
+      .select()
+      .single();
+  } else {
+    result = await supabase
+      .from('organizzatori')
+      .update(payload)
+      .eq('id_organizzatore', id)
+      .select()
+      .single();
+  }
+
+  const { data, error } = result;
+
+  if (error) {
+    console.error(error);
+    alert("Errore salvataggio");
+    return false;
+  }
+
+  dirty = false;
+
+  if (isNew) {
+    location.href = `organizzatore.html?id=${data.id_organizzatore}`;
+  }
+
+  return true;
+}
+
+/* BACK */
+window.requestBack = async () => {
+  if (!dirty) return history.back();
+
+  const ok = confirm("Vuoi salvare le modifiche?");
+  if (ok) {
+    const success = await save();
+    if (!success) return;
+  }
+  history.back();
+};
+
+await load();
+</script>
+
+</body>
+</html>
