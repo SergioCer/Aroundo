@@ -389,7 +389,7 @@ function updateResetUI() {
   const active =
     Object.keys(state.filters).length > 0 ||
     state.attivo !== 'all' ||
-    state.sortField !== null ||
+    state.sortField !== null;
   btn.classList.toggle('active', active);
   btn.textContent = active ? '↺' : '•';
 }
