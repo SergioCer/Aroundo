@@ -211,9 +211,7 @@ textarea {
         <button class="sort-btn" data-field="comune" onclick="sort('comune')">↕</button>
       </div>
       <div class="col-tools">
-        <select id="filter_comune" class="filter" onchange="setFilter('comune', this.value)">
-          <option value="">Tutti</option>
-        </select>
+        <input class="filter" oninput="setFilter('comune', this.value)">  
       </div>
     </div>
   </th>
@@ -315,6 +313,11 @@ let state = {
   dirty: false,
 };
 
+ const savedFilters = sessionStorage.getItem('luoghi_filters');
+if (savedFilters) {
+  state.filters = JSON.parse(savedFilters);
+} 
+  
 let comuniMap = {};  
   
 // ---------------- COMUNI ----------------
@@ -325,11 +328,6 @@ async function loadComuni() {
     return;
   }
     comuni = rows || [];
-      const sel = document.getElementById("filter_comune");
-    sel.innerHTML = `<option value="">Tutti</option>` +
-      (rows || []).map(c =>
-        `<option value="${c.co_descrizione}">${c.co_descrizione}</option>`
-      ).join('');
     comuniMap = Object.fromEntries(
     comuni.map(c => [c.id_comune, c.co_descrizione])
   );
@@ -411,10 +409,14 @@ if (state.sortField) {
       : vb.localeCompare(va);
   });
 }
-
   const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
-
+  document.querySelectorAll('.filter').forEach(input => {
+  const key = input.getAttribute('oninput')?.match(/'(.*?)'/)?.[1];
+  if (key && state.filters[key] !== undefined) {
+    input.value = state.filters[key];
+  }
+});
   filtered.forEach(r => {
     const tr = document.createElement("tr");
     tr.onclick = () => {
@@ -437,6 +439,7 @@ if (state.sortField) {
 // ---------------- FILTER ----------------
 window.setFilter = (k,v) => {
   state.filters[k] = v;
+  sessionStorage.setItem('luoghi_filters', JSON.stringify(state.filters));
   render();
   syncUI();
 };
@@ -486,6 +489,7 @@ window.resetAll = () => {
   state.filters = {};
   state.sortField = null;
   state.sortDir = 'asc';
+  sessionStorage.removeItem('luoghi_filters');
   document.querySelectorAll('.filter').forEach(i => i.value = '');
   render();
   syncUI();
