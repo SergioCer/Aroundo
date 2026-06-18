@@ -12,12 +12,10 @@ body {
   background: #f2f4f7;
 }
 
-/* TOPBAR */
 .topbar {
   padding: 12px 15px;
 }
 
-/* BACK BUTTON */
 .back-btn {
   width: 40px;
   height: 40px;
@@ -38,7 +36,6 @@ body {
   background: #f59e0b;
 }
 
-/* HERO TITLE */
 .hero {
   margin: 10px 15px 8px;
   padding: 12px;
@@ -55,7 +52,6 @@ body {
   background: transparent;
 }
 
-/* CARD */
 .card {
   background: white;
   margin: 0 15px 20px;
@@ -63,15 +59,13 @@ body {
   border-radius: 12px;
 }
 
-/* LABEL */
 .section-title {
   font-size: 11px;
   color: #777;
   margin: 12px 0 4px;
 }
 
-/* INPUT */
-input, textarea, select {
+input, textarea {
   width: 100%;
   border: 1px solid #ddd;
   padding: 6px;
@@ -79,7 +73,37 @@ input, textarea, select {
   font-size: 13px;
 }
 
-/* FOOTER */
+/* STATUS */
+.status-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+.status-ok {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.status-no {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+/* COPERTINA PREVIEW */
+.preview {
+  margin-top: 8px;
+}
+
+.preview img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
 .footer {
   text-align: right;
   font-size: 11px;
@@ -113,12 +137,23 @@ input, textarea, select {
   <div class="section-title">Sito web</div>
   <input id="or_sito_web" oninput="markDirty()">
 
-  <div class="section-title">Attivo</div>
-  <select id="or_attivo" oninput="markDirty()">
-    <option value="true">Attivo</option>
-    <option value="false">Non attivo</option>
-  </select>
+  <!-- STATO -->
+  <div class="section-title">Stato</div>
+  <div class="status-box" onclick="toggleAttivo()">
+    <span id="statusIcon"></span>
+    <span id="statusText"></span>
+  </div>
 
+  <!-- COPERTINA -->
+  <div class="section-title">Copertina (URL)</div>
+  <input id="or_copertina" oninput="markDirty(); updatePreview()">
+
+  <div class="preview">
+    <div id="copertina_url" style="font-size:12px; color:#666;"></div>
+    <img id="copertina_img" />
+  </div>
+
+  <!-- CREATO -->
   <div class="footer" id="or_creato"></div>
 
 </div>
@@ -137,6 +172,7 @@ let dirty = false;
 async function load() {
   if (isNew) {
     original = JSON.stringify({});
+    updateStatus(false);
     return;
   }
 
@@ -158,11 +194,39 @@ async function load() {
   or_email.value = data.or_email || '';
   or_telefono.value = data.or_telefono || '';
   or_sito_web.value = data.or_sito_web || '';
-  or_attivo.value = String(data.or_attivo);
+  or_copertina.value = data.or_copertina || '';
+
+  updateStatus(data.or_attivo);
+  updatePreview();
+
   or_creato.textContent = data.or_creato
     ? new Date(data.or_creato).toLocaleString()
     : '';
 }
+
+/* STATUS */
+window.toggleAttivo = () => {
+  const isActive = document.body.dataset.attivo === 'true';
+  updateStatus(!isActive);
+  markDirty();
+};
+
+function updateStatus(val) {
+  document.body.dataset.attivo = val;
+
+  statusIcon.textContent = val ? '✔' : '✖';
+  statusText.textContent = val ? 'Attivo' : 'Non attivo';
+
+  statusIcon.className = val ? 'status-ok' : 'status-no';
+}
+
+/* PREVIEW */
+window.updatePreview = () => {
+  const url = or_copertina.value;
+
+  copertina_url.textContent = url || '';
+  copertina_img.src = url || '';
+};
 
 /* DIRTY */
 window.markDirty = () => {
@@ -172,7 +236,8 @@ window.markDirty = () => {
     or_email: or_email.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
-    or_attivo: or_attivo.value === 'true'
+    or_copertina: or_copertina.value,
+    or_attivo: document.body.dataset.attivo === 'true'
   });
 
   dirty = current !== original;
@@ -189,7 +254,8 @@ async function save() {
     or_email: or_email.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
-    or_attivo: or_attivo.value === 'true'
+    or_copertina: or_copertina.value,
+    or_attivo: document.body.dataset.attivo === 'true'
   };
 
   let result;
