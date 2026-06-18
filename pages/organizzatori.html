@@ -11,7 +11,7 @@ body {
   margin: 0;
 }
 
-/* HEADER TOP */
+/* HEADER */
 .header {
   display: flex;
   justify-content: space-between;
@@ -37,41 +37,31 @@ body {
   cursor: pointer;
 }
 
-/* GRID TABLE */
-.grid {
-  display: grid;
-  grid-template-columns: 30px 160px 140px 120px 120px 180px 30px;
-  background: white;
+/* TABLE */
+table {
   width: 100%;
+  border-collapse: collapse;
+  background: white;
+  table-layout: fixed;
 }
 
-/* HEADER ROW */
-.grid-header {
-  display: grid;
-  grid-template-columns: inherit;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-/* CELLE */
-.cell {
+th, td {
   padding: 6px;
   border-bottom: 1px solid #e5e7eb;
   overflow: hidden;
 }
 
-/* ROWS */
-.row {
-  display: grid;
-  grid-template-columns: inherit;
+tr:hover {
+  background: #eef6ff;
   cursor: pointer;
 }
 
-.row:hover {
-  background: #eef6ff;
+td {
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-/* COL HEADER STRUCT */
+/* HEADER STRUCT */
 .col-header {
   display: flex;
   flex-direction: column;
@@ -121,6 +111,7 @@ body {
   opacity: 1;
 }
 
+/* STATUS */
 .status-ok { color: #22c55e; }
 .status-no { color: #ef4444; }
 
@@ -131,6 +122,7 @@ body {
   border: none;
   background: #dbeafe;
   cursor: pointer;
+  font-size: 14px;
 }
 </style>
 </head>
@@ -144,19 +136,33 @@ body {
   </div>
 </div>
 
-<!-- GRID HEADER -->
-<div class="grid grid-header">
+<table>
 
-  <div class="cell">
+<colgroup>
+  <col style="width: 30px;">
+  <col style="width: 140px;">
+  <col style="width: 160px;">
+  <col style="width: 150px;">
+  <col style="width: 120px;">
+  <col style="width: 120px;">
+  <col style="width: 60px;">
+</colgroup>
+
+<thead>
+<tr>
+
+  <!-- ID -->
+  <th>
     <div class="col-header">
-      <div class="col-title">ID</div>
-      <div class="col-tools">
+      <div class="col-title">
+        ID
         <button class="reset-btn" onclick="resetAll()">•</button>
       </div>
     </div>
-  </div>
+  </th>
 
-  <div class="cell">
+  <!-- NOME -->
+  <th>
     <div class="col-header">
       <div class="col-title">
         Nome
@@ -166,9 +172,10 @@ body {
         <input class="filter" oninput="setFilter('nome',this.value)">
       </div>
     </div>
-  </div>
+  </th>
 
-  <div class="cell">
+  <!-- DESCRIZIONE -->
+  <th>
     <div class="col-header">
       <div class="col-title">
         Descrizione
@@ -178,9 +185,10 @@ body {
         <input class="filter" oninput="setFilter('descrizione',this.value)">
       </div>
     </div>
-  </div>
+  </th>
 
-  <div class="cell">
+  <!-- EMAIL -->
+  <th>
     <div class="col-header">
       <div class="col-title">
         Email
@@ -190,9 +198,10 @@ body {
         <input class="filter" oninput="setFilter('email',this.value)">
       </div>
     </div>
-  </div>
+  </th>
 
-  <div class="cell">
+  <!-- TELEFONO -->
+  <th>
     <div class="col-header">
       <div class="col-title">
         Telefono
@@ -202,27 +211,38 @@ body {
         <input class="filter" oninput="setFilter('telefono',this.value)">
       </div>
     </div>
-  </div>
+  </th>
 
-  <div class="cell">
+  <!-- NOTE -->
+  <th>
     <div class="col-header">
-      <div class="col-title">Note</div>
+      <div class="col-title">
+        Note
+        <button class="sort-btn" onclick="sort('note')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('note',this.value)">
+      </div>
     </div>
-  </div>
+  </th>
 
-  <div class="cell">
+  <!-- STATO -->
+  <th>
     <div class="col-header">
-      <div class="col-title">Stato</div>
+      <div class="col-title">
+        Stato
+      </div>
       <div class="col-tools">
         <button class="status-filter" onclick="toggleAttivo()" id="attivoBtn">●</button>
       </div>
     </div>
-  </div>
+  </th>
 
-</div>
+</tr>
+</thead>
 
-<!-- ROWS -->
-<div id="tbody"></div>
+<tbody id="tbody"></tbody>
+</table>
 
 <script type="module">
 import { supabase } from '../supabase.js';
@@ -231,13 +251,17 @@ let data = [];
 
 let state = {
   filters: {},
-  sortField: null,
+  sortField: 'nome',
   sortDir: 'asc',
   attivo: 'all'
 };
 
+/* LOAD */
 async function load() {
-  const { data: rows } = await supabase.from('organizzatori').select('*');
+  const { data: rows } = await supabase
+    .from('organizzatori')
+    .select('*');
+
   data = rows || [];
 
   data.sort((a,b) =>
@@ -269,25 +293,28 @@ window.setFilter = (k,v) => {
 /* RESET */
 window.resetAll = () => {
   state.filters = {};
-  state.sortField = null;
+  state.sortField = 'nome';
   state.sortDir = 'asc';
   state.attivo = 'all';
+
   document.querySelectorAll('.filter').forEach(i => i.value = '');
   render();
   syncUI();
 };
 
-/* STATUS */
+/* STATUS FILTER */
 window.toggleAttivo = () => {
   if (state.attivo === 'all') state.attivo = 'true';
   else if (state.attivo === 'true') state.attivo = 'false';
   else state.attivo = 'all';
+
   render();
   syncUI();
 };
 
 /* RENDER */
 function render() {
+
   let filtered = [...data];
 
   if (state.attivo === 'true')
@@ -312,8 +339,9 @@ function render() {
 
   if (state.sortField) {
     filtered.sort((a,b) => {
-      let va = (a['or_' + state.sortField] || '').toString().toLowerCase();
-      let vb = (b['or_' + state.sortField] || '').toString().toLowerCase();
+      let va = (a['or_' + state.sortField] || '').toLowerCase();
+      let vb = (b['or_' + state.sortField] || '').toLowerCase();
+
       return state.sortDir === 'asc'
         ? va.localeCompare(vb)
         : vb.localeCompare(va);
@@ -329,22 +357,21 @@ function render() {
       ? '<span class="status-ok">✔</span>'
       : '<span class="status-no">✖</span>';
 
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.onclick = () =>
+    const tr = document.createElement('tr');
+    tr.onclick = () =>
       location.href = `organizzatore.html?id=${r.id_organizzatore}`;
 
-    row.innerHTML = `
-      <div class="cell">${r.id_organizzatore}</div>
-      <div class="cell">${r.or_nome||''}</div>
-      <div class="cell">${r.or_descrizione||''}</div>
-      <div class="cell">${r.or_email||''}</div>
-      <div class="cell">${r.or_telefono||''}</div>
-      <div class="cell">${r.or_note||''}</div>
-      <div class="cell" style="text-align:center">${stato}</div>
+    tr.innerHTML = `
+      <td>${r.id_organizzatore}</td>
+      <td>${r.or_nome||''}</td>
+      <td>${r.or_descrizione||''}</td>
+      <td>${r.or_email||''}</td>
+      <td>${r.or_telefono||''}</td>
+      <td>${r.or_note||''}</td>
+      <td style="text-align:center">${stato}</td>
     `;
 
-    tbody.appendChild(row);
+    tbody.appendChild(tr);
   });
 
   updateSortUI();
@@ -356,20 +383,23 @@ function render() {
 function updateSortUI() {
   document.querySelectorAll('.sort-btn').forEach(btn => {
     const field = btn.getAttribute('onclick')?.match(/'(.+)'/)?.[1];
+
     if (field !== state.sortField) {
       btn.textContent = '↕';
       return;
     }
+
     btn.textContent = state.sortDir === 'asc' ? '▲' : '▼';
   });
 }
 
 function updateResetUI() {
   const btn = document.querySelector('.reset-btn');
+
   const active =
     Object.keys(state.filters).length > 0 ||
     state.attivo !== 'all' ||
-    state.sortField !== null;
+    state.sortField !== 'nome';
 
   btn.classList.toggle('active', active);
   btn.textContent = active ? '↺' : '•';
@@ -377,6 +407,7 @@ function updateResetUI() {
 
 function updateStatusUI() {
   const btn = document.getElementById('attivoBtn');
+
   if (state.attivo === 'all') btn.textContent = '●';
   if (state.attivo === 'true') btn.textContent = '✔';
   if (state.attivo === 'false') btn.textContent = '✖';
