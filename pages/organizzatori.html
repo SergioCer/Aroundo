@@ -150,7 +150,7 @@ td {
   <col style="width: 160px;">
   <col style="width: 140px;">
   <col style="width: 180px;">
-  <col style="width: 80px;">
+  <col style="width: 60px;">
 </colgroup>
 
 <thead>
@@ -161,11 +161,10 @@ td {
     <div class="col-header">
       <div class="col-title">
         ID
-        <button class="sort-btn" data-field="id" onclick="sort('id')">↕</button>
+        <!-- CANCELLARE  button class="sort-btn" data-field="id" onclick="sort('id')">↕</button -->
       </div>
       <div class="col-tools">
         <button class="reset-btn" onclick="resetAll()">•</button>
-        <button class="status-filter" onclick="toggleAttivo()" id="attivoBtn">●</button>
       </div>
     </div>
   </th>
@@ -234,6 +233,9 @@ td {
     <div class="col-header">
       <div class="col-title">
         Stato
+      </div>  
+      <div class="col-tools">
+        <button class="status-filter" onclick="toggleAttivo()" id="attivoBtn">●</button>
       </div>
     </div>
   </th>
