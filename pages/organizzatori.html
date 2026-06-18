@@ -253,7 +253,7 @@ let data = [];
 
 let state = {
   filters: {},
-  sortField: 'nome',
+  sortField: null,
   sortDir: 'asc',
   attivo: 'all'
 };
@@ -261,6 +261,9 @@ let state = {
 async function load() {
   const { data: rows } = await supabase.from('organizzatori').select('*');
   data = rows || [];
+  data.sort((a,b) =>
+    (a.or_nome || '').localeCompare(b.or_nome || '')
+  );
   render();
 }
 
@@ -392,7 +395,7 @@ function updateResetUI() {
   const active =
     Object.keys(state.filters).length > 0 ||
     state.attivo !== 'all' ||
-    state.sortField !== 'nome';
+    state.sortField !== null ||
 
   btn.classList.toggle('active', active);
 
