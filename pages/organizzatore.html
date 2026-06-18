@@ -137,6 +137,9 @@ input, textarea {
   <div class="section-title">Sito web</div>
   <input id="or_sito_web" oninput="markDirty()">
 
+  <div class="section-title">Note</div>
+  <textarea id="or_note" oninput="markDirty()"></textarea>
+
   <!-- STATO -->
   <div class="section-title">Stato</div>
   <div class="status-box" onclick="toggleAttivo()">
@@ -195,6 +198,7 @@ async function load() {
   or_telefono.value = data.or_telefono || '';
   or_sito_web.value = data.or_sito_web || '';
   or_copertina.value = data.or_copertina || '';
+  or_note.value = data.or_note || '';
 
   updateStatus(data.or_attivo);
   updatePreview();
@@ -236,6 +240,7 @@ window.markDirty = () => {
     or_email: or_email.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
+    or_note: or_note.value,
     or_copertina: or_copertina.value,
     or_attivo: document.body.dataset.attivo === 'true'
   });
@@ -254,6 +259,7 @@ async function save() {
     or_email: or_email.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
+    or_note: or_note.value,
     or_copertina: or_copertina.value,
     or_attivo: document.body.dataset.attivo === 'true'
   };
