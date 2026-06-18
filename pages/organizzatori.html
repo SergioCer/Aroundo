@@ -269,14 +269,12 @@ async function load() {
 
 /* SORT */
 window.sort = (field) => {
-
   if (state.sortField !== field) {
     state.sortField = field;
     state.sortDir = 'asc';
   } else {
     state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
   }
-
   render();
   syncUI();
 };
@@ -291,10 +289,9 @@ window.setFilter = (k,v) => {
 /* RESET */
 window.resetAll = () => {
   state.filters = {};
-  state.sortField = 'nome';
+  state.sortField !== null ||
   state.sortDir = 'asc';
   state.attivo = 'all';
-
   document.querySelectorAll('.filter').forEach(i => i.value = '');
   render();
   syncUI();
@@ -305,26 +302,20 @@ window.toggleAttivo = () => {
   if (state.attivo === 'all') state.attivo = 'true';
   else if (state.attivo === 'true') state.attivo = 'false';
   else state.attivo = 'all';
-
   render();
   syncUI();
 };
 
 /* RENDER */
 function render() {
-
   let filtered = [...data];
-
   if (state.attivo === 'true')
     filtered = filtered.filter(r => r.or_attivo === true);
-
   if (state.attivo === 'false')
     filtered = filtered.filter(r => r.or_attivo === false);
-
   Object.keys(state.filters).forEach(k => {
     const v = state.filters[k]?.toLowerCase();
     if (!v) return;
-
     filtered = filtered.filter(r => {
       if (k === 'nome') return (r.or_nome||'').toLowerCase().includes(v);
       if (k === 'descrizione') return (r.or_descrizione||'').toLowerCase().includes(v);
@@ -334,28 +325,21 @@ function render() {
       return true;
     });
   });
-
   filtered.sort((a,b) => {
     let va = (a['or_' + state.sortField] || '').toString().toLowerCase();
     let vb = (b['or_' + state.sortField] || '').toString().toLowerCase();
-
     return state.sortDir === 'asc'
       ? va.localeCompare(vb)
       : vb.localeCompare(va);
   });
-
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
-
   filtered.forEach(r => {
-
     const stato = r.or_attivo
       ? '<span class="status-ok">✔</span>'
       : '<span class="status-no">✖</span>';
-
     const tr = document.createElement('tr');
     tr.onclick = () => location.href = `organizzatore.html?id=${r.id_organizzatore}`;
-
     tr.innerHTML = `
       <td>${r.id_organizzatore}</td>
       <td>${r.or_nome||''}</td>
@@ -365,7 +349,6 @@ function render() {
       <td>${r.or_note||''}</td>
       <td style="text-align:center">${stato}</td>
     `;
-
     tbody.appendChild(tr);
   });
 
@@ -378,12 +361,10 @@ function render() {
 function updateSortUI() {
   document.querySelectorAll('.sort-btn').forEach(btn => {
     const field = btn.getAttribute('onclick')?.match(/'(.+)'/)?.[1];
-
     if (field !== state.sortField) {
       btn.textContent = '↕';
       return;
     }
-
     btn.textContent = state.sortDir === 'asc' ? '▲' : '▼';
   });
 }
@@ -391,21 +372,17 @@ function updateSortUI() {
 /* RESET UI */
 function updateResetUI() {
   const btn = document.querySelector('.reset-btn');
-
   const active =
     Object.keys(state.filters).length > 0 ||
     state.attivo !== 'all' ||
     state.sortField !== null ||
-
   btn.classList.toggle('active', active);
-
   btn.textContent = active ? '↺' : '•';
 }
 
 /* STATUS UI */
 function updateStatusUI() {
   const btn = document.getElementById('attivoBtn');
-
   if (state.attivo === 'all') btn.textContent = '●';
   if (state.attivo === 'true') btn.textContent = '✔';
   if (state.attivo === 'false') btn.textContent = '✖';
