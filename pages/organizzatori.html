@@ -142,10 +142,10 @@ td {
   <col style="width: 30px;">
   <col style="width: 140px;">
   <col style="width: 160px;">
-  <col style="width: 150px;">
   <col style="width: 120px;">
   <col style="width: 120px;">
-  <col style="width: 60px;">
+  <col style="width: 160px;">
+  <col style="width: 40px;">
 </colgroup>
 
 <thead>
@@ -251,7 +251,7 @@ let data = [];
 
 let state = {
   filters: {},
-  sortField: 'nome',
+  sortField: null,
   sortDir: 'asc',
   attivo: 'all'
 };
@@ -293,7 +293,7 @@ window.setFilter = (k,v) => {
 /* RESET */
 window.resetAll = () => {
   state.filters = {};
-  state.sortField = 'nome';
+  state.sortField = null;
   state.sortDir = 'asc';
   state.attivo = 'all';
 
@@ -399,7 +399,7 @@ function updateResetUI() {
   const active =
     Object.keys(state.filters).length > 0 ||
     state.attivo !== 'all' ||
-    state.sortField !== 'nome';
+    state.sortField !== null;
 
   btn.classList.toggle('active', active);
   btn.textContent = active ? '↺' : '•';
