@@ -274,7 +274,7 @@ textarea {
   <th>
     <div class="col-header">
       <div class="col-title">
-        Capacità:
+        Capienza:
         <button class="sort-btn" data-field="cap" onclick="sort('cap')">↕</button>
       </div>
       <div class="col-tools">
@@ -355,7 +355,7 @@ function render() {
       if (k === 'note')
         return (r.lu_note || '').toLowerCase().includes(v);
       if (k === 'cap')
-        return (r.lu_capacita_massima || '').toString().startsWith(v);
+        return (r.lu_capienza || '').toString().startsWith(v);
       return true;
     });
   });
@@ -397,7 +397,7 @@ if (state.sortField) {
       <td>${r.lu_lat}</td>
       <td>${r.lu_lng}</td>
       <td>${r.lu_note || ''}</td>
-      <td>${r.lu_capacita_massima || ''}</td>
+      <td>${r.lu_capienza || ''}</td>
     `;
     tbody.appendChild(tr);
   });
