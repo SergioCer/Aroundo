@@ -157,20 +157,21 @@ td {
 <tr>
 
   <!-- ID + RESET + STATUS FILTER SOTTO -->
-  <th>
-    <div class="col-header">{
-  justify-content: center;
- }
-      <div class="col-title">{
+th:first-child .col-header {
+  align-items: center;
+}
+
+  th:first-child .col-title {
   justify-content: center;
   width: 100%;
 }
         ID
         <!-- CANCELLARE  button class="sort-btn" data-field="id" onclick="sort('id')">↕</button -->
       </div>
-      <div class="col-tools">{
+
+  th:first-child .col-tools {
   justify-content: center;
- }
+}
         <button class="reset-btn" onclick="resetAll()">•</button>
       </div>
     </div>
