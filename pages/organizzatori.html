@@ -75,7 +75,6 @@ td {
 }
 
 .col-title {
-  min-width: 0;
   font-weight: bold;
   font-size: 14px;
   display: flex;
@@ -86,7 +85,6 @@ td {
 }
 
 .col-tools {
-  min-width: 0;
   display: flex;
   gap: 4px;
   align-items: center;
@@ -98,9 +96,8 @@ td {
   padding: 4px;
 }
 
-/* SORT BUTTON */
+/* SORT */
 .sort-btn {
-  flex-shrink: 0;
   width: 28px;
   height: 28px;
   border-radius: 14px;
@@ -112,10 +109,7 @@ td {
   color: #1e3a8a;
 }
 
-.sort-btn:hover {
-  background: #bfdbfe;
-}
-
+/* RESET */
 .reset-btn {
   width: 28px;
   height: 28px;
@@ -126,8 +120,7 @@ td {
   font-weight: bold;
   background: #f3f4f6;
   color: #374151;
-  transition: 0.2s;
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 .reset-btn.active {
@@ -135,6 +128,22 @@ td {
   color: #111827;
   border-color: #f59e0b;
   opacity: 1;
+}
+
+/* NOTE RIDOTTO */
+.note-col {
+  font-size: 12px;
+  max-width: 120px;
+}
+
+/* STATUS FILTER */
+.status-filter {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  background: #dbeafe;
 }
 </style>
 </head>
@@ -144,8 +153,7 @@ td {
 <div class="header">
   <div class="title">
     Organizzatori
-    <button class="add-btn"
-      onclick="window.location.href='organizzatore.html?new=1'">+</button>
+    <button class="add-btn" onclick="window.location.href='organizzatore.html?new=1'">+</button>
   </div>
 </div>
 
@@ -153,23 +161,26 @@ td {
 
 <colgroup>
   <col style="width: 30px;">
-  <col style="width: 180px;">
-  <col style="width: 180px;">
+  <col style="width: 140px;">
   <col style="width: 160px;">
   <col style="width: 160px;">
+  <col style="width: 140px;">
+  <col style="width: 90px;">
 </colgroup>
 
 <thead>
-
 <tr>
 
+  <!-- ID + RESET sotto -->
   <th>
     <div class="col-header">
       <div class="col-title">
         ID
+        <button class="status-filter" onclick="toggleAttivoFilter()" id="attivoBtn">●</button>
+      </div>
+      <div class="col-tools">
         <button class="reset-btn" onclick="resetAll()">↕</button>
       </div>
-      <div class="col-tools"></div>
     </div>
   </th>
 
@@ -177,7 +188,7 @@ td {
     <div class="col-header">
       <div class="col-title">
         Nome
-        <button class="sort-btn" data-field="nome" onclick="sort('nome')">↕</button>
+        <button class="sort-btn" onclick="sort('nome')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('nome', this.value)">
@@ -189,19 +200,19 @@ td {
     <div class="col-header">
       <div class="col-title">
         Descrizione
-        <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">↕</button>
+        <button class="sort-btn" onclick="sort('descrizione')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('descrizione', this.value)">
       </div>
     </div>
   </th>
-  
+
   <th>
     <div class="col-header">
       <div class="col-title">
         Email
-        <button class="sort-btn" data-field="email" onclick="sort('email')">↕</button>
+        <button class="sort-btn" onclick="sort('email')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('email', this.value)">
@@ -213,7 +224,7 @@ td {
     <div class="col-header">
       <div class="col-title">
         Telefono
-        <button class="sort-btn" data-field="telefono" onclick="sort('telefono')">↕</button>
+        <button class="sort-btn" onclick="sort('telefono')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('telefono', this.value)">
@@ -221,11 +232,11 @@ td {
     </div>
   </th>
 
-  <th>
+  <th class="note-col">
     <div class="col-header">
       <div class="col-title">
         Note
-        <button class="sort-btn" data-field="note" onclick="sort('note')">↕</button>
+        <button class="sort-btn" onclick="sort('note')">↕</button>
       </div>
       <div class="col-tools">
         <input class="filter" oninput="setFilter('note', this.value)">
@@ -234,7 +245,6 @@ td {
   </th>
 
 </tr>
-
 </thead>
 
 <tbody id="tbody"></tbody>
@@ -247,68 +257,86 @@ let data = [];
 
 let state = {
   filters: {},
-  sortField: null,
+  sortField: 'nome',
   sortDir: 'asc',
+  attivoFilter: 'all'
 };
 
-// ---------------- LOAD ----------------
 async function load() {
-  const { data: rows, error } = await supabase
-    .from('organizzatori')
-    .select('*');
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
+  const { data: rows } = await supabase.from('organizzatori').select('*');
   data = rows || [];
-  
-  state.sortField = 'nome';
-  state.sortDir = 'asc';
-  
   render();
 }
 
-// ---------------- RENDER ----------------
+/* FILTER */
+window.setFilter = (k,v) => {
+  state.filters[k] = v;
+  render();
+  syncUI();
+};
+
+/* SORT */
+window.sort = (field) => {
+  if (state.sortField !== field) {
+    state.sortField = field;
+    state.sortDir = 'asc';
+  } else {
+    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  }
+  render();
+  syncUI();
+};
+
+/* RESET */
+window.resetAll = () => {
+  state.filters = {};
+  state.sortField = 'nome';
+  state.sortDir = 'asc';
+  state.attivoFilter = 'all';
+  document.querySelectorAll('.filter').forEach(i => i.value = '');
+  render();
+  syncUI();
+};
+
+/* TRI STATUS */
+window.toggleAttivoFilter = () => {
+  if (state.attivoFilter === 'all') state.attivoFilter = 'true';
+  else if (state.attivoFilter === 'true') state.attivoFilter = 'false';
+  else state.attivoFilter = 'all';
+
+  render();
+  syncUI();
+};
+
+/* RENDER */
 function render() {
 
   let filtered = [...data];
+
+  if (state.attivoFilter === 'true')
+    filtered = filtered.filter(r => r.or_attivo === true);
+
+  if (state.attivoFilter === 'false')
+    filtered = filtered.filter(r => r.or_attivo === false);
 
   Object.keys(state.filters).forEach(k => {
     const v = state.filters[k]?.toLowerCase();
     if (!v) return;
 
     filtered = filtered.filter(r => {
-
-      if (k === 'nome')
-        return (r.or_nome || '').toLowerCase().includes(v);
-      
-      if (k === 'descrizione')
-        return (r.or_descrizione || '').toLowerCase().includes(v);
-
-      if (k === 'email')
-        return (r.or_email || '').toLowerCase().includes(v);
-
-      if (k === 'telefono')
-        return (r.or_telefono || '').toLowerCase().includes(v);
-
-      if (k === 'note')
-        return (r.or_note || '').toLowerCase().includes(v);
-
+      if (k === 'nome') return (r.or_nome||'').toLowerCase().includes(v);
+      if (k === 'descrizione') return (r.or_descrizione||'').toLowerCase().includes(v);
+      if (k === 'email') return (r.or_email||'').toLowerCase().includes(v);
+      if (k === 'telefono') return (r.or_telefono||'').toLowerCase().includes(v);
+      if (k === 'note') return (r.or_note||'').toLowerCase().includes(v);
       return true;
     });
   });
 
   if (state.sortField) {
-    filtered.sort((a,b) => {
-
-      let va = a['or_' + state.sortField];
-      let vb = b['or_' + state.sortField];
-
-      va = (va ?? '').toString().toLowerCase();
-      vb = (vb ?? '').toString().toLowerCase();
-
+    filtered.sort((a,b)=>{
+      let va = (a['or_'+state.sortField]||'').toString().toLowerCase();
+      let vb = (b['or_'+state.sortField]||'').toString().toLowerCase();
       return state.sortDir === 'asc'
         ? va.localeCompare(vb)
         : vb.localeCompare(va);
@@ -318,104 +346,53 @@ function render() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
 
-  filtered.forEach(r => {
+  filtered.forEach(r=>{
     const tr = document.createElement('tr');
-
-    tr.onclick = () => {
-      window.location.href = `organizzatore.html?id=${r.id_organizzatore}`;
-    };
+    tr.onclick = () => location.href = `organizzatore.html?id=${r.id_organizzatore}`;
 
     tr.innerHTML = `
       <td>${r.id_organizzatore}</td>
-      <td>${r.or_nome || ''}</td>
-      <td>${r.or_descrizione || ''}</td>
-      <td>${r.or_email || ''}</td>
-      <td>${r.or_telefono || ''}</td>
-      <td>${r.or_note || ''}</td>
+      <td>${r.or_nome||''}</td>
+      <td>${r.or_descrizione||''}</td>
+      <td>${r.or_email||''}</td>
+      <td>${r.or_telefono||''}</td>
+      <td>${r.or_note||''}</td>
     `;
 
     tbody.appendChild(tr);
   });
+
+  updateAttivoBtn();
+  updateResetBtn();
 }
 
-// ---------------- FILTER ----------------
-window.setFilter = (k,v) => {
-  state.filters[k] = v;
-  render();
-  syncUI();
-};
-
-// ---------------- SORT ----------------
-window.sort = (field) => {
-
-  if (state.sortField !== field) {
-    state.sortField = field;
-    state.sortDir = 'asc';
-  } else {
-    state.sortDir = state.sortDir === 'asc'
-      ? 'desc'
-      : 'asc';
-  }
-
-  render();
-  syncUI();
-};
-
-// ---------------- RESET ----------------
-window.resetAll = () => {
-
-  state.filters = {};
-  state.sortField = null;
-  state.sortDir = 'asc';
-
-  document.querySelectorAll('.filter')
-    .forEach(i => i.value = '');
-
-  render();
-  syncUI();
-};
-
-// ---------------- UI SYNC ----------------
-function syncUI() {
-  updateSortButtons();
-  updateResetButton();
-}
-
-function updateSortButtons() {
-  document.querySelectorAll('.sort-btn').forEach(btn => {
-    const field = btn.dataset.field;
-
-    if (field !== state.sortField) {
-      btn.textContent = '↕';
-      return;
-    }
-
-    btn.textContent =
-      state.sortDir === 'asc'
-        ? '▼'
-        : '▲';
-  });
-}
-
-function updateResetButton() {
-  const hasFilters =
-    Object.values(state.filters).some(v => v && v.length > 0);
-
-  const hasSort = state.sortField !== null;
-
-  const btn = document.querySelector('.reset-btn');
-
+/* UI */
+function updateAttivoBtn() {
+  const btn = document.getElementById('attivoBtn');
   if (!btn) return;
 
-  const active = hasFilters || hasSort;
-
-  btn.textContent = active ? '↺' : '•';
-  btn.classList.toggle('active', active);
+  if (state.attivoFilter === 'all') btn.textContent = '●';
+  if (state.attivoFilter === 'true') btn.textContent = '✔';
+  if (state.attivoFilter === 'false') btn.textContent = '✖';
 }
 
-await load();
-syncUI();
+function updateResetBtn() {
+  const btn = document.querySelector('.reset-btn');
+  const active =
+    Object.keys(state.filters).length ||
+    state.sortField !== 'nome' ||
+    state.attivoFilter !== 'all';
 
+  btn.classList.toggle('active', active);
+  btn.textContent = active ? '↺' : '•';
+}
+
+function syncUI() {
+  updateAttivoBtn();
+  updateResetBtn();
+}
+
+load();
 </script>
 
 </body>
