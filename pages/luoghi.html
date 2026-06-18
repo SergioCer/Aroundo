@@ -357,8 +357,8 @@ function render() {
     if (!v) return;
     filtered = filtered.filter(r => {
       if (k === 'comune') {
-        return (comuniMap[r.lu_comune] || '').toLowerCase() === state.filters[k].toLowerCase();
-        }
+        return (comuniMap[r.lu_comune] || '').toLowerCase().includes(v);
+      }
       if (k === 'location')
         return (r.lu_location || '').toLowerCase().includes(v);
       if (k === 'descrizione')
