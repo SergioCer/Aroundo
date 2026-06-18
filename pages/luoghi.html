@@ -372,8 +372,13 @@ if (state.sortField) {
     } 
     // 🔵 tutti gli altri campi
     else {
-      va = a['lu_' + state.sortField];
-      vb = b['lu_' + state.sortField];
+      if (state.sortField === 'cap') {
+        va = a.lu_capienza;
+        vb = b.lu_capienza;
+      } else {
+        va = a['lu_' + state.sortField];
+        vb = b['lu_' + state.sortField];
+      } 
     }
     // 🔥 NUMERI
     if (numericFields.includes(state.sortField)) {
