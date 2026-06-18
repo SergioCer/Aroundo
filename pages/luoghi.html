@@ -1,0 +1,110 @@
+<thead>
+<tr>
+
+  <!-- ID -->
+  <th>
+    <div class="col-header">
+      <div class="col-title" style="justify-content:center;">
+        ID
+      </div>
+      <div class="col-tools" style="justify-content:center;">
+        <button class="reset-btn" onclick="resetAll()">•</button>
+      </div>
+    </div>
+  </th>
+
+  <!-- COMUNE -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Comune
+        <button class="sort-btn" onclick="sort('comune')">↕</button>
+      </div>
+      <div class="col-tools">
+        <select id="filter_comune" class="filter" onchange="setFilter('comune', this.value)">
+          <option value="">Tutti</option>
+        </select>
+      </div>
+    </div>
+  </th>
+
+  <!-- LOCATION -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Location
+        <button class="sort-btn" onclick="sort('location')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('location', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- DESCRIZIONE -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Descrizione
+        <button class="sort-btn" onclick="sort('descrizione')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('descrizione', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- LAT -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Lat
+        <button class="sort-btn" onclick="sort('lat')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('lat', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- LNG -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Lng
+        <button class="sort-btn" onclick="sort('lng')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('lng', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- NOTE -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Note
+        <button class="sort-btn" onclick="sort('note')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('note', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- CAPIENZA -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Capienza
+        <button class="sort-btn" onclick="sort('cap')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('cap', this.value)">
+      </div>
+    </div>
+  </th>
+
+</tr>
+</thead>
