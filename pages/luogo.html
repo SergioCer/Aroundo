@@ -141,7 +141,7 @@ input, select, textarea {
 
 <!-- RIGA 1: LABEL -->
 <div style="display:flex; font-size: 11px; gap:20px; margin-bottom:4px;">
-  <div style="flex:1;">Capacità:</div>
+  <div style="flex:1;">Capienza:</div>
   <div style="flex:1;">Lat:</div>
   <div style="flex:1;">Lng:</div>
   <div style="width:70px;"></div>
@@ -151,7 +151,7 @@ input, select, textarea {
 <div style="display:flex; gap:20px; align-items:center;">
 
   <div style="flex:1;">
-    <input id="lu_capacita_massima" oninput="markDirty()">
+    <input id="lu_capienza" oninput="markDirty()">
   </div>
 
   <div style="flex:1;">
@@ -220,7 +220,7 @@ async function load() {
   lu_note.value = data.lu_note || '';
   lu_lat.value = data.lu_lat || '';
   lu_lng.value = data.lu_lng || '';
-  lu_capacita_massima.value = data.lu_capacita_massima || '';
+  lu_capienza.value = data.lu_capienza || '';
   document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
 }
 
@@ -233,7 +233,7 @@ window.markDirty = () => {
     lu_note: lu_note.value,
     lu_lat: lu_lat.value,
     lu_lng: lu_lng.value,
-    lu_capacita_massima: lu_capacita_massima.value
+    lu_capienza: lu_capienza.value
   });
 
   dirty = current !== original;
@@ -251,8 +251,8 @@ async function save() {
     lu_note: lu_note.value,
     lu_lat: lu_lat.value ? parseFloat(lu_lat.value) : null,
     lu_lng: lu_lng.value ? parseFloat(lu_lng.value) : null,
-    lu_capacita_massima: lu_capacita_massima.value
-      ? parseInt(lu_capacita_massima.value)
+    lu_capienza: lu_capienza.value
+      ? parseInt(lu_capienza.value)
       : null
   };
 
