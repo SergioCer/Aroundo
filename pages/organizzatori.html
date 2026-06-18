@@ -188,6 +188,18 @@ td {
   <th>
     <div class="col-header">
       <div class="col-title">
+        Descrizione
+        <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('descrizione', this.value)">
+      </div>
+    </div>
+  </th>
+  
+  <th>
+    <div class="col-header">
+      <div class="col-title">
         Email
         <button class="sort-btn" data-field="email" onclick="sort('email')">↕</button>
       </div>
@@ -251,6 +263,10 @@ async function load() {
   }
 
   data = rows || [];
+  
+  state.sortField = 'nome';
+  state.sortDir = 'asc';
+  
   render();
 }
 
@@ -267,6 +283,9 @@ function render() {
 
       if (k === 'nome')
         return (r.or_nome || '').toLowerCase().includes(v);
+      
+      if (k === 'descrizione')
+        return (r.or_descrizione || '').toLowerCase().includes(v);
 
       if (k === 'email')
         return (r.or_email || '').toLowerCase().includes(v);
@@ -309,6 +328,7 @@ function render() {
     tr.innerHTML = `
       <td>${r.id_organizzatore}</td>
       <td>${r.or_nome || ''}</td>
+      <td>${r.or_descrizione || ''}</td>
       <td>${r.or_email || ''}</td>
       <td>${r.or_telefono || ''}</td>
       <td>${r.or_note || ''}</td>
