@@ -15,7 +15,6 @@ body {
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 12px;
 }
 
@@ -49,7 +48,6 @@ table {
 th, td {
   padding: 6px;
   border-bottom: 1px solid #e5e7eb;
-  text-align: left;
   overflow: hidden;
 }
 
@@ -63,7 +61,7 @@ td {
   text-overflow: ellipsis;
 }
 
-/* HEADER COL */
+/* HEADER STRUCT */
 .col-header {
   display: flex;
   flex-direction: column;
@@ -71,11 +69,10 @@ td {
 }
 
 .col-title {
-  font-weight: bold;
-  font-size: 14px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .col-tools {
@@ -89,7 +86,7 @@ td {
   padding: 4px;
 }
 
-/* SORT */
+/* SORT BUTTON */
 .sort-btn {
   width: 28px;
   height: 28px;
@@ -107,6 +104,7 @@ td {
   border: 1px solid #d1d5db;
   background: #f3f4f6;
   opacity: 0.5;
+  cursor: pointer;
 }
 
 .reset-btn.active {
@@ -114,20 +112,14 @@ td {
   opacity: 1;
 }
 
-/* NOTE MEDIO */
-.note-col {
-  font-size: 13px;
-  max-width: 180px;
-}
-
-/* STATO COL */
+/* STATUS */
 .status-cell {
   text-align: center;
   font-size: 16px;
 }
 
-.status-ok { color: #22c55e; font-weight: bold; }
-.status-no { color: #ef4444; font-weight: bold; }
+.status-ok { color: #22c55e; }
+.status-no { color: #ef4444; }
 
 .status-filter {
   width: 28px;
@@ -145,7 +137,7 @@ td {
 <div class="header">
   <div class="title">
     Organizzatori
-    <button class="add-btn" onclick="window.location.href='organizzatore.html?new=1'">+</button>
+    <button class="add-btn" onclick="location.href='organizzatore.html?new=1'">+</button>
   </div>
 </div>
 
@@ -164,22 +156,24 @@ td {
 <thead>
 <tr>
 
-  <!-- ID + RESET sotto -->
+  <!-- ID + RESET + STATUS FILTER SOTTO -->
   <th>
     <div class="col-header">
       <div class="col-title">
         ID
-        <button class="sort-btn" onclick="sort('nome')">↕</button>
+        <button class="sort-btn" data-field="id" onclick="sort('id')">↕</button>
       </div>
       <div class="col-tools">
-        <button class="reset-btn" onclick="resetAll()">↺</button>
+        <button class="reset-btn" onclick="resetAll()">•</button>
+        <button class="status-filter" onclick="toggleAttivo()" id="attivoBtn">●</button>
       </div>
     </div>
   </th>
 
   <th>
     <div class="col-header">
-      <div class="col-title">Nome
+      <div class="col-title">
+        Nome
         <button class="sort-btn" onclick="sort('nome')">↕</button>
       </div>
       <div class="col-tools">
@@ -190,7 +184,8 @@ td {
 
   <th>
     <div class="col-header">
-      <div class="col-title">Descrizione
+      <div class="col-title">
+        Descrizione
         <button class="sort-btn" onclick="sort('descrizione')">↕</button>
       </div>
       <div class="col-tools">
@@ -201,7 +196,8 @@ td {
 
   <th>
     <div class="col-header">
-      <div class="col-title">Email
+      <div class="col-title">
+        Email
         <button class="sort-btn" onclick="sort('email')">↕</button>
       </div>
       <div class="col-tools">
@@ -212,7 +208,8 @@ td {
 
   <th>
     <div class="col-header">
-      <div class="col-title">Telefono
+      <div class="col-title">
+        Telefono
         <button class="sort-btn" onclick="sort('telefono')">↕</button>
       </div>
       <div class="col-tools">
@@ -221,9 +218,10 @@ td {
     </div>
   </th>
 
-  <th class="note-col">
+  <th>
     <div class="col-header">
-      <div class="col-title">Note
+      <div class="col-title">
+        Note
         <button class="sort-btn" onclick="sort('note')">↕</button>
       </div>
       <div class="col-tools">
@@ -232,14 +230,11 @@ td {
     </div>
   </th>
 
-  <!-- STATO COLONNA -->
   <th>
     <div class="col-header">
       <div class="col-title">
         Stato
-        <button class="status-filter" onclick="toggleAttivo()" id="attivoBtn">●</button>
       </div>
-      <div class="col-tools"></div>
     </div>
   </th>
 
@@ -267,115 +262,155 @@ async function load() {
   render();
 }
 
-/* FILTER */
-window.setFilter = (k,v)=>{
-  state.filters[k]=v;
+/* SORT */
+window.sort = (field) => {
+
+  if (state.sortField !== field) {
+    state.sortField = field;
+    state.sortDir = 'asc';
+  } else {
+    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  }
+
   render();
-  sync();
+  syncUI();
 };
 
-/* SORT */
-window.sort = (f)=>{
-  if(state.sortField!==f){
-    state.sortField=f;
-    state.sortDir='asc';
-  } else {
-    state.sortDir = state.sortDir==='asc'?'desc':'asc';
-  }
+/* FILTER */
+window.setFilter = (k,v) => {
+  state.filters[k] = v;
   render();
-  sync();
+  syncUI();
 };
 
 /* RESET */
-window.resetAll = ()=>{
-  state.filters={};
-  state.sortField='nome';
-  state.sortDir='asc';
-  state.attivo='all';
-  document.querySelectorAll('.filter').forEach(i=>i.value='');
+window.resetAll = () => {
+  state.filters = {};
+  state.sortField = 'nome';
+  state.sortDir = 'asc';
+  state.attivo = 'all';
+
+  document.querySelectorAll('.filter').forEach(i => i.value = '');
   render();
-  sync();
+  syncUI();
 };
 
-/* ATTIVO FILTER */
-window.toggleAttivo = ()=>{
-  if(state.attivo==='all') state.attivo='true';
-  else if(state.attivo==='true') state.attivo='false';
-  else state.attivo='all';
+/* STATUS FILTER */
+window.toggleAttivo = () => {
+  if (state.attivo === 'all') state.attivo = 'true';
+  else if (state.attivo === 'true') state.attivo = 'false';
+  else state.attivo = 'all';
 
   render();
-  sync();
+  syncUI();
 };
 
 /* RENDER */
-function render(){
+function render() {
 
-  let filtered=[...data];
+  let filtered = [...data];
 
-  if(state.attivo==='true')
-    filtered=filtered.filter(r=>r.or_attivo===true);
+  if (state.attivo === 'true')
+    filtered = filtered.filter(r => r.or_attivo === true);
 
-  if(state.attivo==='false')
-    filtered=filtered.filter(r=>r.or_attivo===false);
+  if (state.attivo === 'false')
+    filtered = filtered.filter(r => r.or_attivo === false);
 
-  Object.keys(state.filters).forEach(k=>{
-    const v=state.filters[k]?.toLowerCase();
-    if(!v) return;
+  Object.keys(state.filters).forEach(k => {
+    const v = state.filters[k]?.toLowerCase();
+    if (!v) return;
 
-    filtered=filtered.filter(r=>{
-      if(k==='nome') return (r.or_nome||'').toLowerCase().includes(v);
-      if(k==='descrizione') return (r.or_descrizione||'').toLowerCase().includes(v);
-      if(k==='email') return (r.or_email||'').toLowerCase().includes(v);
-      if(k==='telefono') return (r.or_telefono||'').toLowerCase().includes(v);
-      if(k==='note') return (r.or_note||'').toLowerCase().includes(v);
+    filtered = filtered.filter(r => {
+      if (k === 'nome') return (r.or_nome||'').toLowerCase().includes(v);
+      if (k === 'descrizione') return (r.or_descrizione||'').toLowerCase().includes(v);
+      if (k === 'email') return (r.or_email||'').toLowerCase().includes(v);
+      if (k === 'telefono') return (r.or_telefono||'').toLowerCase().includes(v);
+      if (k === 'note') return (r.or_note||'').toLowerCase().includes(v);
       return true;
     });
   });
 
-  filtered.sort((a,b)=>{
-    let va=(a['or_'+state.sortField]||'').toLowerCase();
-    let vb=(b['or_'+state.sortField]||'').toLowerCase();
-    return state.sortDir==='asc'
+  filtered.sort((a,b) => {
+    let va = (a['or_' + state.sortField] || '').toString().toLowerCase();
+    let vb = (b['or_' + state.sortField] || '').toString().toLowerCase();
+
+    return state.sortDir === 'asc'
       ? va.localeCompare(vb)
       : vb.localeCompare(va);
   });
 
-  const tbody=document.getElementById('tbody');
-  tbody.innerHTML='';
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
 
-  filtered.forEach(r=>{
-    const tr=document.createElement('tr');
+  filtered.forEach(r => {
 
-    tr.onclick=()=>location.href=`organizzatore.html?id=${r.id_organizzatore}`;
+    const stato = r.or_attivo
+      ? '<span class="status-ok">✔</span>'
+      : '<span class="status-no">✖</span>';
 
-    tr.innerHTML=`
+    const tr = document.createElement('tr');
+    tr.onclick = () => location.href = `organizzatore.html?id=${r.id_organizzatore}`;
+
+    tr.innerHTML = `
       <td>${r.id_organizzatore}</td>
       <td>${r.or_nome||''}</td>
       <td>${r.or_descrizione||''}</td>
       <td>${r.or_email||''}</td>
       <td>${r.or_telefono||''}</td>
       <td>${r.or_note||''}</td>
-      <td class="status-cell">
-        ${r.or_attivo ? '<span class="status-ok">✔</span>' : '<span class="status-no">✖</span>'}
-      </td>
+      <td style="text-align:center">${stato}</td>
     `;
 
     tbody.appendChild(tr);
   });
 
-  updateAttivoBtn();
+  updateSortUI();
+  updateResetUI();
+  updateStatusUI();
 }
 
-/* UI */
-function updateAttivoBtn(){
-  const b=document.getElementById('attivoBtn');
-  if(state.attivo==='all') b.textContent='●';
-  if(state.attivo==='true') b.textContent='✔';
-  if(state.attivo==='false') b.textContent='✖';
+/* SORT UI */
+function updateSortUI() {
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    const field = btn.getAttribute('onclick')?.match(/'(.+)'/)?.[1];
+
+    if (field !== state.sortField) {
+      btn.textContent = '↕';
+      return;
+    }
+
+    btn.textContent = state.sortDir === 'asc' ? '▲' : '▼';
+  });
 }
 
-function sync(){
-  updateAttivoBtn();
+/* RESET UI */
+function updateResetUI() {
+  const btn = document.querySelector('.reset-btn');
+
+  const active =
+    Object.keys(state.filters).length > 0 ||
+    state.attivo !== 'all' ||
+    state.sortField !== 'nome';
+
+  btn.classList.toggle('active', active);
+
+  btn.textContent = active ? '↺' : '•';
+}
+
+/* STATUS UI */
+function updateStatusUI() {
+  const btn = document.getElementById('attivoBtn');
+
+  if (state.attivo === 'all') btn.textContent = '●';
+  if (state.attivo === 'true') btn.textContent = '✔';
+  if (state.attivo === 'false') btn.textContent = '✖';
+}
+
+/* SYNC */
+function syncUI() {
+  updateSortUI();
+  updateResetUI();
+  updateStatusUI();
 }
 
 load();
