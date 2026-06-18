@@ -1,3 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Luoghi Admin</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f6f8fb;
+  margin: 0;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.add-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #22c55e;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  table-layout: fixed;
+}
+
+th, td {
+  padding: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  overflow: hidden;
+}
+
+/* FILTER + SORT ROW */
+.col-header {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.col-title {
+  min-width: 0;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* input + sort inline */
+.col-tools {
+  min-width: 0;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.filter {
+  flex: 1;
+  font-size: 12px;
+  padding: 4px;
+}
+
+/* SORT BUTTON */
+.sort-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.sort-btn:hover {
+  background: #bfdbfe;
+}
+
+.reset-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background: #f3f4f6;
+  color: #374151;
+  transition: 0.2s;
+  opacity: 0.4;
+}
+
+.reset-btn:hover {
+  background: #e5e7eb;
+}
+
+.reset-btn.active {
+  background: #fbbf24;
+  color: #111827;
+  border-color: #f59e0b;
+  opacity: 1;
+}  
+  
+/* TABLE ROW */
+tr:hover {
+  background: #eef6ff;
+  cursor: pointer;
+}
+
+th {
+  white-space: normal;
+  overflow: hidden;
+}
+  
+td {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}  
+
+label {
+  font-size: 12px;
+  color: #374151;
+  margin-top: 6px;
+}
+
+input, select, textarea {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 13px;
+}
+
+textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="title">
+    <button class="add-btn" onclick="window.location.href='../tabelle.html'">←</button>
+    Luoghi
+    <button class="add-btn" onclick="window.location.href='luogo.html?new=1'">+</button>
+  </div>
+</div>
+
+<table>
+<colgroup>
+  <col style="width: 30px;">
+  <col style="width: 140px;">
+  <col style="width: 140px;">
+  <col style="width: 180px;">
+  <col style="width: 80px;">
+  <col style="width: 80px;">
+  <col style="width: 160px;">
+  <col style="width: 70px;">
+</colgroup>
+
 <thead>
 <tr>
 
@@ -108,3 +298,204 @@
 
 </tr>
 </thead>
+
+<tbody id="tbody"></tbody>
+</table>
+
+<script type="module">
+import { supabase } from '../supabase.js';
+
+let data = [];
+let comuni = [];
+
+let state = {
+  filters: {},
+  sortField: null,
+  sortDir: 'asc',
+  dirty: false,
+};
+
+let comuniMap = {};  
+  
+// ---------------- COMUNI ----------------
+async function loadComuni() {
+  const { data: rows, error } = await supabase.from('comuni').select('*');
+  if (error) {
+    console.error(error);
+    return;
+  }
+    comuni = rows || [];
+      const sel = document.getElementById("filter_comune");
+    sel.innerHTML = `<option value="">Tutti</option>` +
+      (rows || []).map(c =>
+        `<option value="${c.co_descrizione}">${c.co_descrizione}</option>`
+      ).join('');
+    comuniMap = Object.fromEntries(
+    comuni.map(c => [c.id_comune, c.co_descrizione])
+  );
+}
+  
+// ---------------- LOAD ----------------
+async function load() {
+  const { data: rows, error } = await supabase.from('luoghi').select('*');
+  if (error) {
+    console.error(error);
+    return;
+  }
+  data = rows || [];
+    data.sort((a, b) =>
+    (comuniMap[a.lu_comune] || '').localeCompare(
+      comuniMap[b.lu_comune] || ''
+    )
+  );
+  render()
+}
+
+// ---------------- RENDER ----------------
+function render() {
+  let filtered = [...data];
+  Object.keys(state.filters).forEach(k => {
+    const v = state.filters[k]?.toLowerCase();
+    if (!v) return;
+    filtered = filtered.filter(r => {
+      if (k === 'comune') {
+        return (comuniMap[r.lu_comune] || '') === state.filters[k];
+        }
+      if (k === 'location')
+        return (r.lu_location || '').toLowerCase().includes(v);
+      if (k === 'descrizione')
+        return (r.lu_descrizione || '').toLowerCase().includes(v);
+      if (k === 'lat')
+        return (r.lu_lat || '').toString().startsWith(v);
+      if (k === 'lng')
+        return (r.lu_lng || '').toString().startsWith(v);
+      if (k === 'note')
+        return (r.lu_note || '').toLowerCase().includes(v);
+      if (k === 'cap')
+        return (r.lu_capienza || '').toString().startsWith(v);
+      return true;
+    });
+  });
+
+if (state.sortField) {
+  const numericFields = ['cap', 'lat', 'lng'];
+  filtered.sort((a, b) => {
+    let va, vb;
+    // 🟡 caso speciale: comune (label da mappa)
+    if (state.sortField === 'comune') {
+      va = comuniMap[a.lu_comune] || '';
+      vb = comuniMap[b.lu_comune] || '';
+    } 
+    // 🔵 tutti gli altri campi
+    else {
+      if (state.sortField === 'cap') {
+        va = a.lu_capienza;
+        vb = b.lu_capienza;
+      } else {
+        va = a['lu_' + state.sortField];
+        vb = b['lu_' + state.sortField];
+      } 
+    }
+    // 🔥 NUMERI
+    if (numericFields.includes(state.sortField)) {
+      va = Number(va ?? 0);
+      vb = Number(vb ?? 0);
+      return state.sortDir === 'asc'
+        ? va - vb
+        : vb - va;
+    }  
+    va = (va ?? '').toString().toLowerCase();
+    vb = (vb ?? '').toString().toLowerCase();
+    return state.sortDir === 'asc'
+      ? va.localeCompare(vb)
+      : vb.localeCompare(va);
+  });
+}
+
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  filtered.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.onclick = () => {
+      window.location.href = `luogo.html?id=${r.id_luogo}`;
+    };
+    tr.innerHTML = `
+      <td>${r.id_luogo}</td>
+      <td>${comuniMap[r.lu_comune] || ''}</td>
+      <td>${r.lu_location || ''}</td>
+      <td>${r.lu_descrizione || ''}</td>
+      <td>${r.lu_lat}</td>
+      <td>${r.lu_lng}</td>
+      <td>${r.lu_note || ''}</td>
+      <td>${r.lu_capienza || ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ---------------- FILTER ----------------
+window.setFilter = (k,v) => {
+  state.filters[k] = v;
+  render();
+  syncUI();
+};
+
+// ---------------- SORT ----------------
+window.sort = (field) => {
+  if (state.sortField !== field) {
+    state.sortField = field;
+    state.sortDir = 'asc';
+  } else {
+    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  }
+  render();
+  syncUI();
+};
+
+await loadComuni();
+await load();
+updateSortButtons();
+updateResetButton();
+  
+function updateSortButtons() {
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    const field = btn.dataset.field;
+    if (field !== state.sortField) {
+      btn.textContent = '↕';
+      return;
+    }
+    btn.textContent =
+      state.sortDir === 'asc'
+        ? '▲'
+        : '▼';
+  });
+}
+
+function updateResetButton() {
+  const hasFilters =
+    Object.values(state.filters).some(v => v && v.length > 0);
+  const hasSort = state.sortField !== null;
+  const btn = document.querySelector('.reset-btn');
+  if (!btn) return;
+  btn.textContent = (hasFilters || hasSort) ? '↺' : '•';
+  btn.classList.toggle('active', hasFilters || hasSort);
+}
+  
+window.resetAll = () => {
+  state.filters = {};
+  state.sortField = null;
+  state.sortDir = 'asc';
+  document.querySelectorAll('.filter').forEach(i => i.value = '');
+  render();
+  syncUI();
+};
+
+function syncUI() {
+  updateSortButtons();
+  updateResetButton();
+}  
+
+</script>
+</body>
+</html>
