@@ -1182,8 +1182,8 @@ marker.bindPopup(`
         <div style="text-align:center;min-width:220px;font-size:12px;">
         <div style="text-align:center; font-weight:700; font-size:14px; margin-bottom:6px;"> ${e.ev_titolo}</div><hr>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-        <div> Location: ${e.ev_luogo || ''} </div>
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${e.ev_lat},${e.ev_lng}"
+        <div> Location: ${e.luoghi.lu_location || ''} </div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
         target="_blank" class="action-btn map-btn"> Map </a>
       </div>
 
