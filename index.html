@@ -1064,7 +1064,13 @@ document.getElementById("reset-day").addEventListener("click", () => {
       .from('eventi')
       .select(`
       *,
-      organizzatori (or_nome)
+      organizzatori (or_nome),  
+      luoghi (
+      lu_lat,
+      lu_lng,
+      lu_location,
+      id_comune
+      )
       `)
       .eq('ev_attivo', true);
     const { data, error } = await query;  //     
@@ -1074,7 +1080,9 @@ document.getElementById("reset-day").addEventListener("click", () => {
     }
     return data;
   }
-    
+
+console.log(events[0]); // CANCELLARE ALLA FINE 
+  
 // Ricrea i markers 
 function renderEvents() {
   console.log("Aggiorno Markers", new Date().toLocaleTimeString());
