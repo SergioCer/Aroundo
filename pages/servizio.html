@@ -20,6 +20,14 @@ body {
   font-weight: bold;
 }
 
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}  
+
 .back-btn {
   width: 34px;
   height: 34px;
@@ -108,8 +116,10 @@ select {
 <body>
 
 <div class="topbar">
-  <button class="back-btn" onclick="requestBack()">←</button>
-  Servizio
+  <div class="title">
+    <button class="back-btn" onclick="requestBack()">←</button>
+    Servizio
+  </div>
 </div>
 
 <div class="card">
