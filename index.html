@@ -1073,12 +1073,13 @@ document.getElementById("reset-day").addEventListener("click", () => {
       )
       `)
       .eq('ev_attivo', true);
+console.log(events[0]); // CANCELLARE ALLA FINE 
+    
     const { data, error } = await query;  //     
     if (error) {
       console.error("Errore caricamento eventi:", error);
     return [];
     }
-    console.log(events[0]); // CANCELLARE ALLA FINE 
     return data;
   }
 
