@@ -13,28 +13,27 @@ body {
 }
 
 .topbar {
-  padding: 12px 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
 }
 
 .back-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #22c55e;
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
   border: none;
-  color: white;
-  font-size: 24px;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  transition: 0.2s;
 }
 
-.back-btn.dirty {
-  background: #f59e0b;
-}
+.back-btn:hover {
+  background: #d1d5db;
+}  
 
 .hero {
   margin: 10px 15px 8px;
@@ -123,6 +122,7 @@ input, textarea {
 
 <div class="topbar">
   <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
+  Organizzatore
 </div>
 
 <div class="hero">
