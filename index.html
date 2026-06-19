@@ -947,7 +947,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default ok");
+      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
@@ -1273,7 +1273,6 @@ function createIcon(color, state, intensity) {
             }
           }
         });
-      marker._visible = visible; // segna il marker come visibile per il controllo su (updateMarkerState) 
       // CANCELLARE   se soddisfa le due condizioni OK altrimenti rimuove il marker ( Vedi sopra )
       // if (categoryVisible && inTimeRange) {marker.marker.addTo(map);} 
       // else { map.removeLayer(marker.marker); }});
@@ -1790,12 +1789,6 @@ if (state !== 'countdown' && marker.fireworkInterval) {
   clearInterval(marker.fireworkInterval);
   marker.fireworkInterval = null;
 }
-  // dovrebbe cancellare i fireworks del marker. 
-  if (!marker._visible) {
-  if (marker.fireworkInterval) {
-    clearInterval(marker.fireworkInterval);
-    marker.fireworkInterval = null;
-  }
   return;
 }
 }
