@@ -5,31 +5,58 @@
 <title>Servizi Genere</title>
 
 <style>
-body { font-family: Arial; background:#f6f8fb; margin:0; }
+body {
+  font-family: Arial;
+  background: #f6f8fb;
+  margin: 0;
+}
 
 .header {
-  display:flex; justify-content:center; align-items:center; padding:12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
 }
 
 .title {
-  font-size:24px; font-weight:bold; display:flex; gap:20px; align-items:center;
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .bck-btn {
-  width:34px;height:34px;border-radius:17px;border:none;
-  background:#e5e7eb;color:#374151;font-size:18px;font-weight:bold;cursor:pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 table {
-  width:100%; border-collapse:collapse; background:white; table-layout:fixed;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  table-layout: fixed;
 }
 
 td {
-  padding:6px; border-bottom:1px solid #e5e7eb;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  padding: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-tr:hover { background:#eef6ff; cursor:pointer; }
+tr:hover {
+  background: #eef6ff;
+  cursor: pointer;
+}
 </style>
 </head>
 
@@ -43,6 +70,13 @@ tr:hover { background:#eef6ff; cursor:pointer; }
 </div>
 
 <table>
+<colgroup>
+  <col style="width:60px">
+  <col style="width:200px">
+  <col style="width:300px">
+  <col style="width:120px">
+</colgroup>
+
 <tbody id="tbody"></tbody>
 </table>
 
