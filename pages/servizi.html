@@ -2,75 +2,32 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Servizi Genere</title>
+<title>Servizi</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #f6f8fb;
-  margin: 0;
-}
+body { font-family:Arial; background:#f6f8fb; margin:0; }
 
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px;
-}
+.header { display:flex; justify-content:center; padding:12px; font-weight:bold; }
 
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-.bck-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 17px;
-  border: none;
-  background: #e5e7eb;
-  color: #374151;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.bck-btn:hover {
-  background: #d1d5db;
-}
-
-/* TABLE */
 table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  table-layout: fixed;
+  width:100%; border-collapse:collapse; background:white; table-layout:fixed;
 }
 
-th, td {
-  padding: 6px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-  overflow: hidden;
+th,td {
+  padding:6px; border-bottom:1px solid #e5e7eb;
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
 }
 
-tr:hover {
-  background: #eef6ff;
-  cursor: pointer;
-}
+tr:hover { background:#eef6ff; cursor:pointer; }
 
-td {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  border-right: 2px solid #f1f5f9;
+.filter {
+  width:90%; font-size:12px;
 }
-
-td:last-child {
-  border-right: none;
+.sort-btn {
+  width:24px;height:24px;border-radius:12px;border:none;cursor:pointer;
+}
+.reset-btn {
+  width:24px;height:24px;border-radius:12px;border:none;
 }
 </style>
 </head>
@@ -78,19 +35,45 @@ td:last-child {
 <body>
 
 <div class="header">
-  <div class="title">
-    <button class="bck-btn" onclick="window.location.href='../tabelle.html'">←</button>
-    Servizi Genere
-  </div>
+  <button onclick="history.back()">←</button>
+  Servizi
 </div>
 
 <table>
-<colgroup>
-  <col style="width: 60px;">
-  <col style="width: 200px;">
-  <col style="width: 300px;">
-  <col style="width: 120px;">
-</colgroup>
+<thead>
+<tr>
+  <th>ID</th>
+
+  <th>
+    Servizio<br>
+    <button class="sort-btn" data-field="servizio" onclick="sort('servizio')">↕</button>
+    <input class="filter" oninput="setFilter('servizio',this.value)">
+  </th>
+
+  <th>
+    Descrizione<br>
+    <input class="filter" oninput="setFilter('descrizione',this.value)">
+  </th>
+
+  <th>Icona</th>
+
+  <th>
+    Attivo<br>
+    <button class="sort-btn" onclick="sort('attivo')">↕</button>
+    <input class="filter" oninput="setFilter('attivo',this.value)">
+  </th>
+
+  <th>
+    Livello<br>
+    <button class="sort-btn" onclick="sort('livello')">↕</button>
+    <input class="filter" oninput="setFilter('livello',this.value)">
+  </th>
+
+  <th>
+    <button class="reset-btn" onclick="resetAll()">↺</button>
+  </th>
+</tr>
+</thead>
 
 <tbody id="tbody"></tbody>
 </table>
@@ -98,43 +81,108 @@ td:last-child {
 <script type="module">
 import { supabase } from '../supabase.js';
 
+const params = new URLSearchParams(location.search);
+const id_genere = params.get('id_genere');
+
+if (!id_genere) document.body.innerHTML = "ID genere mancante";
+
 let data = [];
 
-async function load() {
-  const { data: rows, error } = await supabase
-    .from('servizi_genere')
-    .select('*');
+let state = {
+  filters: {},
+  sortField: null,
+  sortDir: 'asc'
+};
 
-  if (error) {
-    console.error(error);
-    return;
-  }
+const saved = sessionStorage.getItem('servizi_filters');
+if (saved) state.filters = JSON.parse(saved);
+
+async function load() {
+  const { data: rows } = await supabase
+    .from('servizi')
+    .select('*')
+    .eq('id_genere', id_genere);
 
   data = rows || [];
   render();
 }
 
 function render() {
+  let filtered = [...data];
+
+  Object.keys(state.filters).forEach(k => {
+    const v = state.filters[k]?.toLowerCase();
+    if (!v) return;
+
+    filtered = filtered.filter(r => {
+      if (k==='servizio') return (r.sv_servizio||'').toLowerCase().includes(v);
+      if (k==='descrizione') return (r.sv_descrizione||'').toLowerCase().includes(v);
+      if (k==='attivo') return (r.sv_attivo+'').toLowerCase().includes(v);
+      if (k==='livello') return (r.livello+'').startsWith(v);
+      return true;
+    });
+  });
+
+  if (state.sortField) {
+    filtered.sort((a,b)=>{
+      let va = a['sv_'+state.sortField] ?? a[state.sortField];
+      let vb = b['sv_'+state.sortField] ?? b[state.sortField];
+
+      va=(va??'').toString();
+      vb=(vb??'').toString();
+
+      return state.sortDir==='asc'
+        ? va.localeCompare(vb)
+        : vb.localeCompare(va);
+    });
+  }
+
   const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
 
-  data.forEach(r => {
-    const tr = document.createElement("tr");
+  filtered.forEach(r=>{
+    const tr=document.createElement("tr");
 
-    tr.onclick = () => {
-      window.location.href = `servizi.html?id_genere=${r.id_genere}`;
+    tr.onclick=()=>{
+      window.location.href=`servizio.html?id=${r.id_servizio}`;
     };
 
-    tr.innerHTML = `
-      <td>${r.id_genere}</td>
-      <td>${r.gen_descrizione || ''}</td>
-      <td>${r.gen_descrizione_estesa || ''}</td>
-      <td>${r.gen_icona || ''}</td>
+    tr.innerHTML=`
+      <td>${r.id_servizio}</td>
+      <td>${r.sv_servizio||''}</td>
+      <td>${r.sv_descrizione||''}</td>
+      <td>${r.sv_icona||''}</td>
+      <td>${r.sv_attivo}</td>
+      <td>${r.livello}</td>
+      <td></td>
     `;
 
     tbody.appendChild(tr);
   });
 }
+
+window.setFilter=(k,v)=>{
+  state.filters[k]=v;
+  sessionStorage.setItem('servizi_filters',JSON.stringify(state.filters));
+  render();
+};
+
+window.sort=(f)=>{
+  if(state.sortField!==f){
+    state.sortField=f;
+    state.sortDir='asc';
+  } else {
+    state.sortDir=state.sortDir==='asc'?'desc':'asc';
+  }
+  render();
+};
+
+window.resetAll=()=>{
+  state.filters={};
+  state.sortField=null;
+  sessionStorage.removeItem('servizi_filters');
+  render();
+};
 
 await load();
 </script>
