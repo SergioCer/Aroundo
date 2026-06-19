@@ -1072,7 +1072,8 @@ document.getElementById("reset-day").addEventListener("click", () => {
       lu_lat,
       lu_lng,
       lu_location,
-      id_comune
+      id_comune,
+      comuni (co_descrizione)
       )
       `)
       .eq('ev_attivo', true);
@@ -1596,6 +1597,7 @@ function nextDay() {
           white-space:nowrap;
       ">
         ⏰ ${formatTime(e.ev_inizio)}
+        • ${e.luoghi?.comuni?.co_descrizione || ''}
         • ${e.luoghi.lu_location}
         • ${e.ev_titolo}
         • ${e.ev_descrizione}
