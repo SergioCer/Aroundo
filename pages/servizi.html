@@ -5,73 +5,179 @@
 <title>Servizi</title>
 
 <style>
-body { font-family:Arial; background:#f6f8fb; margin:0; }
+body {
+  font-family: Arial;
+  background: #f6f8fb;
+  margin: 0;
+}
 
-.header { display:flex; justify-content:center; padding:12px; font-weight:bold; }
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.bck-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
 table {
-  width:100%; border-collapse:collapse; background:white; table-layout:fixed;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  table-layout: fixed;
 }
 
-th,td {
-  padding:6px; border-bottom:1px solid #e5e7eb;
-  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+th, td {
+  padding: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  overflow: hidden;
 }
 
-tr:hover { background:#eef6ff; cursor:pointer; }
+.col-header {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.col-title {
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+  font-size:14px;
+}
+
+.col-tools {
+  display:flex;
+  gap:4px;
+}
 
 .filter {
-  width:90%; font-size:12px;
+  width:100%;
+  font-size:12px;
+  padding:6px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
 }
+
 .sort-btn {
-  width:24px;height:24px;border-radius:12px;border:none;cursor:pointer;
+  width:28px;
+  height:28px;
+  border-radius:14px;
+  border:none;
+  background:#dbeafe;
+  cursor:pointer;
 }
+
 .reset-btn {
-  width:24px;height:24px;border-radius:12px;border:none;
+  width:28px;
+  height:28px;
+  border-radius:14px;
+  border:1px solid #d1d5db;
+  background:#f3f4f6;
+  opacity:0.4;
+  cursor:pointer;
 }
+
+.reset-btn.active {
+  background:#fbbf24;
+  opacity:1;
+}
+tr:hover {
+  background:#eef6ff;
+  cursor:pointer;
+}
+
+td {
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  border-right:2px solid #f1f5f9;
+}
+
+td:last-child { border-right:none; }
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <button onclick="history.back()">←</button>
-  Servizi
+  <div class="title">
+    <button class="bck-btn" onclick="history.back()">←</button>
+    Servizi
+  </div>
 </div>
 
 <table>
+
 <thead>
 <tr>
-  <th>ID</th>
 
-  <th>
-    Servizio<br>
-    <button class="sort-btn" data-field="servizio" onclick="sort('servizio')">↕</button>
+<th>ID</th>
+
+<th>
+<div class="col-header">
+  <div class="col-title">
+    Servizio
+    <button class="sort-btn" onclick="sort('servizio')">↕</button>
+  </div>
+  <div class="col-tools">
     <input class="filter" oninput="setFilter('servizio',this.value)">
-  </th>
+  </div>
+</div>
+</th>
 
-  <th>
-    Descrizione<br>
+<th>
+<div class="col-header">
+  <div class="col-title">Descrizione</div>
+  <div class="col-tools">
     <input class="filter" oninput="setFilter('descrizione',this.value)">
-  </th>
+  </div>
+</div>
+</th>
 
-  <th>Icona</th>
+<th>Icona</th>
 
-  <th>
-    Attivo<br>
+<th>
+<div class="col-header">
+  <div class="col-title">
+    Attivo
     <button class="sort-btn" onclick="sort('attivo')">↕</button>
-    <input class="filter" oninput="setFilter('attivo',this.value)">
-  </th>
+  </div>
+</div>
+</th>
 
-  <th>
-    Livello<br>
+<th>
+<div class="col-header">
+  <div class="col-title">
+    Livello
     <button class="sort-btn" onclick="sort('livello')">↕</button>
-    <input class="filter" oninput="setFilter('livello',this.value)">
-  </th>
+  </div>
+</div>
+</th>
 
-  <th>
-    <button class="reset-btn" onclick="resetAll()">↺</button>
-  </th>
+<th>
+<button class="reset-btn" onclick="resetAll()">↺</button>
+</th>
+
 </tr>
 </thead>
 
@@ -84,7 +190,7 @@ import { supabase } from '../supabase.js';
 const params = new URLSearchParams(location.search);
 const id_genere = params.get('id_genere');
 
-if (!id_genere) document.body.innerHTML = "ID genere mancante";
+if (!id_genere) document.body.innerHTML = "ERRORE";
 
 let data = [];
 
@@ -117,7 +223,7 @@ function render() {
     filtered = filtered.filter(r => {
       if (k==='servizio') return (r.sv_servizio||'').toLowerCase().includes(v);
       if (k==='descrizione') return (r.sv_descrizione||'').toLowerCase().includes(v);
-      if (k==='attivo') return (r.sv_attivo+'').toLowerCase().includes(v);
+      if (k==='attivo') return (r.sv_attivo+'').includes(v);
       if (k==='livello') return (r.livello+'').startsWith(v);
       return true;
     });
@@ -125,8 +231,8 @@ function render() {
 
   if (state.sortField) {
     filtered.sort((a,b)=>{
-      let va = a['sv_'+state.sortField] ?? a[state.sortField];
-      let vb = b['sv_'+state.sortField] ?? b[state.sortField];
+      let va=a['sv_'+state.sortField]??a[state.sortField];
+      let vb=b['sv_'+state.sortField]??b[state.sortField];
 
       va=(va??'').toString();
       vb=(vb??'').toString();
@@ -137,8 +243,8 @@ function render() {
     });
   }
 
-  const tbody = document.getElementById("tbody");
-  tbody.innerHTML = "";
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
 
   filtered.forEach(r=>{
     const tr=document.createElement("tr");
