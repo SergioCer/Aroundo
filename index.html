@@ -936,7 +936,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const userLng = pos.coords.longitude;
       // Calcolo approssimativo dello zoom in base agli eventi vicini
       const nearbyEvents = events.filter(e => {
-      const distance = map.distance([userLat, userLng], [e.ev_lat, e.ev_lng]);
+      const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
       return distance <= 25000; // 25 km
       });
       let zoomLevel = 10; // Provincia
