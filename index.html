@@ -925,6 +925,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
   });
   events = await fetchEvents();
+
+console.log(events[0]); // CANCELLARE ALLA FINE 
+  
   // 2. Prova a ottenere la posizione dell'utente
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -1073,8 +1076,6 @@ document.getElementById("reset-day").addEventListener("click", () => {
       )
       `)
       .eq('ev_attivo', true);
-console.log(events[0]); // CANCELLARE ALLA FINE 
-    
     const { data, error } = await query;  //     
     if (error) {
       console.error("Errore caricamento eventi:", error);
