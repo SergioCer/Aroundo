@@ -260,7 +260,7 @@ let state = {
   attivo: 'all'
 };
 
-const savedFilters = sessionStorage.getItem('luoghi_filters');
+const savedFilters = sessionStorage.getItem('organizzatori_filters');
 if (savedFilters) {
   state.filters = JSON.parse(savedFilters);
 }  
@@ -295,7 +295,7 @@ window.sort = (field) => {
 /* FILTER */
 window.setFilter = (k,v) => {
   state.filters[k] = v;
-  sessionStorage.setItem('luoghi_filters', JSON.stringify(state.filters));
+  sessionStorage.setItem('organizzatori_filters', JSON.stringify(state.filters));
   render();
   syncUI();
 };
@@ -306,7 +306,7 @@ window.resetAll = () => {
   state.sortField = null;
   state.sortDir = 'asc';
   state.attivo = 'all';
-  sessionStorage.removeItem('luoghi_filters');
+  sessionStorage.removeItem('organizzatori_filters');
   document.querySelectorAll('.filter').forEach(i => i.value = '');
   render();
   syncUI();
