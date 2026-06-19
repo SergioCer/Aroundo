@@ -947,7 +947,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default ok");
+      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
@@ -1253,18 +1253,29 @@ function createIcon(color, state, intensity) {
       const activeCategories = [];
       checkboxes.forEach(cb => {const catId = parseInt(cb.id.replace('cat-', ''));
       if (cb.checked) { activeCategories.push(catId); }});
-      
       // Preleva eventStart ed eventEnd dai markers      
       markers.forEach(marker => {
       const categoryVisible = activeCategories.includes(marker.category);
       const eventStart = new Date(marker.start);
       const eventEnd = marker.end ? new Date(marker.end) : eventStart;
-
       // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
       const inTimeRange = eventStart <= end &&  eventEnd >= start;
-      // se soddisfa le due condizioni OK altrimenti rimuove il marker
-      if (categoryVisible && inTimeRange) {marker.marker.addTo(map);} 
-      else { map.removeLayer(marker.marker); }});
+      // disattiva il timeriterval del marker per i fireworks
+        const visible = categoryVisible && inTimeRange;
+          if (visible) {
+            marker.marker.addTo(map);
+            // opzionale: riattiva se serve
+          } else {
+            map.removeLayer(marker.marker);
+            if (marker.fireworkInterval) {
+              clearInterval(marker.fireworkInterval);
+              marker.fireworkInterval = null;
+            }
+          }
+        });
+      // CANCELLARE   se soddisfa le due condizioni OK altrimenti rimuove il marker ( Vedi sopra )
+      // if (categoryVisible && inTimeRange) {marker.marker.addTo(map);} 
+      // else { map.removeLayer(marker.marker); }});
       updateTicker(); // Aggiorna le News
     }
 
@@ -1678,9 +1689,7 @@ class Firework {
 
   update() {
     if (!this.exploded) {
-      /// CANCELLARE ???
       this.x += this.vx; 
-      // FINE CANCELLARE
       this.currentY += this.vy; // Salita del razzo
       this.vy += 0.35; // gravità
       this.trail.push({ x: this.x, y: this.currentY }); 
