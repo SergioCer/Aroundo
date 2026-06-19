@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Servizi Genere</title>
+<title>Genere di Servizi</title>
 
 <style>
 body {
@@ -45,7 +45,7 @@ table {
   table-layout: fixed;
 }
 
-td {
+th, td {
   padding: 6px;
   border-bottom: 1px solid #e5e7eb;
   overflow: hidden;
@@ -53,9 +53,29 @@ td {
   text-overflow: ellipsis;
 }
 
+th {
+  font-size: 13px;
+  font-weight: bold;
+  text-align: left;
+  background: #f9fafb;
+}
+
 tr:hover {
   background: #eef6ff;
   cursor: pointer;
+}
+
+td {
+  border-right: 2px solid #f1f5f9;
+}
+
+td:last-child {
+  border-right: none;
+}
+
+/* ICON STYLE */
+.icon {
+  font-size: 18px;
 }
 </style>
 </head>
@@ -65,17 +85,28 @@ tr:hover {
 <div class="header">
   <div class="title">
     <button class="bck-btn" onclick="window.location.href='../tabelle.html'">←</button>
-    Servizi Genere
+    Genere di Servizi
   </div>
 </div>
 
 <table>
 <colgroup>
-  <col style="width:60px">
-  <col style="width:200px">
-  <col style="width:300px">
-  <col style="width:120px">
+  <col style="width:50px;">   <!-- ID ridotto -->
+  <col style="width:200px;">  <!-- descrizione -->
+  <col style="width:400px;">  <!-- descrizione estesa -->
+  <col style="width:120px;">  <!-- icona testuale -->
+  <col style="width:60px;">   <!-- icona render -->
 </colgroup>
+
+<thead>
+<tr>
+  <th>ID</th>
+  <th>Descrizione</th>
+  <th>Descrizione estesa</th>
+  <th>Icona</th>
+  <th></th>
+</tr>
+</thead>
 
 <tbody id="tbody"></tbody>
 </table>
@@ -86,7 +117,10 @@ import { supabase } from '../supabase.js';
 let data = [];
 
 async function load() {
-  const { data: rows } = await supabase.from('servizi_genere').select('*');
+  const { data: rows } = await supabase
+    .from('servizi_genere')
+    .select('*');
+
   data = rows || [];
   render();
 }
@@ -107,6 +141,7 @@ function render() {
       <td>${r.gen_descrizione || ''}</td>
       <td>${r.gen_descrizione_estesa || ''}</td>
       <td>${r.gen_icona || ''}</td>
+      <td class="icon">${r.gen_icona || ''}</td>
     `;
 
     tbody.appendChild(tr);
