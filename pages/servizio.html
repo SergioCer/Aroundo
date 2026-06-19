@@ -110,9 +110,15 @@ select {
   width: 40px;
   text-align: center;
 }
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-size: 22px;
+}
+  
 </style>
 </head>
-
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <body>
 
 <div class="topbar">
@@ -209,7 +215,9 @@ function setStatus(val) {
 
 /* ICON */
 function updateIcon() {
-  document.getElementById('iconPreview').textContent = sv_icona.value ? '● ' + sv_icona.value : '';
+  document.getElementById('iconPreview').innerHTML = sv_icona.value
+  ? `<span class="material-icons">${sv_icona.value}</span>`
+  : '';
 }
 
 sv_icona.oninput = () => {
