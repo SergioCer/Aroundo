@@ -1078,11 +1078,10 @@ document.getElementById("reset-day").addEventListener("click", () => {
       console.error("Errore caricamento eventi:", error);
     return [];
     }
+    console.log(events[0]); // CANCELLARE ALLA FINE 
     return data;
   }
 
-console.log(events[0]); // CANCELLARE ALLA FINE 
-  
 // Ricrea i markers 
 function renderEvents() {
   console.log("Aggiorno Markers", new Date().toLocaleTimeString());
