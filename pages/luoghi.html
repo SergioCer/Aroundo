@@ -374,8 +374,8 @@ async function load() {
   }
   data = rows || [];
     data.sort((a, b) =>
-    (comuniMap[a.lu_comune] || '').localeCompare(
-      comuniMap[b.lu_comune] || ''
+    (comuniMap[a.id_comune] || '').localeCompare(
+      comuniMap[b.id_comune] || ''
     )
   );
   render()
@@ -389,7 +389,7 @@ function render() {
     if (!v) return;
     filtered = filtered.filter(r => {
       if (k === 'comune') {
-        return (comuniMap[r.lu_comune] || '').toLowerCase().includes(v);
+        return (comuniMap[r.id_comune] || '').toLowerCase().includes(v);
       }
       if (k === 'location')
         return (r.lu_location || '').toLowerCase().includes(v);
@@ -413,8 +413,8 @@ if (state.sortField) {
     let va, vb;
     // 🟡 caso speciale: comune (label da mappa)
     if (state.sortField === 'comune') {
-      va = comuniMap[a.lu_comune] || '';
-      vb = comuniMap[b.lu_comune] || '';
+      va = comuniMap[a.id_comune] || '';
+      vb = comuniMap[b.id_comune] || '';
     } 
     // 🔵 tutti gli altri campi
     else {
@@ -456,7 +456,7 @@ if (state.sortField) {
     };
     tr.innerHTML = `
       <td>${r.id_luogo}</td>
-      <td>${comuniMap[r.lu_comune] || ''}</td>
+      <td>${comuniMap[r.id_comune] || ''}</td>
       <td>${r.lu_location || ''}</td>
       <td>${r.lu_descrizione || ''}</td>
       <td>${r.lu_lat}</td>
