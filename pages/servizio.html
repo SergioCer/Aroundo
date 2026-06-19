@@ -64,9 +64,9 @@ input, textarea {
 }
 
 /* INLINE LAST ROW */
-.inline-row {
+.inline-row.equal {
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -136,15 +136,18 @@ select {
   <!-- LAST ROW (COME RICHIESTO) -->
   <div class="section-title">Stato / Livello / Icona</div>
 
-  <div class="inline-row">
+<div class="inline-row equal">
 
-    <!-- STATO -->
+  <!-- STATO -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
     <div class="status" onclick="toggleStatus()">
       <div id="statusBox" class="status-box">✓</div>
       <span>Attivo</span>
     </div>
+  </div>
 
-    <!-- LIVELLO -->
+  <!-- LIVELLO -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
     <select id="livello" onchange="markDirty()">
       <option value="1">1</option>
       <option value="2">2</option>
@@ -152,10 +155,11 @@ select {
       <option value="4">4</option>
       <option value="5">5</option>
     </select>
+  </div>
 
-    <!-- ICONA -->
+  <!-- ICONA -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
     <div class="icon-preview" id="iconPreview"></div>
-
   </div>
 
 </div>
@@ -205,7 +209,7 @@ function setStatus(val) {
 
 /* ICON */
 function updateIcon() {
-  document.getElementById('iconPreview').textContent = sv_icona.value || '';
+  document.getElementById('iconPreview').textContent = sv_icona.value ? '● ' + sv_icona.value : '';
 }
 
 sv_icona.oninput = () => {
