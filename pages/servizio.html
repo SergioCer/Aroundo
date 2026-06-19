@@ -6,42 +6,101 @@
 
 <style>
 body {
-  margin:0;
-  font-family:Arial;
-  background:#f2f4f7;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
 }
 
+/* TOPBAR */
 .topbar {
-  display:flex;
-  justify-content:center;
-  padding:16px;
-  font-weight:bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  font-weight: bold;
 }
 
 .back-btn {
-  width:34px;height:34px;border-radius:17px;
-  border:none;background:#e5e7eb;color:#374151;
-  cursor:pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+  cursor: pointer;
 }
 
+/* CARD */
 .card {
-  background:white;
-  margin:15px;
-  padding:15px;
-  border-radius:12px;
+  background: white;
+  margin: 15px;
+  padding: 15px;
+  border-radius: 12px;
 }
 
+/* LABEL */
 .section-title {
-  font-size:11px;
-  color:#777;
-  margin:10px 0 4px;
+  font-size: 11px;
+  color: #777;
+  margin: 10px 0 4px;
 }
 
-input,textarea,select {
-  width:100%;
-  border:1px solid #ddd;
-  padding:6px;
-  border-radius:6px;
+/* INPUT */
+input, textarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* INLINE LAST ROW */
+.inline-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+/* STATUS CHECK (COME LUOGO STYLE) */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.status-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid #999;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.status-box.active {
+  background: #22c55e;
+  border-color: #16a34a;
+  color: white;
+}
+
+/* LEVEL SELECT */
+select {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px;
+  font-size: 14px;
+}
+
+/* ICON */
+.icon-preview {
+  font-size: 20px;
+  width: 40px;
+  text-align: center;
 }
 </style>
 </head>
@@ -49,85 +108,138 @@ input,textarea,select {
 <body>
 
 <div class="topbar">
-<button class="back-btn" onclick="requestBack()">←</button>
-Servizio
+  <button class="back-btn" onclick="requestBack()">←</button>
+  Servizio
 </div>
 
 <div class="card">
 
-<div class="section-title">Servizio</div>
-<input id="sv_servizio" oninput="markDirty()">
+  <div class="section-title">Servizio</div>
+  <input id="sv_servizio" oninput="markDirty()">
 
-<div class="section-title">Descrizione</div>
-<textarea id="sv_descrizione" oninput="markDirty()"></textarea>
+  <div class="section-title">Descrizione</div>
+  <textarea id="sv_descrizione" oninput="markDirty()"></textarea>
 
-<div class="section-title">Icona</div>
-<input id="sv_icona" oninput="markDirty()">
+  <div class="section-title">Icona</div>
+  <input id="sv_icona" oninput="markDirty()">
 
-<div class="section-title">Attivo</div>
-<select id="sv_attivo" oninput="markDirty()">
-<option value="true">true</option>
-<option value="false">false</option>
-</select>
+  <!-- LAST ROW (COME RICHIESTO) -->
+  <div class="section-title">Stato / Livello / Icona</div>
 
-<div class="section-title">Livello</div>
-<input id="livello" oninput="markDirty()">
+  <div class="inline-row">
+
+    <!-- STATO -->
+    <div class="status" onclick="toggleStatus()">
+      <div id="statusBox" class="status-box">✓</div>
+      <span>Attivo</span>
+    </div>
+
+    <!-- LIVELLO -->
+    <select id="livello" onchange="markDirty()">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+
+    <!-- ICONA -->
+    <div class="icon-preview" id="iconPreview"></div>
+
+  </div>
 
 </div>
 
 <script type="module">
 import { supabase } from '../supabase.js';
 
-const params=new URLSearchParams(location.search);
-const id=params.get('id');
-const isNew=!id;
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const isNew = !id;
 
-let original="{}";
-let dirty=false;
+let original = "{}";
+let dirty = false;
 
-async function load(){
-  if(isNew) return;
+async function load() {
+  if (isNew) return;
 
-  const {data}=await supabase
+  const { data } = await supabase
     .from('servizi')
     .select('*')
-    .eq('id_servizio',id)
+    .eq('id_servizio', id)
     .single();
 
-  original=JSON.stringify(data);
+  original = JSON.stringify(data);
 
-  sv_servizio.value=data.sv_servizio||'';
-  sv_descrizione.value=data.sv_descrizione||'';
-  sv_icona.value=data.sv_icona||'';
-  sv_attivo.value=data.sv_attivo;
-  livello.value=data.livello||'';
+  sv_servizio.value = data.sv_servizio || '';
+  sv_descrizione.value = data.sv_descrizione || '';
+  sv_icona.value = data.sv_icona || '';
+  livello.value = data.livello || '1';
+
+  setStatus(data.sv_attivo);
+  updateIcon();
 }
 
-window.markDirty=()=>{
-  const current=JSON.stringify({
-    sv_servizio:sv_servizio.value,
-    sv_descrizione:sv_descrizione.value,
-    sv_icona:sv_icona.value,
-    sv_attivo:sv_attivo.value,
-    livello:livello.value
-  });
-
-  dirty=current!==original;
+/* STATUS */
+window.toggleStatus = () => {
+  const el = document.getElementById('statusBox');
+  el.classList.toggle('active');
+  markDirty();
 };
 
-window.requestBack=async()=>{
-  if(!dirty) return history.back();
-  if(confirm("Salvare?")) {
-    await supabase.from('servizi')
-      .update({
-        sv_servizio,
-        sv_descrizione,
-        sv_icona,
-        sv_attivo,
-        livello
-      })
-      .eq('id_servizio',id);
+function setStatus(val) {
+  const el = document.getElementById('statusBox');
+  if (val) el.classList.add('active');
+  else el.classList.remove('active');
+}
+
+/* ICON */
+function updateIcon() {
+  document.getElementById('iconPreview').textContent = sv_icona.value || '';
+}
+
+sv_icona.oninput = () => {
+  updateIcon();
+  markDirty();
+};
+
+/* DIRTY */
+window.markDirty = () => {
+  const current = JSON.stringify({
+    sv_servizio: sv_servizio.value,
+    sv_descrizione: sv_descrizione.value,
+    sv_icona: sv_icona.value,
+    sv_attivo: document.getElementById('statusBox').classList.contains('active'),
+    livello: livello.value
+  });
+
+  dirty = current !== original;
+};
+
+/* SAVE */
+async function save() {
+  const payload = {
+    sv_servizio: sv_servizio.value,
+    sv_descrizione: sv_descrizione.value,
+    sv_icona: sv_icona.value,
+    sv_attivo: document.getElementById('statusBox').classList.contains('active'),
+    livello: parseInt(livello.value)
+  };
+
+  if (isNew) {
+    const res = await supabase.from('servizi').insert(payload).select().single();
+    location.href = `servizio.html?id=${res.data.id_servizio}`;
+  } else {
+    await supabase.from('servizi').update(payload).eq('id_servizio', id);
   }
+
+  dirty = false;
+}
+
+/* BACK */
+window.requestBack = async () => {
+  if (!dirty) return history.back();
+  if (confirm("Salvare modifiche?")) await save();
   history.back();
 };
 
