@@ -1111,7 +1111,7 @@ function renderEvents() {
     const stateClass = stateData.state;
     const intensity = stateData.intensity;
     //-- 🎨 ICONA
-    const marker = L.marker([e.ev_lat, e.ev_lng], {
+    const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
       icon: createIcon(
         categories.find(c =>
           c.id_macro_categoria === e.ev_categoria
