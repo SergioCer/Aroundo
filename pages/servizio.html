@@ -2,139 +2,137 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Servizi Genere</title>
+<title>Servizio</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #f6f8fb;
-  margin: 0;
+body { margin:0; font-family:Arial; background:#f2f4f7; }
+
+.topbar {
+  display:flex; justify-content:center; padding:16px; font-weight:bold;
 }
 
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px;
+.back-btn {
+  width:34px;height:34px;border-radius:17px;border:none;
+  background:#e5e7eb;color:#374151;cursor:pointer;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  display: flex;
-  gap: 20px;
-  align-items: center;
+.card {
+  background:white; margin:15px; padding:15px; border-radius:12px;
 }
 
-.bck-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 17px;
-  border: none;
-  background: #e5e7eb;
-  color: #374151;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
+.section-title { font-size:11px; color:#777; margin:10px 0 4px; }
 
-.bck-btn:hover {
-  background: #d1d5db;
-}
-
-/* TABLE */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  table-layout: fixed;
-}
-
-th, td {
-  padding: 6px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-  overflow: hidden;
-}
-
-tr:hover {
-  background: #eef6ff;
-  cursor: pointer;
-}
-
-td {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  border-right: 2px solid #f1f5f9;
-}
-
-td:last-child {
-  border-right: none;
+input,textarea,select {
+  width:100%; padding:6px; border-radius:6px; border:1px solid #ddd;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="title">
-    <button class="bck-btn" onclick="window.location.href='../tabelle.html'">←</button>
-    Servizi Genere
-  </div>
+<div class="topbar">
+  <button class="back-btn" onclick="requestBack()">←</button>
+  Servizio
 </div>
 
-<table>
-<colgroup>
-  <col style="width: 60px;">
-  <col style="width: 200px;">
-  <col style="width: 300px;">
-  <col style="width: 120px;">
-</colgroup>
+<div class="card">
 
-<tbody id="tbody"></tbody>
-</table>
+<div class="section-title">Servizio</div>
+<input id="sv_servizio" oninput="markDirty()">
+
+<div class="section-title">Descrizione</div>
+<textarea id="sv_descrizione" oninput="markDirty()"></textarea>
+
+<div class="section-title">Icona</div>
+<input id="sv_icona" oninput="markDirty()">
+
+<div class="section-title">Attivo</div>
+<select id="sv_attivo" oninput="markDirty()">
+  <option value="true">true</option>
+  <option value="false">false</option>
+</select>
+
+<div class="section-title">Livello</div>
+<input id="livello" oninput="markDirty()">
+
+</div>
 
 <script type="module">
 import { supabase } from '../supabase.js';
 
-let data = [];
+const params=new URLSearchParams(location.search);
+const id=params.get('id');
+const isNew=!id;
 
-async function load() {
-  const { data: rows, error } = await supabase
-    .from('servizi_genere')
-    .select('*');
+let original="{}";
+let dirty=false;
 
-  if (error) {
-    console.error(error);
-    return;
+async function load(){
+  if(isNew) return;
+
+  const {data}=await supabase
+    .from('servizi')
+    .select('*')
+    .eq('id_servizio',id)
+    .single();
+
+  original=JSON.stringify(data);
+
+  sv_servizio.value=data.sv_servizio||'';
+  sv_descrizione.value=data.sv_descrizione||'';
+  sv_icona.value=data.sv_icona||'';
+  sv_attivo.value=data.sv_attivo;
+  livello.value=data.livello||'';
+}
+
+window.markDirty=()=>{
+  const current=JSON.stringify({
+    sv_servizio:sv_servizio.value,
+    sv_descrizione:sv_descrizione.value,
+    sv_icona:sv_icona.value,
+    sv_attivo:sv_attivo.value,
+    livello:livello.value
+  });
+
+  dirty=current!==original;
+};
+
+async function save(){
+  const payload={
+    sv_servizio:sv_servizio.value,
+    sv_descrizione:sv_descrizione.value,
+    sv_icona:sv_icona.value,
+    sv_attivo:sv_attivo.value==="true",
+    livello:livello.value?parseInt(livello.value):null
+  };
+
+  let res;
+
+  if(isNew){
+    res=await supabase.from('servizi').insert(payload).select().single();
+  } else {
+    res=await supabase.from('servizi').update(payload).eq('id_servizio',id).select().single();
   }
 
-  data = rows || [];
-  render();
+  if(res.error){
+    alert("errore");
+    return false;
+  }
+
+  dirty=false;
+
+  if(isNew){
+    location.href=`servizio.html?id=${res.data.id_servizio}`;
+  }
+
+  return true;
 }
 
-function render() {
-  const tbody = document.getElementById("tbody");
-  tbody.innerHTML = "";
-
-  data.forEach(r => {
-    const tr = document.createElement("tr");
-
-    tr.onclick = () => {
-      window.location.href = `servizi.html?id_genere=${r.id_genere}`;
-    };
-
-    tr.innerHTML = `
-      <td>${r.id_genere}</td>
-      <td>${r.gen_descrizione || ''}</td>
-      <td>${r.gen_descrizione_estesa || ''}</td>
-      <td>${r.gen_icona || ''}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
+window.requestBack=async()=>{
+  if(!dirty) return history.back();
+  if(confirm("salvare?")) await save();
+  history.back();
+};
 
 await load();
 </script>
