@@ -5,73 +5,31 @@
 <title>Servizi Genere</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #f6f8fb;
-  margin: 0;
-}
+body { font-family: Arial; background:#f6f8fb; margin:0; }
 
-/* HEADER */
 .header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px;
+  display:flex; justify-content:center; align-items:center; padding:12px;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: bold;
-  display: flex;
-  gap: 20px;
-  align-items: center;
+  font-size:24px; font-weight:bold; display:flex; gap:20px; align-items:center;
 }
 
 .bck-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 17px;
-  border: none;
-  background: #e5e7eb;
-  color: #374151;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
+  width:34px;height:34px;border-radius:17px;border:none;
+  background:#e5e7eb;color:#374151;font-size:18px;font-weight:bold;cursor:pointer;
 }
 
-.bck-btn:hover {
-  background: #d1d5db;
-}
-
-/* TABLE */
 table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  table-layout: fixed;
-}
-
-th, td {
-  padding: 6px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-  overflow: hidden;
-}
-
-tr:hover {
-  background: #eef6ff;
-  cursor: pointer;
+  width:100%; border-collapse:collapse; background:white; table-layout:fixed;
 }
 
 td {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  border-right: 2px solid #f1f5f9;
+  padding:6px; border-bottom:1px solid #e5e7eb;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-td:last-child {
-  border-right: none;
-}
+tr:hover { background:#eef6ff; cursor:pointer; }
 </style>
 </head>
 
@@ -85,13 +43,6 @@ td:last-child {
 </div>
 
 <table>
-<colgroup>
-  <col style="width: 60px;">
-  <col style="width: 200px;">
-  <col style="width: 300px;">
-  <col style="width: 120px;">
-</colgroup>
-
 <tbody id="tbody"></tbody>
 </table>
 
@@ -101,15 +52,7 @@ import { supabase } from '../supabase.js';
 let data = [];
 
 async function load() {
-  const { data: rows, error } = await supabase
-    .from('servizi_genere')
-    .select('*');
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
+  const { data: rows } = await supabase.from('servizi_genere').select('*');
   data = rows || [];
   render();
 }
