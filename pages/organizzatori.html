@@ -37,6 +37,22 @@ body {
   cursor: pointer;
 }
 
+.bck-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.bck-btn:hover {
+  background: #d1d5db;
+}  
+
 /* TABLE */
 table {
   width: 100%;
@@ -96,12 +112,20 @@ td:last-child {
 
 /* BUTTONS */
 .sort-btn {
+  flex-shrink: 0;
   width: 28px;
   height: 28px;
   border-radius: 14px;
   border: none;
-  background: #dbeafe;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.sort-btn:hover {
+  background: #bfdbfe;
 }
 
 .reset-btn {
@@ -139,7 +163,7 @@ td:last-child {
 
 <div class="header">
   <div class="title">
-    <button class="add-btn" onclick="location.href='../tabelle.html'">←</button>
+    <button class="bck-btn" onclick="location.href='../tabelle.html'">←</button>
     Organizzatori
     <button class="add-btn" onclick="location.href='organizzatore.html?new=1'">+</button>
   </div>
