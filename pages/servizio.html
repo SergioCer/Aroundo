@@ -5,25 +5,43 @@
 <title>Servizio</title>
 
 <style>
-body { margin:0; font-family:Arial; background:#f2f4f7; }
+body {
+  margin:0;
+  font-family:Arial;
+  background:#f2f4f7;
+}
 
 .topbar {
-  display:flex; justify-content:center; padding:16px; font-weight:bold;
+  display:flex;
+  justify-content:center;
+  padding:16px;
+  font-weight:bold;
 }
 
 .back-btn {
-  width:34px;height:34px;border-radius:17px;border:none;
-  background:#e5e7eb;color:#374151;cursor:pointer;
+  width:34px;height:34px;border-radius:17px;
+  border:none;background:#e5e7eb;color:#374151;
+  cursor:pointer;
 }
 
 .card {
-  background:white; margin:15px; padding:15px; border-radius:12px;
+  background:white;
+  margin:15px;
+  padding:15px;
+  border-radius:12px;
 }
 
-.section-title { font-size:11px; color:#777; margin:10px 0 4px; }
+.section-title {
+  font-size:11px;
+  color:#777;
+  margin:10px 0 4px;
+}
 
 input,textarea,select {
-  width:100%; padding:6px; border-radius:6px; border:1px solid #ddd;
+  width:100%;
+  border:1px solid #ddd;
+  padding:6px;
+  border-radius:6px;
 }
 </style>
 </head>
@@ -31,8 +49,8 @@ input,textarea,select {
 <body>
 
 <div class="topbar">
-  <button class="back-btn" onclick="requestBack()">←</button>
-  Servizio
+<button class="back-btn" onclick="requestBack()">←</button>
+Servizio
 </div>
 
 <div class="card">
@@ -48,8 +66,8 @@ input,textarea,select {
 
 <div class="section-title">Attivo</div>
 <select id="sv_attivo" oninput="markDirty()">
-  <option value="true">true</option>
-  <option value="false">false</option>
+<option value="true">true</option>
+<option value="false">false</option>
 </select>
 
 <div class="section-title">Livello</div>
@@ -97,40 +115,19 @@ window.markDirty=()=>{
   dirty=current!==original;
 };
 
-async function save(){
-  const payload={
-    sv_servizio:sv_servizio.value,
-    sv_descrizione:sv_descrizione.value,
-    sv_icona:sv_icona.value,
-    sv_attivo:sv_attivo.value==="true",
-    livello:livello.value?parseInt(livello.value):null
-  };
-
-  let res;
-
-  if(isNew){
-    res=await supabase.from('servizi').insert(payload).select().single();
-  } else {
-    res=await supabase.from('servizi').update(payload).eq('id_servizio',id).select().single();
-  }
-
-  if(res.error){
-    alert("errore");
-    return false;
-  }
-
-  dirty=false;
-
-  if(isNew){
-    location.href=`servizio.html?id=${res.data.id_servizio}`;
-  }
-
-  return true;
-}
-
 window.requestBack=async()=>{
   if(!dirty) return history.back();
-  if(confirm("salvare?")) await save();
+  if(confirm("Salvare?")) {
+    await supabase.from('servizi')
+      .update({
+        sv_servizio,
+        sv_descrizione,
+        sv_icona,
+        sv_attivo,
+        livello
+      })
+      .eq('id_servizio',id);
+  }
   history.back();
 };
 
