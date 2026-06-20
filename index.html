@@ -330,11 +330,7 @@
     .pulse.countdown { animation: hopCrazy 0.3s infinite; }
     .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; opacity: 0.8; }
     .pulse.started { animation: hopLive 2s infinite; }    
-    /* .pulse.started::after { animation: pulseLive 0.3s infinite; } */
-    /* cerchio animato */
-    .pulse.started::after { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: pulseLive 0.3s infinite;}
-    /* puntino centrale */
-    .pulse.started::before { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001;}
+    .pulse.started::after { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9; animation: pulseLive 0.3s infinite; }
     
     .pulse.running { animation: none; }
     .pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; }
@@ -952,7 +948,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default ok");
+      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
