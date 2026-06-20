@@ -130,7 +130,13 @@ td {
 td:last-child {
   border-right: none;
 }
+
+.material-symbols-outlined {
+  vertical-align: middle;
+}
+  
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">  
 </head>
 
 <body>
@@ -316,7 +322,7 @@ function render() {
       <td>${r.id_servizio}</td>
       <td>${r.sv_servizio||''}</td>
       <td>${r.sv_descrizione||''}</td>
-      <td>${r.sv_icona||''}</td>
+      <td><span class="material-symbols-outlined">${r.sv_icona || ''}</span></td>
       <td>${r.sv_attivo}</td>
       <td>${r.livello}</td>
     `;
