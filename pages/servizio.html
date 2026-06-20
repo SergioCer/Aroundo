@@ -125,6 +125,10 @@ select {
   font-size: 40px !important;
   line-height: 1;
 }
+
+.inline-row.equal {
+  margin-top: 12px;
+}
   
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
@@ -149,10 +153,13 @@ select {
   <div class="section-title">Icona</div>
   <input id="sv_icona" oninput="markDirty()">
 
-  <!-- LAST ROW (COME RICHIESTO) >
-  <div class="section-title">Stato / Livello / Icona</div-->
-
 <div class="inline-row equal" style="margin-bottom:4px;">
+
+   <!-- GENERE -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+    <div style="font-size:11px; color:#777;">Genere</div>
+  </div>
+  
   <div style="flex:1; text-align:center; font-size:11px; color:#777;">
     Stato
   </div>
@@ -168,6 +175,11 @@ select {
   
 <div class="inline-row equal">
 
+  <!-- GENERE -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <select id="id_genere" onchange="markDirty()"></select>
+    </div>
+  
   <!-- STATO -->
   <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
     <div class="status" onclick="toggleStatus()">
@@ -206,20 +218,18 @@ let dirty = false;
 
 async function load() {
   if (isNew) return;
-
   const { data } = await supabase
     .from('servizi')
     .select('*')
     .eq('id_servizio', id)
     .single();
-
   original = JSON.stringify(data);
-
+  
   sv_servizio.value = data.sv_servizio || '';
   sv_descrizione.value = data.sv_descrizione || '';
   sv_icona.value = data.sv_icona || '';
   livello.value = data.livello || '1';
-
+  id_genere.value = data.id_genere || '';
   setStatus(data.sv_attivo);
   updateIcon();
 }
@@ -256,7 +266,8 @@ window.markDirty = () => {
     sv_descrizione: sv_descrizione.value,
     sv_icona: sv_icona.value,
     sv_attivo: document.getElementById('statusBox').classList.contains('active'),
-    livello: livello.value
+    livello: livello.value,
+    id_genere: id_genere.value,
   });
   dirty = current !== original;
   document.getElementById('backBtn')
@@ -268,6 +279,7 @@ async function save() {
   const payload = {
     sv_servizio: sv_servizio.value,
     sv_descrizione: sv_descrizione.value,
+    id_genere: id_genere.value,
     sv_icona: sv_icona.value,
     sv_attivo: document.getElementById('statusBox').classList.contains('active'),
     livello: parseInt(livello.value)
@@ -290,6 +302,21 @@ window.requestBack = async () => {
   history.back();
 };
 
+async function loadGeneri() {
+  const { data } = await supabase
+    .from('servizi_genere')
+    .select('id_genere, gen_descrizione');
+  const sel = document.getElementById('id_genere');
+  sel.innerHTML = '';
+  data.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g.id_genere;
+    opt.textContent = g.gen_descrizione;
+    sel.appendChild(opt);
+  });
+}  
+
+await loadGeneri();  
 await load();
 </script>
 
