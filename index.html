@@ -331,6 +331,7 @@
     .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; opacity: 0.8; }
     .pulse.started { animation: hopLive 2s infinite; }    
     .pulse.started::after { animation: pulseLive 0.3s infinite; }
+    .pulse.started::before { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9;}
     .pulse.running { animation: none; }
     .pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; } */
     .pulse.running-strong { animation: running-strong 2s infinite ease-in-out;}
@@ -1393,7 +1394,7 @@ function buildCategoryMenu() {
     // evento terminato 
     if (endDate && now > endDate) return {state: 'finished' };
     let state;
-    // evento già in corso da oltre 30'
+    // evento già Started da oltre 30'
     if (minutesFromStart > 0) {
     state = 'running-soft' ;
     if (durationMinutes) {
@@ -1408,7 +1409,7 @@ function buildCategoryMenu() {
     }
     return { state };
   }
-    // Inizia tra 12 - 8 - 6 - 4 - 2 h - in corso < 2 ore
+    // Inizia tra 12 - 8 - 6 - 4 - 2 h - Started < 2 ore
     if (diffMinutes > 720) return { state: 'distant' };
     if (diffMinutes > 480) return { state: 'future-deep' };
     if (diffMinutes > 240) return { state: 'future-far' };
@@ -1772,7 +1773,7 @@ function updateMarkerState(marker, state, latLng, evFine) {
   const now = new Date();
   const eventoFinito = evFine && now >= new Date(evFine);
   if (eventoFinito) {
-    // Evento concluso → pulisci intervallo fuochi e imposta stato a 'done'
+    // Evento Finito → pulisci intervallo fuochi e imposta stato a 'done'
     if (marker.fireworkInterval) {
       clearInterval(marker.fireworkInterval);
       marker.fireworkInterval = null;
