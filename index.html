@@ -329,8 +329,10 @@
     .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; opacity: 0.45; }
     .pulse.countdown { animation: hopCrazy 0.3s infinite; }
     .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; opacity: 0.8; }
+    
+    .pulse.started::before { background: #fff; animation: pulseLive 0.3s infinite; z-index: 1002;}
     .pulse.started { animation: hopLive 2s infinite; }    
-    .pulse.started::after { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9; animation: pulseLive 0.3s infinite; }
+    .pulse.started::after { animation: pulseLive 0.3s infinite; }
     
     .pulse.running { animation: none; }
     .pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; }
@@ -948,7 +950,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
+      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default ok");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
