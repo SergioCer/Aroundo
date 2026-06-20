@@ -78,6 +78,7 @@ td:last-child {
   font-size: 18px;
 }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">  
 </head>
 
 <body>
@@ -140,8 +141,7 @@ function render() {
       <td>${r.id_genere}</td>
       <td>${r.gen_descrizione || ''}</td>
       <td>${r.gen_descrizione_estesa || ''}</td>
-      <td>${r.gen_icona || ''}</td>
-      <td class="icon">${r.gen_icona || ''}</td>
+      <td>${r.gen_icona ? `<span class="material-symbols-outlined">${r.gen_icona}</span>` : ''}</td>
     `;
 
     tbody.appendChild(tr);
