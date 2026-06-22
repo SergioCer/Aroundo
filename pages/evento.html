@@ -359,8 +359,8 @@ window.duplicateEvent = async () => {
     console.error(err2);
     return;
   }
-  // redirect al nuovo evento
-  location.href = `evento.html?id=${newRow.id_evento}`;
+  // redirect a pagina eventi
+    location.href = `eventi.html`;
 };
   
 /* SAVE */
@@ -400,16 +400,18 @@ async function save() {
 
 /* BACK */
 window.requestBack = async () => {
-  if (!dirty) return history.back();
-
+  if (!dirty) {
+    location.href = 'eventi.html';
+    return;
+  }
   const ok = confirm("Vuoi salvare le modifiche?");
   if (ok) {
     const success = await save();
     if (!success) return;
   }
-  history.back();
+  location.href = 'eventi.html';
 };
-
+  
 function updateCover() {
   const url = ev_copertina.value;
   const img = document.getElementById('coverPreview');
