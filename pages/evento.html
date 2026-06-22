@@ -194,6 +194,7 @@ const isNew = params.has('new') || !id;
 let original = "{}";
 let dirty = false;
 let luoghiMap = {};
+let comuniMap = {};
   
 /* LOAD SELECTS */
 async function loadSelects() {
@@ -254,6 +255,13 @@ async function load() {
 updateCover();
 }
 
+async function loadComuni() {
+  const { data } = await supabase.from('comuni').select('*');
+  (data || []).forEach(c => {
+    comuniMap[c.id_comune] = c.co_descrizione;
+  });
+}
+  
 /* DIRTY */
 window.markDirty = () => {
   const current = JSON.stringify({
@@ -343,6 +351,7 @@ function updateCover() {
   }
 }  
 
+await loadComuni();  
 await loadSelects();
 await load();
 
