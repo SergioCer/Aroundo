@@ -197,18 +197,19 @@ let luoghi = [];
   
 /* LOAD SELECTS */
 async function loadSelects() {
-
   const { data: cat } = await supabase.from('macrocategorie').select('*');
   ev_categoria.innerHTML = `<option value="">-- categoria --</option>`;
   (cat || []).forEach(c => {
     ev_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
   });
-
 const { data: luoghiData } = await supabase.from('luoghi').select('*');
 luoghi = luoghiData || [];
 id_comune_evento.innerHTML = `<option value="">-- comune --</option>`;
 /* comuni unici derivati dai luoghi */
-const comuniUnici = [...new Set(luoghi.map(l => l.id_comune))];
+const comuniUnici = [...new Set(luoghi.map(l => l.id_comune))]
+  .sort((a, b) =>
+    (comuniMap[a] || '').localeCompare(comuniMap[b] || '')
+  );
 comuniUnici.forEach(idc => {
   id_comune_evento.innerHTML += `
     <option value="${idc}">
@@ -219,9 +220,18 @@ comuniUnici.forEach(idc => {
   
   const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">-- organizzatore --</option>`;
-  (org || []).forEach(o => {
-    id_organizzatore.innerHTML += `<option value="${o.id_organizzatore}">${o.or_nome}</option>`;
+(org || [])
+  .sort((a, b) =>
+    (a.or_nome || '').localeCompare(b.or_nome || '')
+  )
+  .forEach(o => {
+    id_organizzatore.innerHTML += `
+      <option value="${o.id_organizzatore}">${o.or_nome}</option>
+    `;
   });
+enableTypeSearch(id_comune_evento);
+enableTypeSearch(id_luogo);
+enableTypeSearch(id_organizzatore);  
 }
 
 /* LOAD */
@@ -276,11 +286,14 @@ window.filterLuoghi = () => {
   id_luogo.innerHTML = `<option value="">-- luogo --</option>`;
   luoghi
     .filter(l => l.id_comune == idComune)
+    .sort((a, b) =>
+      (a.lu_location || '').localeCompare(b.lu_location || '')
+    )
     .forEach(l => {
       id_luogo.innerHTML += `
         <option value="${l.id_luogo}">${l.lu_location}</option>
       `;
-    });
+  });
 };
 
   
@@ -363,6 +376,25 @@ function updateCover() {
   }
 }  
 
+function enableTypeSearch(select) {
+  let buffer = "";
+  let timer = null;
+  select.addEventListener("keydown", (e) => {
+    if (e.key.length !== 1) return;
+    buffer += e.key.toLowerCase();
+    clearTimeout(timer);
+    timer = setTimeout(() => buffer = "", 800);
+    const options = Array.from(select.options);
+    const match = options.find(o =>
+      o.text.toLowerCase().startsWith(buffer)
+    );
+    if (match) {
+      select.value = match.value;
+      markDirty();
+    }
+  });
+}
+  
 await loadComuni();  
 await loadSelects();
 await load();
