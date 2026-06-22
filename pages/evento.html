@@ -102,9 +102,21 @@ input, select, textarea {
 
 <body>
 
-<div class="topbar">
-  <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
-  Evento
+<div class="topbar" style="justify-content:space-between; padding:16px 20px;">
+  <div style="display:flex; align-items:center; gap:14px;">
+    <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
+    <div>Evento</div>
+  </div>
+  <button onclick="duplicateEvent()" style="
+    width:34px;
+    height:34px;
+    border-radius:17px;
+    border:none;
+    background:#3b82f6;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+  ">⧉</button>
 </div>
 
 <!-- TITOLO -->
@@ -312,6 +324,45 @@ window.markDirty = () => {
     .classList.toggle('dirty', dirty);
 };
 
+window.duplicateEvent = async () => {
+  if (!id) return;
+  const { data, error } = await supabase
+    .from('eventi')
+    .select('*')
+    .eq('id_evento', id)
+    .single();
+  if (error) {
+    console.error(error);
+    return;
+  }
+  const payload = {
+    ev_titolo: data.ev_titolo,
+    ev_descrizione: data.ev_descrizione,
+    ev_categoria: data.ev_categoria,
+    id_luogo: data.id_luogo,
+    id_organizzatore: data.id_organizzatore,
+    ev_inizio: data.ev_inizio,
+    ev_fine: data.ev_fine,
+    ev_costo: data.ev_costo,
+    ev_capienza: data.ev_capienza,
+    ev_link: data.ev_link,
+    ev_copertina: data.ev_copertina,
+    ev_attivo: data.ev_attivo
+  };
+  const result = await supabase
+    .from('eventi')
+    .insert(payload)
+    .select()
+    .single();
+  const { data: newRow, error: err2 } = result;
+  if (err2) {
+    console.error(err2);
+    return;
+  }
+  // redirect al nuovo evento
+  location.href = `evento.html?id=${newRow.id_evento}`;
+};
+  
 /* SAVE */
 async function save() {
   const payload = {
