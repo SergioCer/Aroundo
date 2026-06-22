@@ -168,7 +168,7 @@ input, select, textarea {
 
   <!-- COPERTINA -->
   <div class="section-title">Copertina</div>
-  <input id="ev_copertina" oninput="markDirty()">
+  <input id="ev_copertina" oninput="markDirty(); updateCover()">
 
   <img id="coverPreview" style="width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin-top:8px; display:none;" />
   
@@ -224,41 +224,34 @@ async function load() {
     original = JSON.stringify({});
     return;
   }
-
   const { data, error } = await supabase
     .from('eventi')
     .select('*')
     .eq('id_evento', id)
     .single();
-
   if (error) {
     console.error(error);
     return;
   }
-
   original = JSON.stringify(data);
-
   ev_titolo.value = data.ev_titolo || '';
   ev_descrizione.value = data.ev_descrizione || '';
   ev_categoria.value = data.ev_categoria || '';
   id_luogo.value = data.id_luogo || '';
   const comuneId = luoghiMap[data.id_luogo];
   lu_creato.textContent = comuneId ? (comuniMap[comuneId] || '') : '';
-  
   id_organizzatore.value = data.id_organizzatore || '';
-
   ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
   ev_fine.value = data.ev_fine ? data.ev_fine.replace(' ', 'T') : '';
-
   ev_costo.value = data.ev_costo || '';
   ev_capienza.value = data.ev_capienza || '';
   ev_link.value = data.ev_link || '';
   ev_copertina.value = data.ev_copertina || '';
   ev_attivo.checked = !!data.ev_attivo;
-
   ev_creato.textContent = data.ev_creato
     ? new Date(data.ev_creato).toLocaleString()
     : '';
+updateCover();
 }
 
 /* DIRTY */
