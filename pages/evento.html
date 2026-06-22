@@ -152,6 +152,12 @@ input, select, textarea {
     <input id="ev_capienza" oninput="markDirty()">
   </div>
 </div>
+    <!-- ATTIVO -->
+  <div class="section-title">Attivo</div>
+  <label style="display:flex; align-items:center; gap:10px;">
+    <input id="ev_attivo" type="checkbox" oninput="markDirty()" style="width:auto;">
+    Attivo
+  </label>
   
   <!-- LINK -->
   <div class="section-title">Link</div>
@@ -161,12 +167,7 @@ input, select, textarea {
   <div class="section-title">Copertina</div>
   <input id="ev_copertina" oninput="markDirty(); updateCover()">
 
-  <!-- ATTIVO (FIX ALLINEAMENTO) -->
-  <div class="section-title">Attivo</div>
-  <label style="display:flex; align-items:center; gap:10px;">
-    <input id="ev_attivo" type="checkbox" oninput="markDirty()" style="width:auto;">
-    Attivo
-  </label>
+
 
   <img id="coverPreview" style="width:200px; height:200px; object-fit:contain; border-radius:8px; margin-top:8px; display:none; background:#f3f4f6; margin-inline:auto;" />
 
