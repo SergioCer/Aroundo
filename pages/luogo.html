@@ -174,6 +174,8 @@ input, select, textarea {
 
   <div class="footer" id="lu_creato"></div>
 
+  <div id="map" style="height:400px;"></div>
+  
 </div>
 
 <script type="module">
@@ -185,22 +187,25 @@ const isNew = params.has('new') || !id;
   
 let original = "{}";
 let dirty = false;
-
+let mapWindow = null;
+let map;
+let markers = [];
+let currentComune = params.get("comune");  
+  
+  
 /* COMUNI */
 async function loadComuni() {
   const { data = [] } = await supabase.from('comuni').select('*');
-
   const sorted = (data || []).sort((a,b)=>
   (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
   );
-  
   const sel = document.getElementById("id_comune");
   sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
-
   sorted.forEach(c=>{
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
 }
+
 
 /* LOAD */
 async function load() {
@@ -217,9 +222,7 @@ async function load() {
     console.error(error);
     return;
   }
-
   original = JSON.stringify(data);
-
   lu_location.value = data.lu_location || '';
   id_comune.value = data.id_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
@@ -315,8 +318,75 @@ window.openCoords = () => {
   );
 };
 
+window.openOrUpdateMap = () => {
+  const idComune = id_comune.value;
+  if (!idComune) return;
+  const url = `https://sergiocer.github.io/Coordinate/?comune=${idComune}`;
+  // prima apertura
+  if (!mapWindow || mapWindow.closed) {
+    mapWindow = window.open(url, "luoghi_map", "width=900,height=700");
+    return;
+  }
+  // update finestra esistente
+  mapWindow.postMessage({
+    type: "update_comune",
+    id_comune: idComune
+  }, "*");
+};
+
+window.addEventListener("message", (event) => {
+  if (event.data?.type === "select_luogo") {
+    id_luogo.value = event.data.id_luogo;
+    markDirty();
+  }
+});
+
+
+  async function loadLuoghi(idComune) {
+  currentComune = idComune;
+  const { data } = await supabase
+    .from("luoghi")
+    .select("*")
+    .eq("id_comune", idComune);
+  renderMarkers(data || []);
+}
+  
+function renderMarkers(luoghi) {
+  markers.forEach(m => m.remove());
+  markers = [];
+  luoghi.forEach(l => {
+    const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
+    marker.bindTooltip(l.lu_location, {
+      direction: "top",
+      permanent: false
+    });
+    marker.on("click", () => {
+      window.opener.postMessage({
+        type: "select_luogo",
+        id_luogo: l.id_luogo
+      }, "*");
+    });
+    markers.push(marker);
+  });
+  // se 0 marker → mappa vuota OK
+}
+
+map = L.map('map').setView([38.1, 13.3], 10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: ''
+}).addTo(map);
+if (currentComune) {
+  loadLuoghi(currentComune);
+}  
+  
 await loadComuni();
 await load();
+
+id_comune_evento.onchange = () => {
+  markDirty();
+  openOrUpdateMap();
+};
+  
 </script>
 
 </body>
