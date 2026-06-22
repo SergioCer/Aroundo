@@ -140,9 +140,9 @@ input, select, textarea {
   <select id="id_comune_evento" oninput="markDirty(); filterLuoghi()"></select>
 
   <!-- LUOGO -->
-<div style="display:flex; gap:10px; align-items:center;">
+  <div class="section-title">Luogo</div>
+  <div style="display:flex; gap:10px; align-items:center;">
   <select id="id_luogo" oninput="markDirty()" style="flex:1;"></select>
-
   <button type="button" onclick="window.location.href='luogo.html?new=1'" style="
     width:34px;
     height:34px;
@@ -157,9 +157,9 @@ input, select, textarea {
 </div>
   
   <!-- ORGANIZZATORE -->
-<div style="display:flex; gap:10px; align-items:center;">
+  <div class="section-title">Organizzatore</div>
+  <div style="display:flex; gap:10px; align-items:center;">
   <select id="id_organizzatore" oninput="markDirty()" style="flex:1;"></select>
-
   <button type="button" onclick="window.location.href='organizzatore.html?new=1'" style="
     width:34px;
     height:34px;
