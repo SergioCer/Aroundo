@@ -873,7 +873,7 @@
   const map = L.map('map', {
     zoomControl: false, // Visualizza o nasconde i controlli dello ZOOM integrati
     minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
-    maxZoom: 19, // evita zoom troppo vicino, il massimo zoom è 18 - 19
+    maxZoom: 20, // evita zoom troppo vicino, il massimo zoom è 18 - 19
     attributionControl: true // default true
     }).setView([defaultLat, defaultLng], defaultZoom);
 
@@ -1273,10 +1273,7 @@ function createIcon(color, state, intensity) {
             }
           }
         });
-      // CANCELLARE   se soddisfa le due condizioni OK altrimenti rimuove il marker ( Vedi sopra )
-      // if (categoryVisible && inTimeRange) {marker.marker.addTo(map);} 
-      // else { map.removeLayer(marker.marker); }});
-      updateTicker(); // Aggiorna le News
+      // updateTicker(); // Aggiorna le News ***** ATTENZIONE Disabilitata temporaneamente, aggiornava le news ogni minuto 
     }
 
 // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
