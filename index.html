@@ -961,7 +961,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('select-all-toggle').checked = true;
   setupTimeline();
   renderEvents();
-  updateDateUI(); 
+  updateDateUI();
+  updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news. 
 });
       
   noUiSlider.create(slider, {
