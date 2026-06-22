@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Eventi Admin</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f6f8fb;
+  margin: 0;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.add-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #22c55e;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background: #16a34a;
+}
+
+.bck-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.bck-btn:hover {
+  background: #d1d5db;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  table-layout: fixed;
+}
+
+th, td {
+  padding: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  overflow: hidden;
+}
+
+/* FILTER + SORT */
+.col-header {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.col-title {
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.col-tools {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.filter {
+  width: 100%;
+  font-size: 12px;
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+/* SORT */
+.sort-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.sort-btn:hover {
+  background: #bfdbfe;
+}
+
+.reset-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background: #f3f4f6;
+  color: #374151;
+  opacity: 0.4;
+}
+
+.reset-btn.active {
+  background: #fbbf24;
+  color: #111827;
+  border-color: #f59e0b;
+  opacity: 1;
+}
+
+/* ROW */
+tr:hover {
+  background: #eef6ff;
+  cursor: pointer;
+}
+
+td {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-right: 2px solid #f1f5f9;
+}
+
+td:last-child {
+  border-right: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="title">
+    <button class="bck-btn" onclick="window.location.href='../tabelle.html'">←</button>
+    Eventi
+    <button class="add-btn" onclick="window.location.href='evento.html?new=1'">+</button>
+  </div>
+</div>
+
+<table>
+<colgroup>
+  <col style="width: 60px;">
+  <col style="width: 140px;">
+  <col style="width: 160px;">
+  <col style="width: 220px;">
+  <col style="width: 160px;">
+  <col style="width: 160px;">
+  <col style="width: 140px;">
+  <col style="width: 90px;">
+</colgroup>
+
+<thead>
+<tr>
+
+  <!-- ID -->
+  <th>
+    <div class="col-header">
+      <div class="col-title" style="justify-content:center;">ID</div>
+      <div class="col-tools" style="justify-content:center;">
+        <button class="reset-btn" onclick="resetAll()">•</button>
+      </div>
+    </div>
+  </th>
+
+  <!-- CATEGORIA -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Categoria
+        <button class="sort-btn" data-field="categoria" onclick="sort('categoria')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('categoria', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- TITOLO -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Titolo
+        <button class="sort-btn" data-field="titolo" onclick="sort('titolo')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('titolo', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- DESCRIZIONE -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Descrizione
+        <button class="sort-btn" data-field="descrizione" onclick="sort('descrizione')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('descrizione', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- COMUNE -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Comune
+        <button class="sort-btn" data-field="comune" onclick="sort('comune')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('comune', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- ORGANIZZATORE -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Organizzatore
+        <button class="sort-btn" data-field="organizzatore" onclick="sort('organizzatore')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('organizzatore', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- INIZIO -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Inizio
+        <button class="sort-btn" data-field="inizio" onclick="sort('inizio')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('inizio', this.value)">
+      </div>
+    </div>
+  </th>
+
+  <!-- ATTIVO -->
+  <th>
+    <div class="col-header">
+      <div class="col-title">
+        Attivo
+        <button class="sort-btn" data-field="attivo" onclick="sort('attivo')">↕</button>
+      </div>
+      <div class="col-tools">
+        <input class="filter" oninput="setFilter('attivo', this.value)">
+      </div>
+    </div>
+  </th>
+
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+</table>
+
+<script type="module">
+import { supabase } from '../supabase.js';
+
+let data = [];
+let state = {
+  filters: {},
+  sortField: null,
+  sortDir: 'asc',
+};
+
+const savedFilters = sessionStorage.getItem('eventi_filters');
+if (savedFilters) state.filters = JSON.parse(savedFilters);
+
+let comuniMap = {};
+let luoghiComuniMap = {};
+let organizzatoriMap = {};
+let categorieMap = {};
+
+// COMUNI
+async function loadComuni() {
+  const { data: rows } = await supabase.from('comuni').select('*');
+  comuniMap = Object.fromEntries((rows || []).map(c => [c.id_comune, c.co_descrizione]));
+}
+
+// LUOGHI -> COMUNE
+async function loadLuoghi() {
+  const { data: rows } = await supabase.from('luoghi').select('*');
+  luoghiComuniMap = Object.fromEntries((rows || []).map(l => [l.id_luogo, l.id_comune]));
+}
+
+// ORGANIZZATORI
+async function loadOrganizzatori() {
+  const { data: rows } = await supabase.from('organizzatori').select('*');
+  organizzatoriMap = Object.fromEntries((rows || []).map(o => [o.id_organizzatore, o.or_nome]));
+}
+
+// CATEGORIE
+async function loadCategorie() {
+  const { data: rows } = await supabase.from('macrocategorie').select('*');
+  categorieMap = Object.fromEntries((rows || []).map(c => [c.id_macro_categoria, c.mc_descrizione]));
+}
+
+// EVENTS
+async function load() {
+  const { data: rows } = await supabase.from('eventi').select('*');
+  data = rows || [];
+  render();
+}
+
+// RENDER
+function render() {
+
+  let filtered = [...data];
+
+  Object.keys(state.filters).forEach(k => {
+    const v = state.filters[k]?.toLowerCase();
+    if (!v) return;
+
+    filtered = filtered.filter(r => {
+
+      if (k === 'categoria')
+        return (categorieMap[r.ev_categoria] || '').toLowerCase().includes(v);
+
+      if (k === 'titolo')
+        return (r.ev_titolo || '').toLowerCase().includes(v);
+
+      if (k === 'descrizione')
+        return (r.ev_descrizione || '').toLowerCase().includes(v);
+
+      if (k === 'comune') {
+        const idComune = luoghiComuniMap[r.id_luogo];
+        return (comuniMap[idComune] || '').toLowerCase().includes(v);
+      }
+
+      if (k === 'organizzatore')
+        return (organizzatoriMap[r.id_organizzatore] || '').toLowerCase().includes(v);
+
+      if (k === 'inizio')
+        return (r.ev_inizio || '').toLowerCase().includes(v);
+
+      if (k === 'attivo')
+        return (String(r.ev_attivo) || '').toLowerCase().includes(v);
+
+      return true;
+    });
+  });
+
+  if (state.sortField) {
+
+    filtered.sort((a, b) => {
+
+      let va, vb;
+
+      if (state.sortField === 'categoria') {
+        va = categorieMap[a.ev_categoria] || '';
+        vb = categorieMap[b.ev_categoria] || '';
+      }
+
+      else if (state.sortField === 'comune') {
+        va = comuniMap[luoghiComuniMap[a.id_luogo]] || '';
+        vb = comuniMap[luoghiComuniMap[b.id_luogo]] || '';
+      }
+
+      else if (state.sortField === 'organizzatore') {
+        va = organizzatoriMap[a.id_organizzatore] || '';
+        vb = organizzatoriMap[b.id_organizzatore] || '';
+      }
+
+      else {
+        va = a['ev_' + state.sortField] ?? '';
+        vb = b['ev_' + state.sortField] ?? '';
+      }
+
+      const numFields = ['attivo'];
+      if (numFields.includes(state.sortField)) {
+        va = Number(va);
+        vb = Number(vb);
+        return state.sortDir === 'asc' ? va - vb : vb - va;
+      }
+
+      va = va.toString().toLowerCase();
+      vb = vb.toString().toLowerCase();
+
+      return state.sortDir === 'asc'
+        ? va.localeCompare(vb)
+        : vb.localeCompare(va);
+    });
+  }
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  filtered.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.onclick = () => window.location.href = `evento.html?id=${r.id_evento}`;
+
+    const comune = comuniMap[luoghiComuniMap[r.id_luogo]] || '';
+    const cat = categorieMap[r.ev_categoria] || '';
+    const org = organizzatoriMap[r.id_organizzatore] || '';
+
+    tr.innerHTML = `
+      <td>${r.id_evento}</td>
+      <td>${cat}</td>
+      <td>${r.ev_titolo || ''}</td>
+      <td>${r.ev_descrizione || ''}</td>
+      <td>${comune}</td>
+      <td>${org}</td>
+      <td>${r.ev_inizio || ''}</td>
+      <td>${r.ev_attivo ?? ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// FILTER
+window.setFilter = (k,v) => {
+  state.filters[k] = v;
+  sessionStorage.setItem('eventi_filters', JSON.stringify(state.filters));
+  render();
+  syncUI();
+};
+
+// SORT
+window.sort = (field) => {
+  if (state.sortField !== field) {
+    state.sortField = field;
+    state.sortDir = 'asc';
+  } else {
+    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  }
+  render();
+  syncUI();
+};
+
+window.resetAll = () => {
+  state.filters = {};
+  state.sortField = null;
+  state.sortDir = 'asc';
+  sessionStorage.removeItem('eventi_filters');
+  document.querySelectorAll('.filter').forEach(i => i.value = '');
+  render();
+  syncUI();
+};
+
+function updateResetButton() {
+  const hasFilters = Object.values(state.filters).some(v => v && v.length > 0);
+  const hasSort = state.sortField !== null;
+  const btn = document.querySelector('.reset-btn');
+  btn.textContent = (hasFilters || hasSort) ? '↺' : '•';
+  btn.classList.toggle('active', hasFilters || hasSort);
+}
+
+function updateSortButtons() {
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    const field = btn.dataset.field;
+    if (field !== state.sortField) return btn.textContent = '↕';
+    btn.textContent = state.sortDir === 'asc' ? '▲' : '▼';
+  });
+}
+
+function syncUI() {
+  updateResetButton();
+  updateSortButtons();
+}
+
+await loadComuni();
+await loadLuoghi();
+await loadOrganizzatori();
+await loadCategorie();
+await load();
+syncUI();
+
+</script>
+</body>
+</html>
