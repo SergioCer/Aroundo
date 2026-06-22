@@ -121,6 +121,10 @@ input, select, textarea {
   <!-- DESCRIZIONE -->
   <div class="section-title">Descrizione</div>
   <textarea id="ev_descrizione" oninput="markDirty()"></textarea>
+  
+  <!-- COMUNE -->
+  <div class="section-title">Comune</div>
+  <select id="id_comune_evento" oninput="markDirty(); filterLuoghi()"></select>
 
   <!-- LUOGO -->
   <div class="section-title">Luogo</div>
@@ -189,6 +193,7 @@ let original = "{}";
 let dirty = false;
 let luoghiMap = {};
 let comuniMap = {};
+let luoghi = [];
   
 /* LOAD SELECTS */
 async function loadSelects() {
@@ -199,12 +204,18 @@ async function loadSelects() {
     ev_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
   });
 
-  const { data: luoghi } = await supabase.from('luoghi').select('*');
-  id_luogo.innerHTML = `<option value="">-- luogo --</option>`;
-  (luoghi || []).forEach(l => {
-    luoghiMap[l.id_luogo] = l.id_comune;
-    id_luogo.innerHTML += `<option value="${l.id_luogo}">${comuniMap[l.id_comune] || ''} - ${l.lu_location}</option>`;
-  });
+const { data: luoghiData } = await supabase.from('luoghi').select('*');
+luoghi = luoghiData || [];
+id_comune_evento.innerHTML = `<option value="">-- comune --</option>`;
+/* comuni unici derivati dai luoghi */
+const comuniUnici = [...new Set(luoghi.map(l => l.id_comune))];
+comuniUnici.forEach(idc => {
+  id_comune_evento.innerHTML += `
+    <option value="${idc}">
+      ${comuniMap[idc] || ''}
+    </option>
+  `;
+});
   
   const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">-- organizzatore --</option>`;
@@ -232,7 +243,12 @@ async function load() {
   ev_titolo.value = data.ev_titolo || '';
   ev_descrizione.value = data.ev_descrizione || '';
   ev_categoria.value = data.ev_categoria || '';
-  id_luogo.value = data.id_luogo || '';
+  const luogo = luoghi.find(l => l.id_luogo == data.id_luogo);
+  if (luogo) {
+    id_comune_evento.value = luogo.id_comune;
+    filterLuoghi();
+    id_luogo.value = data.id_luogo || '';
+  }
   const comuneId = luoghiMap[data.id_luogo];
   id_organizzatore.value = data.id_organizzatore || '';
   ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
@@ -254,6 +270,19 @@ async function loadComuni() {
     comuniMap[c.id_comune] = c.co_descrizione;
   });
 }
+
+window.filterLuoghi = () => {
+  const idComune = id_comune_evento.value;
+  id_luogo.innerHTML = `<option value="">-- luogo --</option>`;
+  luoghi
+    .filter(l => l.id_comune == idComune)
+    .forEach(l => {
+      id_luogo.innerHTML += `
+        <option value="${l.id_luogo}">${l.lu_location}</option>
+      `;
+    });
+};
+
   
 /* DIRTY */
 window.markDirty = () => {
@@ -271,16 +300,13 @@ window.markDirty = () => {
     ev_copertina: ev_copertina.value,
     ev_attivo: ev_attivo.checked
   });
-
   dirty = current !== original;
-
   document.getElementById('backBtn')
     .classList.toggle('dirty', dirty);
 };
 
 /* SAVE */
 async function save() {
-
   const payload = {
     ev_titolo: ev_titolo.value,
     ev_descrizione: ev_descrizione.value,
@@ -295,29 +321,22 @@ async function save() {
     ev_copertina: ev_copertina.value,
     ev_attivo: ev_attivo.checked
   };
-
   let result;
-
   if (isNew) {
     result = await supabase.from('eventi').insert(payload).select().single();
   } else {
     result = await supabase.from('eventi').update(payload).eq('id_evento', id).select().single();
   }
-
   const { data, error } = result;
-
   if (error) {
     console.error(error);
     alert("Errore salvataggio");
     return false;
   }
-
   dirty = false;
-
   if (isNew) {
     location.href = `evento.html?id=${data.id_evento}`;
   }
-
   return true;
 }
 
