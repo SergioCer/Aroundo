@@ -240,7 +240,6 @@ async function load() {
   ev_categoria.value = data.ev_categoria || '';
   id_luogo.value = data.id_luogo || '';
   const comuneId = luoghiMap[data.id_luogo];
-  lu_creato.textContent = comuneId ? (comuniMap[comuneId] || '') : '';
   id_organizzatore.value = data.id_organizzatore || '';
   ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
   ev_fine.value = data.ev_fine ? data.ev_fine.replace(' ', 'T') : '';
