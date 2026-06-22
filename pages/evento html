@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Evento</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
+}
+
+/* TOPBAR */
+.topbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  font-weight: bold;
+}
+
+.back-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.back-btn.dirty {
+  background: #fbbf24;
+  color: #111827;
+}
+
+.back-btn:hover {
+  background: #d1d5db;
+}
+
+/* HERO */
+.hero {
+  margin: 10px 15px 8px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+}
+
+.hero input {
+  width: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  text-align: center;
+  background: transparent;
+}
+
+/* CARD */
+.card {
+  background: white;
+  margin: 0 15px 20px;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+/* LABEL */
+.section-title {
+  font-size: 11px;
+  color: #777;
+  margin: 12px 0 4px;
+}
+
+/* INPUT */
+input, select, textarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* INLINE */
+.inline {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* FOOTER */
+.footer {
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
+  Evento
+</div>
+
+<!-- TITOLO -->
+<div class="hero">
+  <input id="ev_titolo" oninput="markDirty()">
+</div>
+
+<div class="card">
+
+  <!-- CATEGORIA -->
+  <div class="section-title">Categoria</div>
+  <select id="ev_categoria" oninput="markDirty()"></select>
+
+  <!-- DESCRIZIONE -->
+  <div class="section-title">Descrizione</div>
+  <textarea id="ev_descrizione" oninput="markDirty()"></textarea>
+
+  <!-- LUOGO -->
+  <div class="section-title">Luogo</div>
+  <select id="id_luogo" oninput="markDirty()"></select>
+
+  <!-- ORGANIZZATORE -->
+  <div class="section-title">Organizzatore</div>
+  <select id="id_organizzatore" oninput="markDirty()"></select>
+
+  <!-- INIZIO / FINE -->
+  <div class="section-title">Inizio</div>
+  <input id="ev_inizio" type="datetime-local" oninput="markDirty()">
+
+  <div class="section-title">Fine</div>
+  <input id="ev_fine" type="datetime-local" oninput="markDirty()">
+
+  <!-- COSTO / CAPIENZA -->
+  <div class="section-title">Costo</div>
+  <input id="ev_costo" oninput="markDirty()">
+
+  <div class="section-title">Capienza</div>
+  <input id="ev_capienza" oninput="markDirty()">
+
+  <!-- LINK -->
+  <div class="section-title">Link</div>
+  <input id="ev_link" oninput="markDirty()">
+
+  <!-- COPERTINA -->
+  <div class="section-title">Copertina</div>
+  <input id="ev_copertina" oninput="markDirty()">
+
+  <!-- ATTIVO -->
+  <div class="section-title">Attivo</div>
+  <input id="ev_attivo" type="checkbox" oninput="markDirty()">
+
+  <!-- FOOTER -->
+  <div class="footer" id="ev_creato"></div>
+
+</div>
+
+<script type="module">
+import { supabase } from '../supabase.js';
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const isNew = params.has('new') || !id;
+
+let original = "{}";
+let dirty = false;
+
+/* LOAD SELECTS */
+async function loadSelects() {
+
+  const { data: cat } = await supabase.from('macrocategorie').select('*');
+  ev_categoria.innerHTML = `<option value="">-- categoria --</option>`;
+  (cat || []).forEach(c => {
+    ev_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
+  });
+
+  const { data: luoghi } = await supabase.from('luoghi').select('*');
+  id_luogo.innerHTML = `<option value="">-- luogo --</option>`;
+  (luoghi || []).forEach(l => {
+    id_luogo.innerHTML += `<option value="${l.id_luogo}">${l.lu_location}</option>`;
+  });
+
+  const { data: org } = await supabase.from('organizzatori').select('*');
+  id_organizzatore.innerHTML = `<option value="">-- organizzatore --</option>`;
+  (org || []).forEach(o => {
+    id_organizzatore.innerHTML += `<option value="${o.id_organizzatore}">${o.or_nome}</option>`;
+  });
+}
+
+/* LOAD */
+async function load() {
+  if (isNew) {
+    original = JSON.stringify({});
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('eventi')
+    .select('*')
+    .eq('id_evento', id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  original = JSON.stringify(data);
+
+  ev_titolo.value = data.ev_titolo || '';
+  ev_descrizione.value = data.ev_descrizione || '';
+  ev_categoria.value = data.ev_categoria || '';
+  id_luogo.value = data.id_luogo || '';
+  id_organizzatore.value = data.id_organizzatore || '';
+
+  ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
+  ev_fine.value = data.ev_fine ? data.ev_fine.replace(' ', 'T') : '';
+
+  ev_costo.value = data.ev_costo || '';
+  ev_capienza.value = data.ev_capienza || '';
+  ev_link.value = data.ev_link || '';
+  ev_copertina.value = data.ev_copertina || '';
+  ev_attivo.checked = !!data.ev_attivo;
+
+  ev_creato.textContent = data.ev_creato
+    ? new Date(data.ev_creato).toLocaleString()
+    : '';
+}
+
+/* DIRTY */
+window.markDirty = () => {
+  const current = JSON.stringify({
+    ev_titolo: ev_titolo.value,
+    ev_descrizione: ev_descrizione.value,
+    ev_categoria: ev_categoria.value,
+    id_luogo: id_luogo.value,
+    id_organizzatore: id_organizzatore.value,
+    ev_inizio: ev_inizio.value,
+    ev_fine: ev_fine.value,
+    ev_costo: ev_costo.value,
+    ev_capienza: ev_capienza.value,
+    ev_link: ev_link.value,
+    ev_copertina: ev_copertina.value,
+    ev_attivo: ev_attivo.checked
+  });
+
+  dirty = current !== original;
+
+  document.getElementById('backBtn')
+    .classList.toggle('dirty', dirty);
+};
+
+/* SAVE */
+async function save() {
+
+  const payload = {
+    ev_titolo: ev_titolo.value,
+    ev_descrizione: ev_descrizione.value,
+    ev_categoria: ev_categoria.value,
+    id_luogo: id_luogo.value,
+    id_organizzatore: id_organizzatore.value,
+    ev_inizio: ev_inizio.value ? ev_inizio.value.replace('T',' ') : null,
+    ev_fine: ev_fine.value ? ev_fine.value.replace('T',' ') : null,
+    ev_costo: ev_costo.value ? parseFloat(ev_costo.value) : null,
+    ev_capienza: ev_capienza.value ? parseInt(ev_capienza.value) : null,
+    ev_link: ev_link.value,
+    ev_copertina: ev_copertina.value,
+    ev_attivo: ev_attivo.checked
+  };
+
+  let result;
+
+  if (isNew) {
+    result = await supabase.from('eventi').insert(payload).select().single();
+  } else {
+    result = await supabase.from('eventi').update(payload).eq('id_evento', id).select().single();
+  }
+
+  const { data, error } = result;
+
+  if (error) {
+    console.error(error);
+    alert("Errore salvataggio");
+    return false;
+  }
+
+  dirty = false;
+
+  if (isNew) {
+    location.href = `evento.html?id=${data.id_evento}`;
+  }
+
+  return true;
+}
+
+/* BACK */
+window.requestBack = async () => {
+  if (!dirty) return history.back();
+
+  const ok = confirm("Vuoi salvare le modifiche?");
+  if (ok) {
+    const success = await save();
+    if (!success) return;
+  }
+  history.back();
+};
+
+await loadSelects();
+await load();
+
+</script>
+
+</body>
+</html>
