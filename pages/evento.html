@@ -118,6 +118,10 @@ input, select, textarea {
   <div class="section-title">Categoria</div>
   <select id="ev_categoria" oninput="markDirty()"></select>
 
+  <!-- TITOLO -->
+  <div class="section-title">Titolo</div>
+  <input id="ev_titolo" oninput="markDirty()">
+  
   <!-- DESCRIZIONE -->
   <div class="section-title">Descrizione</div>
   <textarea id="ev_descrizione" oninput="markDirty()"></textarea>
@@ -131,19 +135,33 @@ input, select, textarea {
   <select id="id_organizzatore" oninput="markDirty()"></select>
 
   <!-- INIZIO / FINE -->
-  <div class="section-title">Inizio</div>
-  <input id="ev_inizio" type="datetime-local" oninput="markDirty()">
+  <div class="section-title">Inizio - Fine</div>
+  <div class="inline">
+    <div style="flex:1;">
+      <div class="section-title" style="margin-top:0;">Inizio</div>
+      <input id="ev_inizio" type="datetime-local" oninput="markDirty()">
+    </div>
 
-  <div class="section-title">Fine</div>
-  <input id="ev_fine" type="datetime-local" oninput="markDirty()">
+    <div style="flex:1;">
+      <div class="section-title" style="margin-top:0;">Fine</div>
+      <input id="ev_fine" type="datetime-local" oninput="markDirty()">
+    </div>
+  </div>
 
   <!-- COSTO / CAPIENZA -->
-  <div class="section-title">Costo</div>
-  <input id="ev_costo" oninput="markDirty()">
+  <div class="section-title">Costo - Capienza</div>
+  <div class="inline">
+    <div style="flex:1;">
+      <div class="section-title" style="margin-top:0;">Costo</div>
+      <input id="ev_costo" oninput="markDirty()">
+    </div>
 
-  <div class="section-title">Capienza</div>
-  <input id="ev_capienza" oninput="markDirty()">
-
+    <div style="flex:1;">
+      <div class="section-title" style="margin-top:0;">Capienza</div>
+      <input id="ev_capienza" oninput="markDirty()">
+    </div>
+  </div>
+  
   <!-- LINK -->
   <div class="section-title">Link</div>
   <input id="ev_link" oninput="markDirty()">
@@ -152,9 +170,14 @@ input, select, textarea {
   <div class="section-title">Copertina</div>
   <input id="ev_copertina" oninput="markDirty()">
 
-  <!-- ATTIVO -->
+  <img id="coverPreview" style="width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin-top:8px; display:none;" />
+  
+  <!-- ATTIVO (FIX ALLINEAMENTO) -->
   <div class="section-title">Attivo</div>
-  <input id="ev_attivo" type="checkbox" oninput="markDirty()">
+  <label style="display:flex; align-items:center; gap:10px;">
+    <input id="ev_attivo" type="checkbox" oninput="markDirty()" style="width:auto;">
+    Attivo
+  </label>
 
   <!-- FOOTER -->
   <div class="footer" id="ev_creato"></div>
@@ -170,7 +193,8 @@ const isNew = params.has('new') || !id;
 
 let original = "{}";
 let dirty = false;
-
+let luoghiMap = {};
+  
 /* LOAD SELECTS */
 async function loadSelects() {
 
@@ -183,9 +207,10 @@ async function loadSelects() {
   const { data: luoghi } = await supabase.from('luoghi').select('*');
   id_luogo.innerHTML = `<option value="">-- luogo --</option>`;
   (luoghi || []).forEach(l => {
-    id_luogo.innerHTML += `<option value="${l.id_luogo}">${l.lu_location}</option>`;
+    luoghiMap[l.id_luogo] = l.id_comune;
+    id_luogo.innerHTML += `<option value="${l.id_luogo}">${comuniMap[l.id_comune] || ''} - ${l.lu_location}</option>`;
   });
-
+  
   const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">-- organizzatore --</option>`;
   (org || []).forEach(o => {
@@ -217,6 +242,9 @@ async function load() {
   ev_descrizione.value = data.ev_descrizione || '';
   ev_categoria.value = data.ev_categoria || '';
   id_luogo.value = data.id_luogo || '';
+  const comuneId = luoghiMap[data.id_luogo];
+  lu_creato.textContent = comuneId ? (comuniMap[comuneId] || '') : '';
+  
   id_organizzatore.value = data.id_organizzatore || '';
 
   ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
@@ -310,6 +338,17 @@ window.requestBack = async () => {
   }
   history.back();
 };
+
+function updateCover() {
+  const url = ev_copertina.value;
+  const img = document.getElementById('coverPreview');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+}  
 
 await loadSelects();
 await load();
