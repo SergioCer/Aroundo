@@ -198,9 +198,7 @@ input, select, textarea {
   ">
     <div style="padding:10px; display:flex; justify-content:space-between;">
       <div style="font-weight:bold;">Seleziona luogo</div>
-      <button onclick="closeMap()" style="border:none; background:#e5e7eb; color:#374151; width:30px; height:30px; border-radius:15px; font-size:16px; cursor:pointer;>
-  ✕
-</button>
+      <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
     </div>
     <div id="map" style="height:calc(100% - 50px);"></div>
   </div>
@@ -239,10 +237,10 @@ window.openMap = async () => {
   const idComune = id_comune.value;
   if (!idComune) return;
   document.getElementById("mapModal").style.display = "block";
-  setTimeout(async () => {
-    await loadMapLuoghi(idComune);
-    if (map) map.invalidateSize();
-  }, 0);
+  await loadMapLuoghi(idComune);
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
 };
   
 window.closeMap = () => {
@@ -359,15 +357,13 @@ history.back();
 
 function initMap() {
   if (map) return;
-  const container = document.getElementById('map');
-  if (!container) return;
-  map = L.map(container).setView([38.1, 13.3], 10);
+  map = L.map('map').setView([38.1, 13.3], 10);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
-}
+}  
 
-  async function loadMapLuoghi(idComune) {
+async function loadMapLuoghi(idComune) {
   initMap();
   const { data } = await supabase
     .from("luoghi")
@@ -405,7 +401,7 @@ marker.bindTooltip(tooltipContent, {
 });
 if (isSelected) {
   marker.openTooltip();
-}
+}    
     marker.on("click", () => {
       lu_lat.value = l.lu_lat;
       lu_lng.value = l.lu_lng;
@@ -442,5 +438,7 @@ await loadComuni();
 await load();
 </script>
 
+</body>
+</html>
 </body>
 </html>
