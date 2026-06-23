@@ -239,10 +239,10 @@ window.openMap = async () => {
   const idComune = id_comune.value;
   if (!idComune) return;
   document.getElementById("mapModal").style.display = "block";
-  await loadMapLuoghi(idComune);
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 200);
+  setTimeout(async () => {
+    await loadMapLuoghi(idComune);
+    if (map) map.invalidateSize();
+  }, 0);
 };
   
 window.closeMap = () => {
@@ -359,13 +359,15 @@ history.back();
 
 function initMap() {
   if (map) return;
-  map = L.map('map').setView([38.1, 13.3], 10);
+  const container = document.getElementById('map');
+  if (!container) return;
+  map = L.map(container).setView([38.1, 13.3], 10);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
-}  
+}
 
-async function loadMapLuoghi(idComune) {
+  async function loadMapLuoghi(idComune) {
   initMap();
   const { data } = await supabase
     .from("luoghi")
