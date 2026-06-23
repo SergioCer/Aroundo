@@ -138,7 +138,7 @@ input, select, textarea {
   
   <!-- COMUNE -->
   <div class="section-title">Comune</div>
-  <select id="id_comune_evento" oninput="markDirty(); filterLuoghi()"></select>
+  <select id="id_comune_evento" oninput="markDirty(); filterLuoghi(); openOrUpdateMap()"></select>
 
   <!-- LUOGO -->
   <div class="section-title">Luogo</div>
@@ -228,6 +228,7 @@ let dirty = false;
 let luoghiMap = {};
 let comuniMap = {};
 let luoghi = [];
+let mapWindow = null;
   
 /* LOAD SELECTS */
 async function loadSelects() {
@@ -316,6 +317,7 @@ async function loadComuni() {
 }
 
 window.filterLuoghi = () => {
+  id_luogo.value = "";
   const idComune = id_comune_evento.value;
   id_luogo.innerHTML = `<option value="">-- luogo --</option>`;
   luoghi
@@ -390,6 +392,21 @@ window.duplicateEvent = async () => {
   // redirect a pagina eventi
     location.href = `eventi.html`;
 };
+
+window.openOrUpdateMap = () => {
+  const idComune = id_comune_evento.value;
+  if (!idComune) return;
+  const url = `https://sergiocer.github.io/Coordinate/?comune=${idComune}`;
+  if (!mapWindow || mapWindow.closed) {
+    mapWindow = window.open(url, "luoghi_map", "width=900,height=700");
+    return;
+  }
+  mapWindow.postMessage({
+    type: "update_comune",
+    id_comune: idComune
+  }, "*");
+};
+  
   
 /* SAVE */
 async function save() {
