@@ -524,6 +524,12 @@ function initMap() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
+  map.on("click", (e) => {
+  const { lat, lng } = e.latlng;
+  const ok = confirm("Vuoi aggiungere un nuovo luogo qui?");
+  if (!ok) return;
+  openNewLuogoFromMap(lat, lng);
+});
 }
 
 window.openMapByComune = async () => {
@@ -557,7 +563,12 @@ function renderMarkers(luoghiList) {
   const bounds = [];
   valid.forEach(l => {
     const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
-    marker.bindTooltip(l.lu_location);
+    marker.bindTooltip(
+      l.lu_descrizione
+        ? `${l.lu_location}<br><small>${l.lu_descrizione}</small>`
+        : l.lu_location,
+      { direction: "top", sticky: true }
+    );
     marker.on("click", () => {
       id_luogo.value = l.id_luogo;
       markDirty();
@@ -572,6 +583,12 @@ function renderMarkers(luoghiList) {
 window.closeMap = () => {
   document.getElementById("mapModal").style.display = "none";
 };
+
+function openNewLuogoFromMap(lat, lng) {
+  const comune = id_comune_evento.value;
+  const url = `luogo.html?new=1&lat=${lat}&lng=${lng}&comune=${comune}`;
+  window.location.href = url;
+}
   
 await loadComuni();  
 await loadSelects();
