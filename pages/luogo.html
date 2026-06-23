@@ -180,7 +180,6 @@ input, select, textarea {
 import { supabase } from '../supabase.js';
 
 const params = new URLSearchParams(location.search);
-
 const id = params.get('id');
 const isNew = params.has('new') || !id;
 
@@ -191,29 +190,20 @@ const comune = params.get("comune");
 let original = "{}";
 let dirty = false;
 
-/* DOPO che il DOM è pronto */
-window.addEventListener("DOMContentLoaded", () => {
-
-  if (lat) lu_lat.value = lat;
-  if (lng) lu_lng.value = lng;
-  if (comune) id_comune.value = comune;
-
-});
-
 /* COMUNI */
 async function loadComuni() {
   const { data = [] } = await supabase.from('comuni').select('*');
-
   const sorted = (data || []).sort((a,b)=>
   (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
   );
-  
   const sel = document.getElementById("id_comune");
   sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
-
   sorted.forEach(c=>{
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
+    if (isNew && comune) {
+    sel.value = comune;
+  }
 }
 
 /* LOAD */
@@ -231,9 +221,7 @@ async function load() {
     console.error(error);
     return;
   }
-
   original = JSON.stringify(data);
-
   lu_location.value = data.lu_location || '';
   id_comune.value = data.id_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
@@ -273,9 +261,7 @@ async function save() {
       ? parseInt(lu_capienza.value)
       : null
   };
-
   let result;
-
   if (isNew) {
     result = await supabase
       .from('luoghi')
@@ -290,29 +276,23 @@ async function save() {
       .select()
       .single();
   }
-
   const { data, error } = result;
-
   if (error) {
     console.error(error);
     alert("Errore salvataggio");
     return false;
   }
-
   dirty = false;
-
   // 🔥 redirect solo dopo insert
   if (isNew) {
     location.href = `luogo.html?id=${data.id_luogo}`;
   }
-
   return true;
 }
 
 /* BACK */
 window.requestBack = async () => {
   if (!dirty) return history.back();
-
   const ok = confirm("Vuoi salvare le modifiche?");
 if (ok) {
   const success = await save();
@@ -331,7 +311,7 @@ window.openCoords = () => {
 
 await loadComuni();
 await load();
+  
 </script>
-
 </body>
 </html>
