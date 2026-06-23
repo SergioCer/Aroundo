@@ -423,21 +423,6 @@ window.duplicateEvent = async () => {
   // redirect a pagina eventi
     location.href = `eventi.html`;
 };
-
-window.openOrUpdateMap = () => {
-  const idComune = id_comune_evento.value;
-  if (!idComune) return;
-  const url = `https://sergiocer.github.io/Coordinate/?comune=${idComune}`;
-  if (!mapWindow || mapWindow.closed) {
-    mapWindow = window.open(url, "luoghi_map", "width=900,height=700");
-    return;
-  }
-  mapWindow.postMessage({
-    type: "update_comune",
-    id_comune: idComune
-  }, "*");
-};
-  
   
 /* SAVE */
 async function save() {
