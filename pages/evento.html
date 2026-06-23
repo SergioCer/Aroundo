@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Evento</title>
 
+<link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
 body {
   margin: 0;
@@ -550,13 +553,6 @@ window.closeMap = () => {
 await loadComuni();  
 await loadSelects();
 await load();
-
-</script>
-
-</body>
-</html>
-let map;
-let markers = [];
 
 /* LOAD SELECTS */
 async function loadSelects() {
