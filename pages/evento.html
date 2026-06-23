@@ -529,9 +529,13 @@ function initMap() {
 window.openMapByComune = async () => {
   const idComune = id_comune_evento.value;
   if (!idComune) return;
-  await loadMapLuoghi(idComune);
   document.getElementById("mapModal").style.display = "block";
-};  
+  await loadMapLuoghi(idComune);
+  // fondamentale per Leaflet dentro modale
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
+};
 
 async function loadMapLuoghi(idComune) {
   initMap();
@@ -542,16 +546,16 @@ async function loadMapLuoghi(idComune) {
   renderMarkers(data || []);
 }
 
-function renderMarkers(luoghi) {
+function renderMarkers(luoghiList) {
   markers.forEach(m => map.removeLayer(m));
   markers = [];
-  if (!luoghi.length) {
-  map.setView([38.1, 13.3], 10);
-  return;
-}
-  const first = luoghi[0];
-  map.setView([first.lu_lat, first.lu_lng], 13);
-  luoghi.forEach(l => {
+  const valid = luoghiList.filter(l => l.lu_lat && l.lu_lng);
+  if (!valid.length) {
+    map.setView([38.1, 13.3], 10);
+    return;
+  }
+  const bounds = [];
+  valid.forEach(l => {
     const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
     marker.bindTooltip(l.lu_location);
     marker.on("click", () => {
@@ -560,7 +564,9 @@ function renderMarkers(luoghi) {
       closeMap();
     });
     markers.push(marker);
+    bounds.push([l.lu_lat, l.lu_lng]);
   });
+  map.fitBounds(bounds, { padding: [30, 30] });
 }
 
 window.closeMap = () => {
