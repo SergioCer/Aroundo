@@ -250,14 +250,11 @@ window.closeMap = () => {
 /* COMUNI */
 async function loadComuni() {
   const { data = [] } = await supabase.from('comuni').select('*');
-
   const sorted = (data || []).sort((a,b)=>
   (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
   );
-  
   const sel = document.getElementById("id_comune");
   sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
-
   sorted.forEach(c=>{
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
@@ -278,9 +275,7 @@ async function load() {
     console.error(error);
     return;
   }
-
   original = JSON.stringify(data);
-
   lu_location.value = data.lu_location || '';
   id_comune.value = data.id_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
@@ -320,9 +315,7 @@ async function save() {
       ? parseInt(lu_capienza.value)
       : null
   };
-
   let result;
-
   if (isNew) {
     result = await supabase
       .from('luoghi')
@@ -337,29 +330,23 @@ async function save() {
       .select()
       .single();
   }
-
   const { data, error } = result;
-
   if (error) {
     console.error(error);
     alert("Errore salvataggio");
     return false;
   }
-
   dirty = false;
-
   // 🔥 redirect solo dopo insert
   if (isNew) {
     location.href = `luogo.html?id=${data.id_luogo}`;
   }
-
   return true;
 }
 
 /* BACK */
 window.requestBack = async () => {
   if (!dirty) return history.back();
-
   const ok = confirm("Vuoi salvare le modifiche?");
 if (ok) {
   const success = await save();
@@ -393,15 +380,28 @@ function renderMarkers(luoghiList) {
   if (!valid.length) return;
   const bounds = [];
   valid.forEach(l => {
-    const isSelected = id && l.id_luogo == id;
-    const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
-    marker.bindTooltip(
-      l.lu_location,
-      { direction: "top", sticky: true }
-    );
-    if (isSelected) {
-      marker.openTooltip();
-    }
+const isSelected = id && l.id_luogo == id;
+const marker = L.marker(
+  [l.lu_lat, l.lu_lng],
+  {
+    icon: isSelected ? redIcon() : defaultIcon()
+  }
+).addTo(map);
+const tooltipContent = `
+  <div style="font-weight:600;">${l.lu_location}</div>
+  <div style="font-size:11px; color:#666;">
+    ${l.lu_descrizione || ''}
+  </div>
+`;
+marker.bindTooltip(tooltipContent, {
+  direction: "top",
+  offset: [0, -10],
+  opacity: 0.95,
+  permanent: false
+});
+if (isSelected) {
+  marker.openTooltip();
+}    
     marker.on("click", () => {
       lu_lat.value = l.lu_lat;
       lu_lng.value = l.lu_lng;
@@ -413,6 +413,26 @@ function renderMarkers(luoghiList) {
   });
   map.fitBounds(bounds, { padding: [30, 30] });
 }  
+
+function defaultIcon() {
+  return L.icon({
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34]
+  });
+}
+
+function redIcon() {
+  return L.icon({
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34]
+  });
+}
   
 await loadComuni();
 await load();
