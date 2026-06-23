@@ -209,6 +209,10 @@ function initMapLuogo() {
     markDirty();
     if (marker) map.removeLayer(marker);
     marker = L.marker([lat, lng]).addTo(map);
+      marker.bindTooltip("Coordinate selezionate", {
+      direction: "top",
+      offset: [0, -30]
+      }).openTooltip();
   });
 }
   
