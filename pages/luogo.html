@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Luogo</title>
 
-<link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  
-  
 <style>
 body {
   margin: 0;
@@ -130,8 +127,9 @@ input, select, textarea {
   <select id="id_comune"
           style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;"
           oninput="markDirty()"></select>
+
 </div>
- 
+
 <div class="card">
 
   <!-- LOCATION -->
@@ -182,6 +180,7 @@ input, select, textarea {
 import { supabase } from '../supabase.js';
 
 const params = new URLSearchParams(location.search);
+
 const id = params.get('id');
 const isNew = params.has('new') || !id;
 
@@ -191,49 +190,30 @@ const comune = params.get("comune");
 
 let original = "{}";
 let dirty = false;
-let map;
-let marker;
 
-function initMapLuogo() {
-  if (map) return;
-  map = L.map('map').setView([38.1, 13.3], 10);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: ''
-  }).addTo(map);
-  map.on("click", (e) => {
-    const { lat, lng } = e.latlng;
-    const ok = confirm("Vuoi usare queste coordinate per il luogo?");
-    if (!ok) return;
-    lu_lat.value = lat.toFixed(6);
-    lu_lng.value = lng.toFixed(6);
-    markDirty();
-    if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lng]).addTo(map);
-  });
-}
-window.openMapLuogo = () => {
-  document.getElementById("mapModal").style.display = "block";
-  initMapLuogo();
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 200);
-};
+/* DOPO che il DOM è pronto */
+window.addEventListener("DOMContentLoaded", () => {
 
-  
+  if (lat) lu_lat.value = lat;
+  if (lng) lu_lng.value = lng;
+  if (comune) id_comune.value = comune;
+
+});
+
 /* COMUNI */
 async function loadComuni() {
   const { data = [] } = await supabase.from('comuni').select('*');
+
   const sorted = (data || []).sort((a,b)=>
   (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
   );
+  
   const sel = document.getElementById("id_comune");
   sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
+
   sorted.forEach(c=>{
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
-    if (isNew && comune) {
-    sel.value = comune;
-  }
 }
 
 /* LOAD */
@@ -251,7 +231,9 @@ async function load() {
     console.error(error);
     return;
   }
+
   original = JSON.stringify(data);
+
   lu_location.value = data.lu_location || '';
   id_comune.value = data.id_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
@@ -291,7 +273,9 @@ async function save() {
       ? parseInt(lu_capienza.value)
       : null
   };
+
   let result;
+
   if (isNew) {
     result = await supabase
       .from('luoghi')
@@ -306,23 +290,29 @@ async function save() {
       .select()
       .single();
   }
+
   const { data, error } = result;
+
   if (error) {
     console.error(error);
     alert("Errore salvataggio");
     return false;
   }
+
   dirty = false;
+
   // 🔥 redirect solo dopo insert
   if (isNew) {
     location.href = `luogo.html?id=${data.id_luogo}`;
   }
+
   return true;
 }
 
 /* BACK */
 window.requestBack = async () => {
   if (!dirty) return history.back();
+
   const ok = confirm("Vuoi salvare le modifiche?");
 if (ok) {
   const success = await save();
@@ -331,9 +321,17 @@ if (ok) {
 history.back();
 };
 
+/* MAP */
+window.openCoords = () => {
+  window.open(
+    `https://sergiocer.github.io/Coordinate/?lat=${lu_lat.value}&lng=${lu_lng.value}`,
+    "_blank"
+  );
+};
+
 await loadComuni();
 await load();
-  
 </script>
+
 </body>
 </html>
