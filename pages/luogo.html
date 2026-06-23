@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Luogo</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  
   
 <style>
 body {
@@ -130,9 +130,8 @@ input, select, textarea {
   <select id="id_comune"
           style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;"
           oninput="markDirty()"></select>
-
 </div>
-
+ 
 <div class="card">
 
   <!-- LOCATION -->
@@ -172,38 +171,9 @@ input, select, textarea {
   </div>
 
   <div style="width:70px;">
-    <button class="map-btn" onclick="openMap()">Map</button>
+    <button class="map-btn" onclick="openCoords()">Map</button>
   </div>
 
-  <!-- MAP POPUP -->
-<div id="mapModal" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.4);
-  z-index:9999;
-">
-  <div style="
-    position:absolute;
-    top:5%;
-    left:5%;
-    width:90%;
-    height:90%;
-    background:white;
-    border-radius:12px;
-    overflow:hidden;
-  ">
-    <div style="padding:10px; display:flex; justify-content:space-between;">
-      <div style="font-weight:bold;">Seleziona luogo</div>
-      <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
-    </div>
-    <div id="map" style="height:calc(100% - 50px);"></div>
-  </div>
-</div>
-  
   <div class="footer" id="lu_creato"></div>
 
 </div>
@@ -212,7 +182,6 @@ input, select, textarea {
 import { supabase } from '../supabase.js';
 
 const params = new URLSearchParams(location.search);
-
 const id = params.get('id');
 const isNew = params.has('new') || !id;
 
@@ -223,44 +192,48 @@ const comune = params.get("comune");
 let original = "{}";
 let dirty = false;
 let map;
-let markers = [];
-let luoghi = [];
-  
-/* DOPO che il DOM è pronto */
-window.addEventListener("DOMContentLoaded", () => {
-  if (lat) lu_lat.value = lat;
-  if (lng) lu_lng.value = lng;
-  if (comune) id_comune.value = comune;
-});
-  
-window.openMap = async () => {
-  const idComune = id_comune.value;
-  if (!idComune) return;
+let marker;
+
+function initMapLuogo() {
+  if (map) return;
+  map = L.map('map').setView([38.1, 13.3], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: ''
+  }).addTo(map);
+  map.on("click", (e) => {
+    const { lat, lng } = e.latlng;
+    const ok = confirm("Vuoi usare queste coordinate per il luogo?");
+    if (!ok) return;
+    lu_lat.value = lat.toFixed(6);
+    lu_lng.value = lng.toFixed(6);
+    markDirty();
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map);
+  });
+}
+window.openMapLuogo = () => {
   document.getElementById("mapModal").style.display = "block";
-  await loadMapLuoghi(idComune);
+  initMapLuogo();
   setTimeout(() => {
     map.invalidateSize();
   }, 200);
 };
-  
-window.closeMap = () => {
-  document.getElementById("mapModal").style.display = "none";
-};  
 
+  
 /* COMUNI */
 async function loadComuni() {
   const { data = [] } = await supabase.from('comuni').select('*');
-
   const sorted = (data || []).sort((a,b)=>
   (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
   );
-  
   const sel = document.getElementById("id_comune");
   sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
-
   sorted.forEach(c=>{
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
+    if (isNew && comune) {
+    sel.value = comune;
+  }
 }
 
 /* LOAD */
@@ -278,9 +251,7 @@ async function load() {
     console.error(error);
     return;
   }
-
   original = JSON.stringify(data);
-
   lu_location.value = data.lu_location || '';
   id_comune.value = data.id_comune || '';
   lu_descrizione.value = data.lu_descrizione || '';
@@ -320,9 +291,7 @@ async function save() {
       ? parseInt(lu_capienza.value)
       : null
   };
-
   let result;
-
   if (isNew) {
     result = await supabase
       .from('luoghi')
@@ -337,29 +306,23 @@ async function save() {
       .select()
       .single();
   }
-
   const { data, error } = result;
-
   if (error) {
     console.error(error);
     alert("Errore salvataggio");
     return false;
   }
-
   dirty = false;
-
   // 🔥 redirect solo dopo insert
   if (isNew) {
     location.href = `luogo.html?id=${data.id_luogo}`;
   }
-
   return true;
 }
 
 /* BACK */
 window.requestBack = async () => {
   if (!dirty) return history.back();
-
   const ok = confirm("Vuoi salvare le modifiche?");
 if (ok) {
   const success = await save();
@@ -368,57 +331,9 @@ if (ok) {
 history.back();
 };
 
-function initMap() {
-  if (map) return;
-  map = L.map('map').setView([38.1, 13.3], 10);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: ''
-  }).addTo(map);
-}  
-
-async function loadMapLuoghi(idComune) {
-  initMap();
-  const { data } = await supabase
-    .from("luoghi")
-    .select("*")
-    .eq("id_comune", idComune);
-  luoghi = data || [];
-  renderMarkers(luoghi);
-}
-
-function renderMarkers(luoghiList) {
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
-  const valid = luoghiList.filter(l => l.lu_lat && l.lu_lng);
-  if (!valid.length) return;
-  const bounds = [];
-  valid.forEach(l => {
-    const isSelected = id && l.id_luogo == id;
-    const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
-    marker.bindTooltip(
-      l.lu_location,
-      { direction: "top", sticky: true }
-    );
-    if (isSelected) {
-      marker.openTooltip();
-    }
-    marker.on("click", () => {
-      lu_lat.value = l.lu_lat;
-      lu_lng.value = l.lu_lng;
-      markDirty();
-      closeMap();
-    });
-    markers.push(marker);
-    bounds.push([l.lu_lat, l.lu_lng]);
-  });
-  map.fitBounds(bounds, { padding: [30, 30] });
-}  
-  
 await loadComuni();
 await load();
+  
 </script>
-
-</body>
-</html>
 </body>
 </html>
