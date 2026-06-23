@@ -6,7 +6,7 @@
 <title>Luogo</title>
 
 <link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
 <style>
 body {
@@ -131,7 +131,10 @@ input, select, textarea {
           style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;"
           oninput="markDirty()"></select>
 </div>
- 
+<button type="button" onclick="openMapLuogo()" class="map-btn">
+  Map
+</button>
+  
 <div class="card">
 
   <!-- LOCATION -->
@@ -171,7 +174,7 @@ input, select, textarea {
   </div>
 
   <div style="width:70px;">
-    <button class="map-btn" onclick="openMapLuogo()">Map</button>
+    <button class="map-btn" onclick="openCoords()">Map</button>
   </div>
 
   <div class="footer" id="lu_creato"></div>
@@ -211,7 +214,6 @@ function initMapLuogo() {
     marker = L.marker([lat, lng]).addTo(map);
   });
 }
-  
 window.openMapLuogo = () => {
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
