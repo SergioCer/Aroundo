@@ -169,9 +169,38 @@ input, select, textarea {
   </div>
 
   <div style="width:70px;">
-    <button class="map-btn" onclick="openCoords()">Map</button>
+    <button class="map-btn" onclick="openMap()">Map</button>
   </div>
 
+  <!-- MAP POPUP -->
+<div id="mapModal" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  z-index:9999;
+">
+  <div style="
+    position:absolute;
+    top:5%;
+    left:5%;
+    width:90%;
+    height:90%;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+  ">
+    <div style="padding:10px; display:flex; justify-content:space-between;">
+      <div style="font-weight:bold;">Seleziona luogo</div>
+      <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
+    </div>
+    <div id="map" style="height:calc(100% - 50px);"></div>
+  </div>
+</div>
+  
   <div class="footer" id="lu_creato"></div>
 
 </div>
@@ -190,15 +219,30 @@ const comune = params.get("comune");
 
 let original = "{}";
 let dirty = false;
-
+let map;
+let markers = [];
+let luoghi = [];
+  
 /* DOPO che il DOM è pronto */
 window.addEventListener("DOMContentLoaded", () => {
-
   if (lat) lu_lat.value = lat;
   if (lng) lu_lng.value = lng;
   if (comune) id_comune.value = comune;
-
 });
+  
+window.openMap = async () => {
+  const idComune = id_comune.value;
+  if (!idComune) return;
+  document.getElementById("mapModal").style.display = "block";
+  await loadMapLuoghi(idComune);
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
+};
+  
+window.closeMap = () => {
+  document.getElementById("mapModal").style.display = "none";
+};  
 
 /* COMUNI */
 async function loadComuni() {
@@ -321,14 +365,52 @@ if (ok) {
 history.back();
 };
 
-/* MAP */
-window.openCoords = () => {
-  window.open(
-    `https://sergiocer.github.io/Coordinate/?lat=${lu_lat.value}&lng=${lu_lng.value}`,
-    "_blank"
-  );
-};
+function initMap() {
+  if (map) return;
+  map = L.map('map').setView([38.1, 13.3], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: ''
+  }).addTo(map);
+}  
 
+async function loadMapLuoghi(idComune) {
+  initMap();
+  const { data } = await supabase
+    .from("luoghi")
+    .select("*")
+    .eq("id_comune", idComune);
+  luoghi = data || [];
+  renderMarkers(luoghi);
+}
+
+function renderMarkers(luoghiList) {
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+  const valid = luoghiList.filter(l => l.lu_lat && l.lu_lng);
+  if (!valid.length) return;
+  const bounds = [];
+  valid.forEach(l => {
+    const isSelected = id && l.id_luogo == id;
+    const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
+    marker.bindTooltip(
+      l.lu_location,
+      { direction: "top", sticky: true }
+    );
+    if (isSelected) {
+      marker.openTooltip();
+    }
+    marker.on("click", () => {
+      lu_lat.value = l.lu_lat;
+      lu_lng.value = l.lu_lng;
+      markDirty();
+      closeMap();
+    });
+    markers.push(marker);
+    bounds.push([l.lu_lat, l.lu_lng]);
+  });
+  map.fitBounds(bounds, { padding: [30, 30] });
+}  
+  
 await loadComuni();
 await load();
 </script>
