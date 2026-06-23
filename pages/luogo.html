@@ -198,7 +198,9 @@ input, select, textarea {
   ">
     <div style="padding:10px; display:flex; justify-content:space-between;">
       <div style="font-weight:bold;">Seleziona luogo</div>
-      <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
+      <button onclick="closeMap()" style="border:none; background:#e5e7eb; color:#374151; width:30px; height:30px; border-radius:15px; font-size:16px; cursor:pointer;>
+  ✕
+</button>
     </div>
     <div id="map" style="height:calc(100% - 50px);"></div>
   </div>
@@ -387,21 +389,12 @@ const marker = L.marker(
     icon: isSelected ? redIcon() : defaultIcon()
   }
 ).addTo(map);
-const tooltipContent = `
-  <div style="font-weight:600;">${l.lu_location}</div>
-  <div style="font-size:11px; color:#666;">
-    ${l.lu_descrizione || ''}
-  </div>
-`;
-marker.bindTooltip(tooltipContent, {
-  direction: "top",
-  offset: [0, -10],
-  opacity: 0.95,
-  permanent: false
+marker.bindTooltip(l.lu_location, {
+  direction: "top"
 });
 if (isSelected) {
   marker.openTooltip();
-}    
+}
     marker.on("click", () => {
       lu_lat.value = l.lu_lat;
       lu_lng.value = l.lu_lng;
