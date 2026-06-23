@@ -391,8 +391,17 @@ const marker = L.marker(
     icon: isSelected ? redIcon() : defaultIcon()
   }
 ).addTo(map);
-marker.bindTooltip(l.lu_location, {
-  direction: "top"
+const tooltipContent = `
+  <div style="font-weight:600;">${l.lu_location}</div>
+  <div style="font-size:11px; color:#666;">
+    ${l.lu_descrizione || ''}
+  </div>
+`;
+marker.bindTooltip(tooltipContent, {
+  direction: "top",
+  offset: [0, -10],
+  opacity: 0.95,
+  permanent: false
 });
 if (isSelected) {
   marker.openTooltip();
