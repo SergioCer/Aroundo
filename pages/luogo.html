@@ -179,9 +179,18 @@ input, select, textarea {
 <script type="module">
 import { supabase } from '../supabase.js';
 
+
+if (lat) lu_lat.value = lat;
+if (lng) lu_lng.value = lng;
+if (comune) id_comune.value = comune;
+  
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const isNew = params.has('new') || !id;
+
+const lat = params.get("lat");
+const lng = params.get("lng");
+const comune = params.get("comune");
   
 let original = "{}";
 let dirty = false;
