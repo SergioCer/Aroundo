@@ -344,6 +344,10 @@ if (ok) {
 history.back();
 };
 
+  window.closeMap = () => {
+  document.getElementById("mapModal").style.display = "none";
+};
+  
 await loadComuni();
 await load();
   
