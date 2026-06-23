@@ -127,9 +127,11 @@ input, select, textarea {
   <select id="id_comune"
           style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;"
           oninput="markDirty()"></select>
-
 </div>
-
+<button type="button" onclick="openMapLuogo()" class="map-btn">
+  Map
+</button>
+  
 <div class="card">
 
   <!-- LOCATION -->
@@ -189,7 +191,35 @@ const comune = params.get("comune");
 
 let original = "{}";
 let dirty = false;
+let map;
+let marker;
 
+function initMapLuogo() {
+  if (map) return;
+  map = L.map('map').setView([38.1, 13.3], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: ''
+  }).addTo(map);
+  map.on("click", (e) => {
+    const { lat, lng } = e.latlng;
+    const ok = confirm("Vuoi usare queste coordinate per il luogo?");
+    if (!ok) return;
+    lu_lat.value = lat.toFixed(6);
+    lu_lng.value = lng.toFixed(6);
+    markDirty();
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map);
+  });
+}
+window.openMapLuogo = () => {
+  document.getElementById("mapModal").style.display = "block";
+  initMapLuogo();
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
+};
+
+  
 /* COMUNI */
 async function loadComuni() {
   const { data = [] } = await supabase.from('comuni').select('*');
