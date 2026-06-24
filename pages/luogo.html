@@ -254,9 +254,7 @@ import { supabase } from '../supabase.js';
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const isNew = params.has('new') || !id;
-const mapTitleText = isNew
-  ? "Aggiungi Luogo"
-  : "Luogo Attuale";
+const mapTitleText;
 const lat = params.get("lat");
 const lng = params.get("lng");
 const comune = params.get("comune");
@@ -370,7 +368,6 @@ async function loadComuni() {
   comuniCoords = {}; // 👈 Le coordinate del comune
   const sel = document.getElementById("id_comune");
   sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
-  const mapTitleText = "Aggiungi Luogo";
     sorted.forEach(c=>{
     comuniCoords[c.id_comune] = {
       lat: c.co_lat,
@@ -404,7 +401,7 @@ async function load() {
   lu_lng.value = data.lu_lng || '';
   lu_capienza.value = data.lu_capienza || '';
   document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
-  document.getElementById("mapTitle").textContent = mapTitleText;
+  document.getElementById("mapTitle").textContent = isNew ? "Aggiungi Luogo" : "Luogo Attuale";
 }
 
 async function loadMapLuoghi(idComune) {
