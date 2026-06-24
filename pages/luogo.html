@@ -269,7 +269,6 @@ async function loadComuni() {
 /* LOAD */
 async function load() {
   if (isNew) {
-    await loadComuni(); // Aspetta che i comuni vengano tutti caricati
     original = JSON.stringify({}); // base vuoto
     return;
   }
@@ -285,7 +284,6 @@ async function load() {
   original = JSON.stringify(data);
   lu_location.value = data.lu_location || '';
   id_comune.value = data.id_comune || '';
-  await loadComuni(); // dopo avere settato valore
   lu_descrizione.value = data.lu_descrizione || '';
   lu_note.value = data.lu_note || '';
   lu_lat.value = data.lu_lat || '';
@@ -385,7 +383,7 @@ window.openMapLuogo = () => {
   }, 200);
 };
   
-loadComuni();
+await loadComuni();
 await load();
   
 </script>
