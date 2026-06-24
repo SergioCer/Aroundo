@@ -240,7 +240,7 @@ input, select, textarea {
     overflow:hidden;
   ">
     <div style="padding:10px; display:flex; justify-content:space-between;">
-      <div id="mapTitle" style="font-weight:bold;">Nuovo Luogo</div>
+      <div id="mapTitle" style="font-weight:bold;">NON FUNZIONA</div>
       <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
     </div>
     <div id="map" style="height:calc(100% - 50px);"></div>
@@ -380,7 +380,10 @@ async function loadComuni() {
 async function load() {
   if (isNew) {
     original = JSON.stringify({}); // base vuoto
+    document.getElementById("mapTitle").textContent = "Aggiungi Luogo";
     return;
+  } else {
+    document.getElementById("mapTitle").textContent =  "Luogo Attuale";
   }
   const { data, error } = await supabase
     .from('luoghi')
@@ -400,7 +403,6 @@ async function load() {
   lu_lng.value = data.lu_lng || '';
   lu_capienza.value = data.lu_capienza || '';
   document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
-  document.getElementById("mapTitle").textContent = isNew ? "Aggiungi Luogo" : "Luogo Attuale";
 }
 
 async function loadMapLuoghi(idComune) {
