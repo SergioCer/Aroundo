@@ -264,9 +264,6 @@ async function loadComuni() {
   sorted.forEach(c=>{
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
-    if (isNew && comune) {
-    sel.value = comune;
-  }
 }
 
 /* LOAD */
@@ -386,8 +383,8 @@ window.openMapLuogo = () => {
   }, 200);
 };
   
+await loadComuni();
 await load();
-if (!id) {await loadComuni();}
   
 </script>
 </body>
