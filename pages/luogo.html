@@ -338,6 +338,12 @@ const selectedIcon = L.icon({
   
 window.openMapLuogo = () => {
   document.getElementById("mapModal").style.display = "block";
+  const title = document.getElementById("mapTitle");
+  if (isNew) {
+    title.textContent = "Aggiungi Luogo";
+  } else {
+    title.textContent = "Luogo Attuale";
+  }
   initMapLuogo();
   setTimeout(() => {
     map.invalidateSize();
