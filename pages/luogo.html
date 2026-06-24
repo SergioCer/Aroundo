@@ -174,17 +174,47 @@ input, select, textarea {
 ">
   <div style="
     background:white;
-    padding:20px;
+    padding:22px;
     border-radius:12px;
-    width:280px;
+    width:300px;
     text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
   ">
-    <div style="margin-bottom:15px;">
+    <div style="margin-bottom:18px; font-weight:600;">
       Vuoi salvare le modifiche?
     </div>
-    <button onclick="dialogAction('yes')" style="margin:5px;">Sì</button>
-    <button onclick="dialogAction('no')" style="margin:5px;">No</button>
-    <button onclick="dialogAction('cancel')" style="margin:5px;">Annulla</button>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button onclick="dialogAction('yes')" style="
+        flex:1;
+        background:#22c55e;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">Sì</button>
+      <button onclick="dialogAction('no')" style="
+        flex:1;
+        background:#ef4444;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">No</button>
+      <button onclick="dialogAction('cancel')" style="
+        flex:1;
+        background:#9ca3af;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">Annulla</button>
+    </div>
   </div>
 </div>
   
@@ -248,6 +278,8 @@ function dialogAction(type) {
   document.getElementById("saveDialog").style.display = "none";
   dialogResolve(type);
 }
+
+window.dialogAction = dialogAction;
   
 function initMapLuogo() {
   if (map) return;
