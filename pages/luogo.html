@@ -359,8 +359,8 @@ history.back();
   document.getElementById("mapModal").style.display = "none";
 };
   
-await loadComuni();
 await load();
+if (!id) {await loadComuni();}
   
 </script>
 </body>
