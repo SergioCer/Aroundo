@@ -221,7 +221,7 @@ function initMapLuogo() {
     lu_lng.value = lng.toFixed(6);
     markDirty();
     if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lng], { icon: selectedIcon }).addTo(map);
+    marker = L.marker([lat, lng], { icon: selectedIcon, riseOnHover: true }).addTo(map);
   });
 }
 
