@@ -158,6 +158,35 @@ input, select, textarea {
   </div>
 
   <div class="footer" id="lu_creato"></div>
+
+  <!-- SI - NO - ANNULLA -->
+<div id="saveDialog" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  z-index:99999;
+  align-items:center;
+  justify-content:center;
+">
+  <div style="
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    width:280px;
+    text-align:center;
+  ">
+    <div style="margin-bottom:15px;">
+      Vuoi salvare le modifiche?
+    </div>
+    <button onclick="dialogAction('yes')" style="margin:5px;">Sì</button>
+    <button onclick="dialogAction('no')" style="margin:5px;">No</button>
+    <button onclick="dialogAction('cancel')" style="margin:5px;">Annulla</button>
+  </div>
+</div>
   
     <!-- MAP POPUP -->
 <div id="mapModal" style="
@@ -206,6 +235,19 @@ let map;
 let marker;
 let markers = [];
 let luoghi = [];
+let dialogResolve;
+
+function askSaveDialog() {
+  document.getElementById("saveDialog").style.display = "flex";
+  return new Promise(resolve => {
+    dialogResolve = resolve;
+  });
+}
+
+function dialogAction(type) {
+  document.getElementById("saveDialog").style.display = "none";
+  dialogResolve(type);
+}
   
 function initMapLuogo() {
   if (map) return;
@@ -376,15 +418,20 @@ window.markDirty = () => {
     .classList.toggle('dirty', dirty);
 };
   
-  /* BACK */
+  /* SI - NO - ANNULLA */
 window.requestBack = async () => {
   if (!dirty) return history.back();
-  const ok = confirm("Vuoi salvare le modifiche?");
-if (ok) {
-  const success = await save();
-  if (!success) return;
-}
-history.back();
+  const choice = await askSaveDialog();
+  if (choice === "cancel") return;
+  if (choice === "yes") {
+    const success = await save();
+    if (!success) return;
+    history.back();
+    return;
+  }
+  if (choice === "no") {
+    history.back();
+  }
 };
 
   window.closeMap = () => {
