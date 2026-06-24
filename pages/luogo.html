@@ -240,7 +240,7 @@ input, select, textarea {
     overflow:hidden;
   ">
     <div style="padding:10px; display:flex; justify-content:space-between;">
-      <div style="font-weight:bold;">Seleziona luogo</div>
+      <div id="mapTitle" style="font-weight:bold;">Luogo</div>
       <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
     </div>
     <div id="map" style="height:calc(100% - 50px);"></div>
@@ -266,7 +266,8 @@ let marker;
 let markers = [];
 let luoghi = [];
 let dialogResolve;
-
+let comuniCoords = {};
+  
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
   return new Promise(resolve => {
@@ -304,7 +305,16 @@ function renderMarkers(list) {
   markers = [];
   const currentId = id; // luogo in modifica
   const valid = (list || []).filter(l => l.lu_lat && l.lu_lng);
-  if (!valid.length) return;
+  if (!valid.length) {
+  const idComune = id_comune.value;
+  const comune = comuniCoords[idComune];
+  if (comune?.lat && comune?.lng) {
+    map.setView([comune.lat, comune.lng], 12);
+  } else {
+    map.setView([38.1, 13.3], 8);
+  }
+  return;
+}
   const bounds = [];
   valid.forEach(l => {
     const isCurrent = l.id_luogo == currentId;
@@ -357,9 +367,14 @@ async function loadComuni() {
   const sorted = (data || []).sort((a,b)=>
   (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
   );
+  comuniCoords = {}; // 👈 Le coordinate del comune
   const sel = document.getElementById("id_comune");
   sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
   sorted.forEach(c=>{
+    comuniCoords[c.id_comune] = {
+      lat: c.co_lat,
+      lng: c.co_lng
+    };    
     sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
   });
 }
