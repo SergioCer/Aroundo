@@ -226,6 +226,24 @@ function initMapLuogo() {
   });
 }
 
+function renderMarkers(list) {
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+  const valid = (list || []).filter(l => l.lu_lat && l.lu_lng);
+  if (!valid.length) return;
+  const bounds = [];
+  valid.forEach(l => {
+    const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
+    marker.bindTooltip(
+      l.lu_location || "",
+      { direction: "top", sticky: true }
+    );
+    markers.push(marker);
+    bounds.push([l.lu_lat, l.lu_lng]);
+  });
+  map.fitBounds(bounds, { padding: [30, 30] });
+}  
+
 window.openMapLuogo = () => {
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
@@ -278,7 +296,6 @@ async function load() {
 }
 
 async function loadMapLuoghi(idComune) {
-  initMap();
   const { data } = await supabase
     .from("luoghi")
     .select("*")
@@ -357,6 +374,16 @@ history.back();
 
   window.closeMap = () => {
   document.getElementById("mapModal").style.display = "none";
+};
+
+window.openMapLuogo = () => {
+  document.getElementById("mapModal").style.display = "block";
+  initMapLuogo();
+  const idComune = id_comune.value; // 🔥 fondamentale
+  if (idComune) loadMapLuoghi(idComune);
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
 };
   
 await load();
