@@ -292,6 +292,8 @@ function initMapLuogo() {
   }).addTo(map);
   map.on("click", (e) => {
     const { lat, lng } = e.latlng;
+      // 🔴 BLOCCO MODIFICA: non permettere inserimento nuovi punti
+      if (!isNew) return;
     const ok = confirm("Vuoi usare queste coordinate per il luogo?");
     if (!ok) return;
     lu_lat.value = lat.toFixed(6);
