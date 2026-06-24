@@ -229,11 +229,16 @@ function initMapLuogo() {
 function renderMarkers(list) {
   markers.forEach(m => map.removeLayer(m));
   markers = [];
+  const currentId = id; // luogo in modifica
   const valid = (list || []).filter(l => l.lu_lat && l.lu_lng);
   if (!valid.length) return;
   const bounds = [];
   valid.forEach(l => {
-    const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
+    const isCurrent = l.id_luogo == currentId;
+    const marker = L.marker(
+      [l.lu_lat, l.lu_lng],
+      { icon: isCurrent ? selectedIcon : defaultIcon }
+    ).addTo(map);
     marker.bindTooltip(
       l.lu_location || "",
       { direction: "top", sticky: true }
@@ -242,8 +247,22 @@ function renderMarkers(list) {
     bounds.push([l.lu_lat, l.lu_lng]);
   });
   map.fitBounds(bounds, { padding: [30, 30] });
-}  
+}
 
+const defaultIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+
+const selectedIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});  
+  
 window.openMapLuogo = () => {
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
