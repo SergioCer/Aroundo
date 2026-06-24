@@ -96,6 +96,16 @@ input, select, textarea {
   color: #888;
   margin-top: 15px;
 }
+
+.selected-marker {
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
   
 /* BACK ICON STYLE DIFFERENT WHEN DIRTY */
 </style>
