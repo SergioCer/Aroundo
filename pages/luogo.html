@@ -91,23 +91,13 @@ input, select, textarea {
 }
 
 .footer {
-  text-align: right;
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
   font-size: 11px;
   color: #888;
-  margin-top: 15px;
 }
 
-.selected-marker {
-  animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1); }
-}
-  
-/* BACK ICON STYLE DIFFERENT WHEN DIRTY */
 </style>
 </head>
 
@@ -195,10 +185,9 @@ input, select, textarea {
     <div id="map" style="height:calc(100% - 50px);"></div>
   </div>
 </div>
+</div>
   
   <div class="footer" id="lu_creato"></div>
-
-</div>
 
 <script type="module">
 import { supabase } from '../supabase.js';
