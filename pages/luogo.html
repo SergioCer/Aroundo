@@ -205,7 +205,9 @@ let original = "{}";
 let dirty = false;
 let map;
 let marker;
-
+let markers = [];
+let luoghi = [];
+  
 function initMapLuogo() {
   if (map) return;
   map = L.map('map').setView([38.1, 13.3], 10);
@@ -275,22 +277,15 @@ async function load() {
   document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
 }
 
-/* DIRTY */
-window.markDirty = () => {
-  const current = JSON.stringify({
-    lu_location: lu_location.value,
-    id_comune: id_comune.value,
-    lu_descrizione: lu_descrizione.value,
-    lu_note: lu_note.value,
-    lu_lat: lu_lat.value,
-    lu_lng: lu_lng.value,
-    lu_capienza: lu_capienza.value
-  });
-  dirty = current !== original;
-  document.getElementById('backBtn')
-    .classList.toggle('dirty', dirty);
-};
-
+async function loadMapLuoghi(idComune) {
+  initMap();
+  const { data } = await supabase
+    .from("luoghi")
+    .select("*")
+    .eq("id_comune", idComune);
+  renderMarkers(data || []);
+}
+  
 /* SAVE */
 async function save() {
   const payload = {
@@ -333,7 +328,23 @@ async function save() {
   return true;
 }
 
-/* BACK */
+/* DIRTY */
+window.markDirty = () => {
+  const current = JSON.stringify({
+    lu_location: lu_location.value,
+    id_comune: id_comune.value,
+    lu_descrizione: lu_descrizione.value,
+    lu_note: lu_note.value,
+    lu_lat: lu_lat.value,
+    lu_lng: lu_lng.value,
+    lu_capienza: lu_capienza.value
+  });
+  dirty = current !== original;
+  document.getElementById('backBtn')
+    .classList.toggle('dirty', dirty);
+};
+  
+  /* BACK */
 window.requestBack = async () => {
   if (!dirty) return history.back();
   const ok = confirm("Vuoi salvare le modifiche?");
