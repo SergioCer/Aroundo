@@ -336,6 +336,20 @@ let luoghi = [];
 let map;
 let markers = [];
 let dialogResolve;
+
+const defaultIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+
+const selectedIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});  
   
 /* LOAD SELECTS */
 async function loadSelects() {
@@ -627,7 +641,9 @@ function renderMarkers(luoghiList) {
   }
   const bounds = [];
   valid.forEach(l => {
-    const marker = L.marker([l.lu_lat, l.lu_lng]).addTo(map);
+    const isCurrent = l.id_luogo == id_luogo.value;
+    const marker = L.marker([l.lu_lat, l.lu_lng],
+    {icon: isCurrent ? selectedIcon : defaultIcon} ).addTo(map);
     marker.bindTooltip(
       l.lu_descrizione
         ? `${l.lu_location}<br><small>${l.lu_descrizione}</small>`
