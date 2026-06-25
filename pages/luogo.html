@@ -368,19 +368,15 @@ window.openMapLuogo = async () => {
   
 /* COMUNI */
 async function loadComuni() {
-  const { data = [] } = await supabase.from('comuni').select('*');
-  const sorted = (data || []).sort((a,b)=>
-  (a.co_descrizione||'').localeCompare(b.co_descrizione||'')
-  );
-  comuniCoords = {}; // 👈 Le coordinate del comune
-  const sel = document.getElementById("id_comune");
-  sel.innerHTML = `<option value="">-- Seleziona Comune --</option>`;
-    sorted.forEach(c=>{
+  const { data = [] } = await supabase
+    .from('comuni')
+    .select('id_comune, co_lat, co_lng');
+  comuniCoords = {};
+  data.forEach(c => {
     comuniCoords[c.id_comune] = {
       lat: c.co_lat,
       lng: c.co_lng
-    };    
-    sel.innerHTML += `<option value="${c.id_comune}">${c.co_descrizione}</option>`;
+    };
   });
 }
 
