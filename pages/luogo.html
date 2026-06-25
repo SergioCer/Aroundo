@@ -289,7 +289,7 @@ window.dialogAction = dialogAction;
   
 function initMapLuogo() {
   if (map) return;
-  map = L.map('map').setView([38.1, 13.3], 8);
+  map = L.map('map');
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
@@ -357,7 +357,11 @@ window.openMapLuogo = () => {
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
   const idComune = id_comune_hidden.value;
-  if (idComune) loadMapLuoghi(idComune);  
+   if (idComune) {
+    await loadMapLuoghi(idComune);
+  } else {
+    map.setView([38.1, 13.3], 8);
+  }
   setTimeout(() => {
     map.invalidateSize();
   }, 200);
