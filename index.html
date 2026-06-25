@@ -1049,7 +1049,7 @@ document.getElementById("reset-day").addEventListener("click", () => {
   async function fetchCategories() {
     console.log("Creo le Categorie", new Date().toLocaleTimeString());
     const { data, error } = await supabase
-      .from('macrocategorie')
+      .from('categorie')
       .select('*')
       .eq('mc_attiva', true)
       .order('mc_ordine', { ascending: true });
