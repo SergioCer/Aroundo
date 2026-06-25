@@ -47,6 +47,7 @@ body {
 
 .map-btn {
   width: 60px;
+  min-width: 60px;
   height: 30px;
   border-radius: 6px;
   border: none;
@@ -54,7 +55,24 @@ body {
   color: #1e3a8a;
   font-size: 12px;
   cursor: pointer;
-}  
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+  transition: all 0.25s ease;
+}
+
+.map-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+  animation: bounceIn 0.35s ease;
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0.7); }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
 
 /* HERO */
 .hero {
@@ -173,35 +191,7 @@ input, select, textarea {
       <button type="button" class="map-btn" onclick="openMapByComune()" id="mapBtn">
         Map
       </button>
-
-      <div id="mapTooltip" style="
-        display:none;
-        position:absolute;
-        top:-55px;
-        left:50%;
-        transform:translateX(-50%);
-        background:#fee2e2;
-        color:#991b1b;
-        padding:8px 10px;
-        border-radius:8px;
-        font-size:12px;
-        white-space:nowrap;
-        box-shadow:0 6px 18px rgba(0,0,0,0.15);
-      ">
-        ⚠ Selezionare un Comune per visualizzare la mappa
-        <div style="
-          position:absolute;
-          bottom:-6px;
-          left:50%;
-          transform:translateX(-50%);
-          width:10px;
-          height:10px;
-          background:#fee2e2;
-          rotate:45deg;
-        "></div>
-      </div>
-    </div>
-    
+   
     <button type="button" onclick="window.location.href='luogo.html?new=1'" style="
     width:34px;
     height:34px;
@@ -456,6 +446,7 @@ async function load() {
     ? new Date(data.ev_creato).toLocaleString()
     : '';
 updateCover();
+updateMapButton()  
 }
 
 async function loadComuni() {
@@ -546,6 +537,7 @@ window.searchComuni = async (text) => {
   const box = document.getElementById('comuniResults');
   if (text.length < 3) {
     box.innerHTML = '';
+    updateMapButton()
     return;
   }
   const { data } = await supabase
@@ -566,11 +558,11 @@ window.searchComuni = async (text) => {
       filterLuoghi();
       markDirty();
       box.innerHTML = '';
+      updateMapButton() 
     };
     box.appendChild(div);
   });
 };
-  
   
 /* SAVE */
 async function save() {
@@ -674,13 +666,9 @@ function initMap() {
 window.openMapByComune = async () => {
   const idComune = id_comune_evento_hidden.value;
     if (!idComune) {
-      const tip = document.getElementById("mapTooltip");
-      tip.style.display = "block";
-      setTimeout(() => {
-        tip.style.display = "none";
-      }, 2500);
-      return;
-    }
+    updateMapButton();
+    return;
+  }
   document.getElementById("mapModal").style.display = "block";
   await loadMapLuoghi(idComune);
   // fondamentale per Leaflet dentro modale
@@ -762,6 +750,18 @@ function dialogAction(type) {
 }
 
 window.dialogAction = dialogAction;
+
+function updateMapButton() {
+  const idComune = id_comune_evento_hidden.value;
+  const btn = document.querySelector(".map-btn");
+  if (idComune) {
+    btn.classList.add("visible");
+  } else {
+    btn.classList.remove("visible");
+  }
+}
+
+  
   
 await loadComuni();  
 await loadSelects();
