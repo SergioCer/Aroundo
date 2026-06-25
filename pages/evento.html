@@ -685,7 +685,7 @@ function updateCover() {
 
 function initMap() {
   if (map) return;
-  map = L.map('map'); // CANCELLARE VECCHIO .setView([38.1, 13.3], 9);
+  map = L.map('map');
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
@@ -758,13 +758,13 @@ function renderMarkers(luoghiList, comune) {
     bounds.push([l.lu_lat, l.lu_lng]);
   });
   //CANCELLARE VECCHIO map.fitBounds(bounds, { padding: [30, 30] });  SOTTO IL NUOVO 
-  if (bounds.length) {
-  map.fitBounds(bounds, { padding: [30, 30] });
-} else if (comune?.co_lat && comune?.co_lng) {
-  map.setView([comune.co_lat, comune.co_lng], 13);
-} else {
-  map.setView([38.1, 13.3], 9);
-}
+  // if (bounds.length) {
+  map.fitBounds(bounds, { padding: [30, 30] }); // ***** VIVE *****
+  // } else if (comune?.co_lat && comune?.co_lng) {
+  // map.setView([comune.co_lat, comune.co_lng], 13);
+// } else {
+  // map.setView([38.1, 13.3], 9);
+// }
 }
 
 window.closeMap = () => {
