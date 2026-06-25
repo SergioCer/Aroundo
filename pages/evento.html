@@ -384,7 +384,6 @@ const { data: org } = await supabase.from('organizzatori').select('*');
   });
 enableTypeSearch(id_luogo);
 enableTypeSearch(id_organizzatore);
-enableTypeSearch(id_comune_evento);  
 }
 
 /* LOAD */
@@ -679,7 +678,7 @@ function renderMarkers(luoghiList, comune) {
   markers = [];
   const valid = luoghiList.filter(l => l.lu_lat && l.lu_lng);
     if (!valid.length) {
-      if (comune?.lat && comune?.lng) {
+      if (comune?.co_lat && comune?.co_lng) {
         map.setView([comune.co_lat, comune.co_lng], 13);
       } else {
         map.setView([38.1, 13.3], 9);
