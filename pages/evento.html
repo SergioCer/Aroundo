@@ -388,7 +388,7 @@ const selectedIcon = L.icon({
 /* LOAD SELECTS */
 async function loadSelects() {
   const { data: cat } = await supabase.from('macrocategorie').select('*');
-  ev_categoria.innerHTML = `<option value="">-- categoria --</option>`;
+  ev_categoria.innerHTML = `<option value="">Categoria...</option>`;
   (cat || []).forEach(c => {
     ev_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
   });
