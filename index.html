@@ -1762,12 +1762,12 @@ function updateMarkerState(marker, state, latLng, evFine) {
   const now = new Date();
   const eventoFinito = evFine && now >= new Date(evFine);
   if (eventoFinito) {
-    // Evento Finito → pulisci intervallo fuochi e imposta stato a 'done'
+    // Evento Finito → pulisci intervallo fuochi e imposta stato a 'finished'
     if (marker.fireworkInterval) {
       clearInterval(marker.fireworkInterval);
       marker.fireworkInterval = null;
     }
-    marker.state = 'done';
+    marker.state = 'finished';
     return;
   }
   // Evento attuale, fuochi solo se in countdown
