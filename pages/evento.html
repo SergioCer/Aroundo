@@ -393,7 +393,7 @@ async function loadSelects() {
     ev_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
   });
   const { data: luoghiData } = await supabase.from('luoghi').select('*');
-  ev_luogo.innerHTML = `<option value="">Luogo...</option>`;
+  id_luogo.innerHTML = `<option value="">Luogo...</option>`;
   luoghi = luoghiData || [];
   const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">Organizzatore...</option>`;
