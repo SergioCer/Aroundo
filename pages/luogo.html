@@ -491,16 +491,6 @@ window.requestBack = async () => {
   document.getElementById("mapModal").style.display = "none";
 };
 
-window.openMapLuogo = () => {
-  document.getElementById("mapModal").style.display = "block";
-  initMapLuogo();
-  const idComune = id_comune.value; // 🔥 fondamentale
-  if (idComune) loadMapLuoghi(idComune);
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 200);
-};
-  
 await loadComuni();
 await load();
   
