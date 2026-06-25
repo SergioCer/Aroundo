@@ -45,6 +45,17 @@ body {
   background: #d1d5db;
 }
 
+.map-btn {
+  width: 60px;
+  height: 30px;
+  border-radius: 6px;
+  border: none;
+  background: #dbeafe;
+  color: #1e3a8a;
+  font-size: 12px;
+  cursor: pointer;
+}  
+
 /* HERO */
 .hero {
   margin: 10px 15px 8px;
@@ -147,7 +158,7 @@ input, select, textarea {
   <div class="section-title">Luogo</div>
   <div style="display:flex; gap:10px; align-items:center;">
   <select id="id_luogo" oninput="markDirty()" style="flex:1;"></select>
-  <button type="button" onclick="openMapByComune()">Map</button>    
+  <button type="button" class="map-btn" onclick="openMapByComune()">Map</button>    
   <button type="button" onclick="window.location.href='luogo.html?new=1'" style="
     width:34px;
     height:34px;
