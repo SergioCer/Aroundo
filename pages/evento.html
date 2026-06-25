@@ -416,8 +416,7 @@ async function loadSelects() {
       <option value="${o.id_organizzatore}">${o.or_nome}</option>
     `;
   });
-enableTypeSearch(id_luogo);
-enableTypeSearch(id_organizzatore);
+//  CANCELLARE ?????  enableTypeSearch(id_luogo);   NON SAPREI 
 }
 
 /* LOAD */
@@ -680,6 +679,8 @@ function updateCover() {
   }
 }  
 
+
+  // CANCELLARE TUTTA LA FUNZIONE ????? NON SAPREI 
 function enableTypeSearch(select) {
   let buffer = "";
   let timer = null;
@@ -689,13 +690,13 @@ function enableTypeSearch(select) {
     clearTimeout(timer);
     timer = setTimeout(() => buffer = "", 800);
     // CANCELLARE vecchio sistema di ricerca    const options = Array.from(select.options);
-    const match = options.find(o =>
-      o.text.toLowerCase().startsWith(buffer)
-    );
-    if (match) {
-      select.value = match.value;
-      markDirty();
-    }
+    //const match = options.find(o =>
+//      o.text.toLowerCase().startsWith(buffer)
+//    );
+//    if (match) {
+//      select.value = match.value;
+//      markDirty();
+//    }
   });
 }
 
