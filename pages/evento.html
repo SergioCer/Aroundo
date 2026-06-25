@@ -152,7 +152,8 @@ input, select, textarea {
   
   <!-- COMUNE -->
   <div class="section-title">Comune</div>
-  <select id="id_comune_evento" oninput="markDirty(); filterLuoghi();"></select>
+  <input id="id_comune_evento" placeholder="Comune..." oninput="searchComuni(this.value)">
+<div id="comuniResults"></div>
 
   <!-- LUOGO -->
   <div class="section-title">Luogo</div>
@@ -512,6 +513,29 @@ window.duplicateEvent = async () => {
   // redirect a pagina eventi
     location.href = `eventi.html`;
 };
+
+window.searchComuni = async (text) => {
+  if (text.length < 3) return;
+  const { data } = await supabase
+    .from('comuni')
+    .select('id_comune, co_descrizione')
+    .ilike('co_descrizione', text + '%')
+    .limit(10);
+  const box = document.getElementById('comuniResults');
+  box.innerHTML = '';
+  (data || []).forEach(c => {
+    const div = document.createElement('div');
+    div.innerText = c.co_descrizione;
+    div.onclick = () => {
+      id_comune_evento.value = c.id_comune;
+      markDirty();
+      filterLuoghi();
+      box.innerHTML = '';
+    };
+    box.appendChild(div);
+  });
+};
+  
   
 /* SAVE */
 async function save() {
