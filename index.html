@@ -1116,7 +1116,7 @@ function renderEvents() {
     const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
       icon: createIcon(
         categories.find(c =>
-          c.id_macro_categoria === e.ev_categoria
+          c.id_macro_categoria === e.id_categoria
         )?.mc_colore || '#999',
         stateClass,
         intensity
@@ -1219,7 +1219,7 @@ marker.bindPopup(`
     //-- 📦 STORAGE DATI (NO LOGICA)
     markers.push({
       marker,
-      category: parseInt(e.ev_categoria),
+      category: parseInt(e.id_categoria),
       start: new Date(e.ev_inizio),
       end: e.ev_fine ? new Date(e.ev_fine) : null,
       active: e.ev_attivo
@@ -1595,7 +1595,7 @@ function nextDay() {
   // console.trace(); // mostra da dove è stata chiamata
   const list = getUpcomingEvents(20); // Numero di News da visualizzare
   const html = list.map(e => {
-  const color = categories.find(c => c.id_macro_categoria == e.ev_categoria)?.mc_colore || '#999999';
+  const color = categories.find(c => c.id_macro_categoria == e.id_categoria)?.mc_colore || '#999999';
   return `
       <span style="margin-right:20px;
           padding:2px 8px;
