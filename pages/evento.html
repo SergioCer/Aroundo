@@ -141,12 +141,13 @@ input, select, textarea {
   
   <!-- COMUNE -->
   <div class="section-title">Comune</div>
-  <select id="id_comune_evento" oninput="markDirty(); filterLuoghi(); openMapByComune()"></select>
+  <select id="id_comune_evento" oninput="markDirty(); filterLuoghi();"></select>
 
   <!-- LUOGO -->
   <div class="section-title">Luogo</div>
   <div style="display:flex; gap:10px; align-items:center;">
   <select id="id_luogo" oninput="markDirty()" style="flex:1;"></select>
+  <button type="button" onclick="openMapByComune()">Map</button>    
   <button type="button" onclick="window.location.href='luogo.html?new=1'" style="
     width:34px;
     height:34px;
