@@ -210,9 +210,10 @@ input, select, textarea {
   <!-- ORGANIZZATORE -->
   <div class="section-title">Organizzatore</div>
   <div style="display:flex; gap:10px; align-items:center;">
-  <input id="id_organizzatore" placeholder="Organizzatore..." oninput="searchOrganizzatori(this.value)">
+  <input id="id_organizzatore" placeholder="Organizzatore..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
+    
     <input type="hidden" id="id_organizzatore_hidden">
-      <div id="organizzatoriResults"></div>
+    
   <button type="button" onclick="window.location.href='organizzatore.html?new=1'" style="
     width:34px;
     height:34px;
@@ -225,6 +226,10 @@ input, select, textarea {
     cursor:pointer;
   ">+</button>
 </div>
+<div style="font-size:11px;color:#888;margin-top:4px;">
+  Inserire almeno 3 caratteri per la ricerca
+</div>
+<div id="organizzatoriResults"></div>
   
 <div class="inline">
   <div style="flex:1;">
@@ -683,7 +688,7 @@ function enableTypeSearch(select) {
     buffer += e.key.toLowerCase();
     clearTimeout(timer);
     timer = setTimeout(() => buffer = "", 800);
-    const options = Array.from(select.options);
+    // CANCELLARE vecchio sistema di ricerca    const options = Array.from(select.options);
     const match = options.find(o =>
       o.text.toLowerCase().startsWith(buffer)
     );
