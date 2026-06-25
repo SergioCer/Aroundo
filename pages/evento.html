@@ -398,7 +398,7 @@ async function loadSelects() {
   .order('mc_ordine', { ascending: true });
   id_categoria.innerHTML = `<option value="">Categoria...</option>`;
   (cat || []).forEach(c => {
-    id_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
+    id_categoria.innerHTML += `<option value="${c.id_categoria}">${c.mc_descrizione}</option>`;
   });
   id_luogo.innerHTML = `<option value="">Luogo...</option>`;
   const { data: org } = await supabase.from('organizzatori').select('*');
