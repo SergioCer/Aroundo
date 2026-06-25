@@ -628,7 +628,7 @@ function enableTypeSearch(select) {
 
 function initMap() {
   if (map) return;
-  map = L.map('map').setView([38.1, 13.3], 10);
+  map = L.map('map').setView([38.1, 13.3], 9);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
@@ -668,7 +668,7 @@ const { data: luoghiData } = await supabase
 const luoghiList = luoghiData || [];
 const { data: comuneData } = await supabase
   .from("comuni")
-  .select("lat, lng")
+  .select("co_lat, co_lng")
   .eq("id_comune", idComune)
   .single();
 renderMarkers(luoghiList, comuneData);
@@ -680,9 +680,9 @@ function renderMarkers(luoghiList, comune) {
   const valid = luoghiList.filter(l => l.lu_lat && l.lu_lng);
     if (!valid.length) {
       if (comune?.lat && comune?.lng) {
-        map.setView([comune.lat, comune.lng], 13);
+        map.setView([comune.co_lat, comune.co_lng], 13);
       } else {
-        map.setView([38.1, 13.3], 10);
+        map.setView([38.1, 13.3], 9);
       }
       return;
     }
