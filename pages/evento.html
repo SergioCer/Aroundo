@@ -371,9 +371,7 @@ const isNew = params.has('new') || !id;
 
 let original = "{}";
 let dirty = false;
-// CANCELLARE ***** let luoghiMap = {};
 let comuniMap = {};
-let luoghi = [];
 let map;
 let markers = [];
 let dialogResolve;
@@ -402,9 +400,7 @@ async function loadSelects() {
   (cat || []).forEach(c => {
     ev_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
   });
-  const { data: luoghiData } = await supabase.from('luoghi').select('*');
   id_luogo.innerHTML = `<option value="">Luogo...</option>`;
-  luoghi = luoghiData || [];
   const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">Organizzatore...</option>`;
   (org || [])
@@ -437,13 +433,6 @@ async function load() {
   ev_titolo.value = data.ev_titolo || '';
   ev_descrizione.value = data.ev_descrizione || '';
   ev_categoria.value = data.ev_categoria || '';
-  const luogo = luoghi.find(l => l.id_luogo == data.id_luogo);
-  if (luogo) {
-    id_comune_evento_hidden.value = luogo.id_comune;
-    id_comune_evento.value = comuniMap[luogo.id_comune] || '';
-    filterLuoghi();
-    id_luogo.value = data.id_luogo || '';
-  }
   id_organizzatore_hidden.value = data.id_organizzatore || '';
   // opzionale: mostra nome se vuoi
   const org = await supabase
@@ -475,22 +464,26 @@ async function loadComuni() {
   });
 }
 
-window.filterLuoghi = () => {
-  id_luogo.value = "";
+window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
-  id_luogo.innerHTML = `<option value="">-- luogo --</option>`;
-  luoghi
-    .filter(l => l.id_comune == idComune)
-    .sort((a, b) =>
-      (a.lu_location || '').localeCompare(b.lu_location || '')
-    )
-    .forEach(l => {
-      id_luogo.innerHTML += `
-        <option value="${l.id_luogo}">${l.lu_location}</option>
-      `;
+  id_luogo.innerHTML = `<option value="">Luogo...</option>`;
+  if (!idComune) return;
+  const { data } = await supabase
+    .from('luoghi')
+    .select('id_luogo, lu_location')
+    .eq('id_comune', idComune)
+    .order('lu_location');
+  (data || []).forEach(l => {
+    id_luogo.innerHTML += `
+      <option value="${l.id_luogo}">
+        ${l.lu_location}
+      </option>
+    `;
   });
+  if (selectedId) {
+    id_luogo.value = selectedId;
+  }
 };
-
   
 /* DIRTY */
 window.markDirty = () => {
@@ -571,10 +564,10 @@ window.searchComuni = async (text) => {
     div.style.borderBottom = "1px solid #eee";
     div.style.cursor = "pointer";
     div.innerText = c.co_descrizione;
-    div.onclick = () => {
+    div.onclick = async () => {
         id_comune_evento.value = c.co_descrizione;
         id_comune_evento_hidden.value = c.id_comune;
-      filterLuoghi();
+      await filterLuoghi();
       markDirty();
       box.innerHTML = '';
       updateMapButton() 
