@@ -371,19 +371,6 @@ async function loadSelects() {
   });
 const { data: luoghiData } = await supabase.from('luoghi').select('*');
 luoghi = luoghiData || [];
-id_comune_evento.innerHTML = `<option value="">-- comune --</option>`;
-/* comuni unici derivati dai luoghi */
-const comuniUnici = [...new Set(luoghi.map(l => l.id_comune))]
-  .sort((a, b) =>
-    (comuniMap[a] || '').localeCompare(comuniMap[b] || '')
-  );
-comuniUnici.forEach(idc => {
-  id_comune_evento.innerHTML += `
-    <option value="${idc}">
-      ${comuniMap[idc] || ''}
-    </option>
-  `;
-});
 const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">-- organizzatore --</option>`;
 (org || [])
@@ -396,7 +383,8 @@ const { data: org } = await supabase.from('organizzatori').select('*');
     `;
   });
 enableTypeSearch(id_luogo);
-enableTypeSearch(id_organizzatore);  
+enableTypeSearch(id_organizzatore);
+enableTypeSearch(id_comune_evento);  
 }
 
 /* LOAD */
@@ -544,8 +532,8 @@ window.searchComuni = async (text) => {
     div.onclick = () => {
         id_comune_evento.value = c.co_descrizione;
         id_comune_evento_hidden.value = c.id_comune;
-      markDirty();
       filterLuoghi();
+      markDirty();
       box.innerHTML = '';
     };
     box.appendChild(div);
