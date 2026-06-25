@@ -210,7 +210,9 @@ input, select, textarea {
   <!-- ORGANIZZATORE -->
   <div class="section-title">Organizzatore</div>
   <div style="display:flex; gap:10px; align-items:center;">
-  <select id="id_organizzatore" oninput="markDirty()" style="flex:1;"></select>
+  <input id="id_organizzatore" placeholder="Organizzatore..." oninput="searchOrganizzatori(this.value)">
+    <input type="hidden" id="id_organizzatore_hidden">
+      <div id="organizzatoriResults"></div>
   <button type="button" onclick="window.location.href='organizzatore.html?new=1'" style="
     width:34px;
     height:34px;
@@ -439,7 +441,16 @@ async function load() {
     filterLuoghi();
     id_luogo.value = data.id_luogo || '';
   }
-  id_organizzatore.value = data.id_organizzatore || '';
+  id_organizzatore_hidden.value = data.id_organizzatore || '';
+  // opzionale: mostra nome se vuoi
+  const org = await supabase
+    .from('organizzatori')
+    .select('or_nome')
+    .eq('id_organizzatore', data.id_organizzatore)
+    .single();
+  if (org.data) {
+    id_organizzatore.value = org.data.or_nome;
+  }
   ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
   ev_fine.value = data.ev_fine ? data.ev_fine.replace(' ', 'T') : '';
   ev_costo.value = data.ev_costo || '';
@@ -568,6 +579,35 @@ window.searchComuni = async (text) => {
     box.appendChild(div);
   });
 };
+
+window.searchOrganizzatori = async (text) => {
+  const box = document.getElementById('organizzatoriResults');
+  if (text.length < 3) {
+    box.innerHTML = '';
+    return;
+  }
+  const { data } = await supabase
+    .from('organizzatori')
+    .select('id_organizzatore, or_nome')
+    .ilike('or_nome', `%${text}%`)   // 🔥 CONTIENE (non inizia con)
+    .limit(10);
+  box.innerHTML = '';
+  (data || []).forEach(o => {
+    const div = document.createElement('div');
+    div.style.padding = "6px 8px";
+    div.style.borderBottom = "1px solid #eee";
+    div.style.cursor = "pointer";
+    div.innerText = o.or_nome;
+    div.onclick = () => {
+      id_organizzatore.value = o.or_nome;
+      id_organizzatore_hidden.value = o.id_organizzatore;
+      markDirty();
+      box.innerHTML = '';
+    };
+    box.appendChild(div);
+  });
+};
+
   
 /* SAVE */
 async function save() {
@@ -577,7 +617,7 @@ async function save() {
     ev_categoria: ev_categoria.value,
     id_luogo: id_luogo.value,
     id_comune: id_comune_evento_hidden.value,
-    id_organizzatore: id_organizzatore.value,
+    id_organizzatore: id_organizzatore_hidden.value,
     ev_inizio: ev_inizio.value ? ev_inizio.value.replace('T',' ') : null,
     ev_fine: ev_fine.value ? ev_fine.value.replace('T',' ') : null,
     ev_costo: ev_costo.value ? parseFloat(ev_costo.value) : null,
