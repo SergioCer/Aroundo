@@ -334,7 +334,7 @@ async function loadOrganizzatori() {
 
 // CATEGORIE
 async function loadCategorie() {
-  const { data: rows } = await supabase.from('macrocategorie').select('*');
+  const { data: rows } = await supabase.from('categorie').select('*');
   categorieMap = Object.fromEntries((rows || []).map(c => [c.id_macro_categoria, c.mc_descrizione]));
 }
 
