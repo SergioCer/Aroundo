@@ -393,7 +393,7 @@ const selectedIcon = L.icon({
 /* LOAD SELECTS */
 async function loadSelects() {
   const { data: cat } = await supabase
-  .from('macrocategorie')
+  .from('categorie')
   .select('*')
   .order('mc_ordine', { ascending: true });
   ev_categoria.innerHTML = `<option value="">Categoria...</option>`;
