@@ -169,8 +169,40 @@ input, select, textarea {
   <div class="section-title">Luogo</div>
   <div style="display:flex; gap:10px; align-items:center;">
   <select id="id_luogo" oninput="markDirty()" style="flex:1;"></select>
-  <button type="button" class="map-btn" onclick="openMapByComune()">Map</button>    
-  <button type="button" onclick="window.location.href='luogo.html?new=1'" style="
+    <div style="position:relative; display:inline-block;">
+      <button type="button" class="map-btn" onclick="openMapByComune()" id="mapBtn">
+        Map
+      </button>
+
+      <div id="mapTooltip" style="
+        display:none;
+        position:absolute;
+        top:-55px;
+        left:50%;
+        transform:translateX(-50%);
+        background:#fee2e2;
+        color:#991b1b;
+        padding:8px 10px;
+        border-radius:8px;
+        font-size:12px;
+        white-space:nowrap;
+        box-shadow:0 6px 18px rgba(0,0,0,0.15);
+      ">
+        ⚠ Selezionare un Comune per visualizzare la mappa
+        <div style="
+          position:absolute;
+          bottom:-6px;
+          left:50%;
+          transform:translateX(-50%);
+          width:10px;
+          height:10px;
+          background:#fee2e2;
+          rotate:45deg;
+        "></div>
+      </div>
+    </div>
+    
+    <button type="button" onclick="window.location.href='luogo.html?new=1'" style="
     width:34px;
     height:34px;
     border-radius:17px;
@@ -642,12 +674,11 @@ function initMap() {
 window.openMapByComune = async () => {
   const idComune = id_comune_evento_hidden.value;
     if (!idComune) {
-      const box = document.getElementById("comuniResults");
-      box.innerHTML = `
-        <div style="padding:6px 8px; color:#b91c1c; font-size:12px;">
-          Selezionare un Comune per visualizzare la mappa
-        </div>
-      `;
+      const tip = document.getElementById("mapTooltip");
+      tip.style.display = "block";
+      setTimeout(() => {
+        tip.style.display = "none";
+      }, 2500);
       return;
     }
   document.getElementById("mapModal").style.display = "block";
