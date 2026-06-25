@@ -395,7 +395,7 @@ async function loadSelects() {
 const { data: luoghiData } = await supabase.from('luoghi').select('*');
 luoghi = luoghiData || [];
 const { data: org } = await supabase.from('organizzatori').select('*');
-  id_organizzatore.innerHTML = `<option value="">-- organizzatore --</option>`;
+  id_organizzatore.innerHTML = `<option value="">Organizzatore...</option>`;
 (org || [])
   .sort((a, b) =>
     (a.or_nome || '').localeCompare(b.or_nome || '')
