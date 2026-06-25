@@ -168,7 +168,7 @@ input, select, textarea {
 
   <!-- CATEGORIA -->
   <div class="section-title">Categoria</div>
-  <select id="ev_categoria" oninput="markDirty()"></select>
+  <select id="id_categoria" oninput="markDirty()"></select>
 
   <!-- DESCRIZIONE -->
   <div class="section-title">Descrizione</div>
@@ -396,9 +396,9 @@ async function loadSelects() {
   .from('categorie')
   .select('*')
   .order('mc_ordine', { ascending: true });
-  ev_categoria.innerHTML = `<option value="">Categoria...</option>`;
+  id_categoria.innerHTML = `<option value="">Categoria...</option>`;
   (cat || []).forEach(c => {
-    ev_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
+    id_categoria.innerHTML += `<option value="${c.id_macro_categoria}">${c.mc_descrizione}</option>`;
   });
   id_luogo.innerHTML = `<option value="">Luogo...</option>`;
   const { data: org } = await supabase.from('organizzatori').select('*');
@@ -432,7 +432,7 @@ async function load() {
   original = JSON.stringify(data);
   ev_titolo.value = data.ev_titolo || '';
   ev_descrizione.value = data.ev_descrizione || '';
-  ev_categoria.value = data.ev_categoria || '';
+  id_categoria.value = data.id_categoria || '';
   id_organizzatore_hidden.value = data.id_organizzatore || '';
   if (data.id_luogo) {
   const { data: luogo } = await supabase
@@ -503,7 +503,7 @@ window.markDirty = () => {
   const current = JSON.stringify({
     ev_titolo: ev_titolo.value,
     ev_descrizione: ev_descrizione.value,
-    ev_categoria: ev_categoria.value,
+    id_categoria: id_categoria.value,
     id_luogo: id_luogo.value,
     id_organizzatore: id_organizzatore.value,
     ev_inizio: ev_inizio.value,
@@ -533,7 +533,7 @@ window.duplicateEvent = async () => {
   const payload = {
     ev_titolo: data.ev_titolo,
     ev_descrizione: data.ev_descrizione,
-    ev_categoria: data.ev_categoria,
+    id_categoria: data.id_categoria,
     id_luogo: data.id_luogo,
     id_organizzatore: data.id_organizzatore,
     ev_inizio: data.ev_inizio,
@@ -623,7 +623,7 @@ async function save() {
   const payload = {
     ev_titolo: ev_titolo.value,
     ev_descrizione: ev_descrizione.value,
-    ev_categoria: ev_categoria.value,
+    id_categoria: id_categoria.value,
     id_luogo: id_luogo.value,
     id_organizzatore: id_organizzatore_hidden.value,
     ev_inizio: ev_inizio.value ? ev_inizio.value.replace('T',' ') : null,
