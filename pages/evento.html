@@ -434,6 +434,19 @@ async function load() {
   ev_descrizione.value = data.ev_descrizione || '';
   ev_categoria.value = data.ev_categoria || '';
   id_organizzatore_hidden.value = data.id_organizzatore || '';
+  if (data.id_luogo) {
+  const { data: luogo } = await supabase
+    .from('luoghi')
+    .select('id_comune')
+    .eq('id_luogo', data.id_luogo)
+    .single();
+  if (luogo) {
+    id_comune_evento_hidden.value = luogo.id_comune;
+    id_comune_evento.value =
+      comuniMap[luogo.id_comune] || '';
+    await filterLuoghi(data.id_luogo);
+  }
+}
   // opzionale: mostra nome se vuoi
   const org = await supabase
     .from('organizzatori')
@@ -612,7 +625,6 @@ async function save() {
     ev_descrizione: ev_descrizione.value,
     ev_categoria: ev_categoria.value,
     id_luogo: id_luogo.value,
-    id_comune: id_comune_evento_hidden.value,
     id_organizzatore: id_organizzatore_hidden.value,
     ev_inizio: ev_inizio.value ? ev_inizio.value.replace('T',' ') : null,
     ev_fine: ev_fine.value ? ev_fine.value.replace('T',' ') : null,
