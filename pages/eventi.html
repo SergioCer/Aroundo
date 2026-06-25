@@ -357,7 +357,7 @@ function render() {
     filtered = filtered.filter(r => {
 
       if (k === 'categoria')
-        return (categorieMap[r.ev_categoria] || '').toLowerCase().includes(v);
+        return (categorieMap[r.id_categoria] || '').toLowerCase().includes(v);
 
       if (k === 'titolo')
         return (r.ev_titolo || '').toLowerCase().includes(v);
@@ -390,8 +390,8 @@ function render() {
       let va, vb;
 
       if (state.sortField === 'categoria') {
-        va = categorieMap[a.ev_categoria] || '';
-        vb = categorieMap[b.ev_categoria] || '';
+        va = categorieMap[a.id_categoria] || '';
+        vb = categorieMap[b.id_categoria] || '';
       }
 
       else if (state.sortField === 'comune') {
@@ -433,7 +433,7 @@ function render() {
     tr.onclick = () => window.location.href = `evento.html?id=${r.id_evento}`;
 
     const comune = comuniMap[luoghiComuniMap[r.id_luogo]] || '';
-    const cat = categorieMap[r.ev_categoria] || '';
+    const cat = categorieMap[r.id_categoria] || '';
     const org = organizzatoriMap[r.id_organizzatore] || '';
 
     tr.innerHTML = `
