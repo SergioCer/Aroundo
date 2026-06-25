@@ -112,6 +112,12 @@ input, select, textarea {
   color: #888;
   margin-top: 15px;
 }
+
+.search-option {
+  padding: 6px 10px;
+  border-bottom: 1px solid #eee;
+}
+  
 </style>
 </head>
 
@@ -153,6 +159,9 @@ input, select, textarea {
   <!-- COMUNE -->
   <div class="section-title">Comune</div>
   <input id="id_comune_evento" placeholder="Comune..." oninput="searchComuni(this.value)">
+  <div style="font-size:11px;color:#888;margin-top:4px;">
+  Inserire almeno 3 caratteri per la ricerca
+</div>
 <div id="comuniResults"></div>
 
   <!-- LUOGO -->
@@ -618,6 +627,10 @@ function enableTypeSearch(select) {
       select.value = match.value;
       markDirty();
     }
+  if (buffer.length < 3) {
+  select.innerHTML = `<option value="">-- comune --</option>`;
+  return;
+}  
   });
 }
 
