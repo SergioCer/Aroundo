@@ -111,10 +111,16 @@ input, select, textarea {
 <div class="hero">
 
   <!-- COMUNE (EDITABILE) -->
-  <select id="id_comune"
-          style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;"
-          oninput="markDirty()"></select>
- 
+<input id="id_comune"
+       placeholder="Comune..."
+       oninput="searchComuni(this.value)"
+       style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;">
+<input type="hidden" id="id_comune_hidden">
+<div style="font-size:11px;color:#888;margin-top:4px;">
+  Inserire almeno 3 caratteri per la ricerca
+</div>
+
+<div id="comuniResults"></div> 
 <div class="card">
 
   <!-- LOCATION -->
@@ -307,7 +313,7 @@ function renderMarkers(list) {
   const currentId = id; // luogo in modifica
   const valid = (list || []).filter(l => l.lu_lat && l.lu_lng);
   if (!valid.length) {
-  const idComune = id_comune.value;
+  const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
   if (comune?.lat && comune?.lng) {
     map.setView([comune.lat, comune.lng], 12);
@@ -350,7 +356,7 @@ const selectedIcon = L.icon({
 window.openMapLuogo = () => {
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
-  const idComune = id_comune.value;
+  const idComune = id_comune_hidden.value;
   if (idComune) loadMapLuoghi(idComune);  
   setTimeout(() => {
     map.invalidateSize();
@@ -396,7 +402,15 @@ async function load() {
   }
   original = JSON.stringify(data);
   lu_location.value = data.lu_location || '';
-  id_comune.value = data.id_comune || '';
+  id_comune_hidden.value = data.id_comune || '';
+  const com = await supabase
+  .from("comuni")
+  .select("co_descrizione")
+  .eq("id_comune", data.id_comune)
+  .single();
+if (com.data) {
+  id_comune.value = com.data.co_descrizione;
+}
   lu_descrizione.value = data.lu_descrizione || '';
   lu_note.value = data.lu_note || '';
   lu_lat.value = data.lu_lat || '';
@@ -417,7 +431,7 @@ async function loadMapLuoghi(idComune) {
 async function save() {
   const payload = {
     lu_location: lu_location.value,
-    id_comune: id_comune.value,
+    id_comune: id_comune_hidden.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
     lu_lat: lu_lat.value ? parseFloat(lu_lat.value) : null,
@@ -459,7 +473,7 @@ async function save() {
 window.markDirty = () => {
   const current = JSON.stringify({
     lu_location: lu_location.value,
-    id_comune: id_comune.value,
+    id_comune: id_comune_hidden.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
     lu_lat: lu_lat.value,
@@ -470,6 +484,36 @@ window.markDirty = () => {
   document.getElementById('backBtn')
     .classList.toggle('dirty', dirty);
 };
+
+window.searchComuni = async (text) => {
+  const box = document.getElementById("comuniResults");
+  if (text.length < 3) {
+    box.innerHTML = "";
+    return;
+  }
+  const { data } = await supabase
+    .from("comuni")
+    .select("id_comune, co_descrizione")
+    .ilike("co_descrizione", `%${text}%`)   // 👈 CONTIENE
+    .limit(10);
+  box.innerHTML = "";
+  (data || []).forEach(c => {
+    const div = document.createElement("div");
+    div.style.padding = "6px 8px";
+    div.style.borderBottom = "1px solid #eee";
+    div.style.cursor = "pointer";
+    div.innerText = c.co_descrizione;
+    div.onclick = () => {
+      id_comune.value = c.co_descrizione;
+      id_comune_hidden.value = c.id_comune;
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      box.innerHTML = "";
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+};              
   
   /* SI - NO - ANNULLA */
 window.requestBack = async () => {
