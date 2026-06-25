@@ -187,11 +187,13 @@ input, select, textarea {
   <div class="section-title">Luogo</div>
   <div style="display:flex; gap:10px; align-items:center;">
   <select id="id_luogo" oninput="markDirty()" style="flex:1;"></select>
+    
     <div style="position:relative; display:inline-block;">
       <button type="button" class="map-btn" onclick="openMapByComune()" id="mapBtn">
         Map
       </button>
-   
+   </div>
+    
     <button type="button" onclick="window.location.href='luogo.html?new=1'" style="
     width:34px;
     height:34px;
@@ -351,7 +353,6 @@ input, select, textarea {
 
     </div>
   </div>
-</div>
 </div>
 
 <script type="module">
