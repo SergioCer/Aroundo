@@ -159,6 +159,7 @@ input, select, textarea {
   <!-- COMUNE -->
   <div class="section-title">Comune</div>
   <input id="id_comune_evento" placeholder="Comune..." oninput="searchComuni(this.value)">
+  <input type="hidden" id="id_comune_evento_hidden">
   <div style="font-size:11px;color:#888;margin-top:4px;">
   Inserire almeno 3 caratteri per la ricerca
 </div>
@@ -524,19 +525,26 @@ window.duplicateEvent = async () => {
 };
 
 window.searchComuni = async (text) => {
-  if (text.length < 3) return;
+  const box = document.getElementById('comuniResults');
+  if (text.length < 3) {
+    box.innerHTML = '';
+    return;
+  }
   const { data } = await supabase
     .from('comuni')
     .select('id_comune, co_descrizione')
     .ilike('co_descrizione', text + '%')
     .limit(10);
-  const box = document.getElementById('comuniResults');
   box.innerHTML = '';
   (data || []).forEach(c => {
     const div = document.createElement('div');
+        div.style.padding = "6px 8px";
+    div.style.borderBottom = "1px solid #eee";
+    div.style.cursor = "pointer";
     div.innerText = c.co_descrizione;
     div.onclick = () => {
-      id_comune_evento.value = c.id_comune;
+        id_comune_evento.value = c.co_descrizione;
+        id_comune_evento_hidden.value = c.id_comune;
       markDirty();
       filterLuoghi();
       box.innerHTML = '';
@@ -553,6 +561,7 @@ async function save() {
     ev_descrizione: ev_descrizione.value,
     ev_categoria: ev_categoria.value,
     id_luogo: id_luogo.value,
+    id_comune: id_comune_evento_hidden.value
     id_organizzatore: id_organizzatore.value,
     ev_inizio: ev_inizio.value ? ev_inizio.value.replace('T',' ') : null,
     ev_fine: ev_fine.value ? ev_fine.value.replace('T',' ') : null,
@@ -627,10 +636,6 @@ function enableTypeSearch(select) {
       select.value = match.value;
       markDirty();
     }
-  if (buffer.length < 3) {
-  select.innerHTML = `<option value="">-- comune --</option>`;
-  return;
-}  
   });
 }
 
