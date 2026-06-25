@@ -353,7 +353,7 @@ const selectedIcon = L.icon({
   iconAnchor: [12, 41]
 });  
   
-window.openMapLuogo = () => {
+window.openMapLuogo = async () => {
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
   const idComune = id_comune_hidden.value;
