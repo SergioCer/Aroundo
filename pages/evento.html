@@ -416,7 +416,6 @@ async function loadSelects() {
       <option value="${o.id_organizzatore}">${o.or_nome}</option>
     `;
   });
-//  CANCELLARE ?????  enableTypeSearch(id_luogo);   NON SAPREI 
 }
 
 /* LOAD */
@@ -678,27 +677,6 @@ function updateCover() {
     img.style.display = 'none';
   }
 }  
-
-
-  // CANCELLARE TUTTA LA FUNZIONE ????? NON SAPREI 
-function enableTypeSearch(select) {
-  let buffer = "";
-  let timer = null;
-  select.addEventListener("keydown", (e) => {
-    if (e.key.length !== 1) return;
-    buffer += e.key.toLowerCase();
-    clearTimeout(timer);
-    timer = setTimeout(() => buffer = "", 800);
-    // CANCELLARE vecchio sistema di ricerca    const options = Array.from(select.options);
-    //const match = options.find(o =>
-//      o.text.toLowerCase().startsWith(buffer)
-//    );
-//    if (match) {
-//      select.value = match.value;
-//      markDirty();
-//    }
-  });
-}
 
 function initMap() {
   if (map) return;
