@@ -922,7 +922,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   categories = await fetchCategories();
   icons = {};
   categories.forEach(cat => {
-  icons[cat.id_macro_categoria] = createIcon(cat.mc_colore);
+  icons[cat.id_categoria] = createIcon(cat.mc_colore);
   });
   events = await fetchEvents();
 
@@ -1116,7 +1116,7 @@ function renderEvents() {
     const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
       icon: createIcon(
         categories.find(c =>
-          c.id_macro_categoria === e.id_categoria
+          c.id_categoria === e.id_categoria
         )?.mc_colore || '#999',
         stateClass,
         intensity
@@ -1286,11 +1286,11 @@ function buildCategoryMenu() {
   categories.forEach(cat => {
     const cb = document.createElement('input');
     cb.type = 'checkbox';
-    cb.id = `cat-${cat.id_macro_categoria}`;
+    cb.id = `cat-${cat.id_categoria}`;
     cb.checked = true;
     cb.className = 'category-checkbox';
     const label = document.createElement('label');
-    label.htmlFor = `cat-${cat.id_macro_categoria}`;
+    label.htmlFor = `cat-${cat.id_categoria}`;
     label.className = 'category-label';
     label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo link per icone : https://www.svgrepo.com/
     // label.textContent = cat.mc_descrizione; // questa è solo descrizione 
@@ -1595,7 +1595,7 @@ function nextDay() {
   // console.trace(); // mostra da dove è stata chiamata
   const list = getUpcomingEvents(20); // Numero di News da visualizzare
   const html = list.map(e => {
-  const color = categories.find(c => c.id_macro_categoria == e.id_categoria)?.mc_colore || '#999999';
+  const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
   return `
       <span style="margin-right:20px;
           padding:2px 8px;
