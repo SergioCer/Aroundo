@@ -873,12 +873,6 @@
     keepSpiderfied: true
 });
 
-  marker.spiderLegPolylineOptions = {
-  color: categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999',
-  weight: 2,
-  opacity: 0.8
-};
-
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
@@ -1102,6 +1096,12 @@ function renderEvents() {
   events.sort((a, b) =>
     new Date(a.ev_inizio) - new Date(b.ev_inizio)
 );
+    marker.spiderLegPolylineOptions = {
+  color: categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999',
+  weight: 2,
+  opacity: 0.8
+};
+
   events.forEach(e => {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
