@@ -1116,6 +1116,11 @@ function renderEvents() {
     })
     marker.evInizio = new Date(e.ev_inizio); // prede ora inizio del marker per il cluster
     marker.geoKey = `${e.luoghi.lu_lat.toFixed(6)}_${e.luoghi.lu_lng.toFixed(6)}`; // prende le coordinate identiche per il cluster
+    console.log(
+    e.ev_titolo,
+    marker.geoKey,
+    e.ev_inizio
+);
     markersCluster.addLayer(marker);
     updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
      //-- Visualizza i dettagli dell'evento selezionato con Popup //
