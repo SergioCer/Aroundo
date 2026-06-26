@@ -862,8 +862,15 @@
   zoomToBoundsOnClick: true
   });
 
-  map.addLayer(markersCluster);
-  markersCluster.on('clusterclick', function (e) {console.log("Cluster cliccato");}); // CANCELLARE SOLO CONTROLLO
+  map.addLayer(markersCluster); // se i marker hanno la stessa posizione inseriesc in cluster cliccabile
+  markersCluster.on('clusterclick', function (e) {
+    const childs = e.layer.getAllChildMarkers();
+    console.log(childs);
+    childs.sort((a, b) => a.evInizio - b.evInizio); // Ordina il cluster per orario
+    const stessaPosizione =
+    childs.every(m => m.geoKey === childs[0].geoKey);
+console.log(stessaPosizione);
+  });
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
