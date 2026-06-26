@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
   <style>
@@ -863,7 +864,10 @@
   });
 
   map.addLayer(markersCluster);
-  markersCluster.on('clusterclick', function (e) {console.log("Cluster cliccato");}); // CANCELLARE SOLO CONTROLLO
+  const oms = new OverlappingMarkerSpiderfier(map, {
+    nearbyDistance: 1,
+    keepSpiderfied: true
+});
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
@@ -1110,6 +1114,7 @@ function renderEvents() {
     marker.evInizio = new Date(e.ev_inizio); // prede ora inizio del marker per il cluster
     marker.geoKey = `${e.luoghi.lu_lat.toFixed(6)}_${e.luoghi.lu_lng.toFixed(6)}`; // prende le coordinate identiche per il cluster
     markersCluster.addLayer(marker);
+    oms.addMarker(marker);
     updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
      //-- Visualizza i dettagli dell'evento selezionato con Popup //
         const startDate = new Date(e.ev_inizio);
