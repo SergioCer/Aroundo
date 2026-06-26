@@ -1118,6 +1118,7 @@ function renderEvents() {
         intensity
       )
     })
+    marker.evTime = new Date(e.ev_inizio).getTime();
     marker.__eventData = e; // sempre per spiderizza
     marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
     oms.addMarker(marker);
@@ -1229,6 +1230,14 @@ function renderEvents() {
 }
 
 oms.addListener('click', function (marker) {
+    const group = markers.filter(m =>
+    m.marker.getLatLng().lat === marker.getLatLng().lat &&
+    m.marker.getLatLng().lng === marker.getLatLng().lng
+  );
+  group.sort((a, b) => a.marker.evTime - b.marker.evTime);
+  console.log(
+    group.map(g => new Date(g.marker.evTime).toLocaleTimeString())
+  );
   openOrderedPopup(marker);
 });
 
