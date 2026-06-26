@@ -1487,14 +1487,97 @@ function buildCategoryMenu() {
           </a>
         </div>
         <!-- BOTTONE DETTAGLI e relativo POPUP -->
-        <button onclick="window.openDetailPopup(${e.id})" style="margin-top:6px;">More...</button>
+        <button onclick="window.openDetailPopup(window.currentEvent, window.currentLatLng)" style="margin-top:6px;">More...</button>
         </div>
        `;
+        window.currentEvent = e;  // passa evento e coordinate al POPUP More...
+        window.currentLatLng = latlng;
         L.popup()
         .setLatLng(latlng)
         .setContent(content)
         .openOn(map);       
       };
+
+window.openDetailPopup = function(e, latlng) {
+  const content = `
+    <div style="text-align:center;min-width:220px;font-size:12px;">
+      <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:6px;">
+        ${e.ev_titolo}
+      </div>
+      <hr>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+        <div>
+          Location:
+          ${[e.comuni?.co_descrizione, e.luoghi?.lu_location]
+            .filter(Boolean)
+            .join(' • ')}
+        </div>
+        <a
+          href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
+          target="_blank"
+          class="action-btn map-btn">
+          Map
+        </a>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+        ${
+          Number(e.ev_costo) > 0
+          ?
+          `
+          <div>
+            Price €:
+            <span style="font-weight:700;">
+              ${e.ev_costo}
+            </span>
+          </div>
+          <a
+            href="#"
+            class="action-btn buy-btn"
+            onclick="alert('In Progress!');return false;">
+            Buy
+          </a>
+          `
+          :
+          `
+          <div style="width:100%;text-align:center;color:#dc2626;font-weight:700;font-size:14px;">
+            Free Entry
+          </div>
+          `
+        }
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+        <div>I'll be there!</div>
+        <a
+          href="#"
+          class="action-btn book-btn"
+          onclick="alert('In Progress!');return false;">
+          Book
+        </a>
+      </div>
+      <hr>
+      ${
+        e.ev_copertina
+        ?
+        `
+        <div style="text-align:center;">
+          <img
+            src="${e.ev_copertina}"
+            style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
+        </div>
+        <hr>
+        `
+        :
+        ''
+      }
+      ${e.ev_descrizione || ''}
+    </div>
+  `;
+  L.popup()
+    .setLatLng(latlng)
+    .setContent(content)
+    .openOn(map);
+};
+
   
   // Calcola il range della Timeline
   function getTimelineRange () {
