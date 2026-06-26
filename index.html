@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Aroundo - Territory Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+      background: #f4f1ea;
+    }
+
+    #map {
+      height: 100dvh;
+      width: 100%;
+    }
+
+    /* Riduce attributi Leaflet */
+    .leaflet-control-attribution {
+      font-size: 8px;               /* più piccolo */
+      opacity: 0.5;                 /* meno invadente */
+      background: rgba(255,255,255,0.3);     /* leggermente trasparente */
+      padding: 2px 2px;
+    }
+    
+    #fx-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100dvh;
+      width: 100%;
+      pointer-events: none;     /* Non blocca i click sulla mappa */
+      z-index: 9999;
+    }
+    
+    /* Titolo */
+    .title {
+      font-weight: 600;
+      font-size: 20px;
+      color: #3b82f6;
+      text-align: center;
+    }
+
+    /* Sotto titolo */
+    .subtitle {
+      font-size: 14px;
+      color: #6b6b6b;
+      margin-top: 2px;
+      text-align: center;
+    }    
+    
+    /* -- Rettangolo Aroundo trasparente */
+    .map-overlay {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      padding: 20px;
+      border-radius: 16px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);     /* Velocità */ 
+    }
+
+    /* stato “mini” in alto a destra */
+    .map-overlay.minimized {
+      top: 20px;
+      right: 10px;
+      left: auto;
+      transform: none;
+      width: 35px;
+      height: 35px;
+      padding: 0;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    /* icona toggle */
+    #overlayToggle {
+      position: fixed;
+      top: 20px;
+      right: 10px;
+      z-index: 1000;
+      width: 40px;
+      height: 40px;
+      display: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* -- Rettangolo filtro categorie */
+    .map-overlay2 {
+      position: absolute;
+      top: 6px;
+      left: 10px;
+      z-index: 999;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+      padding: 2px 2px;     /* Contenitore */
+      border-radius: 14px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      min-width: 140px;
+      width: fit-content;
+      max-width: 200px;
+      max-height: 60vh;     /* limita altezza della sezione in verticale */
+      overflow-y: auto;     /* scroll verticale se tante categorie */
+    }
+      
+    /* -- Rettangolo barra temporale */
+    .top-timebar {
+      position: absolute;
+      top: 6px;                      /* distanza dal bordo superiore */
+      left: 50%;                     /* centro orizzontale */
+      transform: translateX(-50%);   /* centraggio reale */
+      z-index: 998;
+      display: flex;
+      flex-direction: row;           /* elementi in riga su desktop */
+      align-items: center;
+      justify-content: center;       /* centrare internamente */
+      gap: 10px;                     /* distanza tra elementi interni */
+      width: 330px;                  /* dimensione reale del contenitore */
+      height: 90px;                  /* altezza fissa per contenuto */
+      padding: 2px 2px;              /* spazio interno */
+      border-radius: 16px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    /* Pallino torna alla data di oggi */
+    .reset-btn {
+      border: none;
+      background: transparent;
+      font-size: 32px;
+      cursor: pointer;
+      color: #3b82f6;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .reset-btn:hover {
+      background: rgba(59, 130, 246, 0.08);
+      transform: translateY(-2px) scale(1.12);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .reset-btn:active {
+      transform: translateY(0px) scale(0.96);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    /* --- MENU & FILTRI --- */
+    /* -- Menù a discesa */
+    .menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      margin-bottom: 4px;
+      width: 130px;       /* larghezza */
+    }
+
+    /* Elementi del menu */ 
+    #menu-items {
+      max-height: 72vh;
+      overflow-y: auto;
+    }
+
+    /* elementi in verticale */
+    .vertical-toggles {
+      display: flex;
+      flex-direction: column;
+      width: 140px;     /* largezza massima della riga */
+      gap: 3px;         /* Distanzia le singole categorie in verticale */
+    }
+    
+    /* Bordino intorno a checkbox e label di Seleziona Categorie */
+    .toggle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      padding: 4px 10px;
+      min-height: 30px;     /* Garantisce l'hover */
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      color: black;
+      user-select: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+    }
+
+      /* Passaggio del mouse */
+      .toggle-pill:hover {
+        background: rgba(255,255,255,0.20);
+        border-color: rgba(255,255,255,0.4);
+    }
+
+    /* Checkbox Categorie */
+    .category-checkbox {
+      position: absolute;
+      background: transparent;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    /* Checkbox specifiche grafiche */
+    .toggle-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.15);
+      cursor: pointer;
+      vertical-align: middle;
+      margin-right: 6px;
+      font-size: 12px;
+      position: relative;
+      transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* Checkbox Attiva */
+    .toggle-checkbox:checked {
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-color: white;
+    }
+    
+    /* Checkbox Piccolo punto bianco interno */
+    .toggle-checkbox:checked::after {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: white;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    /* Label delle categorie */
+    .category-label {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;          /* icona e testo allineati in alto */
+      justify-content: flex-start;  /* testo a sinistra */
+      margin: 2px;                  /* distanza verticale compatta */
+      cursor: pointer;
+      border-radius: 50px;
+      padding: 1px 4px;     /* leggero padding */
+      flex-grow: 1;         /* permette all'hover di utilizzare tutta la larghezza */ 
+      font-size: 12px;
+      color: #fff;
+      font-weight: 500;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+
+    /* Cerchietto prima del testo */
+    .category-label::before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-right: 6px;
+      border: 2px solid white;
+      box-sizing: border-box;
+      background: transparent;
+      transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    /* Categoria disattiva */
+    .category-checkbox:not(:checked) + .category-label {
+      opacity: 0.75;
+    }
+
+    /* Pallino categoria disattiva */
+    .category-checkbox:not(:checked) + .category-label::before {
+      background: white;
+     }
+      
+    /* PULSAZIONI dei Marker */
+    /* Marker pulsazioni base */
+    .pulse { border-radius: 50%; position: relative; z-index: 990; }
+    .pulse::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--c); z-index: 990; }
+    .pulse::after { content: ""; position: absolute; inset: -40%; border-radius: 50%; background: var(--c); z-index: 990; opacity: 0.25; transform: scale(0.6); }
+    /* Marker pulsazioni in funzione del tempo */
+    .pulse.distant { animation: none; }
+    .pulse.distant::after { animation: none; opacity: 0; }    
+    .pulse.future-deep { animation: none; }
+    .pulse.future-deep::after { animation: none; opacity: 0; }    
+    .pulse.future-far { animation: hopSlow 3s infinite; }
+    .pulse.future-medium { animation: hopMedium 2s infinite; }
+    .pulse.future-near { animation: hopFast 1s infinite; }
+    .pulse.imminent { animation: hopCrazy 0.5s infinite; }
+    .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; opacity: 0.45; }
+    .pulse.countdown { animation: hopCrazy 0.3s infinite; }
+    .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; opacity: 0.8; }
+    .pulse.started { animation: hopLive 2s infinite; }    
+    .pulse.started::after { animation: pulseLive 0.3s infinite; }
+    .pulse.running { animation: none; }
+    .pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; }
+    .pulse.running-strong { animation: running-strong 2s infinite ease-in-out;}
+    .pulse.running-strong::after { animation: pulse 2s infinite ease-out; opacity: 0.25;}
+    .pulse.running-medium { animation: running-medium 2.5s infinite ease-in-out;}
+    .pulse.running-medium::after { animation: hopSlow 2.5s infinite; opacity: 0.12;}
+    .pulse.running-soft { animation: running-soft 3s infinite ease-in-out;}
+    .pulse.running-soft::after { animation: none; opacity: 0;}
+    .pulse.finished { animation: finished 0.5s ease forwards; }    
+    /* Inserisce un piccolo puntino bianco sui markers conclusi */
+    .pulse.finished::after { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9;}
+
+    /* SALTI dei Marker correlati alle Pulsazioni */
+    @keyframes pulse { 0% { transform: scale(0.6);opacity: 0.5; } 70% { transform: scale(1.6); opacity: 0; } 100% { opacity: 0; }}
+    @keyframes hopSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); }}
+    @keyframes hopMedium { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); }}
+    @keyframes hopFast { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); }}
+    @keyframes hopCrazy { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); }}
+    @keyframes pulseLive { 0% { transform: scale(1) translateY(0); opacity: 0.7; } 70% { transform: scale(1.5) translateY(-5px); opacity: 0.3; } 100% { transform: scale(2) translateY(-10px); opacity: 0; }}
+    @keyframes finished { 0%,100% { transform: translateY(0); }}
+    @keyframes running-strong { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-8px,0); } /* X = -8px, Y = 0 */}
+    @keyframes running-medium { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-6px,0); } /* X = -8px, Y = 0 */}
+    @keyframes running-soft { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-4px,0); } /* X = -8px, Y = 0 */}
+    
+    #menu-toggle {
+      display: inline-flex;
+      vertical-align: middle;
+      align-items: center;
+      justify-content: center;
+      width: 140px; /* larghezza */
+      padding: 6px 10px;
+      border-radius: 999px;
+      text-allign: center;
+      font-size: 12px;
+      font-weight: 500;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      color: white;
+      border: none;
+      margin-right: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(59,130,246,0.25);
+      transition:
+        background 0.15s ease,
+        transform 0.15s ease,
+        opacity 0.15s ease;
+    }  
+
+    #menu-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.35);
+    }
+    
+    .date-box {
+      text-align: center;
+      min-width: 0px;
+    }
+    
+    .date-day {
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      color: #3b82f6;
+    }
+    
+    .date-full {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      font-size: 32px;
+      cursor: pointer;
+      color: #3b82f6;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    
+    .nav-btn:hover {
+      background: rgba(0,0,0,0.05);
+    }
+  
+      /* Timeline Slider */
+    .time-slider {
+      position: relative;
+      width: 220px;
+      padding-top: 2px;
+    }
+    
+    /* Timeline */
+    #timeline {
+      position: relative;
+      width: 220px;
+      height: 18px;
+      margin-bottom: 10px;
+      background: #ddd;
+      border-radius: 10px;
+    }
+
+    /* linea base */
+    #track {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 999px;
+    }
+
+    /* indicatore mezzanotte */
+    #midnight {
+      position: absolute;
+      top: -8px;
+      width: 4px;
+      height: 24px;
+      background: #3b82f6;
+      border-radius: 2px;
+      z-index: 997;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    #midnight::after {
+      content: "24";
+      position: absolute;
+      display: block;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: bold;
+      color: #3b82f6;
+      pointer-events: none;
+    }
+    
+    /* SLIDER */
+    #time-range { width: 100%; margin-top: 2px; }    
+      
+    .noUi-target {
+      background: rgba(255,255,255,0.18);
+      border: none;
+      backdrop-filter: blur(6px);
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.08);
+    }
+    
+    .noUi-base { background: transparent; }
+    .noUi-connect {
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      opacity: 0.85;box-shadow: 0 0 10px rgba(59,130,246,0.35);
+    }
+
+    .handle-label {
+      position: absolute;
+      top: 27px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #444;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .noUi-horizontal .noUi-handle {
+      width: 18px;
+      height: 18px;
+      right: -9px;
+      top: -6px;
+      border-radius: 50%;
+      background: #3b82f6;
+      border: 2px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      cursor: grab;
+      }
+    
+    .noUi-handle::before,
+    .noUi-handle::after { display: none; }    
+    .noUi-handle:hover { transform: scale(1.08); transition: transform 0.15s ease; }    
+    .noUi-horizontal { height: 6px; }    
+
+    /* NUOVO MENU checkbox integrata */
+    /* Contenitore checkbox + pulsante in una riga */
+    .filter-all-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    /* Mantieni il checkbox rotondo come gli altri */
+    .filter-all-container .toggle-pill {
+      width: 28px;           /* piccolo quadrato per il pallino */
+      min-height: 28px;
+      padding: 0;            /* nessun padding extra */
+      border-radius: 50%;    /* cerchio perfetto */
+      justify-content: center;
+    }
+
+    /* Su Categorie crea un effetto passando il mouse */    
+    #menu-items label.category-label {
+      display: flex;
+      align-items: center;
+      padding: 2px 4px;
+      border-radius: 999px;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    #menu-items label.category-label:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(2px);
+    }
+
+    #timeline-wrapper {
+      position: relative;     /* serve per posizionare prev/next/day/full */
+    }
+
+    #prev-day {
+      position: absolute;
+      top: 8;           /* regolabile */
+      left: 8px;      /* leggermente a sinistra della maniglia */
+    }
+
+    #next-day {
+      position: absolute;
+      top: 8;
+      right: 8px;     /* leggermente a destra della maniglia */
+    }
+
+    #day-text,
+    #day-next-text {
+      position: absolute;
+      top: 16px;       /* sopra lo slider */
+    }
+
+    #date-text {
+      position: absolute;
+      top: -2px;        /* sotto lo slider */
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    #reset-day {
+      position: absolute;
+      top: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: transform 0.15s ease;
+    }    
+
+    #eventTicker{
+    position:fixed;
+    bottom:0px;
+    left:0;
+    width:100%;
+    height:32px;
+    background:transparent;
+    color:black;
+    overflow:hidden;
+    z-index:9999;
+  }
+
+    #eventTickerContent{
+      white-space:nowrap;
+      display:inline-block;
+      padding-left: 100%;     /* parte fuori dallo schermo a destra */
+      animation:tickerScroll 120s linear infinite;     /* Velocità di scrolling */
+    }
+
+    /* Pulsante base */
+    .action-btn {
+      min-width: 48px;
+      display: inline-flex;       /* ⭐ fondamentale */
+      justify-content: center;    /* ⭐ centra orizzontale */
+      align-items: center;        /* ⭐ centra verticale */
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white !important;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+      display: inline-block;
+      cursor: pointer;
+      margin-left: 4px;     /* piccolo spazio tra pulsanti */
+    }
+
+    .action-btn:hover {opacity: 0.85;}
+
+    /* colori */
+    .buy-btn  { background:#16a34a; }    /* verde moderno */
+    .book-btn { background:#f97316; }    /* arancione */
+    .map-btn  { background:#3b82f6; }    /* blu standard */
+    
+
+    @keyframes tickerScroll{
+      from{
+        transform:translateX(0%);
+      }
+      to{
+        transform:translateX(-100%);
+      }
+    }
+
+    .category-label svg {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 6px;     /* distanza tra icona e testo */
+    }    
+
+    /* MOBILE */
+    @media (max-width: 380px) {
+  
+    #prev-day {
+    left: 0px;      /* leggermente a sinistra della maniglia */
+    font-weight: bold;
+    }
+  
+    #next-day {
+    right: 0px;      /* leggermente a sinistra della maniglia */
+    font-weight: bold;
+    }
+  
+    .title {
+      font-size: 16px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+    }
+
+    .map-overlay {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;          /* quasi tutta la larghezza dello schermo */
+      padding: 10px;       /* padding ridotto */
+      font-size: 14px;     /* testi più piccoli */
+    }
+
+    .map-overlay.minimized {
+      top: 20px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+    }
+
+    #overlayToggle {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;      /* icona leggibile */
+    }
+  
+    .map-overlay2 {
+      top: 76px;
+      left: 0px;
+      padding: 0px 0px;
+      min-width: 120px;
+      max-width: 70%;
+      max-height: 90vh;    /* leggermente più alta rispetto a desktop */
+      overflow-y: auto;    /* scroll verticale se tanti elementi */
+    }
+  
+    .menu-header {
+      width: 125px;
+    }
+
+    .top-timebar {
+      top: 2px;                /* centro verticale circa + spostamento */
+      /* width: 60%;           /* si adatta allo schermo */
+      /* height: auto;         /* altezza flessibile */
+      flex-direction: column;  /* impila elementi verticalmente */
+      align-items: center;
+      gap: 2px;
+      width: 220px;     /* Larghezza */
+      height: 66px;     /* Altezza */
+      padding: 2px 20px;
+      font-size: 12px;
+    }
+
+    .nav-btn {
+      font-size: 32px;
+      padding: 2px 6px;
+    }
+
+    #reset-day {
+    top: 32px;
+    }    
+
+    .date-day {
+      font-size: 14px;
+      text-align: center;
+      top: 12px;
+    }
+
+    .date-full {
+      font-size: 14px;
+    }
+
+    #menu-toggle {
+      font-size: 14px;
+      width: auto;
+      padding: 2px 2px;
+    }
+
+    .time-slider {
+      width: 90%;
+    }
+
+    .toggle-pill {
+      min-height: 26px;
+      font-size: 11px;
+      padding: 2px 6px;
+    }
+
+    .category-label {
+      font-size: 11px;
+    }
+
+    #eventTicker {
+      height: 24px;
+      font-size: 12px;
+      }
+    }
+
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+</head>
+<body>
+
+<div class="map-overlay" id="mapOverlay">
+  <div class="title">Aroundo</div>
+  <div class="subtitle">Discover what’s around you</div>
+  <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;">
+    Login</div>
+</div>
+  
+<div id="overlayToggle">🔓</div>
+  
+<div class="map-overlay2" id="category-menu">
+<div class="menu-header filter-all-container">
+  <label class="toggle-pill" title="Seleziona tutte le categorie">
+    <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
+  </label>
+  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Categorie ▼</button>
+</div>
+  <div id="menu-items" style="display:none; margin-top:4px;"></div>
+</div>
+<div class="top-timebar">
+  <!-- Sinistra -->
+  <button class="nav-btn" id="prev-day">‹</button>
+  <!-- Date -->
+    <div class="date-day" id="day-text"></div>
+    <div class="date-day" id="day-next-text"></div>
+    <div class="date-full" id="date-text"></div>
+    <button class="reset-btn" id="reset-day">•</button>
+  <!-- Destra -->
+  <button class="nav-btn" id="next-day">›</button>
+  <!-- SLIDER ORARIO -->
+<div class="time-slider">
+<div id="timeline-wrapper">
+  <div id="midnight"></div>
+  <div id="time-range"></div>
+</div>
+</div>
+</div>
+<div id="map"></div>
+<canvas id="fx-canvas"></canvas>  
+  <div id="eventTicker">
+  <div id="eventTickerContent"></div>
+</div>  
+  
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+
+<script type="module">
+  import { supabase } from './supabase.js';
+    
+  // variabili [] Array (lista di valori ordinati)  {} Oggetto (insieme di proprietà)
+  // let colori = ["rosso", "verde", "blu"]; - console.log(colori[0]); // rosso - console.log(colori[1]); // verde
+  // let persona = {nome: "Marco",eta: 30}; - console.log(persona.nome); // Marco - console.log(persona.eta); // 30
+  let categories = [];
+  let icons = {};
+  let events = [];
+  let markers = [];
+  let timelineMode = 'live'; // Modalità della timeline 'past' | 'live' | 'day'
+  let currentDate = new Date(); // Data odierna di riferimento
+  let midnightPercent = 0; // Posizione barra della Mezzanotte
+  let totalHours; // Ore totali della Slidebar
+  
+  // Coordinate di default (Centro provincia Trapani / Sicilia occidentale)
+  const defaultLat = 37.87; /* 37.55 */
+  const defaultLng = 12.69; /* 14.1 */
+  const defaultZoom = 10; /* 9 */
+  const dayText = document.getElementById("day-text");
+  const dateText = document.getElementById("date-text");
+  const slider = document.getElementById('time-range');
+  const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+  // NON USATO const daysShort = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const daysLong  = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+  const fireworks = [];
+  // Dimensione dei Markers
+  const markerSizes = {
+  'finished': 10,
+  'distant': 10,
+  'future-deep': 14,
+  'future-far': 16,
+  'future-medium': 20,
+  'future-near': 25,
+  'imminent': 30,
+  'countdown': 30,
+  'started': 22,
+  'running-soft': 14,
+  'running-medium': 20,
+  'running-strong': 26
+  };
+  const map = L.map('map', {
+    zoomControl: false, // Visualizza o nasconde i controlli dello ZOOM integrati
+    minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
+    maxZoom: 20, // evita zoom troppo vicino, il massimo zoom è 18 - 19
+    attributionControl: true // default true
+    }).setView([defaultLat, defaultLng], defaultZoom);
+
+    map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
+    map.attributionControl.setPrefix(''); // rimuove "Leaflet"
+  
+  // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
+  // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
+  
+  // 🌿 Base Mappa NEUTRA BUONA
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+
+    // Seleziona il div "Login"
+    const loginBtn = document.getElementById('loginBtn');
+    // Click sinistro
+    loginBtn.addEventListener('click', function() {
+    alert('In Progress!');
+  });      
+    // Click destro
+    loginBtn.addEventListener('contextmenu', function(event) {
+    event.preventDefault(); // blocca il menu del browser
+    window.location.href = 'tabelle.html';
+  });
+    
+  const canvas = document.getElementById('fx-canvas');
+   const ctx = canvas.getContext('2d');
+   function resizeCanvas() {
+     const rect = map.getContainer().getBoundingClientRect();
+     canvas.width = rect.width;
+     canvas.height = rect.height;
+     canvas.style.width = rect.width + 'px';
+     canvas.style.height = rect.height + 'px';
+   }
+   resizeCanvas();
+   window.addEventListener('resize', resizeCanvas);
+   map.on('move zoom resize', resizeCanvas);
+
+    // Aggiorna ogni minuto
+    setInterval(renderEvents, 60000);
+    // Preleva nuovamente eventi ogni 5 minuti
+    setInterval(async () => { const data = await fetchEvents(); if (data) { events = data; renderEvents(); } }, 5 * 60 * 1000);
+
+// DOM  
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. prende le categorie con relative icone e colori
+  categories = await fetchCategories();
+  icons = {};
+  categories.forEach(cat => {
+  icons[cat.id_categoria] = createIcon(cat.mc_colore);
+  });
+  events = await fetchEvents();
+
+  // 2. Prova a ottenere la posizione dell'utente
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+      (pos) => {
+      const userLat = pos.coords.latitude;
+      const userLng = pos.coords.longitude;
+      // Calcolo approssimativo dello zoom in base agli eventi vicini
+      const nearbyEvents = events.filter(e => {
+      const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
+      return distance <= 25000; // 25 km
+      });
+      let zoomLevel = 10; // Provincia
+      if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
+      else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
+      else zoomLevel = 9; // Regione
+      console.warn("Posizione ottenuta, Eventi presenti in zona <25Km:", nearbyEvents.length);
+      map.setView([userLat, userLng], zoomLevel);
+      },
+      (err) => {
+      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
+      map.setView([defaultLat, defaultLng], defaultZoom);
+      }
+      );
+    } else {
+      console.warn("Browser non supporta geolocalizzazione");
+      map.setView([defaultLat, defaultLng], defaultZoom);
+      }
+  // 3. Crea il menu Categorie
+  buildCategoryMenu();
+  // 4. inizializza checkbox con tutti selezionati
+  document.getElementById('select-all-toggle').checked = true;
+  setupTimeline();
+  renderEvents();
+  updateDateUI();
+  updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news. 
+});
+      
+  noUiSlider.create(slider, {
+    start: [0, 48],
+    connect: true,
+    step: 1,
+    range: {
+    min: 0,
+    max: 48
+    }
+  });
+
+// Eventi UI
+  slider.noUiSlider.on('set', function(values) {
+  const start = Math.round(values[0]);
+  const end = Math.round(values[1]);
+  updateMarkerVisibility(start, end);
+});
+  
+  document.getElementById("prev-day").addEventListener("click", () => {prevDay();
+  updateDateUI();
+  setupTimeline();
+  const values = slider.noUiSlider.get();
+  renderEvents();
+  });
+
+document.getElementById("next-day").addEventListener("click", () => {nextDay();
+  updateTimelineMode();
+  updateDateUI();
+  setupTimeline();
+  const values = slider.noUiSlider.get();
+  renderEvents();
+  });
+
+document.getElementById("reset-day").addEventListener("click", () => {
+  currentDate = new Date(); // oggi
+  updateTimelineMode();
+  updateDateUI();
+  setupTimeline();
+  renderEvents();
+  });
+
+  // Data unica: currentDate = giorno 'logico' 
+  function getAppTime(mode = 'now') {
+    const day = new Date(currentDate);
+    let time = new Date();
+    switch(mode) {
+        case 'startOfDay':
+            time = new Date(day);
+            time.setHours(0,0,0,0);
+            break;
+        case 'endOfDay':
+            time = new Date(day);
+            time.setHours(23,59,59,999);
+            break;
+        case 'live': 
+            // ora reale se siamo in modalità LIVE
+            time = new Date();
+            break;
+        default: 
+            // ora corrente entro il giorno logico
+            time = new Date(day);
+            time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);
+    }
+    return time;
+}
+  
+    function updateTimelineMode() {
+    const currentDay = new Date(currentDate);
+    currentDay.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const diffDays = Math.round((currentDay - today) / 86400000);
+    if (diffDays < 0) {
+    timelineMode = 'past';
+    } else if (diffDays === 0) {
+    timelineMode = 'live';
+    } else {
+    timelineMode = 'day';
+    }
+  }
+  
+  // Preleva le Categorie da supabase
+  async function fetchCategories() {
+    console.log("Creo le Categorie", new Date().toLocaleTimeString());
+    const { data, error } = await supabase
+      .from('categorie')
+      .select('*')
+      .eq('mc_attiva', true)
+      .order('mc_ordine', { ascending: true });
+      if (error) {
+      console.error("Errore caricamento categorie:", error);
+      return [];
+      }
+      return data;
+      }
+
+  // Preleva gli Eventi ed Organizzatori da supabase
+  async function fetchEvents() {
+    console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
+    // console.trace(); // IMPORTANTE mostra da dove è stata chiamata
+    let query = supabase      
+      .from('eventi')
+      .select(`
+      *,
+      organizzatori (or_nome),  
+      luoghi (
+      lu_lat,
+      lu_lng,
+      lu_location,
+      id_comune,
+      comuni (co_descrizione)
+      )
+      `)
+      .eq('ev_attivo', true);
+    const { data, error } = await query;  //     
+    if (error) {
+      console.error("Errore caricamento eventi:", error);
+    return [];
+    }
+    return data;
+  }
+
+// Ricrea i markers 
+function renderEvents() {
+  console.log("Aggiorno Markers", new Date().toLocaleTimeString());
+  // pulizia markers precedenti
+  markers.forEach(m => {
+  // ferma eventuali fireworks attivi
+  if (m.marker.fireworkInterval) {
+    clearInterval(m.marker.fireworkInterval);
+    m.marker.fireworkInterval = null;
+  }
+  map.removeLayer(m.marker);
+  });
+  markers = [];
+  
+  events.forEach(e => {
+    //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
+    const formatDay = (dateString) => {
+    const d = new Date(dateString);
+    return `${daysLong[d.getDay()]} ${d.getDate()}`;
+    };
+    const stateData = getEventState(
+      new Date(e.ev_inizio),
+      e.ev_fine ? new Date(e.ev_fine) : null
+    );
+    const stateClass = stateData.state;
+    const intensity = stateData.intensity;
+    //-- 🎨 ICONA
+    const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
+      icon: createIcon(
+        categories.find(c =>
+          c.id_categoria === e.id_categoria
+        )?.mc_colore || '#999',
+        stateClass,
+        intensity
+      )
+    })
+    updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
+    
+    //-- Visualizza i dettagli dell'evento selezionato con Popup //
+        const startDate = new Date(e.ev_inizio);
+        const now = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(now.getDate() + 1);
+        tomorrow.setHours(0,0,0,0);
+        const isToday = startDate.toDateString() === now.toDateString();
+        const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
+        const color = isToday ? '#3b82f6' : (isTomorrow ? '#dc3545' : '#666');
+        const align = isToday ? 'flex-start' : (isTomorrow ? 'flex-end' : 'center');
+        // Formatta la data per il popup
+        let dayLabel;
+        if (isToday) {
+          dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+        } else if (isTomorrow) {
+          dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+        } else {
+          dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
+        }
+        // const fullDate = formatDay(e.ev_inizio); // es: "Sab 6"
+        // const dayLabel = isToday ? `Oggi ${fullDate}` : (isTomorrow ? `Domani ${fullDate}` : fullDate);
+
+marker.bindPopup(`
+    <div style="min-width:180px; font-size:12px; line-height:1.3;">
+    <!-- DATA -->
+        <div style="text-align:center; font-weight:700; margin-bottom:6px; color:${color};">
+        ${dayLabel}
+        </div>
+         <!-- TITOLO -->
+        <div style="font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
+        <!-- ORARIO -->
+        <div style="display:flex; flex-direction:column; align-items:${align}; color:${color}; font-weight:600; margin-bottom:6px;">
+          ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+        </div>
+        <!-- DESCRIZIONE -->
+        <div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_descrizione || ''} </div>
+        <!-- Organizzatore -->
+        <div style="font-size: 12px; color:#555; line-height:1.35;">
+          By:
+          <a class="organizzatore-link" 
+              href="pages/organizzatore.html?id=${e.id_organizzatore}">
+            ${e.organizzatori?.or_nome || ''}
+          </a>
+        </div>
+        <!-- BOTTONE DETTAGLI -->
+        <button id="details-${e.id}" style="margin-top:6px;">More...</button>
+        </div>
+      `);      
+  // Associa il click al btn 'More...'
+  marker.on('popupopen', function() {
+  const btn = document.getElementById(`details-${e.id}`);
+  const m = this; // <-- salva il marker in una variabile locale
+  if (btn) {
+    btn.onclick = function() {
+    L.popup()
+      .setLatLng(m.getLatLng()) // usa la variabile locale del marker
+      .setContent(`
+        <div style="text-align:center;min-width:220px;font-size:12px;">
+        <div style="text-align:center; font-weight:700; font-size:14px; margin-bottom:6px;"> ${e.ev_titolo}</div><hr>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+        <div>Location: ${[e.comuni?.co_descrizione, e.luoghi?.lu_location].filter(Boolean).join(' • ')}</div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
+        target="_blank" class="action-btn map-btn"> Map </a>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+        ${Number(e.ev_costo) > 0 ? `
+        <div>Price €: <span style="font-weight:700;">${e.ev_costo}</span></div>
+            <a href="#" class="action-btn buy-btn" onclick="alert('In Progress!'); return false;"> Buy </a>
+        ` : `
+          <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Entry </div>
+        `}
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+      <div style="color:#111;"> I'll be there ! </div>
+      <a href="#" class="action-btn book-btn" onclick="alert('In Progress!'); return false;"> Book </a>
+      </div>
+      <hr>
+      ${ e.ev_copertina ? `
+        <div style="text-align:center;">
+        <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; ">
+        </div>
+        <hr>
+        ` : '' }
+        ${e.ev_descrizione || ''}
+        </div>
+      `)
+      .openOn(map);
+  };
+  }
+});
+
+    //-- 📦 STORAGE DATI (NO LOGICA)
+    markers.push({
+      marker,
+      category: parseInt(e.id_categoria),
+      start: new Date(e.ev_inizio),
+      end: e.ev_fine ? new Date(e.ev_fine) : null,
+      active: e.ev_attivo
+    });
+  });
+    updateMarkerVisibility();
+}
+
+// Dimensione dei Markers  
+function createIcon(color, state, intensity) {
+  const size = markerSizes[state] || 10;
+  return L.divIcon({
+  className: '',
+  html: `
+  <div class="pulse ${state}"
+  style="--c:${color};width:${size}px;height:${size}px;">
+  </div>
+  `,
+  iconSize: [size, size]
+  });
+}
+
+    /* Mostra o nasconde i Marker delle categorie */
+    function updateMarkerVisibility(start, end) {
+        // Se non vengono passati parametri, usa il range corrente della timeline
+      if (!start || !end) {
+      const range = getTimelineRange();
+      start = range.start;
+      end = range.end;
+      }
+      const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+      const activeCategories = [];
+      checkboxes.forEach(cb => {const catId = parseInt(cb.id.replace('cat-', ''));
+      if (cb.checked) { activeCategories.push(catId); }});
+      // Preleva eventStart ed eventEnd dai markers      
+      markers.forEach(marker => {
+      const categoryVisible = activeCategories.includes(marker.category);
+      const eventStart = new Date(marker.start);
+      const eventEnd = marker.end ? new Date(marker.end) : eventStart;
+      // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
+      const inTimeRange = eventStart <= end &&  eventEnd >= start;
+      // disattiva il timeriterval del marker per i fireworks
+        const visible = categoryVisible && inTimeRange;
+          if (visible) {
+            marker.marker.addTo(map);
+            // opzionale: riattiva se serve
+          } else {
+            map.removeLayer(marker.marker);
+            if (marker.fireworkInterval) {
+              clearInterval(marker.fireworkInterval);
+              marker.fireworkInterval = null;
+            }
+          }
+        });
+      // updateTicker(); // Aggiorna le News ***** ATTENZIONE Disabilitata temporaneamente, aggiornava le news ogni minuto 
+    }
+
+// Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
+function buildCategoryMenu() {
+  console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
+  // console.trace(); // mostra da dove è stata chiamata
+  const menuItemsDiv = document.getElementById('menu-items');
+  // checkbox per ogni categoria
+  categories.forEach(cat => {
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.id = `cat-${cat.id_categoria}`;
+    cb.checked = true;
+    cb.className = 'category-checkbox';
+    const label = document.createElement('label');
+    label.htmlFor = `cat-${cat.id_categoria}`;
+    label.className = 'category-label';
+    label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo link per icone : https://www.svgrepo.com/
+    // label.textContent = cat.mc_descrizione; // questa è solo descrizione 
+    // Applichiamo il colore dell’evento
+    label.style.backgroundColor = cat.mc_colore;
+    label.style.color = getContrastColor(cat.mc_colore);
+    label.style.setProperty('--cat-color', cat.mc_colore);
+    menuItemsDiv.appendChild(cb);
+    menuItemsDiv.appendChild(label);
+    });
+    // toggle menu
+    const toggleBtn = document.getElementById('menu-toggle');
+    toggleBtn.addEventListener('click', () => {
+    if (menuItemsDiv.style.display === 'none' || menuItemsDiv.style.display === '') {
+    menuItemsDiv.style.display = 'block';
+    } else { menuItemsDiv.style.display = 'none'; }});
+    // Checkbox Singola Categoria
+    menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
+    const selectAllToggle = document.getElementById('select-all-toggle');
+    selectAllToggle.checked = true;
+    // Checkbox Globale Seleziona/Deseleziona
+    selectAllToggle.addEventListener('change', () => {
+    const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
+    updateMarkerVisibility();
+    });
+    // aggiorna lo stato del checkbox
+    function updateSelectAllToggle() {
+    const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    selectAllToggle.checked = allChecked;
+    }
+    menuItemsDiv.addEventListener('change', updateSelectAllToggle);
+  }
+
+  /* Compone il giorno ed il mese corrente nel rettangolo */  
+    function updateDateUI() {
+      console.log("Aggiorno Data e mese", new Date().toLocaleTimeString());
+      // console.trace(); // mostra da dove è stata chiamata
+      dayText.innerText = currentDate.getDate();
+      dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
+    // -- Posizionamento di -day
+    //-- Iniziali Maiuscole
+    function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+      // ---- dichiarazioni globali alla funzione ----
+      const currentDayEl = document.getElementById('day-text');
+      const nextDayEl = document.getElementById('day-next-text');
+      
+    if (timelineMode === 'live') {
+      const currentDayPercent = midnightPercent / 2;
+      const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
+      // Giorno attuale
+      let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
+      currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+      currentDayEl.style.left = `${currentDayPercent * 100}%`;
+      currentDayEl.style.display = "block";
+      currentDayEl.style.transform = "";
+      // Giorno successivo
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(currentDate.getDate() + 1);
+      let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
+      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
+      nextDayEl.style.left = `${(nextDayPercent - 0.10) * 100}%`; // tolgo il 10% per compensare in allineamento la dimensione dei caratteri
+      nextDayEl.style.display = "block";
+      nextDayEl.style.transform = "";
+    } else { 
+    // DAY MODE
+    nextDayEl.style.display = "none";
+    // centra day-text
+    currentDayEl.style.display = "block";
+    currentDayEl.style.left = "50%";
+    currentDayEl.style.transform = "translateX(-50%)";
+    let currentDayName =
+      currentDate.toLocaleDateString(navigator.language, {
+        weekday: 'short'
+      });
+    currentDayName = capitalizeFirst(currentDayName);
+    currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+    }
+  }
+  
+    /* Formatta la data in stile Italiano 00:00 */   
+    function formatTime(dateString) {
+      const d = new Date(dateString);
+      return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    } 
+
+  /* Temporizzazione dei Marker */
+  function getEventState(startDate, endDate) {
+    const now = new Date();
+    const diffMinutes = (startDate - now) / 1000 / 60;
+    const minutesFromStart =  (now - startDate) / 1000 / 60;
+    const durationMinutes = endDate ? (endDate - startDate) / 1000 / 60 : null; // calcola durata dell'evento
+    // evento terminato 
+    if (endDate && now > endDate) return {state: 'finished' };
+    let state;
+    // evento già Started da oltre 30'
+    if (minutesFromStart > 0) {
+    state = 'running-soft' ;
+    if (durationMinutes) {
+    const progress = minutesFromStart / durationMinutes;
+    if (progress < 0.125) { 
+    state = 'running-strong';
+    } else if (progress < 0.25) { 
+    state = 'running-medium';
+    } else { 
+    state = 'running-soft';
+    }
+    }
+    return { state };
+  }
+    // Inizia tra 12 - 8 - 6 - 4 - 2 h - Started < 2 ore
+    if (diffMinutes > 720) return { state: 'distant' };
+    if (diffMinutes > 480) return { state: 'future-deep' };
+    if (diffMinutes > 240) return { state: 'future-far' };
+    if (diffMinutes > 120) return { state: 'future-medium' };
+    if (diffMinutes > 60) return { state: 'future-near' };
+    if (diffMinutes > 30) return { state: 'imminent' };
+    if (diffMinutes > 0) return { state: 'countdown' };
+    return { state: 'started' };
+}
+  
+  // Calcola il range della Timeline
+  function getTimelineRange () {
+    let start, end;
+    if (timelineMode === 'live') {
+      start = getAppTime('live'); // Ora corrente
+      end = new Date(start);
+      end.setDate(end.getDate() + 1) ; // Domani
+      end.setHours(23, 59, 59, 999);  // fine giornata domani
+      } else {
+      start = getAppTime('startOfDay'); // Inizio Giorno
+      end = getAppTime('endOfDay'); // Fine Giorno
+      }
+  console.log("Mode:", timelineMode, "→ start:", start.toLocaleString(), "end:", end.toLocaleString());
+      return { start, end };
+  }
+
+  // Posiziona la mezzanotte nella Timeline
+function getMidnightPosition(totalHours) {
+  if (timelineMode === 'live') {
+    const currentHour = new Date().getHours();
+    const remainingToday = 24 - currentHour;
+    return remainingToday / totalHours;
+  }
+  return 0;
+}
+ 
+  // Genera la timeline
+  function setupTimeline() {
+    console.log("Crea la TimeLine", new Date().toLocaleTimeString());
+    //-- distrugge vecchio slider per ricrearlo da zero
+    if (slider.noUiSlider) {
+    slider.noUiSlider.destroy();
+    slider.noUiSlider = null;
+    }
+    const { start, end } = getTimelineRange();
+    // ore totali reali del range
+    totalHours = Math.ceil((end - start) / 3600000);
+    //-- Controllo di sicurezza per evitare errori.
+    if (!totalHours || isNaN(totalHours)) {
+    console.error("Invalid timeline range", totalHours);
+    return;
+    }
+    //-- Crea lo slider con doppia maniglia
+    noUiSlider.create(slider, {
+    start: [0, totalHours],
+    connect: true,
+    step: 1,
+    range: {
+      min: 0,
+      max: totalHours
+      }
+    });
+    console.log("Slider Creato",);
+    //-- Ad ogni movimento dello slider agiorna la mappa
+    slider.noUiSlider.on('update', updateHandles);
+    console.log("Listener Update Aggiunto",);
+    
+  //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
+    const midnight = document.getElementById('midnight');
+    if (timelineMode === 'live') {
+    midnightPercent = getMidnightPosition(totalHours);
+    midnight.style.display = "block"; 
+    midnight.style.left = `${midnightPercent * 100}%`;
+    } else {
+    // nascondi barra in day mode
+    midnight.style.display = "none";
+    }
+  }
+    
+   //-- Se slider si muove, aggiorna orari labels in base a posizione slider
+  function updateHandles(values) {
+  console.log("Aggiorno Slider", new Date().toLocaleTimeString());
+  // console.trace(); // mostra da dove è stata chiamata
+    //-- Offset
+    const startOffset = Math.round(values[0]);
+    const endOffset = Math.round(values[1]);
+
+     // baseTime coerente con la modalità timeline
+    const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
+    const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
+    const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
+   
+    //-- Crea le etichette delle maniglie
+    const formatTime = (date) =>
+    date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
+    const startLabel = formatTime(startDate);
+    const endLabel   = formatTime(endDate);
+    const handles = slider.querySelectorAll('.noUi-handle');
+    handles.forEach((h, i) => {
+      let label =
+        h.querySelector('.handle-label');
+      if (!label) {
+        label = document.createElement('div');
+        label.className = 'handle-label';
+        h.appendChild(label);
+      }
+      //-- Inserisce ora di inizio e di fine
+      label.innerText = i === 0 ? startLabel : endLabel;
+    });
+    //-- Aggiorna i marker della mappa in base ad orari inizio-fine
+    updateMarkerVisibility(startDate,endDate);
+console.log("START:", startDate,"END:", endDate);
+  }
+    
+  // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
+  function getContrastColor(hex) {
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substr(0,2),16);
+    const g = parseInt(hex.substr(2,2),16);
+    const b = parseInt(hex.substr(4,2),16);
+    const brightness =
+    (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 150
+    ? '#111'
+    : '#fff';
+  }
+
+  function prevDay() {
+  if (timelineMode === 'live') {
+    timelineMode = 'past';
+    updateDateUI();
+    setupTimeline();
+    renderEvents();
+    return;
+  }
+  // Gli altri casi: spostamento effettivo indietro di un giorno
+  currentDate.setDate(currentDate.getDate() - 1);
+  timelineMode = 'past';
+  updateTimelineMode();
+}
+
+function nextDay() {
+ const today = new Date();
+  today.setHours(0,0,0,0);
+  const current = new Date(currentDate);
+  current.setHours(0,0,0,0);
+  if (timelineMode === 'past' &&
+    current.getTime() === today.getTime()) {   
+  timelineMode = 'live';
+  updateTimelineMode();
+  return;
+  }
+  currentDate.setDate(currentDate.getDate() + 1);
+  timelineMode = 'day';
+  updateTimelineMode();
+}
+  
+  function getUpcomingEvents(hours = 12) {
+  console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
+  // console.trace(); // mostra da dove è stata chiamata
+  const now = timelineMode === 'live'
+      ? getAppTime('live')
+      : getAppTime('startOfDay');
+  const limit = new Date(now);
+  limit.setHours(limit.getHours() + hours);    
+  return events.filter(e => {
+    const start = new Date(e.ev_inizio);
+    return start > now && start <= limit;
+  }).sort((a,b)=>
+    new Date(a.ev_inizio) - new Date(b.ev_inizio)
+  );
+}
+
+  function updateTicker(){
+  console.log("Aggiorno Striscia News", new Date().toLocaleTimeString());
+  // console.trace(); // mostra da dove è stata chiamata
+  const list = getUpcomingEvents(20); // Numero di News da visualizzare
+  const html = list.map(e => {
+  const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
+  return `
+      <span style="margin-right:20px;
+          padding:2px 8px;
+          border-radius:12px;
+          background:${color}33;
+          border:0px solid ${color}66;
+          border-left:4px solid ${color};
+          white-space:nowrap;
+      ">
+        ⏰ ${formatTime(e.ev_inizio)}
+        • ${e.luoghi?.comuni?.co_descrizione || ''}
+        • ${e.luoghi.lu_location}
+        • ${e.ev_titolo}
+        • ${e.ev_descrizione}
+      </span>
+    `;
+  }).join('');
+  document.getElementById('eventTickerContent').innerHTML = html;
+}
+
+function latLngToCanvasXY(lat, lng) {
+  const point = map.latLngToContainerPoint([lat, lng]);
+  return { x: point.x, y: point.y };
+}
+  
+// ====================================================
+// FIREWORKS SCENICI SUL CANVAS
+// ====================================================
+class Particle {
+  constructor(x, y, color, vx, vy, life) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.vx = vx;
+    this.vy = vy;
+    this.life = life;
+    this.alpha = 1;
+    this.radiusOuter = 4; // dimensione stellina
+    this.radiusInner = 2;
+    this.spikes = 5; // punte della stella
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.05; // gravità
+    this.life -= 1;
+    this.alpha = Math.max(0, this.life / 60);
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.translate(this.x, this.y);
+
+    ctx.beginPath();
+    for (let i = 0; i < this.spikes * 2; i++) {
+      const r = i % 2 === 0 ? this.radiusOuter : this.radiusInner;
+      const angle = (Math.PI / this.spikes) * i;
+      const px = Math.cos(angle) * r;
+      const py = Math.sin(angle) * r;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+class Firework {
+  constructor(x, y) {
+    this.x = x; // coordinata orizzontale
+    this.y = y; // posizione iniziale
+    this.startY = y // quota di partenza
+    this.maxHeight = 22 // quota massima raggiungibile
+    this.particles = []; // perticelle dopo esplosione
+    this.exploded = false; // esploso si/no
+    this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    this.vy = -8 - Math.random() * 4; // velocità verticale
+    this.vx = (Math.random() - 0.5) * 2; // deriva laterale
+    this.currentY = y; // quota corrente
+    this.trail = []; // punti della scia
+  }
+  
+  isDead() { return this.exploded && this.particles.length === 0;}
+
+  update() {
+    if (!this.exploded) {
+      this.x += this.vx; 
+      this.currentY += this.vy; // Salita del razzo
+      this.vy += 0.35; // gravità
+      this.trail.push({ x: this.x, y: this.currentY }); 
+      if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
+      if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } // esplode quando raggiunge la quota stabilita (210px)
+    }
+    // Aggiorna particelle esplose
+    this.particles.forEach(p => p.update()); // aggiorna le particelle
+    this.particles = this.particles.filter(p => p.life > 0); // elimina particelle morte
+  }
+
+  createParticles() {
+    const count = 10 + Math.floor(Math.random() * 10); // Numero di stelline che esplodono
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * 2 * Math.PI;
+      const speed = Math.random() * 4 + 2;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      this.particles.push(
+        new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20) // Quanti frame vive una particella
+      );
+    }
+  }
+
+  draw(ctx) {
+    // Disegna la scia del razzo
+    ctx.save();
+    for (let i = 0; i < this.trail.length; i++) {
+      const p = this.trail[i];
+      ctx.globalAlpha = i / this.trail.length * 0.25; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
+      ctx.fillStyle = this.color; // colore della scia
+      ctx.beginPath(); // disegna punto luminoso
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+    // Razzo prima dell’esplosione
+    if (!this.exploded) {
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.currentY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Stelline esplose
+    this.particles.forEach(p => p.draw(ctx));
+  }
+  }
+  
+  // ====================================================
+// GESTIONE FIREWORKS SULLA MAPPA
+// ====================================================
+
+  function triggerFirework(latLng) {
+  const { x, y } = latLngToCanvasXY(latLng.lat, latLng.lng);
+  fireworks.push(new Firework(x, y));
+}
+
+function animateFX() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  fireworks.forEach(fw => {
+    fw.update();
+    fw.draw(ctx);
+  });
+    // elimina fuochi terminati
+  for (let i = fireworks.length - 1; i >= 0; i--) {
+    if (fireworks[i].isDead()) {
+      fireworks.splice(i, 1);
+    }
+  }
+requestAnimationFrame(animateFX);
+}
+animateFX();
+
+// Lancia i fuochi se lo stato è countdown  
+function updateMarkerState(marker, state, latLng, evFine) {
+  marker.state = state;
+  // Calcola se l'evento è finito
+  const now = new Date();
+  const eventoFinito = evFine && now >= new Date(evFine);
+  if (eventoFinito) {
+    // Evento Finito → pulisci intervallo fuochi e imposta stato a 'finished'
+    if (marker.fireworkInterval) {
+      clearInterval(marker.fireworkInterval);
+      marker.fireworkInterval = null;
+    }
+    marker.state = 'finished';
+    return;
+  }
+  // Evento attuale, fuochi solo se in countdown
+  if (state === 'countdown' && !marker.fireworkInterval) {
+  triggerFirework(latLng);
+  marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2500); // Un fuoco ogni X secondi 1=1000
+}
+if (state !== 'countdown' && marker.fireworkInterval) {
+  clearInterval(marker.fireworkInterval);
+  marker.fireworkInterval = null;
+}
+  return;
+}
+
+const overlay = document.getElementById('mapOverlay');
+const toggle = document.getElementById('overlayToggle');
+let timeout = 20 * 1000; // 20 secondi
+
+// chiusura overlay
+function minimizeOverlay() {
+  overlay.classList.add('minimized');
+  toggle.style.display = 'flex';
+}
+
+// apertura overlay
+function openOverlay() {
+  overlay.classList.remove('minimized');
+  toggle.style.display = 'none';
+}
+
+// click fuori → chiude
+document.addEventListener('click', (e) => {
+  if (!overlay.contains(e.target) && !toggle.contains(e.target) && !overlay.classList.contains('minimized')) {
+    minimizeOverlay();
+  }
+});
+
+// evita chiusura cliccando dentro
+overlay.addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
+// click icona → riapre
+toggle.addEventListener('click', openOverlay);
+
+// timer 30 minuti
+setTimeout(() => { minimizeOverlay(); }, timeout);
+  
+</script>
+</body>
+</html>
