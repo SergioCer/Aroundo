@@ -862,7 +862,7 @@
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
   });
-
+  
   map.addLayer(markersCluster);
   const oms = new OverlappingMarkerSpiderfier(map, {
     nearbyDistance: 1,
@@ -872,7 +872,13 @@
     spiralLengthFactor: 5,
     keepSpiderfied: true
 });
-  
+
+  marker.spiderLegPolylineOptions = {
+  color: categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999',
+  weight: 2,
+  opacity: 0.8
+};
+
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
