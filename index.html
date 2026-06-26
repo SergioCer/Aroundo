@@ -1148,76 +1148,57 @@ function renderEvents() {
           dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
         }
 
-
     
- /* marker.bindPopup(`
-    <div style="min-width:180px; font-size:12px; line-height:1.3;">
-    <!-- DATA -->
-        <div style="text-align:center; font-weight:700; margin-bottom:6px; color:${color};">
-        ${dayLabel}
+    /* Richiama il POPUP */
+    marker.on('click', function () {
+    window.openBasePopup(e, this.getLatLng());
+    });
+    
+
+ 
+    /* Associa il click al btn 'More...' 
+     marker.on('popupopen', function() {
+    const btn = document.getElementById(`details-${e.id}`);
+    const m = this; // <-- salva il marker in una variabile locale
+    if (btn) {
+      btn.onclick = function() {
+      L.popup()
+        .setLatLng(m.getLatLng()) // usa la variabile locale del marker
+        .setContent(`
+          <div style="text-align:center;min-width:220px;font-size:12px;">
+          <div style="text-align:center; font-weight:700; font-size:14px; margin-bottom:6px;"> ${e.ev_titolo}</div><hr>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+          <div>Location: ${[e.comuni?.co_descrizione, e.luoghi?.lu_location].filter(Boolean).join(' • ')}</div>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
+          target="_blank" class="action-btn map-btn"> Map </a>
         </div>
-         <!-- TITOLO -->
-        <div style="font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
-        <!-- ORARIO -->
-        <div style="display:flex; flex-direction:column; align-items:${align}; color:${color}; font-weight:600; margin-bottom:6px;">
-          ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+          ${Number(e.ev_costo) > 0 ? `
+          <div>Price €: <span style="font-weight:700;">${e.ev_costo}</span></div>
+              <a href="#" class="action-btn buy-btn" onclick="alert('In Progress!'); return false;"> Buy </a>
+          ` : `
+            <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Entry </div>
+          `}
         </div>
-        <!-- DESCRIZIONE -->
-        <div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_descrizione || ''} </div>
-        <!-- Organizzatore -->
-        <div style="font-size: 12px; color:#555; line-height:1.35;">
-          By:
-          <a class="organizzatore-link" 
-              href="pages/organizzatore.html?id=${e.id_organizzatore}">
-            ${e.organizzatori?.or_nome || ''}
-          </a>
-        </div>
-        <!-- BOTTONE DETTAGLI -->
-        <button id="details-${e.id}" style="margin-top:6px;">More...</button>
-        </div>
-      `); */
-  /* Associa il click al btn 'More...' */
-  /* marker.on('popupopen', function() {
-  const btn = document.getElementById(`details-${e.id}`);
-  const m = this; // <-- salva il marker in una variabile locale
-  if (btn) {
-    btn.onclick = function() {
-    L.popup()
-      .setLatLng(m.getLatLng()) // usa la variabile locale del marker
-      .setContent(`
-        <div style="text-align:center;min-width:220px;font-size:12px;">
-        <div style="text-align:center; font-weight:700; font-size:14px; margin-bottom:6px;"> ${e.ev_titolo}</div><hr>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-        <div>Location: ${[e.comuni?.co_descrizione, e.luoghi?.lu_location].filter(Boolean).join(' • ')}</div>
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
-        target="_blank" class="action-btn map-btn"> Map </a>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-        ${Number(e.ev_costo) > 0 ? `
-        <div>Price €: <span style="font-weight:700;">${e.ev_costo}</span></div>
-            <a href="#" class="action-btn buy-btn" onclick="alert('In Progress!'); return false;"> Buy </a>
-        ` : `
-          <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Entry </div>
-        `}
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-      <div style="color:#111;"> I'll be there ! </div>
-      <a href="#" class="action-btn book-btn" onclick="alert('In Progress!'); return false;"> Book </a>
-      </div>
-      <hr>
-      ${ e.ev_copertina ? `
-        <div style="text-align:center;">
-        <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; ">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+        <div style="color:#111;"> I'll be there ! </div>
+        <a href="#" class="action-btn book-btn" onclick="alert('In Progress!'); return false;"> Book </a>
         </div>
         <hr>
-        ` : '' }
-        ${e.ev_descrizione || ''}
-        </div>
-      `)
-      .openOn(map);
-  };
-  }
-}); */
+        ${ e.ev_copertina ? `
+          <div style="text-align:center;">
+          <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; ">
+          </div>
+          <hr>
+          ` : '' }
+          ${e.ev_descrizione || ''}
+          </div>
+        `)
+        .openOn(map);
+    };
+    }
+  }); */
+    
     //-- 📦 STORAGE DATI (NO LOGICA)
     markers.push({
       marker,
@@ -1460,6 +1441,60 @@ function buildCategoryMenu() {
     if (diffMinutes > 0) return { state: 'countdown' };
     return { state: 'started' };
 }
+
+    /* EX *****  marker.bindPopup  ***** sotto POPUP nuovo */
+    window.openBasePopup = function(e, latlng) {
+          const startDate = new Date(e.ev_inizio);
+          const now = new Date();
+          const tomorrow = new Date();
+          tomorrow.setDate(now.getDate() + 1);
+          tomorrow.setHours(0,0,0,0);
+          const isToday = startDate.toDateString() === now.toDateString();
+          const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
+          const color = isToday ? '#3b82f6'
+                 : isTomorrow ? '#dc3545'
+                 : '#666';
+          const align = isToday ? 'flex-start'
+                 : isTomorrow ? 'flex-end'
+                 : 'center';
+          let dayLabel;
+          if (isToday)
+              dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+          else if (isTomorrow)
+              dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+          else
+              dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}
+      const content = `
+        <div style="min-width:180px; font-size:12px; line-height:1.3;">
+        <!-- DATA -->
+        <div style="text-align:center; font-weight:700; margin-bottom:6px; color:${color};">
+        ${dayLabel}
+        </div>
+         <!-- TITOLO -->
+        <div style="font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
+        <!-- ORARIO -->
+        <div style="display:flex; flex-direction:column; align-items:${align}; color:${color}; font-weight:600; margin-bottom:6px;">
+          ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+        </div>
+        <!-- DESCRIZIONE -->
+        <div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_descrizione || ''} </div>
+        <!-- Organizzatore -->
+        <div style="font-size: 12px; color:#555; line-height:1.35;">
+          By:
+          <a class="organizzatore-link" 
+              href="pages/organizzatore.html?id=${e.id_organizzatore}">
+            ${e.organizzatori?.or_nome || ''}
+          </a>
+        </div>
+        <!-- BOTTONE DETTAGLI e relativo POPUP -->
+        <button onclick="openDetailPopup(${e.id})" style="margin-top:6px;">More...</button>
+        </div>
+       `;
+        L.popup()
+        .setLatLng(latlng)
+        .setContent(content)
+        .openOn(map);       
+      };
   
   // Calcola il range della Timeline
   function getTimelineRange () {
