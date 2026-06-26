@@ -865,12 +865,12 @@
   
   map.addLayer(markersCluster);
   const oms = new OverlappingMarkerSpiderfier(map, {
-    nearbyDistance: 1,
-    circleFootSeparation: 40,
-    spiralFootSeparation: 35,
-    spiralLengthStart: 18,
-    spiralLengthFactor: 5,
-    keepSpiderfied: true
+    nearbyDistance: 1,    // distanza dei marker da considerare spiderizzabili
+    circleFootSeparation: 45,  // fino ad 8 marker circa li dispone a cerchio
+    spiralFootSeparation: 35,  // per tanti marker passa alla disposizione a spirale
+    spiralLengthStart: 18,     // lunghezza braccio della spirale
+    spiralLengthFactor: 8,     // all'aumentare dei marker a spirale quanto aumenta la distanza
+    keepSpiderfied: true       // click sul marker chiude spiderizzazione
 });
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
