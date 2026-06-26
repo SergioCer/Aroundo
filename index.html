@@ -856,6 +856,7 @@
 
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 5, // 0 nessun cluster ; 150 tutto raggruppato
+  disableClusteringAtZoom: 16 // al livello di zoom 16 disabilita i cluster    
   spiderfyOnMaxZoom: true,
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
