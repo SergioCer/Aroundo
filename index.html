@@ -1093,6 +1093,9 @@ function renderEvents() {
   markersCluster.removeLayer(m.marker);
   });
   markers = [];
+  events.sort((a, b) =>
+    new Date(a.ev_inizio) - new Date(b.ev_inizio)
+);
   events.forEach(e => {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
@@ -1115,8 +1118,8 @@ function renderEvents() {
         intensity
       )
     })
-    marker.evInizio = new Date(e.ev_inizio); // prede ora inizio del marker per il cluster
-    marker.geoKey = `${e.luoghi.lu_lat.toFixed(6)}_${e.luoghi.lu_lng.toFixed(6)}`; // prende le coordinate identiche per il cluster
+    // CANCELLARE ***** marker.evInizio = new Date(e.ev_inizio); // prede ora inizio del marker per il cluster
+    // CANCELLARE ***** marker.geoKey = `${e.luoghi.lu_lat.toFixed(6)}_${e.luoghi.lu_lng.toFixed(6)}`; // prende le coordinate identiche per il cluster
     markersCluster.addLayer(marker);
     oms.addMarker(marker);
     oms.addListener('spiderfy', function(markers) {
