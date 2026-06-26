@@ -855,7 +855,7 @@
     }).setView([defaultLat, defaultLng], defaultZoom);
 
   const markersCluster = L.markerClusterGroup({
-  maxClusterRadius: 5, // 0 nessun cluster ; 150 tutto raggruppato
+  maxClusterRadius: 15, // 0 nessun cluster ; 150 tutto raggruppato
   disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster    
   spiderfyOnMaxZoom: true,
   showCoverageOnHover: false,
