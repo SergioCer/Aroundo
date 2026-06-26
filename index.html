@@ -902,8 +902,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   events = await fetchEvents();
 
-// console.log(events[0]); // CANCELLARE ALLA FINE 
-  
   // 2. Prova a ottenere la posizione dell'utente
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -1540,8 +1538,6 @@ function nextDay() {
   updateTimelineMode();
 }
   
-  // NON USATA CANCELLARE function getNow(date = null) {const d = new Date(date); d.setHours(0,0,0,0); return d;}
-
   function getUpcomingEvents(hours = 12) {
   console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
   // console.trace(); // mostra da dove è stata chiamata
