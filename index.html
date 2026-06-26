@@ -866,6 +866,10 @@
   map.addLayer(markersCluster);
   const oms = new OverlappingMarkerSpiderfier(map, {
     nearbyDistance: 1,
+    circleFootSeparation: 40,
+    spiralFootSeparation: 35,
+    spiralLengthStart: 18,
+    spiralLengthFactor: 5,
     keepSpiderfied: true
 });
   
