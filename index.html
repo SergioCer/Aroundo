@@ -19,9 +19,9 @@
 
     /* Riduce attributi Leaflet */
     .leaflet-control-attribution {
-      font-size: 8px;        /* più piccolo */
-      opacity: 0.5;           /* meno invadente */
-      background: rgba(255,255,255,0.3); /* leggermente trasparente */
+      font-size: 8px;               /* più piccolo */
+      opacity: 0.5;                 /* meno invadente */
+      background: rgba(255,255,255,0.3);     /* leggermente trasparente */
       padding: 2px 2px;
     }
     
@@ -31,8 +31,8 @@
       left: 0;
       height: 100dvh;
       width: 100%;
-      pointer-events: none; /* Non blocca i click sulla mappa */
-      z-index: 9999; /* Tenere basso ??? */
+      pointer-events: none;     /* Non blocca i click sulla mappa */
+      z-index: 9999;
     }
     
     /* Titolo */
@@ -52,49 +52,49 @@
     }    
     
     /* -- Rettangolo Aroundo trasparente */
-.map-overlay {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 999;
-  padding: 20px;
-  border-radius: 16px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
-  backdrop-filter: blur(8px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); /* Velocità */ 
-}
+    .map-overlay {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      padding: 20px;
+      border-radius: 16px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);     /* Velocità */ 
+    }
 
-/* stato “mini” in alto a destra */
-.map-overlay.minimized {
-  top: 20px;
-  right: 10px;
-  left: auto;
-  transform: none;
-  width: 35px;
-  height: 35px;
-  padding: 0;
-  border-radius: 50%;
-  overflow: hidden;
-}
+    /* stato “mini” in alto a destra */
+    .map-overlay.minimized {
+      top: 20px;
+      right: 10px;
+      left: auto;
+      transform: none;
+      width: 35px;
+      height: 35px;
+      padding: 0;
+      border-radius: 50%;
+      overflow: hidden;
+    }
 
-/* icona toggle */
-#overlayToggle {
-  position: fixed;
-  top: 20px;
-  right: 10px;
-  z-index: 1000;
-  width: 40px;
-  height: 40px;
-  display: none;
-  background: #3b82f6;
-  color: white;
-  border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
+    /* icona toggle */
+    #overlayToggle {
+      position: fixed;
+      top: 20px;
+      right: 10px;
+      z-index: 1000;
+      width: 40px;
+      height: 40px;
+      display: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
 
     /* -- Rettangolo filtro categorie */
     .map-overlay2 {
@@ -103,66 +103,61 @@
       left: 10px;
       z-index: 999;
       background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
-      padding: 2px 2px; /* Contenitore */
+      padding: 2px 2px;     /* Contenitore */
       border-radius: 14px;
       backdrop-filter: blur(8px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.08);
       min-width: 140px;
       width: fit-content;
       max-width: 200px;
-      max-height: 60vh;   /* limita altezza della sezione in verticale */
-      overflow-y: auto;   /* scroll verticale se tante categorie */
+      max-height: 60vh;     /* limita altezza della sezione in verticale */
+      overflow-y: auto;     /* scroll verticale se tante categorie */
     }
       
-/* -- Rettangolo barra temporale */
-.top-timebar {
-  position: absolute;
-  top: 6px;                     /* distanza dal bordo superiore */
-  left: 50%;                     /* centro orizzontale */
-  transform: translateX(-50%);   /* centraggio reale */
-  z-index: 998;
-
-  display: flex;
-  flex-direction: row;           /* elementi in riga su desktop */
-  align-items: center;
-  justify-content: center;       /* centrare internamente */
-  gap: 10px;                     /* distanza tra elementi interni */
-
-  width: 330px;                  /* dimensione reale del contenitore */
-  height: 90px;                 /* altezza fissa per contenuto */
-  padding: 2px 2px;            /* spazio interno */
-  border-radius: 16px;
-
-  background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
-  backdrop-filter: blur(8px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
+    /* -- Rettangolo barra temporale */
+    .top-timebar {
+      position: absolute;
+      top: 6px;                      /* distanza dal bordo superiore */
+      left: 50%;                     /* centro orizzontale */
+      transform: translateX(-50%);   /* centraggio reale */
+      z-index: 998;
+      display: flex;
+      flex-direction: row;           /* elementi in riga su desktop */
+      align-items: center;
+      justify-content: center;       /* centrare internamente */
+      gap: 10px;                     /* distanza tra elementi interni */
+      width: 330px;                  /* dimensione reale del contenitore */
+      height: 90px;                  /* altezza fissa per contenuto */
+      padding: 2px 2px;              /* spazio interno */
+      border-radius: 16px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
 
     /* Pallino torna alla data di oggi */
-    /* .reset-btn { font-size: 32px; font-weight: bold; color: #3b82f6; background: transparent; border: none; padding: 2px 2px; cursor: pointer; transition: transform 0.15s ease; display: inline-block; position: rlative;}
-    /* .reset-btn:hover { transform: translate(-50%, -50px) scale(1.08); }    */
-.reset-btn {
-  border: none;
-  background: transparent;
-  font-size: 32px;
-  cursor: pointer;
-  color: #3b82f6;
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-weight: bold;
-  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-}
+    .reset-btn {
+      border: none;
+      background: transparent;
+      font-size: 32px;
+      cursor: pointer;
+      color: #3b82f6;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
 
-.reset-btn:hover {
-  background: rgba(59, 130, 246, 0.08);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
+    .reset-btn:hover {
+      background: rgba(59, 130, 246, 0.08);
+      transform: translateY(-2px) scale(1.12);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
 
-.reset-btn:active {
-  transform: translateY(0px) scale(0.96);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-}
+    .reset-btn:active {
+      transform: translateY(0px) scale(0.96);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
 
     /* --- MENU & FILTRI --- */
     /* -- Menù a discesa */
@@ -172,7 +167,7 @@
       justify-content: space-between;
       gap: 4px;
       margin-bottom: 4px;
-      width: 130px; /* larghezza */
+      width: 130px;       /* larghezza */
     }
 
     /* Elementi del menu */ 
@@ -185,8 +180,8 @@
     .vertical-toggles {
       display: flex;
       flex-direction: column;
-      width: 140px; /* largezza massima della riga */
-      gap: 3px; /* Distanzia le singole categorie in verticale */
+      width: 140px;     /* largezza massima della riga */
+      gap: 3px;         /* Distanzia le singole categorie in verticale */
     }
     
     /* Bordino intorno a checkbox e label di Seleziona Categorie */
@@ -196,7 +191,7 @@
       gap: 4px;
       width: 100%;
       padding: 4px 10px;
-      min-height: 30px; /* Garantisce l'hover */
+      min-height: 30px;     /* Garantisce l'hover */
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.18);
       background: rgba(255,255,255,0.06);
@@ -271,13 +266,13 @@
     .category-label {
       white-space: nowrap;
       display: flex;
-      align-items: center;      /* icona e testo allineati in alto */
-      justify-content: flex-start; /* testo a sinistra */
-      margin: 2px;            /* distanza verticale compatta */
+      align-items: center;          /* icona e testo allineati in alto */
+      justify-content: flex-start;  /* testo a sinistra */
+      margin: 2px;                  /* distanza verticale compatta */
       cursor: pointer;
       border-radius: 50px;
-      padding: 1px 4px;         /* leggero padding */
-      flex-grow: 1; /* permette all'hover di utilizzare tutta la larghezza */ 
+      padding: 1px 4px;     /* leggero padding */
+      flex-grow: 1;         /* permette all'hover di utilizzare tutta la larghezza */ 
       font-size: 12px;
       color: #fff;
       font-weight: 500;
@@ -343,8 +338,6 @@
     /* Inserisce un piccolo puntino bianco sui markers conclusi */
     .pulse.finished::after { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9;}
 
-
-    
     /* SALTI dei Marker correlati alle Pulsazioni */
     @keyframes pulse { 0% { transform: scale(0.6);opacity: 0.5; } 70% { transform: scale(1.6); opacity: 0; } 100% { opacity: 0; }}
     @keyframes hopSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); }}
@@ -352,7 +345,6 @@
     @keyframes hopFast { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); }}
     @keyframes hopCrazy { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); }}
     @keyframes pulseLive { 0% { transform: scale(1) translateY(0); opacity: 0.7; } 70% { transform: scale(1.5) translateY(-5px); opacity: 0.3; } 100% { transform: scale(2) translateY(-10px); opacity: 0; }}
-    /* @keyframes finished { 0%,100% { transform: translateY(0); } 50% { transform: translateY(0px); }} Sostituita con quella di sotto */
     @keyframes finished { 0%,100% { transform: translateY(0); }}
     @keyframes running-strong { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-8px,0); } /* X = -8px, Y = 0 */}
     @keyframes running-medium { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-6px,0); } /* X = -8px, Y = 0 */}
@@ -517,93 +509,93 @@
     .noUi-handle:hover { transform: scale(1.08); transition: transform 0.15s ease; }    
     .noUi-horizontal { height: 6px; }    
 
-/* NUOVO MENU checkbox integrata */
-/* Contenitore checkbox + pulsante in una riga */
-.filter-all-container {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 2px;
-}
+    /* NUOVO MENU checkbox integrata */
+    /* Contenitore checkbox + pulsante in una riga */
+    .filter-all-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
 
-/* Mantieni il checkbox rotondo come gli altri */
-.filter-all-container .toggle-pill {
-  width: 28px;           /* piccolo quadrato per il pallino */
-  min-height: 28px;
-  padding: 0;            /* nessun padding extra */
-  border-radius: 50%;    /* cerchio perfetto */
-  justify-content: center;
-}
+    /* Mantieni il checkbox rotondo come gli altri */
+    .filter-all-container .toggle-pill {
+      width: 28px;           /* piccolo quadrato per il pallino */
+      min-height: 28px;
+      padding: 0;            /* nessun padding extra */
+      border-radius: 50%;    /* cerchio perfetto */
+      justify-content: center;
+    }
 
-/* Su Categorie crea un effetto passando il mouse */    
-#menu-items label.category-label {
-  display: flex;
-  align-items: center;
-  padding: 2px 4px;
-  border-radius: 999px;
-  transition: background 0.2s ease, transform 0.15s ease;
-}
+    /* Su Categorie crea un effetto passando il mouse */    
+    #menu-items label.category-label {
+      display: flex;
+      align-items: center;
+      padding: 2px 4px;
+      border-radius: 999px;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
 
-#menu-items label.category-label:hover {
-  background: rgba(255,255,255,0.15);
-  transform: translateX(2px);
-}
+    #menu-items label.category-label:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(2px);
+    }
 
-#timeline-wrapper {
-  position: relative; /* serve per posizionare prev/next/day/full */
-}
+    #timeline-wrapper {
+      position: relative;     /* serve per posizionare prev/next/day/full */
+    }
 
-#prev-day {
-  position: absolute;
-  top: 8;           /* regolabile */
-  left: 8px;      /* leggermente a sinistra della maniglia */
-}
+    #prev-day {
+      position: absolute;
+      top: 8;           /* regolabile */
+      left: 8px;      /* leggermente a sinistra della maniglia */
+    }
 
-#next-day {
-  position: absolute;
-  top: 8;
-  right: 8px;     /* leggermente a destra della maniglia */
-}
+    #next-day {
+      position: absolute;
+      top: 8;
+      right: 8px;     /* leggermente a destra della maniglia */
+    }
 
-#day-text,
-#day-next-text {
-  position: absolute;
-  top: 16px;       /* sopra lo slider */
-}
+    #day-text,
+    #day-next-text {
+      position: absolute;
+      top: 16px;       /* sopra lo slider */
+    }
 
-#date-text {
-  position: absolute;
-  top: -2px;        /* sotto lo slider */
-  left: 50%;
-  transform: translateX(-50%);
-}
+    #date-text {
+      position: absolute;
+      top: -2px;        /* sotto lo slider */
+      left: 50%;
+      transform: translateX(-50%);
+    }
 
-#reset-day {
-  position: absolute;
-  top: 46px;
-  left: 50%;
-  transform: translateX(-50%);
-  transition: transform 0.15s ease;
-}    
+    #reset-day {
+      position: absolute;
+      top: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: transform 0.15s ease;
+    }    
 
-  #eventTicker{
-  position:fixed;
-  bottom:0px;
-  left:0;
-  width:100%;
-  height:32px;
-  background:transparent;
-  color:black;
-  overflow:hidden;
-  z-index:9999;
-}
+    #eventTicker{
+    position:fixed;
+    bottom:0px;
+    left:0;
+    width:100%;
+    height:32px;
+    background:transparent;
+    color:black;
+    overflow:hidden;
+    z-index:9999;
+  }
 
-#eventTickerContent{
-  white-space:nowrap;
-  display:inline-block;
-  padding-left: 100%; /* parte fuori dallo schermo a destra */
-  animation:tickerScroll 120s linear infinite; /* Velocità di scrolling */
-}
+    #eventTickerContent{
+      white-space:nowrap;
+      display:inline-block;
+      padding-left: 100%;     /* parte fuori dallo schermo a destra */
+      animation:tickerScroll 120s linear infinite;     /* Velocità di scrolling */
+    }
 
     /* Pulsante base */
     .action-btn {
@@ -620,163 +612,147 @@
       transition: opacity 0.15s ease;
       display: inline-block;
       cursor: pointer;
-      margin-left: 4px; /* piccolo spazio tra pulsanti */
+      margin-left: 4px;     /* piccolo spazio tra pulsanti */
     }
 
     .action-btn:hover {opacity: 0.85;}
 
     /* colori */
-    .buy-btn  { background:#16a34a; }  /* verde moderno */
-    .book-btn { background:#f97316; }  /* arancione */
-    .map-btn  { background:#3b82f6; }  /* blu standard */
+    .buy-btn  { background:#16a34a; }    /* verde moderno */
+    .book-btn { background:#f97316; }    /* arancione */
+    .map-btn  { background:#3b82f6; }    /* blu standard */
     
 
-@keyframes tickerScroll{
-  from{
-    transform:translateX(0%);
-  }
-  to{
-    transform:translateX(-100%);
-  }
-}
-
-    /*  CANCELLARE ?????   ICONE SVG prelevate da Supabase con tutti i parametri HTML
-    .mc-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;    /* dimensione icona 
-      height: 20px;
-      margin-right: 6px;
-      vertical-align: middle;
+    @keyframes tickerScroll{
+      from{
+        transform:translateX(0%);
+      }
+      to{
+        transform:translateX(-100%);
+      }
     }
-
-    .mc-icon svg {
-      width: 100%;
-      height: 100%;
-      fill: currentColor;  eredità colore dal testo 
-    }  */
 
     .category-label svg {
       width: 20px;
       height: 20px;
       vertical-align: middle;
-      margin-right: 6px; /* distanza tra icona e testo */
+      margin-right: 6px;     /* distanza tra icona e testo */
     }    
 
-/* MOBILE */
-@media (max-width: 380px) {
+    /* MOBILE */
+    @media (max-width: 380px) {
   
-  #prev-day {
-  left: 0px;      /* leggermente a sinistra della maniglia */
-  font-weight: bold;
-  }
+    #prev-day {
+    left: 0px;      /* leggermente a sinistra della maniglia */
+    font-weight: bold;
+    }
   
-  #next-day {
-  right: 0px;      /* leggermente a sinistra della maniglia */
-  font-weight: bold;
-  }
+    #next-day {
+    right: 0px;      /* leggermente a sinistra della maniglia */
+    font-weight: bold;
+    }
   
-  .title {
-    font-size: 16px;
-  }
-  .subtitle {
-    font-size: 12px;
-  }
+    .title {
+      font-size: 16px;
+    }
 
-  .map-overlay {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;          /* quasi tutta la larghezza dello schermo */
-    padding: 10px;       /* padding ridotto */
-    font-size: 14px;     /* testi più piccoli */
-  }
+    .subtitle {
+      font-size: 12px;
+    }
 
-  .map-overlay.minimized {
-    top: 20px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
-  }
+    .map-overlay {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;          /* quasi tutta la larghezza dello schermo */
+      padding: 10px;       /* padding ridotto */
+      font-size: 14px;     /* testi più piccoli */
+    }
 
-  #overlayToggle {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;      /* icona leggibile */
-  }
+    .map-overlay.minimized {
+      top: 20px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+    }
+
+    #overlayToggle {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;      /* icona leggibile */
+    }
   
-  .map-overlay2 {
-    top: 76px;
-    left: 0px;
-    padding: 0px 0px;
-    min-width: 120px;
-    max-width: 70%;
-    max-height: 90vh;  /* leggermente più alta rispetto a desktop */
-    overflow-y: auto;  /* scroll verticale se tanti elementi */
-  }
+    .map-overlay2 {
+      top: 76px;
+      left: 0px;
+      padding: 0px 0px;
+      min-width: 120px;
+      max-width: 70%;
+      max-height: 90vh;    /* leggermente più alta rispetto a desktop */
+      overflow-y: auto;    /* scroll verticale se tanti elementi */
+    }
   
-  .menu-header {
-    width: 125px;
-  }
+    .menu-header {
+      width: 125px;
+    }
 
-  .top-timebar {
-    top: 2px;                   /* centro verticale circa + spostamento */
-    /* width: 60%;                   /* si adatta allo schermo */
-    /* height: auto;                 /* altezza flessibile */
-    flex-direction: column;       /* impila elementi verticalmente */
-    align-items: center;
-    gap: 2px;
-    width: 220px; /* Larghezza */
-    height: 66px; /* Altezza */
-    padding: 2px 20px;
-    font-size: 12px;
-  }
+    .top-timebar {
+      top: 2px;                /* centro verticale circa + spostamento */
+      /* width: 60%;           /* si adatta allo schermo */
+      /* height: auto;         /* altezza flessibile */
+      flex-direction: column;  /* impila elementi verticalmente */
+      align-items: center;
+      gap: 2px;
+      width: 220px;     /* Larghezza */
+      height: 66px;     /* Altezza */
+      padding: 2px 20px;
+      font-size: 12px;
+    }
 
-  .nav-btn {
-    font-size: 32px;
-    padding: 2px 6px;
-  }
+    .nav-btn {
+      font-size: 32px;
+      padding: 2px 6px;
+    }
 
-  #reset-day {
-  top: 32px;
-  }    
+    #reset-day {
+    top: 32px;
+    }    
 
-  .date-day {
-    font-size: 14px;
-    text-align: center;
-    top: 12px;
-  }
+    .date-day {
+      font-size: 14px;
+      text-align: center;
+      top: 12px;
+    }
 
-  .date-full {
-    font-size: 14px;
-  }
+    .date-full {
+      font-size: 14px;
+    }
 
-  #menu-toggle {
-    font-size: 14px;
-    width: auto;
-    padding: 2px 2px;
-  }
+    #menu-toggle {
+      font-size: 14px;
+      width: auto;
+      padding: 2px 2px;
+    }
 
-  .time-slider {
-    width: 90%;
-  }
+    .time-slider {
+      width: 90%;
+    }
 
-  .toggle-pill {
-    min-height: 26px;
-    font-size: 11px;
-    padding: 2px 6px;
-  }
+    .toggle-pill {
+      min-height: 26px;
+      font-size: 11px;
+      padding: 2px 6px;
+    }
 
-  .category-label {
-    font-size: 11px;
-  }
+    .category-label {
+      font-size: 11px;
+    }
 
-  #eventTicker {
-    height: 24px;
-    font-size: 12px;
-  }
-}
+    #eventTicker {
+      height: 24px;
+      font-size: 12px;
+      }
+    }
 
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
