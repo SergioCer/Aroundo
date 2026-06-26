@@ -1119,6 +1119,9 @@ function renderEvents() {
     marker.geoKey = `${e.luoghi.lu_lat.toFixed(6)}_${e.luoghi.lu_lng.toFixed(6)}`; // prende le coordinate identiche per il cluster
     markersCluster.addLayer(marker);
     oms.addMarker(marker);
+    oms.addListener('spiderfy', function(markers) {
+    map.closePopup();
+    });
     updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
      //-- Visualizza i dettagli dell'evento selezionato con Popup //
         const startDate = new Date(e.ev_inizio);
