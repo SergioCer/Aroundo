@@ -4,6 +4,10 @@
   <title>Aroundo - Territory Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <style>
     body {
       margin: 0;
@@ -853,8 +857,16 @@
     attributionControl: true // default true
     }).setView([defaultLat, defaultLng], defaultZoom);
 
-    map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
-    map.attributionControl.setPrefix(''); // rimuove "Leaflet"
+  const markersCluster = L.markerClusterGroup({
+  spiderfyOnMaxZoom: true,
+  showCoverageOnHover: false,
+  zoomToBoundsOnClick: true
+  });
+
+  map.addLayer(markersCluster);
+  
+  map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
+  map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
   // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
@@ -1070,10 +1082,9 @@ function renderEvents() {
     clearInterval(m.marker.fireworkInterval);
     m.marker.fireworkInterval = null;
   }
-  map.removeLayer(m.marker);
+  markersCluster.removeLayer(m.marker);
   });
   markers = [];
-  
   events.forEach(e => {
     //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
     const formatDay = (dateString) => {
@@ -1096,9 +1107,9 @@ function renderEvents() {
         intensity
       )
     })
+    markersCluster.addLayer(marker);
     updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
-    
-    //-- Visualizza i dettagli dell'evento selezionato con Popup //
+     //-- Visualizza i dettagli dell'evento selezionato con Popup //
         const startDate = new Date(e.ev_inizio);
         const now = new Date();
         const tomorrow = new Date();
@@ -1119,7 +1130,6 @@ function renderEvents() {
         }
         // const fullDate = formatDay(e.ev_inizio); // es: "Sab 6"
         // const dayLabel = isToday ? `Oggi ${fullDate}` : (isTomorrow ? `Domani ${fullDate}` : fullDate);
-
 marker.bindPopup(`
     <div style="min-width:180px; font-size:12px; line-height:1.3;">
     <!-- DATA -->
@@ -1162,7 +1172,6 @@ marker.bindPopup(`
         <a href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
         target="_blank" class="action-btn map-btn"> Map </a>
       </div>
-
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
         ${Number(e.ev_costo) > 0 ? `
         <div>Price €: <span style="font-weight:700;">${e.ev_costo}</span></div>
@@ -1189,7 +1198,6 @@ marker.bindPopup(`
   };
   }
 });
-
     //-- 📦 STORAGE DATI (NO LOGICA)
     markers.push({
       marker,
@@ -1238,10 +1246,10 @@ function createIcon(color, state, intensity) {
       // disattiva il timeriterval del marker per i fireworks
         const visible = categoryVisible && inTimeRange;
           if (visible) {
-            marker.marker.addTo(map);
+            markersCluster.addLayer(marker.marker);
             // opzionale: riattiva se serve
           } else {
-            map.removeLayer(marker.marker);
+            markersCluster.removeLayer(marker.marker);
             if (marker.fireworkInterval) {
               clearInterval(marker.fireworkInterval);
               marker.fireworkInterval = null;
