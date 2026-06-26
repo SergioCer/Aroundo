@@ -1118,10 +1118,10 @@ function renderEvents() {
         intensity
       )
     })
-    marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
     marker.__eventData = e; // sempre per spiderizza
-    markersCluster.addLayer(marker);
+    marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
     oms.addMarker(marker);
+    markersCluster.addLayer(marker);
     oms.addListener('spiderfy', function(markers) {
     map.closePopup();
     });
@@ -1233,18 +1233,34 @@ oms.addListener('click', function (marker) {
 });
 
 function openOrderedPopup(marker) {
-  const group = oms.getMarkers()
-    .filter(m => m.getLatLng().lat === marker.getLatLng().lat &&
-                 m.getLatLng().lng === marker.getLatLng().lng);
-  // ordina per data evento
+  const group = oms.getMarkers().filter(m =>
+    m.getLatLng().lat === marker.getLatLng().lat &&
+    m.getLatLng().lng === marker.getLatLng().lng
+  );
   group.sort((a, b) => new Date(a.evInizio) - new Date(b.evInizio));
-  const first = group[0]; // evento più vicino nel tempo
-  const content = buildPopupContent(first.__eventData || first);
+  const first = group[0];
+  const e = first.__eventData; // recupero dati evento
+  const content = `
+    <div style="min-width:180px; font-size:12px; line-height:1.3;">
+      <div style="text-align:center; font-weight:700; margin-bottom:6px;">
+        ${e.ev_titolo}
+      </div>
+      <div style="text-align:center; margin-bottom:6px;">
+        ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+      </div>
+      <div style="font-size:12px; color:#555;">
+        ${e.ev_descrizione || ''}
+      </div>
+      <div style="margin-top:6px;">
+        By: ${e.organizzatori?.or_nome || ''}
+      </div>
+    </div>
+  `;
   L.popup()
     .setLatLng(first.getLatLng())
     .setContent(content)
     .openOn(map);
-}  
+}
   
 // Dimensione dei Markers  
 function createIcon(color, state, intensity) {
