@@ -855,8 +855,15 @@
     }).setView([defaultLat, defaultLng], defaultZoom);
 
   const markersCluster = L.markerClusterGroup({
+      iconCreateFunction: function (cluster) {
+    return L.divIcon({
+      html: `<div class="cluster-bubble">${cluster.getChildCount()}</div>`,
+      className: 'custom-cluster',
+      iconSize: [40, 40]
+    });
+  },
   spiderfyOnMaxZoom: true,
-  showCoverageOnHover: false,
+  showCoverageOnHover: true,
   zoomToBoundsOnClick: true
   });
 
