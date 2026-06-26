@@ -862,16 +862,6 @@
   zoomToBoundsOnClick: true
   });
 
-  map.addLayer(markersCluster); // se i marker hanno la stessa posizione inseriesc in cluster cliccabile
-  markersCluster.on('clusterclick', function (e) {
-    const childs = e.layer.getAllChildMarkers();
-    console.log(childs);
-    childs.sort((a, b) => a.evInizio - b.evInizio); // Ordina il cluster per orario
-    const stessaPosizione =
-    childs.every(m => m.geoKey === childs[0].geoKey);
-console.log(stessaPosizione);
-  });
-  
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
@@ -1114,13 +1104,6 @@ function renderEvents() {
         intensity
       )
     })
-    marker.evInizio = new Date(e.ev_inizio); // prede ora inizio del marker per il cluster
-    marker.geoKey = `${e.luoghi.lu_lat.toFixed(6)}_${e.luoghi.lu_lng.toFixed(6)}`; // prende le coordinate identiche per il cluster
-    console.log(
-    e.ev_titolo,
-    marker.geoKey,
-    e.ev_inizio
-);
     markersCluster.addLayer(marker);
     updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
      //-- Visualizza i dettagli dell'evento selezionato con Popup //
