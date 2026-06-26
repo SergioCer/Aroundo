@@ -759,27 +759,6 @@
       }
     }
 
-    .custom-cluster {
-      width: 30px !important;
-      height: 30px !important;
-      margin-left: -15px !important;
-      margin-top: -15px !important;
-    }
-
-    .cluster-bubble {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: #3b82f6;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }
-    
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
 </head>
@@ -877,17 +856,10 @@
 
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 5, // 0 nessun cluster ; 150 tutto raggruppato
-  disableClusteringAtZoom: 14, // al livello di zoom 14 disabilita i cluster    
+  disableClusteringAtZoom: 11, // al livello di zoom 14 disabilita i cluster    
   spiderfyOnMaxZoom: true,
   showCoverageOnHover: false,
-  zoomToBoundsOnClick: true,
-    iconCreateFunction: function (cluster) {
-      return L.divIcon({
-      html: `<div class="cluster-bubble">${cluster.getChildCount()}</div>`,
-      className: 'custom-cluster',
-      iconSize: [15, 15]   // 👈 qui
-      });
-    }
+  zoomToBoundsOnClick: true
   });
 
   map.addLayer(markersCluster);
