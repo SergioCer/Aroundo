@@ -204,10 +204,11 @@ td:last-child {
     <div class="col-header">
       <div class="col-title">
         Categoria
-        <button class="sort-btn" data-field="categoria" onclick="sort('categoria')">↕</button>
       </div>
       <div class="col-tools">
-        <input class="filter" oninput="setFilter('categoria', this.value)">
+        <select class="filter" onchange="setFilter('categoria', this.value)">
+          <option value="">Tutte</option>
+        </select>
       </div>
     </div>
   </th>
@@ -333,9 +334,15 @@ async function loadOrganizzatori() {
 }
 
 // CATEGORIE
+let categorieRows = [];
+
 async function loadCategorie() {
   const { data: rows } = await supabase.from('categorie').select('*');
-  categorieMap = Object.fromEntries((rows || []).map(c => [c.id_categoria, c.mc_descrizione]));
+  categorieRows = rows || [];
+  categorieMap = Object.fromEntries(
+    categorieRows.map(c => [c.id_categoria, c.mc_descrizione])
+  );
+  fillCategorieDropdown(categorieRows);
 }
 
 // EVENTS
@@ -347,95 +354,70 @@ async function load() {
 
 // RENDER
 function render() {
-
   let filtered = [...data];
-
   Object.keys(state.filters).forEach(k => {
     const v = state.filters[k]?.toLowerCase();
     if (!v) return;
-
     filtered = filtered.filter(r => {
-
       if (k === 'categoria')
-        return (categorieMap[r.id_categoria] || '').toLowerCase().includes(v);
-
+        return String(r.id_categoria) === v;
       if (k === 'titolo')
         return (r.ev_titolo || '').toLowerCase().includes(v);
-
       if (k === 'descrizione')
         return (r.ev_descrizione || '').toLowerCase().includes(v);
-
       if (k === 'comune') {
         const idComune = luoghiComuniMap[r.id_luogo];
         return (comuniMap[idComune] || '').toLowerCase().includes(v);
       }
-
       if (k === 'organizzatore')
         return (organizzatoriMap[r.id_organizzatore] || '').toLowerCase().includes(v);
-
       if (k === 'inizio')
         return (r.ev_inizio || '').toLowerCase().includes(v);
-
       if (k === 'attivo')
         return (String(r.ev_attivo) || '').toLowerCase().includes(v);
-
       return true;
     });
   });
-
   if (state.sortField) {
-
     filtered.sort((a, b) => {
-
       let va, vb;
-
       if (state.sortField === 'categoria') {
         va = categorieMap[a.id_categoria] || '';
         vb = categorieMap[b.id_categoria] || '';
       }
-
       else if (state.sortField === 'comune') {
         va = comuniMap[luoghiComuniMap[a.id_luogo]] || '';
         vb = comuniMap[luoghiComuniMap[b.id_luogo]] || '';
       }
-
       else if (state.sortField === 'organizzatore') {
         va = organizzatoriMap[a.id_organizzatore] || '';
         vb = organizzatoriMap[b.id_organizzatore] || '';
       }
-
       else {
         va = a['ev_' + state.sortField] ?? '';
         vb = b['ev_' + state.sortField] ?? '';
       }
-
       const numFields = ['attivo'];
       if (numFields.includes(state.sortField)) {
         va = Number(va);
         vb = Number(vb);
         return state.sortDir === 'asc' ? va - vb : vb - va;
       }
-
       va = va.toString().toLowerCase();
       vb = vb.toString().toLowerCase();
-
       return state.sortDir === 'asc'
         ? va.localeCompare(vb)
         : vb.localeCompare(va);
     });
   }
-
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
-
   filtered.forEach(r => {
     const tr = document.createElement('tr');
     tr.onclick = () => window.location.href = `evento.html?id=${r.id_evento}`;
-
     const comune = comuniMap[luoghiComuniMap[r.id_luogo]] || '';
     const cat = categorieMap[r.id_categoria] || '';
     const org = organizzatoriMap[r.id_organizzatore] || '';
-
     tr.innerHTML = `
       <td>${r.id_evento}</td>
       <td>${cat}</td>
@@ -449,7 +431,6 @@ function render() {
     tbody.appendChild(tr);
   });
 }
-
 // FILTER
 window.setFilter = (k,v) => {
   state.filters[k] = v;
@@ -501,6 +482,22 @@ function syncUI() {
   updateSortButtons();
 }
 
+function fillCategorieDropdown(rows) {
+  const select = document.querySelector('select.filter');
+  // ordina per mc_ordine
+  const sorted = [...rows].sort((a, b) => a.mc_ordine - b.mc_ordine);
+  sorted.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id_categoria;
+    opt.textContent = c.mc_descrizione;
+    select.appendChild(opt);
+  });
+  // ripristina valore se presente in sessionStorage
+  if (state.filters.categoria) {
+    select.value = state.filters.categoria;
+  }
+}
+  
 await loadComuni();
 await loadLuoghi();
 await loadOrganizzatori();
