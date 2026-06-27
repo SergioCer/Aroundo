@@ -327,19 +327,19 @@
     .pulse.future-medium { animation: hopMedium 2s infinite; }
     .pulse.future-near { animation: hopFast 1s infinite; }
     .pulse.imminent { animation: hopCrazy 0.5s infinite; }
-    .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; }  /* CANCELLARE opacity: 0.45; } */
+    .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; }
     .pulse.countdown { animation: hopCrazy 0.3s infinite; }
-    .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; }  /* CANCELLARE opacity: 0.8; } */
+    .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; }
     .pulse.started { animation: hopLive 2s infinite; }    
     .pulse.started::after { animation: pulseLive 0.3s infinite; }
     .pulse.running-strong { animation: running-strong 2s infinite ease-in-out;}
-    .pulse.running-strong::after { animation: pulse 2s infinite ease-out; }  /* CANCELLARE opacity: 0.25;} */
+    .pulse.running-strong::after { animation: pulse 2s infinite ease-out; }
     .pulse.running-medium { animation: running-medium 2.5s infinite ease-in-out;}
     .pulse.running-medium::after { animation: hopSlow 2.5s infinite; opacity: 0.12;}
     .pulse.running-soft { animation: running-soft 3s infinite ease-in-out;}
     .pulse.running-soft::after { animation: none; opacity: 0;}
     .pulse.running { animation: none; }
-    .pulse.running::after { animation: pulse 2.5s infinite ease-out; }  /* CANCELLARE opacity: 0.2; } */
+    .pulse.running::after { animation: pulse 2.5s infinite ease-out; }
     .pulse.finished { animation: finished 0.5s ease forwards; }    
     /* Inserisce un piccolo puntino bianco sui markers conclusi */
     .pulse.finished::after { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9;}
