@@ -317,7 +317,7 @@
     /* Marker pulsazioni base */
     .pulse { border-radius: 50%; position: relative; z-index: 990; }
     .pulse::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--c); z-index: 990; }
-    .pulse::after { content: ""; position: absolute; inset: -40%; border-radius: 50%; background: var(--c); z-index: 990; opacity: 0.25; transform: scale(0.6); }
+    .pulse::after { content: ""; position: absolute; inset: -50%; border-radius: 50%; background: var(--c); z-index: 991; opacity: 0.25; transform: scale(0.6); }
     /* Marker pulsazioni in funzione del tempo */
     .pulse.distant { animation: none; }
     .pulse.distant::after { animation: none; opacity: 0; }    
@@ -327,19 +327,19 @@
     .pulse.future-medium { animation: hopMedium 2s infinite; }
     .pulse.future-near { animation: hopFast 1s infinite; }
     .pulse.imminent { animation: hopCrazy 0.5s infinite; }
-    .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; opacity: 0.45; }
+    .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; }  /* CANCELLARE opacity: 0.45; } */
     .pulse.countdown { animation: hopCrazy 0.3s infinite; }
-    .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; opacity: 0.8; }
+    .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; }  /* CANCELLARE opacity: 0.8; } */
     .pulse.started { animation: hopLive 2s infinite; }    
     .pulse.started::after { animation: pulseLive 0.3s infinite; }
-    .pulse.running { animation: none; }
-    .pulse.running::after { animation: pulse 2.5s infinite ease-out; opacity: 0.2; }
     .pulse.running-strong { animation: running-strong 2s infinite ease-in-out;}
-    .pulse.running-strong::after { animation: pulse 2s infinite ease-out; opacity: 0.25;}
+    .pulse.running-strong::after { animation: pulse 2s infinite ease-out; }  /* CANCELLARE opacity: 0.25;} */
     .pulse.running-medium { animation: running-medium 2.5s infinite ease-in-out;}
     .pulse.running-medium::after { animation: hopSlow 2.5s infinite; opacity: 0.12;}
     .pulse.running-soft { animation: running-soft 3s infinite ease-in-out;}
     .pulse.running-soft::after { animation: none; opacity: 0;}
+    .pulse.running { animation: none; }
+    .pulse.running::after { animation: pulse 2.5s infinite ease-out; }  /* CANCELLARE opacity: 0.2; } */
     .pulse.finished { animation: finished 0.5s ease forwards; }    
     /* Inserisce un piccolo puntino bianco sui markers conclusi */
     .pulse.finished::after { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9;}
@@ -351,10 +351,10 @@
     @keyframes hopFast { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); }}
     @keyframes hopCrazy { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); }}
     @keyframes pulseLive { 0% { transform: scale(1) translateY(0); opacity: 0.7; } 70% { transform: scale(1.5) translateY(-5px); opacity: 0.3; } 100% { transform: scale(2) translateY(-10px); opacity: 0; }}
-    @keyframes finished { 0%,100% { transform: translateY(0); }}
     @keyframes running-strong { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-8px,0); } /* X = -8px, Y = 0 */}
     @keyframes running-medium { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-6px,0); } /* X = -8px, Y = 0 */}
     @keyframes running-soft { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-4px,0); } /* X = -8px, Y = 0 */}
+    @keyframes finished { 0%,100% { transform: translateY(0); }}
     
     #menu-toggle {
       display: inline-flex;
@@ -835,18 +835,19 @@
   const fireworks = [];
   // Dimensione dei Markers
   const markerSizes = {
-  'finished': 10,
   'distant': 10,
   'future-deep': 14,
   'future-far': 16,
   'future-medium': 20,
   'future-near': 25,
   'imminent': 30,
-  'countdown': 30,
-  'started': 22,
-  'running-soft': 14,
-  'running-medium': 20,
-  'running-strong': 26
+  'countdown': 32,
+  'started': 28,
+  'running-strong': 25,
+  'running-medium': 21,
+  'running-soft': 17,
+  'running': 13,
+  'finished': 10
   };
   const map = L.map('map', {
     zoomControl: false, // Visualizza o nasconde i controlli dello ZOOM integrati
@@ -1217,9 +1218,7 @@ oms.addListener('click', function (marker) {
     m.marker.getLatLng().lng === marker.getLatLng().lng
   );
   group.sort((a, b) => a.marker.evTime - b.marker.evTime);
-  console.log(
-    group.map(g => new Date(g.marker.evTime).toLocaleTimeString())
-  );
+  /* console.log(group.map(g => new Date(g.marker.evTime).toLocaleTimeString())); */
   openOrderedPopup(marker);
 });
 
@@ -1269,7 +1268,7 @@ function createIcon(color, state, intensity) {
 
     /* Mostra o nasconde i Marker delle categorie */
     function updateMarkerVisibility(start, end) {
-        // Se non vengono passati parametri, usa il range corrente della timeline
+      // Se non vengono passati parametri, usa il range corrente della timeline
       if (!start || !end) {
       const range = getTimelineRange();
       start = range.start;
@@ -1351,7 +1350,7 @@ function buildCategoryMenu() {
     menuItemsDiv.addEventListener('change', updateSelectAllToggle);
   }
 
-  /* Compone il giorno ed il mese corrente nel rettangolo */  
+    /* Compone il giorno ed il mese corrente nel rettangolo */  
     function updateDateUI() {
       console.log("Aggiorno Data e mese", new Date().toLocaleTimeString());
       // console.trace(); // mostra da dove è stata chiamata
@@ -1365,7 +1364,6 @@ function buildCategoryMenu() {
       // ---- dichiarazioni globali alla funzione ----
       const currentDayEl = document.getElementById('day-text');
       const nextDayEl = document.getElementById('day-next-text');
-      
     if (timelineMode === 'live') {
       const currentDayPercent = midnightPercent / 2;
       const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
@@ -1405,42 +1403,37 @@ function buildCategoryMenu() {
     function formatTime(dateString) {
       const d = new Date(dateString);
       return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-    } 
-
-  /* Temporizzazione dei Marker */
-  function getEventState(startDate, endDate) {
-    const now = new Date();
-    const diffMinutes = (startDate - now) / 1000 / 60;
-    const minutesFromStart =  (now - startDate) / 1000 / 60;
-    const durationMinutes = endDate ? (endDate - startDate) / 1000 / 60 : null; // calcola durata dell'evento
-    // evento terminato 
-    if (endDate && now > endDate) return {state: 'finished' };
-    let state;
-    // evento già Started da oltre 30'
-    if (minutesFromStart > 0) {
-    state = 'running-soft' ;
-    if (durationMinutes) {
-    const progress = minutesFromStart / durationMinutes;
-    if (progress < 0.125) { 
-    state = 'running-strong';
-    } else if (progress < 0.25) { 
-    state = 'running-medium';
-    } else { 
-    state = 'running-soft';
-    }
-    }
-    return { state };
   }
-    // Inizia tra 12 - 8 - 6 - 4 - 2 h - Started < 2 ore
-    if (diffMinutes > 720) return { state: 'distant' };
-    if (diffMinutes > 480) return { state: 'future-deep' };
-    if (diffMinutes > 240) return { state: 'future-far' };
-    if (diffMinutes > 120) return { state: 'future-medium' };
-    if (diffMinutes > 60) return { state: 'future-near' };
-    if (diffMinutes > 30) return { state: 'imminent' };
-    if (diffMinutes > 0) return { state: 'countdown' };
-    return { state: 'started' };
-}
+
+    /* Temporizzazione dei Marker */
+    function getEventState(startDate, endDate) {
+      const now = new Date();
+      const diffMinutes = (startDate - now) / 1000 / 60;
+      const minutesFromStart =  (now - startDate) / 1000 / 60;
+      const durationMinutes = endDate ? (endDate - startDate) / 1000 / 60 : null; // calcola durata dell'evento
+      // evento terminato 
+      if (endDate && now > endDate) return {state: 'finished' };
+      /* evento partito */
+      let state;
+      if (minutesFromStart > 0) {
+      if (durationMinutes) {
+        const progress = minutesFromStart / durationMinutes;
+          if (progress < 0.125) return { state: 'running-strong' };
+          if (progress < 0.25)  return { state: 'running-medium' };
+          if (progress < 0.5)   return { state: 'running' };
+        }
+        return { state: 'running-soft' };
+      }
+      // Inizia tra +12 - 8 - 4 - 2 - 1h - 30' - 0' - Started 
+      if (diffMinutes > 720) return { state: 'distant' };
+      if (diffMinutes > 480) return { state: 'future-deep' };
+      if (diffMinutes > 240) return { state: 'future-far' };
+      if (diffMinutes > 120) return { state: 'future-medium' };
+      if (diffMinutes > 60) return { state: 'future-near' };
+      if (diffMinutes > 30) return { state: 'imminent' };
+      if (diffMinutes > 0) return { state: 'countdown' };
+      return { state: 'started' };
+  }
 
     /* EX *****  marker.bindPopup  ***** sotto POPUP nuovo */
     window.openBasePopup = function(e, latlng) {
