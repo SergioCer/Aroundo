@@ -1125,9 +1125,7 @@ function renderEvents() {
     marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
     oms.addMarker(marker);
     markersCluster.addLayer(marker);
-    oms.addListener('spiderfy', function(markers) {
-    map.closePopup();
-    });
+    oms.addListener('spiderfy', function(markers) {map.closePopup();});
     updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
      //-- Visualizza i dettagli dell'evento selezionato con Popup //
         const startDate = new Date(e.ev_inizio);
@@ -1154,51 +1152,6 @@ function renderEvents() {
     marker.on('click', function () {
     window.openBasePopup(e, this.getLatLng());
     });
-    
-
- 
-    /* Associa il click al btn 'More...' 
-     marker.on('popupopen', function() {
-    const btn = document.getElementById(`details-${e.id}`);
-    const m = this; // <-- salva il marker in una variabile locale
-    if (btn) {
-      btn.onclick = function() {
-      L.popup()
-        .setLatLng(m.getLatLng()) // usa la variabile locale del marker
-        .setContent(`
-          <div style="text-align:center;min-width:220px;font-size:12px;">
-          <div style="text-align:center; font-weight:700; font-size:14px; margin-bottom:6px;"> ${e.ev_titolo}</div><hr>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-          <div>Location: ${[e.comuni?.co_descrizione, e.luoghi?.lu_location].filter(Boolean).join(' • ')}</div>
-          <a href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
-          target="_blank" class="action-btn map-btn"> Map </a>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-          ${Number(e.ev_costo) > 0 ? `
-          <div>Price €: <span style="font-weight:700;">${e.ev_costo}</span></div>
-              <a href="#" class="action-btn buy-btn" onclick="alert('In Progress!'); return false;"> Buy </a>
-          ` : `
-            <div style=" width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; letter-spacing:0.3px;"> Free Entry </div>
-          `}
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-        <div style="color:#111;"> I'll be there ! </div>
-        <a href="#" class="action-btn book-btn" onclick="alert('In Progress!'); return false;"> Book </a>
-        </div>
-        <hr>
-        ${ e.ev_copertina ? `
-          <div style="text-align:center;">
-          <img src="${e.ev_copertina}" style=" width:100%; max-width:180px; height:auto; border-radius:6px; margin-bottom:8px; ">
-          </div>
-          <hr>
-          ` : '' }
-          ${e.ev_descrizione || ''}
-          </div>
-        `)
-        .openOn(map);
-    };
-    }
-  }); */
     
     //-- 📦 STORAGE DATI (NO LOGICA)
     markers.push({
