@@ -172,7 +172,66 @@ input, textarea {
 
   <!-- CREATO -->
   <div class="footer" id="or_creato"></div>
-
+  
+<!-- SI - NO - ANNULLA -->
+<div id="saveDialog" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  z-index:99999;
+  align-items:center;
+  justify-content:center;
+">
+  <div style="
+    background:white;
+    padding:22px;
+    border-radius:12px;
+    width:300px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  ">
+    <div style="margin-bottom:18px; font-weight:600;">
+      Vuoi salvare le modifiche?
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button onclick="dialogAction('yes')" style="
+        flex:1;
+        background:#22c55e;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">Sì</button>
+      <button onclick="dialogAction('no')" style="
+        flex:1;
+        background:#ef4444;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">No</button>
+      <button onclick="dialogAction('cancel')" style="
+        flex:1;
+        background:#9ca3af;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">Annulla</button>
+    </div>
+  </div>
+</div>
+  
 </div>
 
 <script type="module">
@@ -184,7 +243,21 @@ const isNew = params.has('new') || !id;
 
 let original = "{}";
 let dirty = false;
+let dialogResolve;
 
+function askSaveDialog() {
+  document.getElementById("saveDialog").style.display = "flex";
+  return new Promise(resolve => {
+    dialogResolve = resolve;
+  });
+}
+
+function dialogAction(type) {
+  document.getElementById("saveDialog").style.display = "none";
+  dialogResolve(type);
+}
+window.dialogAction = dialogAction;
+  
 /* LOAD */
 async function load() {
   if (isNew) {
@@ -192,20 +265,16 @@ async function load() {
     updateStatus(false);
     return;
   }
-
   const { data, error } = await supabase
     .from('organizzatori')
     .select('*')
     .eq('id_organizzatore', id)
     .single();
-
   if (error) {
     console.error(error);
     return;
   }
-
   original = JSON.stringify(data);
-
   or_nome.value = data.or_nome || '';
   or_descrizione.value = data.or_descrizione || '';
   or_email.value = data.or_email || '';
@@ -213,10 +282,8 @@ async function load() {
   or_sito_web.value = data.or_sito_web || '';
   or_copertina.value = data.or_copertina || '';
   or_note.value = data.or_note || '';
-
   updateStatus(data.or_attivo);
   updatePreview();
-
   or_creato.textContent = data.or_creato
     ? new Date(data.or_creato).toLocaleString()
     : '';
@@ -231,17 +298,14 @@ window.toggleAttivo = () => {
 
 function updateStatus(val) {
   document.body.dataset.attivo = val;
-
   statusIcon.textContent = val ? '✔' : '✖';
   statusText.textContent = val ? 'Attivo' : 'Non attivo';
-
   statusIcon.className = val ? 'status-ok' : 'status-no';
 }
 
 /* PREVIEW */
 window.updatePreview = () => {
   const url = or_copertina.value;
-
   copertina_url.textContent = url || '';
   copertina_img.src = url || '';
 };
@@ -275,9 +339,7 @@ async function save() {
     or_copertina: or_copertina.value,
     or_attivo: document.body.dataset.attivo === 'true'
   };
-
   let result;
-
   if (isNew) {
     result = await supabase
       .from('organizzatori')
@@ -292,38 +354,39 @@ async function save() {
       .select()
       .single();
   }
-
   const { data, error } = result;
-
   if (error) {
     console.error(error);
     alert("Errore salvataggio");
     return false;
   }
-
   dirty = false;
-
   if (isNew) {
     location.href = `organizzatore.html?id=${data.id_organizzatore}`;
   }
-
   return true;
 }
 
 /* BACK */
 window.requestBack = async () => {
-  if (!dirty) return history.back();
-
-  const ok = confirm("Vuoi salvare le modifiche?");
-  if (ok) {
+  if (!dirty)
+    return history.back();
+  const choice = await askSaveDialog();
+  if (choice === "cancel")
+    return;
+  if (choice === "yes") {
     const success = await save();
-    if (!success) return;
+    if (!success)
+      return;
+    history.back();
+    return;
   }
-  history.back();
+  if (choice === "no") {
+    history.back();
+  }
 };
 
 await load();
 </script>
-
 </body>
 </html>
