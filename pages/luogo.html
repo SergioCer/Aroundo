@@ -141,6 +141,25 @@ input, select, textarea {
 .mini-table tr:hover {
   background: #eef6ff;
 }
+
+.link-cell {
+  color: #1e3a8a;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.link-cell:hover {
+  text-decoration: underline;
+}
+
+.header-row td {
+  font-size: 11px;
+  color: #777;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  cursor: default;
+  background: #fafafa;
+}
   
 </style>
 </head>
@@ -624,6 +643,7 @@ async function loadEventiLuogo(idLuogo) {
     .eq("id_luogo", idLuogo);
   eventiList = sortEventi(data || []);
   renderEventi();
+  
 }
 
 async function loadOrganizzatoriLuogo(idLuogo) {
@@ -642,6 +662,17 @@ const { data } = await supabase
 }
  
 function renderEventi() {
+  console.log("STEP 2");  // CANCELLARE ***** //
+  body.innerHTML = "";
+  const header = document.createElement("tr");
+    header.className = "header-row";
+    header.innerHTML = `
+        <td>Data</td>
+        <td>Evento</td>
+        <td>Organizzatore</td>
+        <td>Descrizione</td>
+    `;
+body.appendChild(header);
   const body = document.getElementById("eventiBody");
   body.innerHTML = "";
   document.getElementById("eventiTitle").textContent =
@@ -655,18 +686,29 @@ function renderEventi() {
   } else {
     header.classList.remove("disabled");
   }
-  eventiList.forEach(e => {
+eventiList.forEach(e => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${e.ev_titolo || ''}</td>
-      <td>${e.ev_descrizione || ''}</td>
-      <td>${formatInizio(e.ev_inizio)}</td>
-      `;
-    tr.onclick = () => {
-      window.location.href = `evento.html?id=${e.id_evento}`;
+        <td>${formatInizio(e.ev_inizio)}</td>
+        <td class="link-cell">
+            ${e.ev_titolo || ""}
+        </td>
+        <td class="link-cell">
+            ${e.organizzatori?.or_nome || ""}
+        </td>
+        <td>
+            ${e.ev_descrizione || ""}
+        </td>
+    `;
+    tr.cells[1].onclick = () => {
+        location.href = `evento.html?id=${e.id_evento}`;
+    };
+    tr.cells[2].onclick = () => {
+        location.href =
+            `organizzatore.html?id=${e.organizzatori.id_organizzatore}`;
     };
     body.appendChild(tr);
-  });
+});
 }  
 
 function parseDate(v) {
@@ -710,12 +752,11 @@ function renderOrganizzatori() {
 function formatInizio(val) {
   if (!val) return '';
   const d = new Date(val);
-  return d.toLocaleDateString('it-IT', {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit'
-  });
-}  
+  const aa = String(d.getFullYear()).slice(-2);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const gg = String(d.getDate()).padStart(2, "0");
+  return `${aa}/${mm}/${gg}`;
+}
 
 window.toggleSection = (section) => {
   if (section === "eventi") {
