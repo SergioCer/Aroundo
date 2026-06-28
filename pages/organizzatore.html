@@ -470,7 +470,7 @@ const body=document.getElementById("luoghiBody");
 body.innerHTML="";
 const header=document.createElement("tr");
 header.className="header-row";
-header.innerHTML="<td>Luogo</td><td style='text-align:right;'>N° eventi</td>";
+header.innerHTML="<td>Comune</td><td>Luogo</td><td style='text-align:right;'>N° eventi</td>";
 body.appendChild(header);
 [...luoghiMap.values()]
 .sort((a,b)=>a.lu_location.localeCompare(b.lu_location))
