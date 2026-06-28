@@ -627,6 +627,7 @@ const { data } = await supabase
   `)
   .eq("eventi.id_luogo", idLuogo)
   .order("or_nome", { ascending: true });
+  organizzatoriList = data || [];
   renderOrganizzatori();
 }
  
