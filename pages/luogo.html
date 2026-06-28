@@ -662,54 +662,58 @@ const { data } = await supabase
 }
  
 function renderEventi() {
-  console.log("STEP 2");  // CANCELLARE ***** //
-  body.innerHTML = "";
-  const header = document.createElement("tr");
-    header.className = "header-row";
-    header.innerHTML = `
-        <td>Data</td>
-        <td>Evento</td>
-        <td>Organizzatore</td>
-        <td>Descrizione</td>
-    `;
-body.appendChild(header);
+  console.log("STEP 2");   // DA TOGLIERE A LAVORO FINITO
   const body = document.getElementById("eventiBody");
   body.innerHTML = "";
   document.getElementById("eventiTitle").textContent =
     `Eventi (${eventiList.length})`;
   const arrow = document.getElementById("eventiArrow");
-  const header = document.querySelector(".section-header");
+  const sectionHeader = document.querySelector("#eventiPanel").previousElementSibling;
   if (eventiList.length === 0) {
     arrow.textContent = "▶";
-    header.classList.add("disabled");
+    sectionHeader.classList.add("disabled");
     return;
-  } else {
-    header.classList.remove("disabled");
   }
-eventiList.forEach(e => {
+  sectionHeader.classList.remove("disabled");
+  // intestazione colonne
+  const headerRow = document.createElement("tr");
+  headerRow.className = "header-row";
+  headerRow.innerHTML = `
+      <td>Data</td>
+      <td>Evento</td>
+      <td>Organizzatore</td>
+      <td>Descrizione</td>
+  `;
+  body.appendChild(headerRow);
+  // righe dati
+  eventiList.forEach(e => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-        <td>${formatInizio(e.ev_inizio)}</td>
-        <td class="link-cell">
-            ${e.ev_titolo || ""}
-        </td>
-        <td class="link-cell">
-            ${e.organizzatori?.or_nome || ""}
-        </td>
-        <td>
-            ${e.ev_descrizione || ""}
-        </td>
+      <td>${formatInizio(e.ev_inizio)}</td>
+      <td class="link-cell">
+        ${e.ev_titolo || ""}
+      </td>
+      <td class="link-cell">
+        ${e.organizzatori?.or_nome || ""}
+      </td>
+      <td>
+        ${e.ev_descrizione || ""}
+      </td>
     `;
+    // Evento
     tr.cells[1].onclick = () => {
-        location.href = `evento.html?id=${e.id_evento}`;
+      location.href = `evento.html?id=${e.id_evento}`;
     };
-    tr.cells[2].onclick = () => {
+    // Organizzatore
+    if (e.organizzatori) {
+      tr.cells[2].onclick = () => {
         location.href =
-            `organizzatore.html?id=${e.organizzatori.id_organizzatore}`;
-    };
+          `organizzatore.html?id=${e.organizzatori.id_organizzatore}`;
+      };
+    }
     body.appendChild(tr);
-});
-}  
+  });
+}
 
 function parseDate(v) {
   if (!v) return new Date(0);
