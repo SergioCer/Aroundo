@@ -600,9 +600,15 @@ async function loadEventiLuogo(idLuogo) {
     .select("*")
     .eq("id_luogo", idLuogo);
   eventiList = data || [];
+  eventiList = sortEventi(data || []);
   renderEventi();
 }  
 
+const { data } = await supabase
+  .from("eventi")
+  .select("id_organizzatore, organizzatori(or_nome, or_descrizione)")
+  .eq("id_luogo", id);
+  
 function renderEventi() {
   const body = document.getElementById("eventiBody");
   body.innerHTML = "";
@@ -626,6 +632,38 @@ function renderEventi() {
       `;
     tr.onclick = () => {
       window.location.href = `evento.html?id=${e.id_evento}`;
+    };
+    body.appendChild(tr);
+  });
+}  
+
+function sortEventi(list) {
+  const now = new Date();
+  return [...list].sort((a, b) => {
+    const da = new Date(a.ev_inizio);
+    const db = new Date(b.ev_inizio);
+    const aFuture = da >= now;
+    const bFuture = db >= now;
+    // prima futuri, poi passati
+    if (aFuture !== bFuture) {
+      return aFuture ? -1 : 1;
+    }
+    // dentro lo stesso gruppo: ordine cronologico
+    return da - db;
+  });
+}  
+
+function renderOrganizzatori(list) {
+  const body = document.getElementById("organizzatoriBody");
+  body.innerHTML = "";
+  list.forEach(o => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${o.or_nome || ''}</td>
+      <td>${o.or_descrizione || ''}</td>
+    `;
+    tr.onclick = () => {
+      window.location.href = `organizzatore.html?id=${o.id_organizzatore}`;
     };
     body.appendChild(tr);
   });
