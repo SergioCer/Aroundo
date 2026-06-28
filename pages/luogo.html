@@ -737,24 +737,41 @@ function sortEventi(list) {
 }
 
 function renderOrganizzatori() {
+  console.log("STEP 4"); // DA TOGLIERE
   const body = document.getElementById("organizzatoriBody");
   body.innerHTML = "";
   document.getElementById("organizzatoriTitle").textContent =
     `Organizzatori (${organizzatoriList.length})`;
   const arrow = document.getElementById("organizzatoriArrow");
+  const sectionHeader = document.querySelector("#organizzatoriPanel").previousElementSibling;
   if (organizzatoriList.length === 0) {
     arrow.textContent = "▶";
-    document.getElementById("organizzatoriPanel").style.display = "none";
+    sectionHeader.classList.add("disabled");
     return;
   }
+  sectionHeader.classList.remove("disabled");
+  // intestazione colonne
+  const headerRow = document.createElement("tr");
+  headerRow.className = "header-row";
+  headerRow.innerHTML = `
+    <td>Nome</td>
+    <td style="text-align:right;">N° eventi</td>
+  `;
+  body.appendChild(headerRow);
+  // righe
   organizzatoriList.forEach(o => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${o.or_nome || ''}</td>
-      <td>${o.or_descrizione || ''}</td>
+      <td class="link-cell">
+        ${o.or_nome || ""}
+      </td>
+      <td style="text-align:right;">
+        ${o.num_eventi || 0}
+      </td>
     `;
-    tr.onclick = () => {
-      window.location.href = `organizzatore.html?id=${o.id_organizzatore}`;
+    // click su nome → organizzatore
+    tr.cells[0].onclick = () => {
+      location.href = `organizzatore.html?id=${o.id_organizzatore}`;
     };
     body.appendChild(tr);
   });
