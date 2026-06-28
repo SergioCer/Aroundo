@@ -314,6 +314,10 @@ async function load() {
     : '';
 }
 
+function sortEventi(list){
+return [...list].sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio));
+}
+  
 async function loadEventiOrganizzatore(idOrg){
 console.log("STEP 1 EVENTI ORG");
 const { data } = await supabase.from("eventi").select(`
@@ -348,6 +352,16 @@ function renderEventiOrg(){
 console.log("STEP 3 RENDER EVENTI");
 const body=document.getElementById("eventiBody");
 body.innerHTML="";
+const title=document.getElementById("eventiTitle");
+const arrow=document.getElementById("eventiArrow");
+title.textContent=`Eventi (${eventiList.length})`;
+if(eventiList.length===0){
+arrow.textContent="▶";
+document.querySelector("#eventiPanel").previousElementSibling.classList.add("disabled");
+return;
+}else{
+document.querySelector("#eventiPanel").previousElementSibling.classList.remove("disabled");
+}
 const header=document.createElement("tr");
 header.className="header-row";
 header.innerHTML="<td>Data</td><td>Evento</td><td>Luogo</td><td>Descrizione</td>";
@@ -364,9 +378,7 @@ tr.cells[1].onclick=()=>location.href=`evento.html?id=${e.id_evento}`;
 if(e.luoghi) tr.cells[2].onclick=()=>location.href=`luogo.html?id=${e.luoghi.id_luogo}`;
 body.appendChild(tr);
 });
-document.getElementById("eventiTitle").textContent=`Eventi (${eventiList.length})`;
-document.getElementById("eventiArrow").textContent="▶";  
-}  
+}
   
 /* STATUS */
 window.toggleAttivo = () => {
