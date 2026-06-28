@@ -391,7 +391,12 @@ ev_titolo,
 ev_descrizione,
 ev_inizio,
 id_luogo,
-luoghi(id_luogo, lu_location)
+luoghi(
+  id_luogo,
+  lu_location,
+  id_comune,
+  comuni(id_comune, co_descrizione)
+)
 `).eq("id_organizzatore", idOrg);
 eventiList = sortEventi(data || []);
 buildLuoghiFromEventi();
@@ -405,13 +410,20 @@ luoghiMap.clear();
 eventiList.forEach(e=>{
 if(!e.luoghi) return;
 const id = e.luoghi.id_luogo;
+const comune = e.luoghi.comuni?.co_descrizione || "";
 if(!luoghiMap.has(id)){
-luoghiMap.set(id,{id_luogo:id,lu_location:e.luoghi.lu_location,num_eventi:1});
-} else {
-luoghiMap.get(id).num_eventi++;
+luoghiMap.set(id,{
+id_luogo:id,
+lu_location:e.luoghi.lu_location,
+comune:comune,
+num_eventi:1
+});
+}else{
+const l = luoghiMap.get(id);
+l.num_eventi++;
 }
 });
-}  
+}
 
 function renderEventiOrg(){
 console.log("STEP 3 RENDER EVENTI");
@@ -464,8 +476,14 @@ body.appendChild(header);
 .sort((a,b)=>a.lu_location.localeCompare(b.lu_location))
 .forEach(l=>{
 const tr=document.createElement("tr");
+const comune = l.comune || "";
 tr.innerHTML=`
-<td class="link-cell">${l.lu_location}</td>
+<td>
+  <span style="color:#6b7280;font-weight:500;">
+    ${comune ? comune + " - " : ""}
+  </span>
+  <span class="link-cell">${l.lu_location}</span>
+</td>
 <td style="text-align:right;">${l.num_eventi}</td>
 `;
 tr.cells[0].onclick=()=>location.href=`luogo.html?id=${l.id_luogo}`;
