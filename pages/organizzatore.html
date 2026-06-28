@@ -237,7 +237,7 @@ input, textarea {
 <span id="eventiArrow">▶</span>
 <span id="eventiTitle">Eventi (0)</span>
 </div>
-<div class="section-panel" id="eventiPanel">
+<div class="section-panel" id="eventiPanel" style="display:none;">
 <table class="mini-table"><tbody id="eventiBody"></tbody></table>
 </div>
 </div>
@@ -247,7 +247,7 @@ input, textarea {
 <span id="luoghiArrow">▶</span>
 <span id="luoghiTitle">Luoghi (0)</span>
 </div>
-<div class="section-panel" id="luoghiPanel">
+<div class="section-panel" id="luoghiPanel" style="display:none;">
 <table class="mini-table"><tbody id="luoghiBody"></tbody></table>
 </div>
 </div>
@@ -373,6 +373,10 @@ async function load() {
   or_creato.textContent = data.or_creato
     ? new Date(data.or_creato).toLocaleString()
     : '';
+eventiOpen = false;
+luoghiOpen = false;
+document.getElementById("eventiArrow").textContent = "▶";
+document.getElementById("luoghiArrow").textContent = "▶";  
 }
 
 function sortEventi(list){
