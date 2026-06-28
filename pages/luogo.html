@@ -310,6 +310,18 @@ input, select, textarea {
     </table>
   </div>
 </div>
+
+<div class="section-box">
+  <div class="section-header" onclick="toggleSection('organizzatori')">
+    <span id="organizzatoriArrow">▶</span>
+    <span id="organizzatoriTitle">Organizzatori (0)</span>
+  </div>
+  <div id="organizzatoriPanel" class="section-panel" style="display:none;">
+    <table class="mini-table">
+      <tbody id="organizzatoriBody"></tbody>
+    </table>
+  </div>
+</div>
   
   
 <script type="module">
@@ -332,7 +344,8 @@ let dialogResolve;
 let comuniCoords = {};
 let eventiList = [];
 let eventiOpen = false;
-  
+let organizzatoriList = [];  
+let orgOpen = false;
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -599,16 +612,26 @@ async function loadEventiLuogo(idLuogo) {
     .from("eventi")
     .select("*")
     .eq("id_luogo", idLuogo);
-  eventiList = data || [];
   eventiList = sortEventi(data || []);
   renderEventi();
-}  
+}
 
-const { data } = await supabase
-  .from("eventi")
-  .select("id_organizzatore, organizzatori(or_nome, or_descrizione)")
-  .eq("id_luogo", id);
-  
+async function loadOrganizzatoriLuogo(idLuogo) {
+  const { data } = await supabase
+    .from("eventi")
+    .select("id_organizzatore, organizzatori(id_organizzatore, or_nome, or_descrizione)")
+    .eq("id_luogo", idLuogo);
+  const map = new Map();
+  (data || []).forEach(e => {
+    const o = e.organizzatori;
+    if (!o) return;
+    map.set(o.id_organizzatore, o);
+  });
+  organizzatoriList = Array.from(map.values())
+    .sort((a, b) => (a.or_nome || '').localeCompare(b.or_nome || ''));
+  renderOrganizzatori();
+}  
+ 
 function renderEventi() {
   const body = document.getElementById("eventiBody");
   body.innerHTML = "";
@@ -653,10 +676,18 @@ function sortEventi(list) {
   });
 }  
 
-function renderOrganizzatori(list) {
+function renderOrganizzatori() {
   const body = document.getElementById("organizzatoriBody");
   body.innerHTML = "";
-  list.forEach(o => {
+  document.getElementById("organizzatoriTitle").textContent =
+    `Organizzatori (${organizzatoriList.length})`;
+  const arrow = document.getElementById("organizzatoriArrow");
+  if (organizzatoriList.length === 0) {
+    arrow.textContent = "▶";
+    document.getElementById("organizzatoriPanel").style.display = "none";
+    return;
+  }
+  organizzatoriList.forEach(o => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${o.or_nome || ''}</td>
@@ -667,7 +698,7 @@ function renderOrganizzatori(list) {
     };
     body.appendChild(tr);
   });
-}  
+}
 
 function formatInizio(val) {
   if (!val) return '';
@@ -680,16 +711,28 @@ function formatInizio(val) {
 }  
 
 window.toggleSection = (section) => {
-  if (section !== "eventi") return;
-  if (eventiList.length === 0) return;
-  eventiOpen = !eventiOpen;
-  const panel = document.getElementById("eventiPanel");
-  const arrow = document.getElementById("eventiArrow");
-  panel.style.display = eventiOpen ? "block" : "none";
-  arrow.textContent = eventiOpen ? "▼" : "▶";
-};  
+  if (section === "eventi") {
+    if (eventiList.length === 0) return;
+    eventiOpen = !eventiOpen;
+    document.getElementById("eventiPanel").style.display =
+      eventiOpen ? "block" : "none";
+    document.getElementById("eventiArrow").textContent =
+      eventiOpen ? "▼" : "▶";
+  }
+  if (section === "organizzatori") {
+    if (organizzatoriList.length === 0) return;
+    orgOpen = !orgOpen;
+    document.getElementById("organizzatoriPanel").style.display =
+      orgOpen ? "block" : "none";
+    document.getElementById("organizzatoriArrow").textContent =
+      orgOpen ? "▼" : "▶";
+  }
+};
 
-await loadEventiLuogo(id);  
+if (!isNew) {
+  await loadEventiLuogo(id);
+  await loadOrganizzatoriLuogo(id);
+}
 await loadComuni();
 await load();
   
