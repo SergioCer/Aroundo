@@ -122,6 +122,67 @@ input, textarea {
   color: #888;
   margin-top: 15px;
 }
+
+.section-box{
+  margin:0 15px 15px;
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.section-header{
+  padding:10px 12px;
+  font-weight:bold;
+  cursor:pointer;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  user-select:none;
+  border-bottom:1px solid #eee;
+}
+
+.section-header.disabled{
+  color:#9ca3af;
+  cursor:default;
+}
+
+.section-panel{
+  max-height:300px;
+  overflow-y:auto;
+}
+
+.mini-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+.mini-table td{
+  padding:6px 8px;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.header-row td{
+  font-size:11px;
+  color:#777;
+  font-weight:600;
+  background:#fafafa;
+  position:sticky;
+  top:0;
+  z-index:5;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.link-cell{
+  color:#1e3a8a;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.link-cell:hover{
+  text-decoration:underline;
+}
+  
 </style>
 </head>
 
@@ -356,7 +417,7 @@ const title=document.getElementById("eventiTitle");
 const arrow=document.getElementById("eventiArrow");
 title.textContent=`Eventi (${eventiList.length})`;
 if(eventiList.length===0){
-arrow.textContent="▶";
+arrow.textContent = eventiOpen ? "▼" : "▶";
 document.querySelector("#eventiPanel").previousElementSibling.classList.add("disabled");
 return;
 }else{
@@ -407,7 +468,7 @@ tr.cells[0].onclick=()=>location.href=`luogo.html?id=${l.id_luogo}`;
 body.appendChild(tr);
 });
 document.getElementById("luoghiTitle").textContent=`Luoghi (${luoghiMap.size})`;
-document.getElementById("luoghiArrow").textContent="▶";
+document.getElementById("luoghiArrow").textContent = luoghiOpen ? "▼" : "▶";
 }
   
 function updateStatus(val) {
