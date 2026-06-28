@@ -620,14 +620,24 @@ function renderEventi() {
   eventiList.forEach(e => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${e.id_evento}</td>
       <td>${e.ev_titolo || ''}</td>
-      <td>${e.ev_inizio || ''}</td>
-    `;
+      <td>${e.ev_descrizione || ''}</td>
+      <td>${formatInizio(e.ev_inizio)}</td>
+      `;
     tr.onclick = () => {
       window.location.href = `evento.html?id=${e.id_evento}`;
     };
     body.appendChild(tr);
+  });
+}  
+
+function formatInizio(val) {
+  if (!val) return '';
+  const d = new Date(val);
+  return d.toLocaleDateString('it-IT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
   });
 }  
 
