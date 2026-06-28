@@ -171,6 +171,26 @@ input, textarea {
   </div>
   </div>
 
+<div class="section-box">
+<div class="section-header" onclick="toggleSection('eventi')">
+<span id="eventiArrow">▶</span>
+<span id="eventiTitle">Eventi (0)</span>
+</div>
+<div class="section-panel" id="eventiPanel">
+<table class="mini-table"><tbody id="eventiBody"></tbody></table>
+</div>
+</div>
+
+<div class="section-box">
+<div class="section-header" onclick="toggleSection('luoghi')">
+<span id="luoghiArrow">▶</span>
+<span id="luoghiTitle">Luoghi (0)</span>
+</div>
+<div class="section-panel" id="luoghiPanel">
+<table class="mini-table"><tbody id="luoghiBody"></tbody></table>
+</div>
+</div>
+  
   <!-- CREATO -->
   <div class="footer" id="or_creato"></div>
   
@@ -245,7 +265,11 @@ const isNew = params.has('new') || !id;
 let original = "{}";
 let dirty = false;
 let dialogResolve;
-
+let eventiList = [];
+let luoghiMap = new Map();
+let eventiOpen=false;
+let luoghiOpen=false;
+  
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
   return new Promise(resolve => {
@@ -290,6 +314,60 @@ async function load() {
     : '';
 }
 
+async function loadEventiOrganizzatore(idOrg){
+console.log("STEP 1 EVENTI ORG");
+const { data } = await supabase.from("eventi").select(`
+id_evento,
+ev_titolo,
+ev_descrizione,
+ev_inizio,
+id_luogo,
+luoghi(id_luogo, lu_location)
+`).eq("id_organizzatore", idOrg);
+eventiList = sortEventi(data || []);
+buildLuoghiFromEventi();
+renderEventiOrg();
+renderLuoghiOrg();
+}
+
+function buildLuoghiFromEventi(){
+console.log("STEP 2 LUOGHI BUILD");
+luoghiMap.clear();
+eventiList.forEach(e=>{
+if(!e.luoghi) return;
+const id = e.luoghi.id_luogo;
+if(!luoghiMap.has(id)){
+luoghiMap.set(id,{id_luogo:id,lu_location:e.luoghi.lu_location,num_eventi:1});
+} else {
+luoghiMap.get(id).num_eventi++;
+}
+});
+}  
+
+function renderEventiOrg(){
+console.log("STEP 3 RENDER EVENTI");
+const body=document.getElementById("eventiBody");
+body.innerHTML="";
+const header=document.createElement("tr");
+header.className="header-row";
+header.innerHTML="<td>Data</td><td>Evento</td><td>Luogo</td><td>Descrizione</td>";
+body.appendChild(header);
+eventiList.forEach(e=>{
+const tr=document.createElement("tr");
+tr.innerHTML=`
+<td>${formatInizio(e.ev_inizio)}</td>
+<td class="link-cell">${e.ev_titolo||""}</td>
+<td class="link-cell">${e.luoghi?.lu_location||""}</td>
+<td>${e.ev_descrizione||""}</td>
+`;
+tr.cells[1].onclick=()=>location.href=`evento.html?id=${e.id_evento}`;
+if(e.luoghi) tr.cells[2].onclick=()=>location.href=`luogo.html?id=${e.luoghi.id_luogo}`;
+body.appendChild(tr);
+});
+document.getElementById("eventiTitle").textContent=`Eventi (${eventiList.length})`;
+document.getElementById("eventiArrow").textContent="▶";  
+}  
+  
 /* STATUS */
 window.toggleAttivo = () => {
   const isActive = document.body.dataset.attivo === 'true';
@@ -297,6 +375,29 @@ window.toggleAttivo = () => {
   markDirty();
 };
 
+function renderLuoghiOrg(){
+console.log("STEP 4 RENDER LUOGHI");
+const body=document.getElementById("luoghiBody");
+body.innerHTML="";
+const header=document.createElement("tr");
+header.className="header-row";
+header.innerHTML="<td>Luogo</td><td style='text-align:right;'>N° eventi</td>";
+body.appendChild(header);
+[...luoghiMap.values()]
+.sort((a,b)=>a.lu_location.localeCompare(b.lu_location))
+.forEach(l=>{
+const tr=document.createElement("tr");
+tr.innerHTML=`
+<td class="link-cell">${l.lu_location}</td>
+<td style="text-align:right;">${l.num_eventi}</td>
+`;
+tr.cells[0].onclick=()=>location.href=`luogo.html?id=${l.id_luogo}`;
+body.appendChild(tr);
+});
+document.getElementById("luoghiTitle").textContent=`Luoghi (${luoghiMap.size})`;
+document.getElementById("luoghiArrow").textContent="▶";
+}
+  
 function updateStatus(val) {
   document.body.dataset.attivo = val;
   statusIcon.textContent = val ? '✔' : '✖';
@@ -304,6 +405,16 @@ function updateStatus(val) {
   statusIcon.className = val ? 'status-ok' : 'status-no';
 }
 
+function formatInizio(v){
+if(!v) return "";
+const d=new Date(v);
+if(isNaN(d)) return "";
+const yy=String(d.getFullYear()).slice(-2);
+const mm=String(d.getMonth()+1).padStart(2,"0");
+const dd=String(d.getDate()).padStart(2,"0");
+return `${yy}/${mm}/${dd}`;
+}
+  
 /* PREVIEW */
 window.updatePreview = () => {
   const url = or_copertina.value;
@@ -387,6 +498,22 @@ window.requestBack = async () => {
   }
 };
 
+window.toggleSection=(sec)=>{
+if(sec==="eventi"){
+eventiOpen=!eventiOpen;
+document.getElementById("eventiPanel").style.display=eventiOpen?"block":"none";
+document.getElementById("eventiArrow").textContent=eventiOpen?"▼":"▶";
+}
+if(sec==="luoghi"){
+luoghiOpen=!luoghiOpen;
+document.getElementById("luoghiPanel").style.display=luoghiOpen?"block":"none";
+document.getElementById("luoghiArrow").textContent=luoghiOpen?"▼":"▶";
+}
+};  
+
+if(!isNew){
+await loadEventiOrganizzatore(id);
+}
 await load();
 </script>
 </body>
