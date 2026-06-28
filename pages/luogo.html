@@ -647,17 +647,24 @@ async function loadEventiLuogo(idLuogo) {
 }
 
 async function loadOrganizzatoriLuogo(idLuogo) {
-const { data } = await supabase
-  .from("organizzatori")
-  .select(`
-    id_organizzatore,
-    or_nome,
-    or_descrizione,
-    eventi!inner(id_luogo)
-  `)
-  .eq("eventi.id_luogo", idLuogo)
-  .order("or_nome", { ascending: true });
-  organizzatoriList = data || [];
+  console.log("STEP 3");   // DA TOGLIERE
+  const map = new Map();
+  eventiList.forEach(e => {
+    if (!e.organizzatori) return;
+    const id = e.organizzatori.id_organizzatore;
+    if (!map.has(id)) {
+      map.set(id, {
+        id_organizzatore: id,
+        or_nome: e.organizzatori.or_nome,
+        or_descrizione: "",
+        num_eventi: 1
+      });
+    } else {
+      map.get(id).num_eventi++;
+    }
+  });
+  organizzatoriList = [...map.values()]
+      .sort((a, b) => a.or_nome.localeCompare(b.or_nome));
   renderOrganizzatori();
 }
  
