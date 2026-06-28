@@ -384,7 +384,6 @@ return [...list].sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio));
 }
   
 async function loadEventiOrganizzatore(idOrg){
-console.log("STEP 1 EVENTI ORG");
 const { data } = await supabase.from("eventi").select(`
 id_evento,
 ev_titolo,
@@ -405,7 +404,6 @@ renderLuoghiOrg();
 }
 
 function buildLuoghiFromEventi(){
-console.log("STEP 2 LUOGHI BUILD");
 luoghiMap.clear();
 eventiList.forEach(e=>{
 if(!e.luoghi) return;
@@ -426,7 +424,6 @@ l.num_eventi++;
 }
 
 function renderEventiOrg(){
-console.log("STEP 3 RENDER EVENTI");
 const body=document.getElementById("eventiBody");
 body.innerHTML="";
 const title=document.getElementById("eventiTitle");
@@ -465,7 +462,6 @@ window.toggleAttivo = () => {
 };
 
 function renderLuoghiOrg(){
-console.log("STEP 4 RENDER LUOGHI");
 const body=document.getElementById("luoghiBody");
 body.innerHTML="";
 const header=document.createElement("tr");
