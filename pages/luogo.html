@@ -617,21 +617,17 @@ async function loadEventiLuogo(idLuogo) {
 }
 
 async function loadOrganizzatoriLuogo(idLuogo) {
-  const { data } = await supabase
-    .from("eventi")
-    .select("organizzatori(id_organizzatore, or_nome, or_descrizione)")
-    .eq("id_luogo", idLuogo);
-  const map = new Map();
-  (data || []).forEach(e => {
-    const o = e.organizzatori;
-    if (!o) return;
-    map.set(o.id_organizzatore, o);
-  });
-  organizzatoriList = Array.from(map.values())
-    .sort((a, b) =>
-      (a.or_nome || '').localeCompare(b.or_nome || '')
-    );
-  renderOrganizzatori(organizzatoriList);
+const { data } = await supabase
+  .from("organizzatori")
+  .select(`
+    id_organizzatore,
+    or_nome,
+    or_descrizione,
+    eventi!inner(id_luogo)
+  `)
+  .eq("eventi.id_luogo", idLuogo)
+  .order("or_nome", { ascending: true });
+  renderOrganizzatori();
 }
  
 function renderEventi() {
