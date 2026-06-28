@@ -651,7 +651,6 @@ async function loadEventiLuogo(idLuogo) {
 }
 
 async function loadOrganizzatoriLuogo(idLuogo) {
-  console.log("STEP 3");   // DA TOGLIERE
   const map = new Map();
   eventiList.forEach(e => {
     if (!e.organizzatori) return;
@@ -673,7 +672,6 @@ async function loadOrganizzatoriLuogo(idLuogo) {
 }
  
 function renderEventi() {
-  console.log("STEP 2");   // DA TOGLIERE A LAVORO FINITO
   const body = document.getElementById("eventiBody");
   body.innerHTML = "";
   document.getElementById("eventiTitle").textContent =
@@ -741,7 +739,6 @@ function sortEventi(list) {
 }
 
 function renderOrganizzatori() {
-  console.log("STEP 4"); // DA TOGLIERE
   const body = document.getElementById("organizzatoriBody");
   body.innerHTML = "";
   document.getElementById("organizzatoriTitle").textContent =
