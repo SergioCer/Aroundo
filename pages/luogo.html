@@ -660,21 +660,19 @@ function renderEventi() {
   });
 }  
 
+function parseDate(v) {
+  if (!v) return new Date(0);
+  const d = new Date(v);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
 function sortEventi(list) {
-  const now = new Date();
   return [...list].sort((a, b) => {
     const da = new Date(a.ev_inizio);
     const db = new Date(b.ev_inizio);
-    const aFuture = da >= now;
-    const bFuture = db >= now;
-    // prima futuri, poi passati
-    if (aFuture !== bFuture) {
-      return aFuture ? -1 : 1;
-    }
-    // dentro lo stesso gruppo: ordine cronologico
-    return da - db;
+    return db - da; // 👈 dal più futuro al più passato
   });
-}  
+}
 
 function renderOrganizzatori() {
   const body = document.getElementById("organizzatoriBody");
