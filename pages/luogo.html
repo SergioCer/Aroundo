@@ -98,6 +98,50 @@ input, select, textarea {
   color: #888;
 }
 
+.section-box {
+  margin: 0 15px 15px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 10px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  user-select: none;
+}
+
+.section-header.disabled {
+  color: #9ca3af;
+  cursor: default;
+}
+
+.section-panel {
+  border-top: 1px solid #eee;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mini-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+
+.mini-table tr:hover {
+  background: #eef6ff;
+}
+  
 </style>
 </head>
 
@@ -254,6 +298,19 @@ input, select, textarea {
   </div>
 </div>
 </div>
+
+<div class="section-box">
+  <div class="section-header" onclick="toggleSection('eventi')">
+    <span id="eventiArrow">▶</span>
+    <span id="eventiTitle">Eventi (0)</span>
+  </div>
+  <div id="eventiPanel" class="section-panel" style="display:none;">
+    <table class="mini-table">
+      <tbody id="eventiBody"></tbody>
+    </table>
+  </div>
+</div>
+  
   
 <script type="module">
 import { supabase } from '../supabase.js';
@@ -273,6 +330,9 @@ let markers = [];
 let luoghi = [];
 let dialogResolve;
 let comuniCoords = {};
+let eventiList = [];
+let eventiOpen = false;
+  
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -534,6 +594,54 @@ window.requestBack = async () => {
   document.getElementById("mapModal").style.display = "none";
 };
 
+async function loadEventiLuogo(idLuogo) {
+  const { data } = await supabase
+    .from("eventi")
+    .select("*")
+    .eq("id_luogo", idLuogo);
+  eventiList = data || [];
+  renderEventi();
+}  
+
+function renderEventi() {
+  const body = document.getElementById("eventiBody");
+  body.innerHTML = "";
+  document.getElementById("eventiTitle").textContent =
+    `Eventi (${eventiList.length})`;
+  const arrow = document.getElementById("eventiArrow");
+  const header = document.querySelector(".section-header");
+  if (eventiList.length === 0) {
+    arrow.textContent = "▶";
+    header.classList.add("disabled");
+    return;
+  } else {
+    header.classList.remove("disabled");
+  }
+  eventiList.forEach(e => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${e.id_evento}</td>
+      <td>${e.ev_titolo || ''}</td>
+      <td>${e.ev_inizio || ''}</td>
+    `;
+    tr.onclick = () => {
+      window.location.href = `evento.html?id=${e.id_evento}`;
+    };
+    body.appendChild(tr);
+  });
+}  
+
+window.toggleSection = (section) => {
+  if (section !== "eventi") return;
+  if (eventiList.length === 0) return;
+  eventiOpen = !eventiOpen;
+  const panel = document.getElementById("eventiPanel");
+  const arrow = document.getElementById("eventiArrow");
+  panel.style.display = eventiOpen ? "block" : "none";
+  arrow.textContent = eventiOpen ? "▼" : "▶";
+};  
+
+await loadEventiLuogo(id);  
 await loadComuni();
 await load();
   
