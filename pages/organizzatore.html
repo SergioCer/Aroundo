@@ -476,17 +476,18 @@ body.appendChild(header);
 .sort((a,b)=>a.lu_location.localeCompare(b.lu_location))
 .forEach(l=>{
 const tr=document.createElement("tr");
-const comune = l.comune || "";
 tr.innerHTML=`
-<td>
-  <span style="color:#6b7280;font-weight:500;">
-    ${comune ? comune + " - " : ""}
-  </span>
-  <span class="link-cell">${l.lu_location}</span>
+<td style="color:#6b7280;font-weight:500;">
+  ${l.comune || ""}
 </td>
-<td style="text-align:right;">${l.num_eventi}</td>
+<td class="link-cell">
+  ${l.lu_location}
+</td>
+<td style="text-align:right;font-weight:600;">
+  ${l.num_eventi}
+</td>
 `;
-tr.cells[0].onclick=()=>location.href=`luogo.html?id=${l.id_luogo}`;
+tr.cells[1].onclick=()=>location.href=`luogo.html?id=${l.id_luogo}`;
 body.appendChild(tr);
 });
 document.getElementById("luoghiTitle").textContent=`Luoghi (${luoghiMap.size})`;
