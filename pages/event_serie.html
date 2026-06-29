@@ -172,6 +172,19 @@ let original = "{}";
 let dirty = false;
 let eventsOpen = false;
 
+function askSaveDialog() {
+  document.getElementById("saveDialog").style.display = "flex";
+  return new Promise(resolve => {
+    dialogResolve = resolve;
+  });
+}
+
+function dialogAction(type) {
+  document.getElementById("saveDialog").style.display = "none";
+  dialogResolve(type);
+}
+window.dialogAction = dialogAction;  
+
 async function load() {
     if (isNew) {
       original = JSON.stringify({
@@ -289,16 +302,21 @@ window.goNew = () => {
   location.href = 'event_serie.html?new=1';
 };
 
+/* BACK */
 window.requestBack = async () => {
-  if (!dirty) {
+  if (!dirty)
+    return history.back();
+  const choice = await askSaveDialog();
+  if (choice === "cancel")
+    return;
+  if (choice === "yes") {
+    const success = await save();
+    if (!success)
+      return;
     history.back();
     return;
   }
-  const choice = confirm("Salvare le modifiche? OK = salva, Annulla = esci senza salvare");
-  if (choice) {
-    const ok = await save();
-    if (ok) history.back();
-  } else {
+  if (choice === "no") {
     history.back();
   }
 };
