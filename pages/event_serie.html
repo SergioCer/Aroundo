@@ -171,9 +171,6 @@ async function load() {
   es_description.value = data.es_description || '';
   es_notes.value = data.es_notes || '';
   es_cover.value = data.es_cover || '';
-  created.textContent = data.es_created
-    ? new Date(data.es_created).toLocaleString()
-    : '';
   preview();
   loadEvents();
 }
@@ -220,7 +217,7 @@ window.markDirty = () => {
     es_cover: es_cover.value
   });
   dirty = current !== original;
-    document.getElementById('backBtn')
+    document.getElementById('back-btn')
     ?.classList.toggle('dirty', dirty);
 };
 
