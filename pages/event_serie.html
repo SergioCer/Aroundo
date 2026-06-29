@@ -111,6 +111,14 @@ input, textarea {
   cursor: pointer;
   font-weight: 600;
 }
+
+.footer {
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+  margin-top: 15px;
+}
+  
 </style>
 </head>
 
@@ -252,6 +260,7 @@ async function load() {
     });
     dirty = false;
     document.getElementById("backBtn").classList.remove("dirty");
+    es_created.textContent = "";
     return;
   }
   const { data, error } = await supabase
@@ -273,6 +282,9 @@ async function load() {
   es_description.value = data.es_description || "";
   es_notes.value = data.es_notes || "";
   es_cover.value = data.es_cover || "";
+  es_created.textContent = data.es_created
+  ? new Date(data.es_created).toLocaleString()
+  : "";
   dirty = false;
   document.getElementById("backBtn").classList.remove("dirty");
   preview();
