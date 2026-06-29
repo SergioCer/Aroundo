@@ -167,11 +167,12 @@ async function load() {
     .select('*')
     .eq('id_event_series', id)
     .single();
-  original = JSON.stringify(data);
-  es_title.value = data.es_title || '';
-  es_description.value = data.es_description || '';
-  es_notes.value = data.es_notes || '';
-  es_cover.value = data.es_cover || '';
+original = JSON.stringify({
+  es_title: data.es_title || '',
+  es_description: data.es_description || '',
+  es_notes: data.es_notes || '',
+  es_cover: data.es_cover || ''
+});
   preview();
   loadEvents();
 }
