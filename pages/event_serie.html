@@ -182,24 +182,28 @@ async function loadEvents() {
     .from('eventi')
     .select('id_evento, ev_titolo, ev_inizio')
     .eq('id_event_series', id);
-
   const body = document.getElementById('eventsBody');
   body.innerHTML = '';
-
   (data || []).forEach(e => {
     const tr = document.createElement('tr');
-
     tr.innerHTML = `
       <td class="link">${e.ev_titolo}</td>
       <td>${new Date(e.ev_inizio).toLocaleDateString()}</td>
     `;
-
     tr.onclick = () =>
       location.href = `evento.html?id=${e.id_evento}`;
-
     body.appendChild(tr);
   });
 }
+
+function getSnapshot() {
+  return {
+    es_title: es_title.value,
+    es_description: es_description.value,
+    es_notes: es_notes.value,
+    es_cover: es_cover.value
+  };
+}  
 
 window.toggleEvents = () => {
   eventsOpen = !eventsOpen;
@@ -212,14 +216,8 @@ window.preview = () => {
 };
 
 window.markDirty = () => {
-  const current = JSON.stringify({
-    es_title: es_title.value,
-    es_description: es_description.value,
-    es_notes: es_notes.value,
-    es_cover: es_cover.value
-  });
-  dirty = current !== original;
-    document.getElementById('back-btn')
+dirty = JSON.stringify(getSnapshot()) !== original;
+  document.getElementById('back-btn')
     ?.classList.toggle('dirty', dirty);
 };
 
