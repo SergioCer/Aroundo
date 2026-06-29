@@ -650,9 +650,7 @@ window.markDirty = () => {
 
 window.createSerie = (e) => {
   e.stopPropagation();
-  console.log("STEP 6 - createSerie CLICK");
   const url = `event_serie.html?new=1&id_organizzatore=${id}`;
-  console.log("STEP 7 - redirect:", url);
   location.href = url;
 };  
   
