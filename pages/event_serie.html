@@ -139,6 +139,16 @@ input, textarea {
   <div class="section-title">Note</div>
   <textarea id="es_notes" oninput="markDirty()"></textarea>
 
+  <div class="section-title">Organizzatore</div>
+<div id="es_organizzatore" style="
+  padding:6px;
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+  border-radius:6px;
+  font-size:15px;
+  color:#374151;
+"></div>
+
   <div class="section-title">Copertina</div>
   <input id="es_cover" oninput="markDirty(); preview()">
 
@@ -263,11 +273,17 @@ async function load() {
     es_created.textContent = "";
     return;
   }
-  const { data, error } = await supabase
-    .from("event_series")
-    .select("*")
-    .eq("id_event_series", id)
-    .single();
+const { data, error } = await supabase
+  .from("event_series")
+  .select(`
+    *,
+    organizzatori (
+      id_organizzatore,
+      or_nome
+    )
+  `)
+  .eq("id_event_series", id)
+  .single();
   if (error) {
     console.error(error);
     return;
@@ -285,6 +301,8 @@ async function load() {
   es_created.textContent = data.es_created
   ? new Date(data.es_created).toLocaleString()
   : "";
+  es_organizzatore.textContent =
+  data.organizzatori?.or_nome || "—";
   dirty = false;
   document.getElementById("backBtn").classList.remove("dirty");
   preview();
