@@ -251,6 +251,34 @@ input, textarea {
 <table class="mini-table"><tbody id="luoghiBody"></tbody></table>
 </div>
 </div>
+
+<div class="section-box">
+<div class="section-header" onclick="toggleSection('serie')">
+<span id="serieArrow">▶</span>
+<span id="serieTitle">Serie (0)</span>
+
+<!-- pulsante + -->
+<button onclick="createSerie(event)" style="
+  margin-left:auto;
+  width:26px;
+  height:26px;
+  border-radius:13px;
+  border:none;
+  background:#22c55e;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+">+</button>
+
+</div>
+
+<div class="section-panel" id="seriePanel" style="display:none;">
+<table class="mini-table">
+<tbody id="serieBody"></tbody>
+</table>
+</div>
+</div>
+
   
   <!-- CREATO -->
   <div class="footer" id="or_creato"></div>
@@ -330,6 +358,8 @@ let eventiList = [];
 let luoghiMap = new Map();
 let eventiOpen=false;
 let luoghiOpen=false;
+let serieList = [];
+let serieOpen = false;
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -403,6 +433,45 @@ renderEventiOrg();
 renderLuoghiOrg();
 }
 
+async function loadSerieOrganizzatore(idOrg){
+  console.log("STEP 1 - loadSerieOrganizzatore START", idOrg);
+  const { data, error } = await supabase
+    .from('event_series')
+    .select('id_event_series, es_title, es_created')
+    .eq('id_organizzatore', idOrg);
+  if(error){
+    console.error("ERRORE SERIE:", error);
+    return;
+  }
+  serieList = data || [];
+  console.log("STEP 2 - serie caricate:", serieList.length);
+  renderSerie();
+  console.log("STEP 3 - renderSerie chiamata");
+}
+
+function renderSerie(){
+  console.log("STEP 4 - renderSerie");
+  const body = document.getElementById("serieBody");
+  body.innerHTML = "";
+  const title = document.getElementById("serieTitle");
+  const arrow = document.getElementById("serieArrow");
+  title.textContent = `Serie (${serieList.length})`;
+  serieList.forEach(s => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="link-cell">${s.es_title || ""}</td>
+      <td>${s.es_created ? new Date(s.es_created).toLocaleDateString() : ""}</td>
+    `;
+    tr.onclick = () => {
+      console.log("CLICK SERIE:", s.id_event_series);
+      location.href = `event_serie.html?id=${s.id_event_series}`;
+    };
+    body.appendChild(tr);
+  });
+  console.log("STEP 5 - serie renderizzate");
+}
+  
+  
 function buildLuoghiFromEventi(){
 luoghiMap.clear();
 eventiList.forEach(e=>{
@@ -531,6 +600,15 @@ window.markDirty = () => {
     .classList.toggle('dirty', dirty);
 };
 
+window.createSerie = (e) => {
+  e.stopPropagation();
+  console.log("STEP 6 - createSerie CLICK");
+  const url = `event_serie.html?new=1&id_organizzatore=${id}`;
+  console.log("STEP 7 - redirect:", url);
+  location.href = url;
+};
+  
+
 /* SAVE */
 async function save() {
   const payload = {
@@ -601,12 +679,23 @@ luoghiOpen=!luoghiOpen;
 document.getElementById("luoghiPanel").style.display=luoghiOpen?"block":"none";
 document.getElementById("luoghiArrow").textContent=luoghiOpen?"▼":"▶";
 }
+if(sec==="serie"){
+  serieOpen = !serieOpen;
+  document.getElementById("seriePanel").style.display = serieOpen ? "block" : "none";
+  document.getElementById("serieArrow").textContent = serieOpen ? "▼" : "▶";
+}  
 };  
 
 if(!isNew){
 await loadEventiOrganizzatore(id);
 }
 await load();
+
+if(!isNew){
+  console.log("STEP 0 - avvio caricamento sezioni");
+  await loadSerieOrganizzatore(id);
+}  
+  
 </script>
 </body>
 </html>
