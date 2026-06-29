@@ -698,15 +698,12 @@ window.toggleSection = (sec) => {
   }
 };
 
-if(!isNew){
-await loadEventiOrganizzatore(id);
-}
 await load();
 
-if(!isNew){
-  console.log("STEP 0 - avvio caricamento sezioni");
+if (!isNew) {
+  await loadEventiOrganizzatore(id);
   await loadSerieOrganizzatore(id);
-}  
+}
   
 </script>
 </body>
