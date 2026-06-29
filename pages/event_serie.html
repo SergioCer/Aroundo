@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Event Series</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f2f4f7;
+}
+
+.topbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px;
+  font-weight: bold;
+  gap: 12px;
+}
+
+.back-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+}
+
+.add-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #22c55e;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.card {
+  background: white;
+  margin: 10px 15px;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.section-title {
+  font-size: 11px;
+  color: #777;
+  margin-top: 10px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+}
+
+.preview img {
+  max-width: 100%;
+  margin-top: 8px;
+  border-radius: 8px;
+}
+
+.section-box {
+  margin: 10px 15px;
+  background: white;
+  border-radius: 12px;
+}
+
+.section-header {
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+.section-panel {
+  display: none;
+  padding: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table td {
+  padding: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.link {
+  color: #1e3a8a;
+  cursor: pointer;
+  font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <button class="back-btn" onclick="history.back()">←</button>
+  Event Series
+  <button class="add-btn" onclick="goNew()">+</button>
+</div>
+
+<div class="card">
+  <div class="section-title">Titolo</div>
+  <input id="es_title" oninput="markDirty()">
+
+  <div class="section-title">Descrizione</div>
+  <textarea id="es_description" oninput="markDirty()"></textarea>
+
+  <div class="section-title">Note</div>
+  <textarea id="es_notes" oninput="markDirty()"></textarea>
+
+  <div class="section-title">Copertina</div>
+  <input id="es_cover" oninput="markDirty(); preview()">
+
+  <div class="preview">
+    <img id="img">
+  </div>
+
+  <div class="section-title">Creata</div>
+  <div id="created"></div>
+</div>
+
+<!-- EVENTI COLLEGATI -->
+<div class="section-box">
+  <div class="section-header" onclick="toggleEvents()">
+    Eventi collegati
+    <span id="arrow">▶</span>
+  </div>
+
+  <div class="section-panel" id="panel">
+    <table class="table">
+      <tbody id="eventsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from '../supabase.js';
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const isNew = params.has('new');
+
+let original = "{}";
+let dirty = false;
+let eventsOpen = false;
+
+async function load() {
+  if (isNew) return;
+
+  const { data } = await supabase
+    .from('event_series')
+    .select('*')
+    .eq('id_event_series', id)
+    .single();
+
+  original = JSON.stringify(data);
+
+  es_title.value = data.es_title || '';
+  es_description.value = data.es_description || '';
+  es_notes.value = data.es_notes || '';
+  es_cover.value = data.es_cover || '';
+
+  created.textContent = data.es_created
+    ? new Date(data.es_created).toLocaleString()
+    : '';
+
+  preview();
+  loadEvents();
+}
+
+async function loadEvents() {
+  const { data } = await supabase
+    .from('eventi')
+    .select('id_evento, ev_titolo, ev_inizio')
+    .eq('id_event_series', id);
+
+  const body = document.getElementById('eventsBody');
+  body.innerHTML = '';
+
+  (data || []).forEach(e => {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td class="link">${e.ev_titolo}</td>
+      <td>${new Date(e.ev_inizio).toLocaleDateString()}</td>
+    `;
+
+    tr.onclick = () =>
+      location.href = `evento.html?id=${e.id_evento}`;
+
+    body.appendChild(tr);
+  });
+}
+
+window.toggleEvents = () => {
+  eventsOpen = !eventsOpen;
+  panel.style.display = eventsOpen ? 'block' : 'none';
+  arrow.textContent = eventsOpen ? '▼' : '▶';
+};
+
+window.preview = () => {
+  img.src = es_cover.value;
+};
+
+window.markDirty = () => {
+  const current = JSON.stringify({
+    es_title: es_title.value,
+    es_description: es_description.value,
+    es_notes: es_notes.value,
+    es_cover: es_cover.value
+  });
+
+  dirty = current !== original;
+};
+
+window.goNew = () => {
+  location.href = 'event_serie.html?new=1';
+};
+
+load();
+</script>
+
+</body>
+</html>
