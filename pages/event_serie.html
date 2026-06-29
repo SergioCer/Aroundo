@@ -42,17 +42,6 @@ body {
   color: #111827;
 }
   
-.add-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: none;
-  background: #22c55e;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-}
-
 .card {
   background: white;
   margin: 10px 15px;
@@ -130,7 +119,6 @@ input, textarea {
 <div class="topbar">
   <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
   Event Serie
-  <button class="add-btn" onclick="goNew()">+</button>
 </div>
 
 <div class="card">
@@ -385,10 +373,6 @@ window.markDirty = () => {
   dirty = current !== original;
   const btn = document.getElementById('backBtn');
   if (btn) btn.classList.toggle('dirty', dirty);
-};
-
-window.goNew = () => {
-  location.href = 'event_serie.html?new=1';
 };
 
 /* BACK */
