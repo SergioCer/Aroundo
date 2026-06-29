@@ -288,7 +288,7 @@ async function load() {
   dirty = false;
   document.getElementById("backBtn").classList.remove("dirty");
   preview();
-  loadEvents();
+  await loadEvents();
 }
 
 async function loadEvents() {
