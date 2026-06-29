@@ -161,24 +161,19 @@ let eventsOpen = false;
 
 async function load() {
   if (isNew) return;
-
   const { data } = await supabase
     .from('event_series')
     .select('*')
     .eq('id_event_series', id)
     .single();
-
   original = JSON.stringify(data);
-
   es_title.value = data.es_title || '';
   es_description.value = data.es_description || '';
   es_notes.value = data.es_notes || '';
   es_cover.value = data.es_cover || '';
-
   created.textContent = data.es_created
     ? new Date(data.es_created).toLocaleString()
     : '';
-
   preview();
   loadEvents();
 }
@@ -224,8 +219,9 @@ window.markDirty = () => {
     es_notes: es_notes.value,
     es_cover: es_cover.value
   });
-
   dirty = current !== original;
+    document.getElementById('backBtn')
+    ?.classList.toggle('dirty', dirty);
 };
 
 window.goNew = () => {
@@ -233,7 +229,7 @@ window.goNew = () => {
 };
 
 load();
-</script>
 
+</script>
 </body>
 </html>
