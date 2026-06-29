@@ -186,6 +186,7 @@ function dialogAction(type) {
 window.dialogAction = dialogAction;  
 
 async function load() {
+  dirty = false;
     if (isNew) {
       original = JSON.stringify({
         es_title: '',
