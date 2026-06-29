@@ -240,7 +240,8 @@ import { supabase } from '../supabase.js';
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const isNew = params.has('new');
-
+const idOrganizzatore = params.get("id_organizzatore");
+  
 let original = "{}";
 let dirty = false;
 let eventsOpen = false;
@@ -271,6 +272,14 @@ async function load() {
     dirty = false;
     document.getElementById("backBtn").classList.remove("dirty");
     es_created.textContent = "";
+    if (idOrganizzatore) {
+  const { data } = await supabase
+    .from("organizzatori")
+    .select("or_nome")
+    .eq("id_organizzatore", idOrganizzatore)
+    .single();
+  es_organizzatore.textContent = data?.or_nome || "—";
+}
     return;
   }
 const { data, error } = await supabase
@@ -355,6 +364,9 @@ async function save() {
     es_notes: es_notes.value,
     es_cover: es_cover.value
   };
+  if (isNew && idOrganizzatore) {
+    payload.id_organizzatore = Number(idOrganizzatore);
+  }
   let result;
   if (isNew) {
     result = await supabase
