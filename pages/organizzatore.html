@@ -433,7 +433,6 @@ renderLuoghiOrg();
 }
 
 async function loadSerieOrganizzatore(idOrg){
-  console.log("STEP 1 - loadSerieOrganizzatore START", idOrg);
   const { data, error } = await supabase
     .from('event_series')
     .select('id_event_series, es_title, es_created')
@@ -443,9 +442,7 @@ async function loadSerieOrganizzatore(idOrg){
     return;
   }
   serieList = data || [];
-  console.log("STEP 2 - serie caricate:", serieList.length);
   renderSerie();
-  console.log("STEP 3 - renderSerie chiamata");
 }
 
 function buildLuoghiFromEventi(){
