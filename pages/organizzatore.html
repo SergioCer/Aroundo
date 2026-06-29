@@ -372,8 +372,7 @@ function dialogAction(type) {
   document.getElementById("saveDialog").style.display = "none";
   dialogResolve(type);
 }
-window.dialogAction = dialogAction;
-  
+
 /* LOAD */
 async function load() {
   if (isNew) {
@@ -449,29 +448,6 @@ async function loadSerieOrganizzatore(idOrg){
   console.log("STEP 3 - renderSerie chiamata");
 }
 
-function renderSerie(){
-  console.log("STEP 4 - renderSerie");
-  const body = document.getElementById("serieBody");
-  body.innerHTML = "";
-  const title = document.getElementById("serieTitle");
-  const arrow = document.getElementById("serieArrow");
-  title.textContent = `Serie (${serieList.length})`;
-  serieList.forEach(s => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="link-cell">${s.es_title || ""}</td>
-      <td>${s.es_created ? new Date(s.es_created).toLocaleDateString() : ""}</td>
-    `;
-    tr.onclick = () => {
-      console.log("CLICK SERIE:", s.id_event_series);
-      location.href = `event_serie.html?id=${s.id_event_series}`;
-    };
-    body.appendChild(tr);
-  });
-  console.log("STEP 5 - serie renderizzate");
-}
-  
-  
 function buildLuoghiFromEventi(){
 luoghiMap.clear();
 eventiList.forEach(e=>{
@@ -522,13 +498,6 @@ if(e.luoghi) tr.cells[2].onclick=()=>location.href=`luogo.html?id=${e.luoghi.id_
 body.appendChild(tr);
 });
 }
-  
-/* STATUS */
-window.toggleAttivo = () => {
-  const isActive = document.body.dataset.attivo === 'true';
-  updateStatus(!isActive);
-  markDirty();
-};
 
 function renderLuoghiOrg(){
 const body=document.getElementById("luoghiBody");
@@ -558,6 +527,28 @@ body.appendChild(tr);
 document.getElementById("luoghiTitle").textContent=`Luoghi (${luoghiMap.size})`;
 document.getElementById("luoghiArrow").textContent = luoghiOpen ? "▼" : "▶";
 }
+
+function renderSerie(){
+  console.log("STEP 4 - renderSerie");
+  const body = document.getElementById("serieBody");
+  body.innerHTML = "";
+  const title = document.getElementById("serieTitle");
+  const arrow = document.getElementById("serieArrow");
+  title.textContent = `Serie (${serieList.length})`;
+  serieList.forEach(s => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="link-cell">${s.es_title || ""}</td>
+      <td>${s.es_created ? new Date(s.es_created).toLocaleDateString() : ""}</td>
+    `;
+    tr.onclick = () => {
+      console.log("CLICK SERIE:", s.id_event_series);
+      location.href = `event_serie.html?id=${s.id_event_series}`;
+    };
+    body.appendChild(tr);
+  });
+  console.log("STEP 5 - serie renderizzate");
+}
   
 function updateStatus(val) {
   document.body.dataset.attivo = val;
@@ -575,39 +566,7 @@ const mm=String(d.getMonth()+1).padStart(2,"0");
 const dd=String(d.getDate()).padStart(2,"0");
 return `${yy}/${mm}/${dd}`;
 }
-  
-/* PREVIEW */
-window.updatePreview = () => {
-  const url = or_copertina.value;
-  copertina_url.textContent = url || '';
-  copertina_img.src = url || '';
-};
 
-/* DIRTY */
-window.markDirty = () => {
-  const current = JSON.stringify({
-    or_nome: or_nome.value,
-    or_descrizione: or_descrizione.value,
-    or_email: or_email.value,
-    or_telefono: or_telefono.value,
-    or_sito_web: or_sito_web.value,
-    or_note: or_note.value,
-    or_copertina: or_copertina.value,
-    or_attivo: document.body.dataset.attivo === 'true'
-  });
-  dirty = current !== original;
-  document.getElementById('backBtn')
-    .classList.toggle('dirty', dirty);
-};
-
-window.createSerie = (e) => {
-  e.stopPropagation();
-  console.log("STEP 6 - createSerie CLICK");
-  const url = `event_serie.html?new=1&id_organizzatore=${id}`;
-  console.log("STEP 7 - redirect:", url);
-  location.href = url;
-};
-  
 
 /* SAVE */
 async function save() {
@@ -649,6 +608,47 @@ async function save() {
   return true;
 }
 
+window.dialogAction = dialogAction;
+ 
+/* STATUS */
+window.toggleAttivo = () => {
+  const isActive = document.body.dataset.attivo === 'true';
+  updateStatus(!isActive);
+  markDirty();
+};
+  
+/* PREVIEW */
+window.updatePreview = () => {
+  const url = or_copertina.value;
+  copertina_url.textContent = url || '';
+  copertina_img.src = url || '';
+};
+
+/* DIRTY */
+window.markDirty = () => {
+  const current = JSON.stringify({
+    or_nome: or_nome.value,
+    or_descrizione: or_descrizione.value,
+    or_email: or_email.value,
+    or_telefono: or_telefono.value,
+    or_sito_web: or_sito_web.value,
+    or_note: or_note.value,
+    or_copertina: or_copertina.value,
+    or_attivo: document.body.dataset.attivo === 'true'
+  });
+  dirty = current !== original;
+  document.getElementById('backBtn')
+    .classList.toggle('dirty', dirty);
+};
+
+window.createSerie = (e) => {
+  e.stopPropagation();
+  console.log("STEP 6 - createSerie CLICK");
+  const url = `event_serie.html?new=1&id_organizzatore=${id}`;
+  console.log("STEP 7 - redirect:", url);
+  location.href = url;
+};  
+  
 /* BACK */
 window.requestBack = async () => {
   if (!dirty)
@@ -668,23 +668,28 @@ window.requestBack = async () => {
   }
 };
 
-window.toggleSection=(sec)=>{
-if(sec==="eventi"){
-eventiOpen=!eventiOpen;
-document.getElementById("eventiPanel").style.display=eventiOpen?"block":"none";
-document.getElementById("eventiArrow").textContent=eventiOpen?"▼":"▶";
-}
-if(sec==="luoghi"){
-luoghiOpen=!luoghiOpen;
-document.getElementById("luoghiPanel").style.display=luoghiOpen?"block":"none";
-document.getElementById("luoghiArrow").textContent=luoghiOpen?"▼":"▶";
-}
-if(sec==="serie"){
-  serieOpen = !serieOpen;
-  document.getElementById("seriePanel").style.display = serieOpen ? "block" : "none";
-  document.getElementById("serieArrow").textContent = serieOpen ? "▼" : "▶";
-}  
-};  
+window.toggleSection = (sec) => {
+  if (sec === "eventi") {
+    if (eventiList.length === 0) return;
+    eventiOpen = !eventiOpen;
+    document.getElementById("eventiPanel").style.display = eventiOpen ? "block" : "none";
+    document.getElementById("eventiArrow").textContent = eventiOpen ? "▼" : "▶";
+    return;
+  }
+  if (sec === "luoghi") {
+    if (luoghiMap.size === 0) return;
+    luoghiOpen = !luoghiOpen;
+    document.getElementById("luoghiPanel").style.display = luoghiOpen ? "block" : "none";
+    document.getElementById("luoghiArrow").textContent = luoghiOpen ? "▼" : "▶";
+    return;
+  }
+  if (sec === "serie") {
+    if (serieList.length === 0) return;
+    serieOpen = !serieOpen;
+    document.getElementById("seriePanel").style.display = serieOpen ? "block" : "none";
+    document.getElementById("serieArrow").textContent = serieOpen ? "▼" : "▶";
+  }
+};
 
 if(!isNew){
 await loadEventiOrganizzatore(id);
