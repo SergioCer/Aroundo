@@ -205,6 +205,43 @@ function getSnapshot() {
   };
 }  
 
+async function save() {
+  const payload = {
+    es_title: es_title.value,
+    es_description: es_description.value,
+    es_notes: es_notes.value,
+    es_cover: es_cover.value
+  };
+  let result;
+  if (isNew) {
+    result = await supabase
+      .from('event_series')
+      .insert(payload)
+      .select()
+      .single();
+  } else {
+    result = await supabase
+      .from('event_series')
+      .update(payload)
+      .eq('id_event_series', id)
+      .select()
+      .single();
+  }
+  const { error, data } = result;
+  if (error) {
+    console.error(error);
+    alert("Errore salvataggio");
+    return false;
+  }
+  dirty = false;
+  original = JSON.stringify(payload);
+  if (isNew && data?.id_event_series) {
+    location.href = `event_serie.html?id=${data.id_event_series}`;
+  }
+  return true;
+}
+  
+
 window.toggleEvents = () => {
   eventsOpen = !eventsOpen;
   panel.style.display = eventsOpen ? 'block' : 'none';
@@ -225,6 +262,20 @@ window.goNew = () => {
   location.href = 'event_serie.html?new=1';
 };
 
+window.requestBack = async () => {
+  if (!dirty) {
+    history.back();
+    return;
+  }
+  const choice = confirm("Salvare le modifiche? OK = salva, Annulla = esci senza salvare");
+  if (choice) {
+    const ok = await save();
+    if (ok) history.back();
+  } else {
+    history.back();
+  }
+};
+  
 load();
 
 </script>
