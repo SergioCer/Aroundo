@@ -86,12 +86,20 @@ input, textarea {
   border-radius: 12px;
 }
 
-.section-header {
-  padding: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
+.section-header{
+  padding:10px 12px;
+  font-weight:bold;
+  cursor:pointer;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  user-select:none;
+  border-bottom:1px solid #eee;
+}
+
+.section-header.disabled{
+  color:#9ca3af;
+  cursor:default;
 }
 
 .section-panel {
@@ -144,10 +152,10 @@ input, textarea {
 
 <!-- EVENTI COLLEGATI -->
 <div class="section-box">
-  <div class="section-header" onclick="toggleEvents()">
-    Eventi collegati
-    <span id="arrow">▶</span>
-  </div>
+<div class="section-header" onclick="toggleEvents()">
+    <span id="eventiArrow">▶</span>
+    <span id="eventiTitle">Eventi collegati (0)</span>
+</div>
 
   <div class="section-panel" id="panel">
     <table class="table">
@@ -300,6 +308,17 @@ async function loadEvents() {
       location.href = `evento.html?id=${e.id_evento}`;
     body.appendChild(tr);
   });
+const title = document.getElementById("eventiTitle");
+const arrow = document.getElementById("eventiArrow");
+const header = document.querySelector(".section-header");
+title.textContent = `Eventi collegati (${data?.length || 0})`;
+if (!data || data.length === 0) {
+    header.classList.add("disabled");
+    arrow.textContent = "▶";
+} else {
+    header.classList.remove("disabled");
+    arrow.textContent = eventsOpen ? "▼" : "▶";
+}
 }
 
 function getSnapshot() {
@@ -347,11 +366,13 @@ async function save() {
   return true;
 }
   
-
 window.toggleEvents = () => {
+  const body = document.getElementById("eventsBody");
+  if (!body.children.length)
+    return;
   eventsOpen = !eventsOpen;
-  panel.style.display = eventsOpen ? 'block' : 'none';
-  arrow.textContent = eventsOpen ? '▼' : '▶';
+  panel.style.display = eventsOpen ? "block" : "none";
+  eventiArrow.textContent = eventsOpen ? "▼" : "▶";
 };
 
 window.preview = () => {
