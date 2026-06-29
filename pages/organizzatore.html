@@ -530,12 +530,9 @@ tr.innerHTML=`
 tr.cells[1].onclick=()=>location.href=`luogo.html?id=${l.id_luogo}`;
 body.appendChild(tr);
 });
-document.getElementById("luoghiTitle").textContent=`Luoghi (${luoghiMap.size})`;
-document.getElementById("luoghiArrow").textContent = luoghiOpen ? "▼" : "▶";
 }
 
 function renderSerie(){
-  console.log("STEP 4 - renderSerie");
   const body = document.getElementById("serieBody");
   body.innerHTML = "";
   document.getElementById("serieTitle").textContent = `Serie (${serieList.length})`;
@@ -557,12 +554,10 @@ function renderSerie(){
       <td>${s.es_created ? new Date(s.es_created).toLocaleDateString() : ""}</td>
     `;
     tr.onclick = () => {
-      console.log("CLICK SERIE:", s.id_event_series);
       location.href = `event_serie.html?id=${s.id_event_series}`;
     };
     body.appendChild(tr);
   });
-  console.log("STEP 5 - serie renderizzate");
 }
   
 function updateStatus(val) {
