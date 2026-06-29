@@ -292,21 +292,20 @@ window.resetAll = () => {
 /* RENDER */
 function render() {
   let filtered = [...data];
+  // FILTRI
   Object.keys(state.filters).forEach(k => {
-    const img = r.es_cover
-      ? '<span class="status-ok">✔</span>'
-      : '<span class="status-no">✖</span>';
     const v = state.filters[k]?.toLowerCase();
     if (!v) return;
     filtered = filtered.filter(r => {
-      if (k === 'title') return (r.es_title||'').toLowerCase().includes(v);
-      if (k === 'description') return (r.es_description||'').toLowerCase().includes(v);
-      if (k === 'notes') return (r.es_notes||'').toLowerCase().includes(v);
+      if (k === 'title') return (r.es_title || '').toLowerCase().includes(v);
+      if (k === 'description') return (r.es_description || '').toLowerCase().includes(v);
+      if (k === 'notes') return (r.es_notes || '').toLowerCase().includes(v);
       return true;
     });
   });
+  // SORT
   if (state.sortField) {
-    filtered.sort((a,b) => {
+    filtered.sort((a, b) => {
       let va = (a['es_' + state.sortField] || '').toLowerCase();
       let vb = (b['es_' + state.sortField] || '').toLowerCase();
       return state.sortDir === 'asc'
@@ -314,30 +313,22 @@ function render() {
         : vb.localeCompare(va);
     });
   }
+  // RENDER TABELLA
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
-  document.querySelectorAll('.filter').forEach(input => {
-  const key = input.getAttribute('oninput')?.match(/'(.*?)'/)?.[1];
-  if (key && state.filters[key] !== undefined) {
-    input.value = state.filters[key];
-  }
-});
+  filtered.forEach(r => {
     const tr = document.createElement('tr');
     tr.onclick = () =>
       location.href = `event_serie.html?id=${r.id_event_series}`;
     tr.innerHTML = `
-      <td>${r.id_event_series}</td>
-      <td>${r.es_title||''}</td>
-      <td>${r.es_description||''}</td>
-      <td>${r.es_notes||''}</td>
-      <td style="text-align:center">${img}</td>
+      <td>${r.es_title || ''}</td>
+      <td>${r.es_description || ''}</td>
+      <td>${r.es_notes || ''}</td>
     `;
     tbody.appendChild(tr);
   });
-
   updateSortUI();
   updateResetUI();
-  updateStatusUI();
 }
 
 /* UI */
