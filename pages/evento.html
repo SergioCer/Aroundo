@@ -256,6 +256,12 @@ input, select, textarea {
     Attivo
   </label>
   
+  <!-- SERIE EVENTI -->
+  <div class="section-title">Serie evento</div>
+  <select id="id_event_series" oninput="markDirty()" disabled>
+    <option value="">Nessuna serie</option>
+  </select>
+  
   <!-- LINK -->
   <div class="section-title">Link</div>
   <input id="ev_link" oninput="markDirty()">
@@ -375,6 +381,7 @@ let comuniMap = {};
 let map;
 let markers = [];
 let dialogResolve;
+let seriesCache = [];  
 
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -413,6 +420,36 @@ async function loadSelects() {
     `;
   });
 }
+
+async function loadSeriesByOrganizzatore(idOrg) {
+  console.log("STEP SERIES - load per organizzatore:", idOrg);
+  const select = document.getElementById("id_event_series");
+  if (!idOrg) {
+    console.log("STEP SERIES - nessun organizzatore -> reset");
+    select.innerHTML = `<option value="">Nessuna serie</option>`;
+    select.disabled = true;
+    return;
+  }
+  const { data, error } = await supabase
+    .from("event_series")
+    .select("id_event_series, es_title")
+    .eq("id_organizzatore", idOrg)
+    .order("es_title");
+  if (error) {
+    console.error("STEP SERIES - errore:", error);
+    return;
+  }
+  console.log("STEP SERIES - trovate serie:", data?.length || 0);
+  seriesCache = data || [];
+  select.innerHTML = `<option value="">Nessuna serie</option>`;
+  (data || []).forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.id_event_series;
+    opt.textContent = s.es_title;
+    select.appendChild(opt);
+  });
+  select.disabled = false;
+}  
 
 /* LOAD */
 async function load() {
@@ -466,7 +503,14 @@ async function load() {
   ev_creato.textContent = data.ev_creato
     ? new Date(data.ev_creato).toLocaleString()
     : '';
-updateCover();
+    if (data.id_organizzatore) {
+      await loadSeriesByOrganizzatore(data.id_organizzatore);
+      if (data.id_event_series) {
+        document.getElementById("id_event_series").value = data.id_event_series;
+        console.log("STEP LOAD - serie assegnata:", data.id_event_series);
+      }
+    }
+  updateCover();
 updateMapButton()  
 }
 
@@ -607,12 +651,17 @@ window.searchOrganizzatori = async (text) => {
     div.style.borderBottom = "1px solid #eee";
     div.style.cursor = "pointer";
     div.innerText = o.or_nome;
-    div.onclick = () => {
-      id_organizzatore.value = o.or_nome;
-      id_organizzatore_hidden.value = o.id_organizzatore;
-      markDirty();
-      box.innerHTML = '';
-    };
+    div.onclick = async () => {
+    console.log("STEP ORG - selezionato:", o.id_organizzatore);
+    id_organizzatore.value = o.or_nome;
+    id_organizzatore_hidden.value = o.id_organizzatore;
+    markDirty();
+    box.innerHTML = '';
+    // 🔥 reset serie quando cambia organizzatore
+    const seriesSelect = document.getElementById("id_event_series");
+    seriesSelect.value = "";
+    await loadSeriesByOrganizzatore(o.id_organizzatore);
+  };
     box.appendChild(div);
   });
 };
@@ -626,6 +675,7 @@ async function save() {
     id_categoria: id_categoria.value,
     id_luogo: id_luogo.value,
     id_organizzatore: id_organizzatore_hidden.value,
+    id_event_series: document.getElementById("id_event_series").value || null,
     ev_inizio: ev_inizio.value ? ev_inizio.value.replace('T',' ') : null,
     ev_fine: ev_fine.value ? ev_fine.value.replace('T',' ') : null,
     ev_costo: ev_costo.value ? parseFloat(ev_costo.value) : null,
@@ -633,7 +683,7 @@ async function save() {
     ev_link: ev_link.value,
     ev_copertina: ev_copertina.value,
     ev_attivo: ev_attivo.checked
-  };
+    };
   let result;
   if (isNew) {
     result = await supabase.from('eventi').insert(payload).select().single();
