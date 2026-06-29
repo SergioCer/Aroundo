@@ -176,39 +176,24 @@ td:last-child {
 <table>
 
 <colgroup>
-  <col style="width: 30px;">
   <col style="width: 160px;">
   <col style="width: 140px;">
   <col style="width: 100px;">
-  <col style="width: 100px;">
-  <col style="width: 160px;">
   <col style="width: 30px;">
 </colgroup>
 
 <thead>
 <tr>
 
-  <!-- ID -->
-  <th>
-    <div class="col-header">
-      <div class="col-title" style="justify-content:center;">
-        ID
-      </div>
-      <div class="col-tools" style="justify-content:center;">
-        <button class="reset-btn" onclick="resetAll()">•</button>
-      </div>
-    </div>
-  </th>
-
   <!-- TITOLO -->
   <th>
     <div class="col-header">
       <div class="col-title">
         Titolo
-        <button class="sort-btn" onclick="sort('nome')">↕</button>
+        <button class="sort-btn" onclick="sort('title')">↕</button>
       </div>
       <div class="col-tools">
-        <input class="filter" oninput="setFilter('nome',this.value)">
+        <input class="filter" oninput="setFilter('title',this.value)">
       </div>
     </div>
   </th>
@@ -218,10 +203,10 @@ td:last-child {
     <div class="col-header">
       <div class="col-title">
         Descrizione
-        <button class="sort-btn" onclick="sort('descrizione')">↕</button>
+        <button class="sort-btn" onclick="sort('description')">↕</button>
       </div>
       <div class="col-tools">
-        <input class="filter" oninput="setFilter('descrizione',this.value)">
+        <input class="filter" oninput="setFilter('description',this.value)">
       </div>
     </div>
   </th>
@@ -231,10 +216,10 @@ td:last-child {
     <div class="col-header">
       <div class="col-title">
         Notes
-        <button class="sort-btn" onclick="sort('email')">↕</button>
+        <button class="sort-btn" onclick="sort('notes')">↕</button>
       </div>
       <div class="col-tools">
-        <input class="filter" oninput="setFilter('email',this.value)">
+        <input class="filter" oninput="setFilter('notes',this.value)">
       </div>
     </div>
   </th>
@@ -299,18 +284,11 @@ window.resetAll = () => {
   state.filters = {};
   state.sortField = null;
   state.sortDir = 'asc';
-  state.attivo = 'all';
   sessionStorage.removeItem('event_series_filters');
   document.querySelectorAll('.filter').forEach(i => i.value = '');
   render();
   syncUI();
 };
-
-/* STATUS FILTER */
-window.toggleAttivo = () => {
-  if (state.attivo === 'all') state.attivo = 'true';
-  else if (state.attivo === 'true') state.attivo = 'false';
-  else state.attivo = 'all';
 
   render();
   syncUI();
@@ -319,24 +297,23 @@ window.toggleAttivo = () => {
 /* RENDER */
 function render() {
   let filtered = [...data];
-  if (state.attivo === 'true')
-    filtered = filtered.filter(r => r.or_attivo === true);
-  if (state.attivo === 'false')
-    filtered = filtered.filter(r => r.or_attivo === false);
   Object.keys(state.filters).forEach(k => {
+    const img = r.es_cover
+      ? '<span class="status-ok">✔</span>'
+      : '<span class="status-no">✖</span>';
     const v = state.filters[k]?.toLowerCase();
     if (!v) return;
     filtered = filtered.filter(r => {
-      if (k === 'nome') return (r.es_title||'').toLowerCase().includes(v);
-      if (k === 'descrizione') return (r.es_description||'').toLowerCase().includes(v);
-      if (k === 'note') return (r.es_notes||'').toLowerCase().includes(v);
+      if (k === 'title') return (r.es_title||'').toLowerCase().includes(v);
+      if (k === 'description') return (r.es_description||'').toLowerCase().includes(v);
+      if (k === 'notes') return (r.es_notes||'').toLowerCase().includes(v);
       return true;
     });
   });
   if (state.sortField) {
     filtered.sort((a,b) => {
-      let va = (a['or_' + state.sortField] || '').toLowerCase();
-      let vb = (b['or_' + state.sortField] || '').toLowerCase();
+      let va = (a['es_' + state.sortField] || '').toLowerCase();
+      let vb = (b['es_' + state.sortField] || '').toLowerCase();
       return state.sortDir === 'asc'
         ? va.localeCompare(vb)
         : vb.localeCompare(va);
@@ -350,9 +327,6 @@ function render() {
     input.value = state.filters[key];
   }
 });
-    const img = r.es_cover
-      ? '<span class="status-ok">✔</span>'
-      : '<span class="status-no">✖</span>';
     const tr = document.createElement('tr');
     tr.onclick = () =>
       location.href = `event_serie.html?id=${r.id_event_series}`;
@@ -387,17 +361,9 @@ function updateResetUI() {
   const btn = document.querySelector('.reset-btn');
   const active =
     Object.keys(state.filters).length > 0 ||
-    state.attivo !== 'all' ||
     state.sortField !== null;
   btn.classList.toggle('active', active);
   btn.textContent = active ? '↺' : '•';
-}
-
-function updateStatusUI() {
-  const btn = document.getElementById('attivoBtn');
-  if (state.attivo === 'all') btn.textContent = '●';
-  if (state.attivo === 'true') btn.textContent = '✔';
-  if (state.attivo === 'false') btn.textContent = '✖';
 }
 
 function syncUI() {
