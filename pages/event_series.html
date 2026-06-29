@@ -336,6 +336,7 @@ function render() {
     tr.onclick = () =>
       location.href = `event_serie.html?id=${r.id_event_series}`;
     tr.innerHTML = `
+      <td></td>
       <td>${r.es_title || ''}</td>
       <td>${r.es_description || ''}</td>
       <td>${r.es_notes || ''}</td>
