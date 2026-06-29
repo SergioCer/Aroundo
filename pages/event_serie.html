@@ -247,34 +247,40 @@ function dialogAction(type) {
 window.dialogAction = dialogAction;  
 
 async function load() {
-  dirty = false;
-    if (isNew) {
-      original = JSON.stringify({
-        es_title: '',
-        es_description: '',
-        es_notes: '',
-        es_cover: ''
-      });
-      return;
-    }
+  if (isNew) {
+    original = JSON.stringify({
+      es_title: '',
+      es_description: '',
+      es_notes: '',
+      es_cover: ''
+    });
+    dirty = false;
+    document.getElementById("backBtn").classList.remove("dirty");
+    return;
+  }
   const { data, error } = await supabase
-    .from('event_series')
-    .select('*')
-    .eq('id_event_series', id?.trim())
+    .from("event_series")
+    .select("*")
+    .eq("id_event_series", id)
     .single();
   if (error) {
     console.error(error);
     return;
   }
-  document.getElementById('es_title').value = data.es_title || '';
-  document.getElementById('es_description').value = data.es_description || '';
-  document.getElementById('es_notes').value = data.es_notes || '';
-  document.getElementById('es_cover').value = data.es_cover || '';
+  original = JSON.stringify({
+    es_title: data.es_title || '',
+    es_description: data.es_description || '',
+    es_notes: data.es_notes || '',
+    es_cover: data.es_cover || ''
+  });
+  es_title.value = data.es_title || "";
+  es_description.value = data.es_description || "";
+  es_notes.value = data.es_notes || "";
+  es_cover.value = data.es_cover || "";
   dirty = false;
+  document.getElementById("backBtn").classList.remove("dirty");
   preview();
   loadEvents();
-  markDirty(); // importante per sincronizzare stato UI
-console.log("ID ricevuto:", id); // CANCELLARE 
 }
 
 async function loadEvents() {
