@@ -471,16 +471,14 @@ l.num_eventi++;
 function renderEventiOrg(){
 const body=document.getElementById("eventiBody");
 body.innerHTML="";
-const title=document.getElementById("eventiTitle");
-const arrow=document.getElementById("eventiArrow");
-title.textContent=`Eventi (${eventiList.length})`;
-if(eventiList.length===0){
-arrow.textContent = eventiOpen ? "▼" : "▶";
-document.querySelector("#eventiPanel").previousElementSibling.classList.add("disabled");
-return;
-}else{
-document.querySelector("#eventiPanel").previousElementSibling.classList.remove("disabled");
-}
+  document.getElementById("eventiTitle").textContent = `Eventi (${eventiList.length})`;
+  document.getElementById("eventiArrow").textContent = eventiOpen ? "▼" : "▶";
+  const section = document.querySelector("#eventiPanel").previousElementSibling;
+  if (eventiList.length === 0) {
+    section.classList.add("disabled");
+    return;
+  }
+section.classList.remove("disabled");
 const header=document.createElement("tr");
 header.className="header-row";
 header.innerHTML="<td>Data</td><td>Evento</td><td>Luogo</td><td>Descrizione</td>";
@@ -502,10 +500,18 @@ body.appendChild(tr);
 function renderLuoghiOrg(){
 const body=document.getElementById("luoghiBody");
 body.innerHTML="";
-const header=document.createElement("tr");
-header.className="header-row";
-header.innerHTML="<td>Comune</td><td>Luogo</td><td style='text-align:right;'>N° eventi</td>";
-body.appendChild(header);
+  document.getElementById("luoghiTitle").textContent = `Luoghi (${luoghiMap.size})`;
+  document.getElementById("luoghiArrow").textContent = luoghiOpen ? "▼" : "▶";
+  const section = document.querySelector("#luoghiPanel").previousElementSibling;
+  if (luoghiMap.size === 0) {
+    section.classList.add("disabled");
+    return;
+  }
+  section.classList.remove("disabled");
+  const header = document.createElement("tr");
+  header.className = "header-row";
+  header.innerHTML = "<td>Comune</td><td>Luogo</td><td style='text-align:right;'>N° eventi</td>";
+  body.appendChild(header);
 [...luoghiMap.values()]
 .sort((a,b)=>a.lu_location.localeCompare(b.lu_location))
 .forEach(l=>{
@@ -532,9 +538,18 @@ function renderSerie(){
   console.log("STEP 4 - renderSerie");
   const body = document.getElementById("serieBody");
   body.innerHTML = "";
-  const title = document.getElementById("serieTitle");
-  const arrow = document.getElementById("serieArrow");
-  title.textContent = `Serie (${serieList.length})`;
+  document.getElementById("serieTitle").textContent = `Serie (${serieList.length})`;
+  document.getElementById("serieArrow").textContent = serieOpen ? "▼" : "▶";
+  const section = document.querySelector("#seriePanel").previousElementSibling;
+  if (serieList.length === 0) {
+    section.classList.add("disabled");
+    return;
+  }
+  section.classList.remove("disabled");
+  const header = document.createElement("tr");
+  header.className = "header-row";
+  header.innerHTML = "<td>Serie</td><td>Creata</td>";
+  body.appendChild(header);
   serieList.forEach(s => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
