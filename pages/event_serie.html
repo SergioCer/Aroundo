@@ -155,6 +155,20 @@ input, textarea {
     </table>
   </div>
 
+  <div id="saveDialog" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
+  <div style="background:white; padding:20px; border-radius:12px; display:flex; gap:10px;">
+    <button onclick="dialogAction('yes')" style="background:#22c55e; color:white; padding:8px 12px; border:none; border-radius:8px;">
+      Salva
+    </button>
+    <button onclick="dialogAction('no')" style="background:#ef4444; color:white; padding:8px 12px; border:none; border-radius:8px;">
+      Esci senza salvare
+    </button>
+    <button onclick="dialogAction('cancel')" style="background:#e5e7eb; padding:8px 12px; border:none; border-radius:8px;">
+      Annulla
+    </button>
+  </div>
+    
+</div>
 </div>
 </div>
   <div class="section-title">Created</div>
@@ -171,9 +185,11 @@ const isNew = params.has('new');
 let original = "{}";
 let dirty = false;
 let eventsOpen = false;
+let dialogResolve;  
 
 function askSaveDialog() {
-  document.getElementById("saveDialog").style.display = "flex";
+  const dialog = document.getElementById("saveDialog");
+  dialog.style.display = "flex";
   return new Promise(resolve => {
     dialogResolve = resolve;
   });
