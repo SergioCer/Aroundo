@@ -345,6 +345,7 @@ function updateSortUI() {
 
 function updateResetUI() {
   const btn = document.querySelector('.reset-btn');
+  if (!btn) return; // 🔴 evita crash
   const active =
     Object.keys(state.filters).length > 0 ||
     state.sortField !== null;
