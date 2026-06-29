@@ -108,7 +108,7 @@ input, textarea {
 <body>
 
 <div class="topbar">
-  <button class="back-btn" onclick="history.back()">←</button>
+  <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
   Event Serie
   <button class="add-btn" onclick="goNew()">+</button>
 </div>
@@ -173,6 +173,7 @@ original = JSON.stringify({
   es_notes: data.es_notes || '',
   es_cover: data.es_cover || ''
 });
+  dirty = false;
   preview();
   loadEvents();
 }
@@ -198,12 +199,12 @@ async function loadEvents() {
 
 function getSnapshot() {
   return {
-    es_title: es_title.value,
-    es_description: es_description.value,
-    es_notes: es_notes.value,
-    es_cover: es_cover.value
+    es_title: document.getElementById('es_title').value,
+    es_description: document.getElementById('es_description').value,
+    es_notes: document.getElementById('es_notes').value,
+    es_cover: document.getElementById('es_cover').value
   };
-}  
+}
 
 async function save() {
   const payload = {
@@ -253,8 +254,8 @@ window.preview = () => {
 };
 
 window.markDirty = () => {
-dirty = JSON.stringify(getSnapshot()) !== original;
-  document.getElementById('back-btn')
+  dirty = JSON.stringify(getSnapshot()) !== original;
+  document.getElementById('backBtn')
     ?.classList.toggle('dirty', dirty);
 };
 
