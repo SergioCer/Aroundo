@@ -177,7 +177,8 @@ td:last-child {
 
 <colgroup>
   <col style="width: 30px;">
-  <col style="width: 160px;">
+  <col style="width: 140px;">
+  <col style="width: 140px;">
   <col style="width: 160px;">
   <col style="width: 200px;">
 </colgroup>
@@ -196,6 +197,19 @@ td:last-child {
       </div>
     </div>
   </th>
+
+      <!-- ORGANIZZATORE -->
+    <th>
+      <div class="col-header">
+        <div class="col-title">
+          Organizzatore
+          <button class="sort-btn" onclick="sort('organizzatore')">↕</button>
+        </div>
+        <div class="col-tools">
+          <input class="filter" oninput="setFilter('organizzatore',this.value)">
+        </div>
+      </div>
+    </th>
   
   <!-- TITOLO -->
   <th>
@@ -261,9 +275,20 @@ if (savedFilters) {
 
 /* LOAD */
 async function load() {
-  const { data: rows } = await supabase
-    .from('event_series')
-    .select('*');
+const { data: rows } = await supabase
+  .from('event_series')
+  .select(`
+    id_event_series,
+    es_title,
+    es_description,
+    es_notes,
+    es_created,
+    id_organizzatore,
+    organizzatori (
+      id_organizzatore,
+      or_nome
+    )
+  `);
   data = rows || [];
   data.sort((a,b)=>
     new Date(b.es_created)-new Date(a.es_created)
@@ -312,6 +337,8 @@ function render() {
     const v = state.filters[k]?.toLowerCase();
     if (!v) return;
     filtered = filtered.filter(r => {
+      if (k === 'organizzatore')
+      return (r.organizzatori?.or_nome || '').toLowerCase().includes(v);
       if (k === 'title') return (r.es_title || '').toLowerCase().includes(v);
       if (k === 'description') return (r.es_description || '').toLowerCase().includes(v);
       if (k === 'notes') return (r.es_notes || '').toLowerCase().includes(v);
@@ -319,15 +346,21 @@ function render() {
     });
   });
   // SORT
-  if (state.sortField) {
-    filtered.sort((a, b) => {
-      let va = (a['es_' + state.sortField] || '').toLowerCase();
-      let vb = (b['es_' + state.sortField] || '').toLowerCase();
-      return state.sortDir === 'asc'
-        ? va.localeCompare(vb)
-        : vb.localeCompare(va);
-    });
-  }
+    if (state.sortField) {
+      filtered.sort((a, b) => {
+        let va, vb;
+        if (state.sortField === 'organizzatore') {
+          va = (a.organizzatori?.or_nome || '').toLowerCase();
+          vb = (b.organizzatori?.or_nome || '').toLowerCase();
+        } else {
+          va = (a['es_' + state.sortField] || '').toLowerCase();
+          vb = (b['es_' + state.sortField] || '').toLowerCase();
+        }
+        return state.sortDir === 'asc'
+          ? va.localeCompare(vb)
+          : vb.localeCompare(va);
+      });
+    }
   // RENDER TABELLA
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
@@ -337,6 +370,7 @@ function render() {
       location.href = `event_serie.html?id=${r.id_event_series}`;
     tr.innerHTML = `
       <td></td>
+      <td>${r.organizzatori?.or_nome || ''}</td>
       <td>${r.es_title || ''}</td>
       <td>${r.es_description || ''}</td>
       <td>${r.es_notes || ''}</td>
