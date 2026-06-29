@@ -102,12 +102,13 @@ input, textarea {
   cursor:default;
 }
 
-.section-panel {
-  display: none;
-  padding: 10px;
+.section-panel{
+  display:none;
+  max-height:300px;
+  overflow-y:auto;
 }
 
-.table {
+.mini-table {
   width: 100%;
   border-collapse: collapse;
 }
@@ -336,17 +337,29 @@ async function loadEvents() {
     .eq('id_event_series', id);
   const body = document.getElementById('eventsBody');
   body.innerHTML = '';
-  (data || [])
-    .sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio))
-    .forEach(e => {
-    const header = document.createElement("tr");
-    header.className = "header-row";
-    header.innerHTML = `
+  const eventi = (data || [])
+  .sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio));
+if(eventi.length){
+  const header = document.createElement("tr");
+  header.className = "header-row";
+  header.innerHTML = `
     <td>Data</td>
     <td>Evento</td>
-    `;
-    body.appendChild(header);
-  });
+  `;
+  body.appendChild(header);
+}
+eventi.forEach(e=>{
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${new Date(e.ev_inizio).toLocaleDateString()}</td>
+    <td class="link">${e.ev_titolo}</td>
+  `;
+  tr.cells[1].onclick = () =>
+    location.href = `evento.html?id=${e.id_evento}`;
+  body.appendChild(tr);
+});
+
+  
 const title = document.getElementById("eventiTitle");
 const arrow = document.getElementById("eventiArrow");
 const header = document.querySelector(".section-header");
@@ -409,8 +422,7 @@ async function save() {
 }
   
 window.toggleEvents = () => {
-  const body = document.getElementById("eventsBody");
-  if (!body.children.length)
+  if(document.querySelector(".section-header").classList.contains("disabled"))
     return;
   eventsOpen = !eventsOpen;
   panel.style.display = eventsOpen ? "block" : "none";
