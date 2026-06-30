@@ -883,6 +883,9 @@ window.toggleSection = (section) => {
 if (!isNew) {
   await loadEventiLuogo(id);
   await loadOrganizzatoriLuogo(id);
+} else {
+  renderEventi();
+  renderOrganizzatori();
 }
 await loadComuni();
 await load();
