@@ -545,14 +545,12 @@ map.on("click", async (e) => {
   lu_lng.value = lngF;
   markDirty();
   if (marker) {
-  map.removeLayer(marker);
-  marker = null;
-}
-  marker = L.marker([lat, lng], {
-    icon: selectedIcon,
-    riseOnHover: true
-  }).addTo(map);
-});
+      marker.setLatLng([lat, lng]);
+    }
+    lu_lat.value = latF;
+    lu_lng.value = lngF;
+  markDirty();
+  });
 }
 
 function renderMarkers(list) {
@@ -632,10 +630,19 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     `;
     }
     html += `
+    <div style="height:10px"></div>
+      <div style="
+        text-align:center;
+        font-size:20px;
+        margin:8px 0;
+    ">
+        ↓
+    </div>
     <div style="font-family:monospace;color:#374151">
     Lat : ${newLat}<br>
     Lng : ${newLng}
     </div>
+    <div style="height:16px"></div>
     `;
     box.innerHTML = html;
     document.getElementById("coordDialog").style.display = "flex";
