@@ -90,6 +90,12 @@ input, select, textarea {
   cursor: pointer;
 }
 
+.map-btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}  
+
 .footer {
   position: fixed;
   bottom: 10px;
@@ -180,7 +186,13 @@ input, select, textarea {
   <!-- COMUNE (EDITABILE) -->
 <input id="id_comune"
        placeholder="Comune..."
-       oninput="searchComuni(this.value)"
+       oninput="
+          if(this.value===''){
+             id_comune_hidden.value='';
+             updateMapButton();
+          }
+          searchComuni(this.value);
+       "
        style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;">
 <input type="hidden" id="id_comune_hidden">
 <div style="font-size:11px;color:#888;margin-top:4px;">
@@ -227,7 +239,7 @@ input, select, textarea {
   </div>
 
   <div style="width:70px;">
-    <button class="map-btn" onclick="openMapLuogo()">Map</button>
+    <button id="mapBtn" class="map-btn" onclick="openMapLuogo()" title="Seleziona il Comune per accedere">Map</button>
   </div>
   </div>
 
@@ -382,6 +394,21 @@ function dialogAction(type) {
   dialogResolve(type);
 }
 
+function updateMapButton() {
+  const btn = document.getElementById("mapBtn");
+  // in modifica sempre disponibile
+  if (!isNew) {
+    btn.disabled = false;
+    btn.title = "";
+    return;
+  }
+  const ok = id_comune_hidden.value !== "";
+  btn.disabled = !ok;
+  btn.title = ok
+    ? ""
+    : "Seleziona il Comune per accedere";
+}  
+
 window.dialogAction = dialogAction;
   
 function initMapLuogo() {
@@ -451,6 +478,7 @@ const selectedIcon = L.icon({
 });  
   
 window.openMapLuogo = async () => {
+  if (isNew && !id_comune_hidden.value) return;
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
   const idComune = id_comune_hidden.value;
@@ -482,6 +510,7 @@ async function load() {
   if (isNew) {
     original = JSON.stringify({}); // base vuoto
     document.getElementById("mapTitle").textContent = "Aggiungi Luogo";
+    updateMapButton();
     return;
   } else {
     document.getElementById("mapTitle").textContent =  "Luogo Attuale";
@@ -512,6 +541,7 @@ if (com.data) {
   lu_lng.value = data.lu_lng || '';
   lu_capienza.value = data.lu_capienza || '';
   document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
+  updateMapButton();
 }
 
 async function loadMapLuoghi(idComune) {
@@ -601,6 +631,7 @@ window.searchComuni = async (text) => {
     div.onclick = () => {
       id_comune.value = c.co_descrizione;
       id_comune_hidden.value = c.id_comune;
+      updateMapButton();
       markers.forEach(m => map.removeLayer(m));
       markers = [];
       box.innerHTML = "";
