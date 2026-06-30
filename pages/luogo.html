@@ -185,19 +185,10 @@ input, select, textarea {
 
   <!-- COMUNE (EDITABILE) -->
 <input id="id_comune"
-       placeholder="Comune..."
-       oninput="
-          if(this.value===''){
-             id_comune_hidden.value='';
-             updateMapButton();
-          }
-          searchComuni(this.value);
-       "
+       placeholder="Inserire almeno 3 caratteri per la ricerca del Comune..."
+       oninput="onComuneInput(this.value)"
        style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;">
 <input type="hidden" id="id_comune_hidden">
-<div style="font-size:11px;color:#888;margin-top:4px;">
-  Inserire almeno 3 caratteri per la ricerca
-</div>
 
 <div id="comuniResults"></div> 
 <div class="card">
@@ -488,6 +479,14 @@ window.openMapLuogo = async () => {
   setTimeout(() => {
     map.invalidateSize();
   }, 200);
+};
+
+window.onComuneInput = (text) => {
+  // qualsiasi modifica manuale invalida il comune selezionato
+  id_comune_hidden.value = "";
+  updateMapButton();
+  searchComuni(text);
+  markDirty();
 };
 
   
