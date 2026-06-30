@@ -518,31 +518,34 @@ map.on("click", async (e) => {
       // PRIMO INSERIMENTO
       if (minDist < 2) {
         mode = "block";
-        message = "Posizione già occupata";
+        msg = "Posizione già occupata";
       } else if (minDist <= 10) {
         mode = "warn";
-        message = "Esistono posizioni molto vicine, confermi ?";
+        msg = "Esistono posizioni molto vicine, confermi ?";
       } else {
         mode = "first";
-        message = "Aggiungere il luogo ?";
+        msg = "Aggiungere il luogo ?";
       }
     } else {
       // MODIFICA SUCCESSIVA
       if (minDist < 2) {
         mode = "block";
-        message = "Posizione già occupata";
+        msg = "Posizione già occupata";
       } else if (minDist <= 10) {
         mode = "warn";
-        message = "Esistono posizioni molto vicine, confermi ?";
+        msg = "Esistono posizioni molto vicine, confermi ?";
       } else {
         mode = "move";
-        message = "Spostare il luogo ?";
+        msg = "Spostare il luogo ?";
       }
     }
   
   const choice = await askCoordDialog(latF, lngF, msg);
   // BLOCCO
-  if (mode === "block") return;
+  if (mode === "block") {
+    await askCoordDialog(latF, lngF, msg);
+    return;
+  }
   // ANNULLA
   if (choice !== "yes") return;
   // OK o WARN confermato → APPLICO MOVIMENTO
