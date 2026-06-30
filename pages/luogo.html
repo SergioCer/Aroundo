@@ -416,23 +416,10 @@ function dialogAction(type) {
   dialogResolve(type);
 }
 
-function updateMapButton() {
-  const btn = document.getElementById("mapBtn");
-  // in modifica sempre disponibile
-  if (!isNew) {
-    btn.disabled = false;
-    btn.title = "";
-    return;
-  }
-  const ok = id_comune_hidden.value !== "";
-  btn.disabled = !ok;
-  btn.title = ok
-    ? ""
-    : "Seleziona il Comune per accedere";
-}  
-
 function updatePageState() {
   const comuneOk = !isNew || id_comune_hidden.value !== "";
+  document.querySelector(".card")
+    .classList.toggle("locked", !comuneOk);
   const controls = [
     lu_location,
     lu_descrizione,
@@ -441,15 +428,13 @@ function updatePageState() {
     lu_lat,
     lu_lng
   ];
-  controls.forEach(c => {
-    c.disabled = !comuneOk;
-  });
+  controls.forEach(c => c.disabled = !comuneOk);
   const mapBtn = document.getElementById("mapBtn");
   mapBtn.disabled = !comuneOk;
   mapBtn.title = comuneOk
       ? ""
       : "Seleziona il Comune per accedere";
-}  
+}
 
 window.dialogAction = dialogAction;
   
@@ -523,7 +508,6 @@ window.openMapLuogo = async () => {
   if (isNew && !id_comune_hidden.value) return;
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
-  updatePageState()
   const idComune = id_comune_hidden.value;
    if (idComune) {
     await loadMapLuoghi(idComune);
@@ -536,7 +520,6 @@ window.openMapLuogo = async () => {
 window.onComuneInput = (text) => {
   // qualsiasi modifica manuale invalida il comune selezionato
   id_comune_hidden.value = "";
-  updateMapButton();
   searchComuni(text);
   markDirty();
 };
@@ -561,7 +544,7 @@ async function load() {
   if (isNew) {
     original = JSON.stringify({}); // base vuoto
     document.getElementById("mapTitle").textContent = "Aggiungi Luogo";
-    updateMapButton();
+    updatePageState();
     return;
   } else {
     document.getElementById("mapTitle").textContent =  "Luogo Attuale";
@@ -592,7 +575,7 @@ if (com.data) {
   lu_lng.value = data.lu_lng || '';
   lu_capienza.value = data.lu_capienza || '';
   document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
-  updateMapButton();
+  updatePageState();
 }
 
 async function loadMapLuoghi(idComune) {
@@ -697,7 +680,7 @@ window.searchComuni = async (text) => {
     div.onclick = () => {
       id_comune.value = c.co_descrizione;
       id_comune_hidden.value = c.id_comune;
-      updateMapButton();
+      updatePageState();
       markers.forEach(m => map.removeLayer(m));
       markers = [];
       box.innerHTML = "";
