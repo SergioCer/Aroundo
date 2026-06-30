@@ -438,8 +438,6 @@ const isNew = params.has('new') || !id;
 const lat = params.get("lat");
 const lng = params.get("lng");
 const comune = params.get("comune");
-const box = document.getElementById("coordContent");
-box.innerHTML = html;  
 
 let original = "{}";
 let dirty = false;
@@ -618,7 +616,7 @@ const selectedIcon = L.icon({
 });  
 
 function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
-    const box = document.querySelector("#coordDialog div div");
+    const box = document.getElementById("coordContent");
     let html = `
     <div style="margin-bottom:10px;font-weight:600">
     ${message}
