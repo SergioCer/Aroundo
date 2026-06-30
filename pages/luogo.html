@@ -535,16 +535,11 @@ map.on("click", async (e) => {
     }
   const choice = await askCoordDialog(oldLat, oldLng, latF, lngF, msg);
   // BLOCCO
-  if (mode === "block")
-    return;
+  if (mode === "block") return;
   // ANNULLA
-  if (choice !== "yes") 
-    return;
-  // OK o WARN confermato → APPLICO MOVIMENTO
-  lu_lat.value = latF;
-  lu_lng.value = lngF;
+  if (choice !== "yes") return;
+  // OK → APPLICO MOVIMENTO / CREAZIONE
   if (marker) {
-  // MODIFICA
     marker.setLatLng([lat, lng]);
   } else {
   // NUOVO LUOGO → crea marker rosso
