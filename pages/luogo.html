@@ -185,6 +185,22 @@ input, select, textarea {
   font-style: italic;
   color: #9ca3af;
 }
+
+input:disabled,
+textarea:disabled {
+  background: #f8fafc;
+  color: #9ca3af;
+  cursor: not-allowed;
+}  
+
+.card.locked {
+  opacity: .55;
+  pointer-events: none;
+}
+
+.card.locked .map-btn {
+  pointer-events: none;
+}
   
 </style>
 </head>
@@ -200,7 +216,7 @@ input, select, textarea {
 
   <!-- COMUNE (EDITABILE) -->
 <input id="id_comune"
-       placeholder=" Comune... (minimo 3 caratteri) "
+       placeholder=" Comune... obbligatorio (minimo 3 caratteri) "
        oninput="onComuneInput(this.value)"
        style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;">
 <input type="hidden" id="id_comune_hidden">
@@ -415,6 +431,26 @@ function updateMapButton() {
     : "Seleziona il Comune per accedere";
 }  
 
+function updatePageState() {
+  const comuneOk = !isNew || id_comune_hidden.value !== "";
+  const controls = [
+    lu_location,
+    lu_descrizione,
+    lu_note,
+    lu_capienza,
+    lu_lat,
+    lu_lng
+  ];
+  controls.forEach(c => {
+    c.disabled = !comuneOk;
+  });
+  const mapBtn = document.getElementById("mapBtn");
+  mapBtn.disabled = !comuneOk;
+  mapBtn.title = comuneOk
+      ? ""
+      : "Seleziona il Comune per accedere";
+}  
+
 window.dialogAction = dialogAction;
   
 function initMapLuogo() {
@@ -487,6 +523,7 @@ window.openMapLuogo = async () => {
   if (isNew && !id_comune_hidden.value) return;
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
+  updatePageState()
   const idComune = id_comune_hidden.value;
    if (idComune) {
     await loadMapLuoghi(idComune);
