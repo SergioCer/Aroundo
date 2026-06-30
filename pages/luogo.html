@@ -499,24 +499,42 @@ function initMapLuogo() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
-  map.on("click", async (e) => {
-    const { lat, lng } = e.latlng;
-    // SOLO in inserimento
-    if (!isNew) return;
-    const choice = await askCoordDialog(
-      lat.toFixed(6),
-      lng.toFixed(6)
-    );
-    if (choice !== "yes") return;
-    lu_lat.value = lat.toFixed(6);
-    lu_lng.value = lng.toFixed(6);
-    markDirty();
-    if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lng], {
-      icon: selectedIcon,
-      riseOnHover: true
-    }).addTo(map);
-  });
+map.on("click", async (e) => {
+  const { lat, lng } = e.latlng;
+  const latF = lat.toFixed(6);
+  const lngF = lng.toFixed(6);
+  // prendo lista luoghi per confronto
+  const valid = await loadMapLuoghiReturn();
+  const minDist = checkDistance(lat, lng, valid);
+  let mode = "";
+  let msg = "";
+  if (minDist < 2) {
+    mode = "block";
+    msg = "Posizione già occupata";
+  } 
+  else if (minDist <= 10) {
+    mode = "warn";
+    msg = "Esistono posizioni molto vicine, confermi ?";
+  } 
+  else {
+    mode = "ok";
+    msg = "Spostare il luogo ?";
+  }
+  const choice = await askCoordDialog(latF, lngF, msg);
+  // BLOCCO
+  if (mode === "block") return;
+  // ANNULLA
+  if (choice !== "yes") return;
+  // OK o WARN confermato → APPLICO MOVIMENTO
+  lu_lat.value = latF;
+  lu_lng.value = lngF;
+  markDirty();
+  if (marker) map.removeLayer(marker);
+  marker = L.marker([lat, lng], {
+    icon: selectedIcon,
+    riseOnHover: true
+  }).addTo(map);
+});
 }
 
 function renderMarkers(list) {
@@ -551,6 +569,20 @@ function renderMarkers(list) {
   map.fitBounds(bounds, { padding: [30, 30] });
 }
 
+function checkDistance(lat, lng, list) {
+  let min = Infinity;
+  for (const l of list) {
+    if (!l.lu_lat || !l.lu_lng) continue;
+    const d = map.distance(
+      [lat, lng],
+      [l.lu_lat,
+       l.lu_lng]
+    );
+    if (d < min) min = d;
+  }
+  return min;
+}
+    
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
@@ -565,14 +597,26 @@ const selectedIcon = L.icon({
   iconAnchor: [12, 41]
 });  
 
-function askCoordDialog(lat, lng) {
+function askCoordDialog(lat, lng, message) {
   document.getElementById("coordLat").textContent = `Lat : ${lat}`;
   document.getElementById("coordLng").textContent = `Lng : ${lng}`;
+  // riuso stesso box senza creare UI nuova
+  const box = document.querySelector("#coordDialog div div");
+  box.innerHTML = `
+    <div style="margin-bottom:10px; font-weight:600;">
+      ${message}
+    </div>
+    <div style="font-family: monospace; color:#374151;">
+      <div>Lat : ${lat}</div>
+      <div>Lng : ${lng}</div>
+    </div>
+  `;
   document.getElementById("coordDialog").style.display = "flex";
   return new Promise(resolve => {
     coordResolve = resolve;
   });
 }
+  
 window.coordAction = (type) => {
   document.getElementById("coordDialog").style.display = "none";
   coordResolve(type);
