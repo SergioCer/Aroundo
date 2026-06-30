@@ -568,22 +568,21 @@ function renderMarkers(list) {
   const bounds = [];
   valid.forEach(l => {
     const isCurrent = l.id_luogo == currentId;
-    
     const m = L.marker(
-        [l.lu_lat, l.lu_lng],
-        { icon: isCurrent ? selectedIcon : defaultIcon }
+      [l.lu_lat, l.lu_lng],
+      { icon: isCurrent ? selectedIcon : defaultIcon }
     ).addTo(map);
-    marker.bindTooltip(
+    m.bindTooltip(
       l.lu_location || "",
       { direction: "top", sticky: true }
     );
     markers.push(m);
     if (isCurrent) {
-      marker = m;
-  }
+      marker = m; // marker globale del luogo attivo
+    }
     bounds.push([l.lu_lat, l.lu_lng]);
   });
-  map.fitBounds(bounds, { padding: [30, 30] });
+    map.fitBounds(bounds, { padding: [30, 30] });
 }
 
 function checkDistance(lat, lng, list) {
