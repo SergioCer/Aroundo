@@ -512,7 +512,6 @@ map.on("click", async (e) => {
   const minDist = checkDistance(lat, lng, valid);
   let mode = "";
   let msg = "";
-  
   const oldLat = lu_lat.value;
   const oldLng = lu_lng.value;
     if (!oldLat || !oldLng) {
@@ -540,21 +539,13 @@ map.on("click", async (e) => {
         msg = "Spostare il luogo ?";
       }
     }
-  
-  const choice = await askCoordDialog(latF, lngF, msg);
+  const choice = await askCoordDialog(oldLat, oldLng, latF, lngF, msg);
   // BLOCCO
-  if (mode === "block") {
-    await askCoordDialog(
-    lu_lat.value,
-    lu_lng.value,
-    latF,
-    lngF,
-    msg
-);
+  if (mode === "block")
     return;
-  }
   // ANNULLA
-  if (choice !== "yes") return;
+  if (choice !== "yes") 
+    return;
   // OK o WARN confermato → APPLICO MOVIMENTO
   lu_lat.value = latF;
   lu_lng.value = lngF;
