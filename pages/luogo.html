@@ -444,11 +444,7 @@ const isNew = params.has('new') || !id;
 const lat = params.get("lat");
 const lng = params.get("lng");
 const comune = params.get("comune");
-const GEO_RULES = {
-  block: 2,   // metri
-  warn: 10    // metri
-};
-  
+
 let original = "{}";
 let dirty = false;
 let map;
@@ -503,31 +499,24 @@ function initMapLuogo() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
-map.on("click", async (e) => {
-  const { lat, lng } = e.latlng;
-  if (!isNew) return;
-  const valid = await loadMapLuoghiReturn(); 
-  const minDist = getMinDistance(lat, lng, valid);
-  // BLOCCO
-  if (minDist < GEO_RULES.block) {
-    await askGeoConfirm(lat.toFixed(6), lng.toFixed(6), minDist);
-    return; // non si applica
-  }
-  // AVVISO
-  if (minDist < GEO_RULES.warn) {
-    const ok = await askGeoConfirm(lat.toFixed(6), lng.toFixed(6), minDist);
-    if (ok !== "yes") return;
-  }
-  // OK
-  lu_lat.value = lat.toFixed(6);
-  lu_lng.value = lng.toFixed(6);
-  markDirty();
-  if (marker) map.removeLayer(marker);
-  marker = L.marker([lat, lng], {
-    icon: selectedIcon,
-    riseOnHover: true
-  }).addTo(map);
-});
+  map.on("click", async (e) => {
+    const { lat, lng } = e.latlng;
+    // SOLO in inserimento
+    if (!isNew) return;
+    const choice = await askCoordDialog(
+      lat.toFixed(6),
+      lng.toFixed(6)
+    );
+    if (choice !== "yes") return;
+    lu_lat.value = lat.toFixed(6);
+    lu_lng.value = lng.toFixed(6);
+    markDirty();
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng], {
+      icon: selectedIcon,
+      riseOnHover: true
+    }).addTo(map);
+  });
 }
 
 function renderMarkers(list) {
@@ -670,67 +659,6 @@ async function loadMapLuoghi(idComune) {
     .eq("id_comune", idComune);
   renderMarkers(data || []);
 }
-
-function getMinDistance(lat, lng, list) {
-  let min = Infinity;
-  for (const l of list) {
-    if (!l.lu_lat || !l.lu_lng) continue;
-    const d = map.distance(
-      [lat, lng],
-      [l.lu_lat, l.lu_lng]
-    );
-    if (d < min) min = d;
-  }
-  return min;
-}
-
-async function loadMapLuoghiReturn() {
-  const { data } = await supabase
-    .from("luoghi")
-    .select("*")
-    .eq("id_comune", id_comune_hidden.value);
-
-  return (data || []).filter(l => l.lu_lat && l.lu_lng);
-}
-  
-let geoResolve;
-
-function askGeoConfirm(lat, lng, distance) {
-  document.getElementById("coordLat").textContent = `Lat : ${lat}`;
-  document.getElementById("coordLng").textContent = `Lng : ${lng}`;
-  // riusiamo il tuo coordDialog
-  const msg = document.querySelector("#coordDialog div div");
-  if (distance < GEO_RULES.block) {
-    msg.innerHTML = `
-      <div style="color:#ef4444; font-weight:600; margin-bottom:6px;">
-        Posizione troppo vicina ad un altro luogo
-      </div>
-      <div style="font-family: monospace;">
-        Lat : ${lat}<br>
-        Lng : ${lng}
-      </div>
-    `;
-  } else {
-    msg.innerHTML = `
-      <div style="font-weight:600; margin-bottom:6px;">
-        Posizione selezionata
-      </div>
-      <div style="font-family: monospace;">
-        Lat : ${lat}<br>
-        Lng : ${lng}
-      </div>
-    `;
-  }
-  document.getElementById("coordDialog").style.display = "flex";
-  return new Promise(resolve => {
-    geoResolve = resolve;
-  });
-}
-
-window.coordAction = (type) => {
-  document.getElementById("coordDialog").style.display = "none";
-  geoResolve(type);
-};  
   
 /* SAVE */
 async function save() {
