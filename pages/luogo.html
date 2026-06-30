@@ -543,12 +543,9 @@ map.on("click", async (e) => {
   // OK o WARN confermato → APPLICO MOVIMENTO
   lu_lat.value = latF;
   lu_lng.value = lngF;
-  markDirty();
   if (marker) {
-      marker.setLatLng([lat, lng]);
-    }
-    lu_lat.value = latF;
-    lu_lng.value = lngF;
+    marker.setLatLng([lat, lng]);
+  }
   markDirty();
   });
 }
@@ -571,15 +568,19 @@ function renderMarkers(list) {
   const bounds = [];
   valid.forEach(l => {
     const isCurrent = l.id_luogo == currentId;
-    const marker = L.marker(
-      [l.lu_lat, l.lu_lng],
-      { icon: isCurrent ? selectedIcon : defaultIcon }
+    
+    const m = L.marker(
+        [l.lu_lat, l.lu_lng],
+        { icon: isCurrent ? selectedIcon : defaultIcon }
     ).addTo(map);
     marker.bindTooltip(
       l.lu_location || "",
       { direction: "top", sticky: true }
     );
-    markers.push(marker);
+    markers.push(m);
+    if (isCurrent) {
+      marker = m;
+  }
     bounds.push([l.lu_lat, l.lu_lng]);
   });
   map.fitBounds(bounds, { padding: [30, 30] });
@@ -630,7 +631,6 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     `;
     }
     html += `
-    <div style="height:10px"></div>
       <div style="
         text-align:center;
         font-size:20px;
