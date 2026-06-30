@@ -170,6 +170,14 @@ input, select, textarea {
   top: 0;
   z-index: 5;
 }
+
+#comuniResults {
+  margin-top: 6px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}  
   
 </style>
 </head>
@@ -613,6 +621,7 @@ window.searchComuni = async (text) => {
   const box = document.getElementById("comuniResults");
   if (text.length < 3) {
     box.innerHTML = "";
+    box.style.border = "none";
     return;
   }
   const { data } = await supabase
@@ -626,6 +635,13 @@ window.searchComuni = async (text) => {
     div.style.padding = "6px 8px";
     div.style.borderBottom = "1px solid #eee";
     div.style.cursor = "pointer";
+    div.style.textAlign = "center";
+      div.onmouseenter = () => {
+      div.style.background = "#eef6ff"; /* oppure colore f8fafc */
+    };
+      div.onmouseleave = () => {
+      div.style.background = "";
+    };
     div.innerText = c.co_descrizione;
     div.onclick = () => {
       id_comune.value = c.co_descrizione;
