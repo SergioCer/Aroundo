@@ -458,6 +458,7 @@ let eventiOpen = false;
 let organizzatoriList = [];  
 let orgOpen = false;
 let coordResolve;
+let hasInitialPosition = false;
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -512,18 +513,33 @@ map.on("click", async (e) => {
   const minDist = checkDistance(lat, lng, valid);
   let mode = "";
   let msg = "";
-  if (minDist < 2) {
-    mode = "block";
-    msg = "Posizione già occupata";
-  } 
-  else if (minDist <= 10) {
-    mode = "warn";
-    msg = "Esistono posizioni molto vicine, confermi ?";
-  } 
-  else {
-    mode = "ok";
-    msg = "Spostare il luogo ?";
-  }
+  
+    if (!hasInitialPosition) {
+      // PRIMO INSERIMENTO
+      if (minDist < 2) {
+        mode = "block";
+        message = "Posizione già occupata";
+      } else if (minDist <= 10) {
+        mode = "warn";
+        message = "Esistono posizioni molto vicine, confermi ?";
+      } else {
+        mode = "first";
+        message = "Aggiungere il luogo ?";
+      }
+    } else {
+      // MODIFICA SUCCESSIVA
+      if (minDist < 2) {
+        mode = "block";
+        message = "Posizione già occupata";
+      } else if (minDist <= 10) {
+        mode = "warn";
+        message = "Esistono posizioni molto vicine, confermi ?";
+      } else {
+        mode = "move";
+        message = "Spostare il luogo ?";
+      }
+    }
+  
   const choice = await askCoordDialog(latF, lngF, msg);
   // BLOCCO
   if (mode === "block") return;
@@ -533,7 +549,10 @@ map.on("click", async (e) => {
   lu_lat.value = latF;
   lu_lng.value = lngF;
   markDirty();
-  if (marker) map.removeLayer(marker);
+  if (marker) {
+  map.removeLayer(marker);
+  marker = null;
+}
   marker = L.marker([lat, lng], {
     icon: selectedIcon,
     riseOnHover: true
@@ -611,8 +630,8 @@ function askCoordDialog(lat, lng, message) {
       ${message}
     </div>
     <div style="font-family: monospace; color:#374151;">
-      <div>Lat : ${lat}</div>
-      <div>Lng : ${lng}</div>
+      Lat : ${lat}<br>
+      Lng : ${lng}
     </div>
   `;
   document.getElementById("coordDialog").style.display = "flex";
