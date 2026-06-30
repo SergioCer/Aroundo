@@ -178,6 +178,13 @@ input, select, textarea {
   overflow: hidden;
   background: white;
 }  
+
+#id_comune::placeholder {
+  font-size: 13px;
+  font-weight: normal;
+  font-style: italic;
+  color: #9ca3af;
+}
   
 </style>
 </head>
@@ -193,7 +200,7 @@ input, select, textarea {
 
   <!-- COMUNE (EDITABILE) -->
 <input id="id_comune"
-       placeholder="Inserire almeno 3 caratteri per la ricerca del Comune..."
+       placeholder=" Comune... (minimo 3 caratteri) "
        oninput="onComuneInput(this.value)"
        style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;">
 <input type="hidden" id="id_comune_hidden">
