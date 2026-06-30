@@ -339,21 +339,15 @@ textarea:disabled {
   align-items:center;
   justify-content:center;
 ">
-  <div style="
-    background:white;
-    padding:22px;
-    border-radius:12px;
-    width:300px;
-    text-align:center;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  ">
-    <div style="margin-bottom:10px; font-weight:600;">
-      Posizione selezionata
-    </div>
-    <div style="font-family: monospace; margin-bottom:14px; color:#374151;">
-      <div id="coordLat">Lat : -</div>
-      <div id="coordLng">Lng : -</div>
-    </div>
+    <div style="
+      background:white;
+      padding:22px;
+      border-radius:12px;
+      width:300px;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    ">
+    <div id="coordContent"></div>
     <div style="display:flex; gap:10px; justify-content:center;">
       <button onclick="coordAction('yes')" style="
         flex:1;
@@ -444,6 +438,8 @@ const isNew = params.has('new') || !id;
 const lat = params.get("lat");
 const lng = params.get("lng");
 const comune = params.get("comune");
+const box = document.getElementById("coordContent");
+box.innerHTML = html;  
 
 let original = "{}";
 let dirty = false;
