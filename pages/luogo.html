@@ -544,8 +544,17 @@ map.on("click", async (e) => {
   lu_lat.value = latF;
   lu_lng.value = lngF;
   if (marker) {
+  // MODIFICA
     marker.setLatLng([lat, lng]);
+  } else {
+  // NUOVO LUOGO → crea marker rosso
+    marker = L.marker([lat, lng], {
+      icon: selectedIcon,
+      riseOnHover: true
+    }).addTo(map);
   }
+  lu_lat.value = latF;
+  lu_lng.value = lngF;
   markDirty();
   });
 }
