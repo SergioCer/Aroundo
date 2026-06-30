@@ -504,7 +504,11 @@ map.on("click", async (e) => {
   const latF = lat.toFixed(6);
   const lngF = lng.toFixed(6);
   // prendo lista luoghi per confronto
-  const valid = await loadMapLuoghiReturn();
+  const { data } = await supabase
+    .from("luoghi")
+    .select("lu_lat, lu_lng")
+    .eq("id_comune", id_comune_hidden.value);
+  const valid = data || [];
   const minDist = checkDistance(lat, lng, valid);
   let mode = "";
   let msg = "";
