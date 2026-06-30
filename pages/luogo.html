@@ -325,6 +325,60 @@ textarea:disabled {
     </div>
   </div>
 </div>
+
+<!-- COORDINATE -->  
+<div id="coordDialog" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  z-index:99999;
+  align-items:center;
+  justify-content:center;
+">
+  <div style="
+    background:white;
+    padding:22px;
+    border-radius:12px;
+    width:300px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  ">
+    <div style="margin-bottom:10px; font-weight:600;">
+      Posizione selezionata
+    </div>
+    <div style="font-family: monospace; margin-bottom:14px; color:#374151;">
+      <div id="coordLat">Lat : -</div>
+      <div id="coordLng">Lng : -</div>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button onclick="coordAction('yes')" style="
+        flex:1;
+        background:#22c55e;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">Usa</button>
+      <button onclick="coordAction('cancel')" style="
+        flex:1;
+        background:#9ca3af;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">Annulla</button>
+    </div>
+  </div>
+</div>
+  
   
     <!-- MAP POPUP -->
 <div id="mapModal" style="
@@ -403,6 +457,7 @@ let eventiList = [];
 let eventiOpen = false;
 let organizzatoriList = [];  
 let orgOpen = false;
+let coordResolve;
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -444,17 +499,23 @@ function initMapLuogo() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
-  map.on("click", (e) => {
+  map.on("click", async (e) => {
     const { lat, lng } = e.latlng;
-      // 🔴 BLOCCO MODIFICA: non permettere inserimento nuovi punti
-      if (!isNew) return;
-    const ok = confirm("Vuoi usare queste coordinate per il luogo?");
-    if (!ok) return;
+    // SOLO in inserimento
+    if (!isNew) return;
+    const choice = await askCoordDialog(
+      lat.toFixed(6),
+      lng.toFixed(6)
+    );
+    if (choice !== "yes") return;
     lu_lat.value = lat.toFixed(6);
     lu_lng.value = lng.toFixed(6);
     markDirty();
     if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lng], { icon: selectedIcon, riseOnHover: true }).addTo(map);
+    marker = L.marker([lat, lng], {
+      icon: selectedIcon,
+      riseOnHover: true
+    }).addTo(map);
   });
 }
 
@@ -503,6 +564,19 @@ const selectedIcon = L.icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41]
 });  
+
+function askCoordDialog(lat, lng) {
+  document.getElementById("coordLat").textContent = `Lat : ${lat}`;
+  document.getElementById("coordLng").textContent = `Lng : ${lng}`;
+  document.getElementById("coordDialog").style.display = "flex";
+  return new Promise(resolve => {
+    coordResolve = resolve;
+  });
+}
+window.coordAction = (type) => {
+  document.getElementById("coordDialog").style.display = "none";
+  coordResolve(type);
+};  
   
 window.openMapLuogo = async () => {
   if (isNew && !id_comune_hidden.value) return;
