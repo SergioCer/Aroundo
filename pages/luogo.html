@@ -610,6 +610,13 @@ async function save() {
 
 /* DIRTY */
 window.markDirty = () => {
+  // Nessun comune selezionato: non è possibile salvare
+  if (!id_comune_hidden.value) {
+    dirty = false;
+    document.getElementById('backBtn')
+      .classList.remove('dirty');
+    return;
+  }
   const current = JSON.stringify({
     lu_location: lu_location.value,
     id_comune: id_comune_hidden.value,
