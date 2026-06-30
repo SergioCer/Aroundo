@@ -458,7 +458,6 @@ let eventiOpen = false;
 let organizzatoriList = [];  
 let orgOpen = false;
 let coordResolve;
-let hasInitialPosition = false;
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -514,7 +513,9 @@ map.on("click", async (e) => {
   let mode = "";
   let msg = "";
   
-    if (!hasInitialPosition) {
+  const oldLat = lu_lat.value;
+  const oldLng = lu_lng.value;
+    if (!oldLat || !oldLng) {
       // PRIMO INSERIMENTO
       if (minDist < 2) {
         mode = "block";
@@ -543,7 +544,13 @@ map.on("click", async (e) => {
   const choice = await askCoordDialog(latF, lngF, msg);
   // BLOCCO
   if (mode === "block") {
-    await askCoordDialog(latF, lngF, msg);
+    await askCoordDialog(
+    lu_lat.value,
+    lu_lng.value,
+    latF,
+    lngF,
+    msg
+);
     return;
   }
   // ANNULLA
@@ -623,25 +630,34 @@ const selectedIcon = L.icon({
   iconAnchor: [12, 41]
 });  
 
-function askCoordDialog(lat, lng, message) {
-  document.getElementById("coordLat").textContent = `Lat : ${lat}`;
-  document.getElementById("coordLng").textContent = `Lng : ${lng}`;
-  // riuso stesso box senza creare UI nuova
-  const box = document.querySelector("#coordDialog div div");
-  box.innerHTML = `
-    <div style="margin-bottom:10px; font-weight:600;">
-      ${message}
+function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
+    const box = document.querySelector("#coordDialog div div");
+    let html = `
+    <div style="margin-bottom:10px;font-weight:600">
+    ${message}
     </div>
-    <div style="font-family: monospace; color:#374151;">
-      Lat : ${lat}<br>
-      Lng : ${lng}
+    `;
+    if (oldLat && oldLng) {
+    html += `
+    <div style="font-family:monospace;font-weight:bold;color:#111827">
+    Lat : ${oldLat}<br>
+    Lng : ${oldLng}
     </div>
-  `;
-  document.getElementById("coordDialog").style.display = "flex";
-  return new Promise(resolve => {
-    coordResolve = resolve;
-  });
-}
+    <div style="height:10px"></div>
+    `;
+    }
+    html += `
+    <div style="font-family:monospace;color:#374151">
+    Lat : ${newLat}<br>
+    Lng : ${newLng}
+    </div>
+    `;
+    box.innerHTML = html;
+    document.getElementById("coordDialog").style.display = "flex";
+    return new Promise(resolve => {
+      coordResolve = resolve;
+    });
+  }
   
 window.coordAction = (type) => {
   document.getElementById("coordDialog").style.display = "none";
