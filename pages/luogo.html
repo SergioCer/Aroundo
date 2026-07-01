@@ -494,6 +494,19 @@ function initMapLuogo() {
     attribution: ''
   }).addTo(map);
 map.on("click", async (e) => {
+  const idComune = id_comune_hidden.value;
+  const comune = comuniCoords[idComune];
+  if (!comune?.lat || !comune?.lng) {
+    return;
+  }
+  const distanzaComune = map.distance(
+    [e.latlng.lat, e.latlng.lng],
+    [comune.lat, comune.lng]
+  );
+  if (distanzaComune > 15000) { // è una approssimazione, usare GeoJSON ISTAT per mappa poligonale
+    alert("La posizione è troppo distante dal comune selezionato.");
+    return;
+  }
   const { lat, lng } = e.latlng;
   const latF = lat.toFixed(6);
   const lngF = lng.toFixed(6);
@@ -653,6 +666,15 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
       coordResolve = resolve;
     });
   }
+
+    // Preleva la distanza dal comune selezionato per verificare se è coerente usando il raggio 
+    function isInsideComune(lat, lng, comuneLat, comuneLng, maxKm = 15) {
+      const d = map.distance(
+        [lat, lng],
+        [comuneLat, comuneLng]
+      );
+      return d <= maxKm * 1000;
+    }
   
 window.coordAction = (type) => {
   document.getElementById("coordDialog").style.display = "none";
