@@ -779,7 +779,7 @@
   <label class="toggle-pill" title="Seleziona tutte le categorie">
     <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
   </label>
-  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Categorie ▼</button>
+  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Categorie <span id="menu-arrow">▼</span></button>
 </div>
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
 </div>
@@ -1344,10 +1344,14 @@ oms.addListener('click', function (marker) {
         });
         // toggle menu
         const toggleBtn = document.getElementById('menu-toggle');
-        toggleBtn.addEventListener('click', () => {
-        if (menuItemsDiv.style.display === 'none' || menuItemsDiv.style.display === '') {
-        menuItemsDiv.style.display = 'block';
-        } else { menuItemsDiv.style.display = 'none'; }});
+        const menuItemsDiv = document.getElementById('menu-items');
+        const arrow = document.getElementById('menu-arrow');
+          toggleBtn.addEventListener('click', () => {
+          menuItemsDiv.classList.toggle('open');
+          const isOpen = menuItemsDiv.classList.contains('open');
+          menuItemsDiv.style.display = isOpen ? 'block' : 'none';
+          arrow.textContent = isOpen ? '▲' : '▼';
+        });      
         // Checkbox Singola Categoria
         menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
         const selectAllToggle = document.getElementById('select-all-toggle');
