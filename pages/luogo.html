@@ -678,7 +678,7 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
   }
 
     // Preleva la distanza dal comune selezionato per verificare se è coerente usando il raggio 
-    function isInsideComune(lat, lng, comuneLat, comuneLng, maxKm = 15) {
+    function isInsideComune(lat, lng, comuneLat, comuneLng, maxKm = 30) {
       const d = map.distance(
         [lat, lng],
         [comuneLat, comuneLng]
