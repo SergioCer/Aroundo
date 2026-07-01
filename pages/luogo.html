@@ -438,6 +438,7 @@ const isNew = params.has('new') || !id;
 const lat = params.get("lat");
 const lng = params.get("lng");
 const comune = params.get("comune");
+const maxKm = 30; // Distanza massima accettata dal centro geografico del comune. 
 
 let original = "{}";
 let dirty = false;
@@ -503,7 +504,7 @@ map.on("click", async (e) => {
     [e.latlng.lat, e.latlng.lng],
     [comune.lat, comune.lng]
   );
-    if (distanzaComune > 15000) {
+    if (distanzaComune > maxKm * 1000) {
       await askCoordDialog(
         "",
         "",
@@ -678,7 +679,7 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
   }
 
     // Preleva la distanza dal comune selezionato per verificare se è coerente usando il raggio 
-    function isInsideComune(lat, lng, comuneLat, comuneLng, maxKm = 50) {
+    function isInsideComune(lat, lng, comuneLat, comuneLng) {
       const d = map.distance(
         [lat, lng],
         [comuneLat, comuneLng]
