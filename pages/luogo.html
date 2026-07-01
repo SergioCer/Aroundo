@@ -494,26 +494,6 @@ function initMapLuogo() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
-
-let comuneLayer;
-
-async function drawComuneConfine(nomeComune) {
-  if (!nomeComune) return;
-  const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(nomeComune)}&country=Italy&format=geojson&polygon_geojson=1`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (comuneLayer) {
-    map.removeLayer(comuneLayer);
-  }
-  comuneLayer = L.geoJSON(data, {
-    style: {
-      color: "blue",
-      weight: 2,
-      fillOpacity: 0.05
-    }
-  }).addTo(map);
-}
-  
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
@@ -594,6 +574,25 @@ map.on("click", async (e) => {
   });
 }
 
+let comuneLayer;
+async function drawComuneConfine(nomeComune) {
+  if (!nomeComune) return;
+  const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(nomeComune)}&country=Italy&format=geojson&polygon_geojson=1`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (comuneLayer) {
+    map.removeLayer(comuneLayer);
+  }
+  comuneLayer = L.geoJSON(data, {
+    style: {
+      color: "blue",
+      weight: 2,
+      fillOpacity: 0.05
+    }
+  }).addTo(map);
+}
+
+  
 function renderMarkers(list) {
   markers.forEach(m => map.removeLayer(m));
   markers = [];
@@ -720,7 +719,7 @@ window.openMapLuogo = async () => {
    if (idComune) {
     await loadMapLuoghi(idComune);
     const nomeComune = id_comune.value;
-    drawComuneConfine(nomeComune);
+    drawComuneConfine(nomeComune,map);
   }
   setTimeout(() => {
     map.invalidateSize();
