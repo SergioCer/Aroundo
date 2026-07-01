@@ -872,7 +872,17 @@
     spiralLengthStart: 25,     // lunghezza braccio della spirale
     spiralLengthFactor: 8,     // all'aumentare dei marker a spirale quanto aumenta la distanza
     keepSpiderfied: true       // click sul marker lascia aperta la spiderizzazione
-});
+  });
+    // ==========================================================
+    // Listener globale OMS
+    // Data: 01/07/2026
+    // Proviene da riga 118x prima di updateMarkerState(
+    // Chiusura del popup quando OMS spiderizza i marker.
+    // Spostato da renderEvents() dove veniva registrato
+    // una volta per ogni evento.
+    // ==========================================================
+    oms.addListener('spiderfy', function(markers) {map.closePopup();
+  });
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
@@ -1182,7 +1192,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
         oms.addMarker(marker);
         markersCluster.addLayer(marker);
-        oms.addListener('spiderfy', function(markers) {map.closePopup();});
         updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
          //-- Visualizza i dettagli dell'evento selezionato con Popup //
             const startDate = new Date(e.ev_inizio);
