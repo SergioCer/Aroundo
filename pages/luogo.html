@@ -580,6 +580,7 @@ async function drawComuneConfine(nomeComune) {
   const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(nomeComune)}&country=Italy&format=geojson&polygon_geojson=1`;
   const res = await fetch(url);
   const data = await res.json();
+  if (!data.features || !data.features.length) return;
   if (comuneLayer) {
     map.removeLayer(comuneLayer);
   }
@@ -590,6 +591,7 @@ async function drawComuneConfine(nomeComune) {
       fillOpacity: 0.05
     }
   }).addTo(map);
+   map.fitBounds(comuneLayer.getBounds());
 }
 
   
@@ -625,7 +627,7 @@ function renderMarkers(list) {
     }
     bounds.push([l.lu_lat, l.lu_lng]);
   });
-    map.fitBounds(bounds, { padding: [30, 30] });
+    // CANCELLARE se tutto funziona map.fitBounds(bounds, { padding: [30, 30] });
 }
 
 function checkDistance(lat, lng, list) {
