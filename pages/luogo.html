@@ -500,25 +500,25 @@ function initMapLuogo() {
     attribution: ''
   }).addTo(map);
 map.on("click", async (e) => {
-  const idComune = id_comune_hidden.value;
-  const comune = comuniCoords[idComune];
-  if (!comune?.lat || !comune?.lng) {
-    return;
-  }
-  const distanzaComune = map.distance(
-    [e.latlng.lat, e.latlng.lng],
-    [comune.lat, comune.lng]
-  );
-    if (distanzaComune > 15000) {
-      await askCoordDialog(
-        "",
-        "",
-        "",
-        "",
-        "La posizione è troppo distante dal comune selezionato."
-      );
-      return;
-    }
+  // const idComune = id_comune_hidden.value;
+  // const comune = comuniCoords[idComune];
+  // if (!comune?.lat || !comune?.lng) {
+    // return;
+  // }
+  // const distanzaComune = map.distance(
+    // [e.latlng.lat, e.latlng.lng],
+    // [comune.lat, comune.lng]
+  // );
+    // if (distanzaComune > 15000) {
+      //await askCoordDialog(
+        //"",
+        //"",
+        // "",
+        //"",
+        // "La posizione è troppo distante dal comune selezionato."
+      // );
+      // return;
+    // }
   const { lat, lng } = e.latlng;
   const latF = lat.toFixed(6);
   const lngF = lng.toFixed(6);
