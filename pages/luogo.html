@@ -486,6 +486,12 @@ function updatePageState() {
 }
 
 window.dialogAction = dialogAction;
+
+async function loadComuneBoundary(idComune) {
+  const res = await fetch(`/geo/comuni/${idComune}.geojson`);
+  if (!res.ok) return null;
+  return await res.json();
+}
   
 function initMapLuogo() {
   if (map) return;
@@ -695,6 +701,17 @@ window.openMapLuogo = async () => {
   if (isNew && !id_comune_hidden.value) return;
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
+  const idComune = id_comune_hidden.value;
+    if (idComune) {
+      const geo = await loadComuneBoundary(idComune);
+      if (geo) {
+        L.geoJSON(geo, {
+          color: "#3b82f6",
+          weight: 2,
+          fillOpacity: 0.05
+        }).addTo(map);
+      }
+    }
   const idComune = id_comune_hidden.value;
    if (idComune) {
     await loadMapLuoghi(idComune);
