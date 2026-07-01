@@ -979,7 +979,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
       updateDateUI();
       setupTimeline();
-      const values = slider.noUiSlider.get();
+    // ========================
+    // CANDIDATO ALLA RIMOZIONE
+    // Data: 01/07/2026
+    // ***** ///// *****
+    //  const values = slider.noUiSlider.get();
+    // ***** ///// *****
+    // Atteso:
+    // Nessuna modifica grafica o funzionale.
+    // Motivo:
+    // La variabile "values" veniva letta dallo slider ma non
+    // risultava utilizzata in alcun punto del codice.
+    // Verifica:
+    // Controllare il corretto funzionamento del cambio giorno.
+    // ========================
       renderEvents();
     });
 
@@ -987,7 +1000,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateTimelineMode();
       updateDateUI();
       setupTimeline();
-      const values = slider.noUiSlider.get();
+    // ========================
+    // CANDIDATO ALLA RIMOZIONE
+    // Data: 01/07/2026
+    // ***** ///// *****
+    //  const values = slider.noUiSlider.get();
+    // ***** ///// *****
+    // Atteso:
+    // Nessuna modifica grafica o funzionale.
+    // Motivo:
+    // La variabile "values" veniva letta dallo slider ma non
+    // risultava utilizzata in alcun punto del codice.
+    // Verifica:
+    // Controllare il corretto funzionamento del cambio giorno.
+    // ========================
       renderEvents();
     });
 
