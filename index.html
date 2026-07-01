@@ -779,7 +779,7 @@
   <label class="toggle-pill" title="Seleziona tutte le categorie">
     <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
   </label>
-  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Categorie <span id="menu-arrow">▼</span></button>
+  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Categorie<span id="menu-arrow"> ▼</span></button>
 </div>
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
 </div>
@@ -1350,7 +1350,7 @@ oms.addListener('click', function (marker) {
           menuItemsDiv.classList.toggle('open');
           const isOpen = menuItemsDiv.classList.contains('open');
           menuItemsDiv.style.display = isOpen ? 'block' : 'none';
-          arrow.textContent = isOpen ? '▲' : '▼';
+          arrow.textContent = isOpen ? ' ▲' : ' ▼';
         });      
         // Checkbox Singola Categoria
         menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
