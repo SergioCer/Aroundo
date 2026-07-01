@@ -486,16 +486,6 @@ function updatePageState() {
 }
 
 window.dialogAction = dialogAction;
-
-async function loadComuneBoundary(idComune) {
-  const res = await fetch('/geo/comuni-sicilia.geojson');
-  if (!res.ok) return null;
-  const geo = await res.json();
-  const feature = geo.features.find(f =>
-    String(f.properties.PRO_COM || f.properties.id_comune) === String(idComune)
-  );
-  return feature || null;
-}
   
 function initMapLuogo() {
   if (map) return;
@@ -504,25 +494,25 @@ function initMapLuogo() {
     attribution: ''
   }).addTo(map);
 map.on("click", async (e) => {
-  // const idComune = id_comune_hidden.value;
-  // const comune = comuniCoords[idComune];
-  // if (!comune?.lat || !comune?.lng) {
-    // return;
-  // }
-  // const distanzaComune = map.distance(
-    // [e.latlng.lat, e.latlng.lng],
-    // [comune.lat, comune.lng]
-  // );
-    // if (distanzaComune > 15000) {
-      //await askCoordDialog(
-        //"",
-        //"",
-        // "",
-        //"",
-        // "La posizione è troppo distante dal comune selezionato."
-      // );
-      // return;
-    // }
+  const idComune = id_comune_hidden.value;
+  const comune = comuniCoords[idComune];
+  if (!comune?.lat || !comune?.lng) {
+    return;
+  }
+  const distanzaComune = map.distance(
+    [e.latlng.lat, e.latlng.lng],
+    [comune.lat, comune.lng]
+  );
+    if (distanzaComune > 15000) {
+      await askCoordDialog(
+        "",
+        "",
+        "",
+        "",
+        "La posizione è troppo distante dal comune selezionato."
+      );
+      return;
+    }
   const { lat, lng } = e.latlng;
   const latF = lat.toFixed(6);
   const lngF = lng.toFixed(6);
@@ -591,11 +581,11 @@ function renderMarkers(list) {
   if (!valid.length) {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
-  // if (comune?.lat && comune?.lng) {
-  //  map.setView([comune.lat, comune.lng], 12);
-  // } else {
-  //  map.setView([38.1, 13.3], 8);
-  // }
+  if (comune?.lat && comune?.lng) {
+    map.setView([comune.lat, comune.lng], 12);
+  } else {
+    map.setView([38.1, 13.3], 8);
+  }
   return;
 }
   const bounds = [];
@@ -630,7 +620,6 @@ function checkDistance(lat, lng, list) {
     if (d < min) min = d;
   }
   return min;
-  if (!map) return Infinity;
 }
     
 const defaultIcon = L.icon({
@@ -707,18 +696,6 @@ window.openMapLuogo = async () => {
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
   const idComune = id_comune_hidden.value;
-    if (idComune) {
-      const feature = await loadComuneBoundary(idComune);
-      if (feature) {
-        const layer = L.geoJSON(feature, {
-          color: "#3b82f6",
-          weight: 2,
-          fillOpacity: 0.05
-        }).addTo(map);
-        // map.fitBounds(layer.getBounds());
-      }
-    }
-  map.fitBounds(L.geoJSON(feature).getBounds());
    if (idComune) {
     await loadMapLuoghi(idComune);
   }
