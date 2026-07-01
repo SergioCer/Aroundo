@@ -652,21 +652,25 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     <div style="height:10px"></div>
     `;
     }
-    html += `
-      <div style="
-        text-align:center;
-        font-size:20px;
-        margin:8px 0;
-    ">
-        ↓
-    </div>
-    <div style="font-family:monospace;color:#374151">
-    Lat : ${newLat}<br>
-    Lng : ${newLng}
-    </div>
-    <div style="height:16px"></div>
-    `;
+    if (newLat && newLng) {
+      html += `
+        <div style="
+          text-align:center;
+          font-size:20px;
+          margin:8px 0;
+        ">
+          ↓
+        </div>
+        <div style="font-family:monospace;color:#374151">
+          Lat : ${newLat}<br>
+          Lng : ${newLng}
+        </div>
+        <div style="height:16px"></div>
+      `;
+    }
     box.innerHTML = html;
+    const yesBtn = document.querySelector("#coordDialog button:nth-child(1)");
+    yesBtn.style.display = (newLat && newLng) ? "" : "none";
     document.getElementById("coordDialog").style.display = "flex";
     return new Promise(resolve => {
       coordResolve = resolve;
