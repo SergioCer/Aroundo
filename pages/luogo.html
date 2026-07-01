@@ -495,17 +495,24 @@ function initMapLuogo() {
     attribution: ''
   }).addTo(map);
 
-fetch("https://nominatim.openstreetmap.org/search?city=Palermo&country=Italy&format=geojson&polygon_geojson=1")
-  .then(r => r.json())
-  .then(data => {
-    L.geoJSON(data, {
-      style: {
-        color: "blue",
-        weight: 2,
-        fillOpacity: 0.05
-      }
-    }).addTo(map);
-  });
+let comuneLayer;
+
+async function drawComuneConfine(nomeComune) {
+  if (!nomeComune) return;
+  const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(nomeComune)}&country=Italy&format=geojson&polygon_geojson=1`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (comuneLayer) {
+    map.removeLayer(comuneLayer);
+  }
+  comuneLayer = L.geoJSON(data, {
+    style: {
+      color: "blue",
+      weight: 2,
+      fillOpacity: 0.05
+    }
+  }).addTo(map);
+}
   
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
@@ -712,6 +719,8 @@ window.openMapLuogo = async () => {
   const idComune = id_comune_hidden.value;
    if (idComune) {
     await loadMapLuoghi(idComune);
+    const nomeComune = id_comune.value;
+    drawComuneConfine(nomeComune);
   }
   setTimeout(() => {
     map.invalidateSize();
