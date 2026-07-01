@@ -922,7 +922,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   icons[cat.id_categoria] = createIcon(cat.mc_colore);
   });
   events = await fetchEvents();
-
   // 2. Prova a ottenere la posizione dell'utente
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -960,84 +959,84 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news. 
 });
       
-  noUiSlider.create(slider, {
-    start: [0, 48],
-    connect: true,
-    step: 1,
-    range: {
-    min: 0,
-    max: 48
-    }
-  });
+    noUiSlider.create(slider, {
+      start: [0, 48],
+      connect: true,
+      step: 1,
+      range: {
+      min: 0,
+      max: 48
+      }
+    });
 
-// Eventi UI
-  slider.noUiSlider.on('set', function(values) {
-  const start = Math.round(values[0]);
-  const end = Math.round(values[1]);
-  updateMarkerVisibility(start, end);
-});
+    // Eventi UI
+    slider.noUiSlider.on('set', function(values) {
+      const start = Math.round(values[0]);
+      const end = Math.round(values[1]);
+      updateMarkerVisibility(start, end);
+    });
   
-  document.getElementById("prev-day").addEventListener("click", () => {prevDay();
-  updateDateUI();
-  setupTimeline();
-  const values = slider.noUiSlider.get();
-  renderEvents();
-  });
+    document.getElementById("prev-day").addEventListener("click", () => {prevDay();
+      updateDateUI();
+      setupTimeline();
+      const values = slider.noUiSlider.get();
+      renderEvents();
+    });
 
-document.getElementById("next-day").addEventListener("click", () => {nextDay();
-  updateTimelineMode();
-  updateDateUI();
-  setupTimeline();
-  const values = slider.noUiSlider.get();
-  renderEvents();
-  });
+    document.getElementById("next-day").addEventListener("click", () => {nextDay();
+      updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      const values = slider.noUiSlider.get();
+      renderEvents();
+    });
 
-document.getElementById("reset-day").addEventListener("click", () => {
-  currentDate = new Date(); // oggi
-  updateTimelineMode();
-  updateDateUI();
-  setupTimeline();
-  renderEvents();
-  });
+    document.getElementById("reset-day").addEventListener("click", () => {
+      currentDate = new Date(); // oggi
+      updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+    });
 
-  // Data unica: currentDate = giorno 'logico' 
-  function getAppTime(mode = 'now') {
-    const day = new Date(currentDate);
-    let time = new Date();
-    switch(mode) {
-        case 'startOfDay':
-            time = new Date(day);
-            time.setHours(0,0,0,0);
-            break;
-        case 'endOfDay':
-            time = new Date(day);
-            time.setHours(23,59,59,999);
-            break;
-        case 'live': 
-            // ora reale se siamo in modalità LIVE
-            time = new Date();
-            break;
-        default: 
-            // ora corrente entro il giorno logico
-            time = new Date(day);
-            time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);
-    }
-    return time;
-}
+    // Data unica: currentDate = giorno 'logico' 
+    function getAppTime(mode = 'now') {
+      const day = new Date(currentDate);
+      let time = new Date();
+      switch(mode) {
+          case 'startOfDay':
+              time = new Date(day);
+              time.setHours(0,0,0,0);
+              break;
+          case 'endOfDay':
+              time = new Date(day);
+              time.setHours(23,59,59,999);
+              break;
+          case 'live': 
+              // ora reale se siamo in modalità LIVE
+              time = new Date();
+              break;
+          default: 
+              // ora corrente entro il giorno logico
+              time = new Date(day);
+              time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);
+      }
+      return time;
+  }
   
     function updateTimelineMode() {
-    const currentDay = new Date(currentDate);
-    currentDay.setHours(0,0,0,0);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const diffDays = Math.round((currentDay - today) / 86400000);
-    if (diffDays < 0) {
-    timelineMode = 'past';
-    } else if (diffDays === 0) {
-    timelineMode = 'live';
-    } else {
-    timelineMode = 'day';
-    }
+      const currentDay = new Date(currentDate);
+      currentDay.setHours(0,0,0,0);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const diffDays = Math.round((currentDay - today) / 86400000);
+      if (diffDays < 0) {
+      timelineMode = 'past';
+      } else if (diffDays === 0) {
+      timelineMode = 'live';
+      } else {
+      timelineMode = 'day';
+      }
   }
   
   // Preleva le Categorie da supabase
@@ -1081,89 +1080,85 @@ document.getElementById("reset-day").addEventListener("click", () => {
     return data;
   }
 
-// Ricrea i markers 
-function renderEvents() {
-  console.log("Aggiorno Markers", new Date().toLocaleTimeString());
-  // pulizia markers precedenti
-  markers.forEach(m => {
-  // ferma eventuali fireworks attivi
-  if (m.marker.fireworkInterval) {
-    clearInterval(m.marker.fireworkInterval);
-    m.marker.fireworkInterval = null;
-  }
-  markersCluster.removeLayer(m.marker);
-  });
-  markers = [];
-  events.sort((a, b) =>
-    new Date(a.ev_inizio) - new Date(b.ev_inizio)
-);
-
-  events.forEach(e => {
-    //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
-    const formatDay = (dateString) => {
-    const d = new Date(dateString);
-    return `${daysLong[d.getDay()]} ${d.getDate()}`;
-    };
-    const stateData = getEventState(
-      new Date(e.ev_inizio),
-      e.ev_fine ? new Date(e.ev_fine) : null
+    // Ricrea i markers 
+    function renderEvents() {
+      console.log("Aggiorno Markers", new Date().toLocaleTimeString());
+      // pulizia markers precedenti
+      markers.forEach(m => {
+      // ferma eventuali fireworks attivi
+      if (m.marker.fireworkInterval) {
+        clearInterval(m.marker.fireworkInterval);
+        m.marker.fireworkInterval = null;
+      }
+      markersCluster.removeLayer(m.marker);
+      });
+      markers = [];
+      events.sort((a, b) =>
+        new Date(a.ev_inizio) - new Date(b.ev_inizio)
     );
-    const stateClass = stateData.state;
-    const intensity = stateData.intensity;
-    //-- 🎨 ICONA
-    const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
-      icon: createIcon(
-        categories.find(c =>
-          c.id_categoria === e.id_categoria
-        )?.mc_colore || '#999',
-        stateClass,
-        intensity
-      )
-    })
-    marker.evTime = new Date(e.ev_inizio).getTime();
-    marker.__eventData = e; // sempre per spiderizza
-    marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
-    oms.addMarker(marker);
-    markersCluster.addLayer(marker);
-    oms.addListener('spiderfy', function(markers) {map.closePopup();});
-    updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
-     //-- Visualizza i dettagli dell'evento selezionato con Popup //
-        const startDate = new Date(e.ev_inizio);
-        const now = new Date();
-        const tomorrow = new Date();
-        tomorrow.setDate(now.getDate() + 1);
-        tomorrow.setHours(0,0,0,0);
-        const isToday = startDate.toDateString() === now.toDateString();
-        const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
-        const color = isToday ? '#3b82f6' : (isTomorrow ? '#dc3545' : '#666');
-        const align = isToday ? 'flex-start' : (isTomorrow ? 'flex-end' : 'center');
-        // Formatta la data per il popup
-        let dayLabel;
-        if (isToday) {
-          dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-        } else if (isTomorrow) {
-          dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-        } else {
-          dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
-        }
-
-    
-    /* Richiama il POPUP */
-    marker.on('click', function () {
-    window.openBasePopup(e, this.getLatLng());
-    });
-    
-    //-- 📦 STORAGE DATI (NO LOGICA)
-    markers.push({
-      marker,
-      category: parseInt(e.id_categoria),
-      start: new Date(e.ev_inizio),
-      end: e.ev_fine ? new Date(e.ev_fine) : null,
-      active: e.ev_attivo
-    });
-  });
-    updateMarkerVisibility();
-}
+      events.forEach(e => {
+        //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
+        const formatDay = (dateString) => {
+        const d = new Date(dateString);
+        return `${daysLong[d.getDay()]} ${d.getDate()}`;
+        };
+        const stateData = getEventState(
+          new Date(e.ev_inizio),
+          e.ev_fine ? new Date(e.ev_fine) : null
+        );
+        const stateClass = stateData.state;
+        const intensity = stateData.intensity;
+        //-- 🎨 ICONA
+        const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
+          icon: createIcon(
+            categories.find(c =>
+              c.id_categoria === e.id_categoria
+            )?.mc_colore || '#999',
+            stateClass,
+            intensity
+          )
+        })
+        marker.evTime = new Date(e.ev_inizio).getTime();
+        marker.__eventData = e; // sempre per spiderizza
+        marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
+        oms.addMarker(marker);
+        markersCluster.addLayer(marker);
+        oms.addListener('spiderfy', function(markers) {map.closePopup();});
+        updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
+         //-- Visualizza i dettagli dell'evento selezionato con Popup //
+            const startDate = new Date(e.ev_inizio);
+            const now = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(now.getDate() + 1);
+            tomorrow.setHours(0,0,0,0);
+            const isToday = startDate.toDateString() === now.toDateString();
+            const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
+            const color = isToday ? '#3b82f6' : (isTomorrow ? '#dc3545' : '#666');
+            const align = isToday ? 'flex-start' : (isTomorrow ? 'flex-end' : 'center');
+            // Formatta la data per il popup
+            let dayLabel;
+            if (isToday) {
+              dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+            } else if (isTomorrow) {
+              dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+            } else {
+              dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
+            }
+        /* Richiama il POPUP */
+        marker.on('click', function () {
+        window.openBasePopup(e, this.getLatLng());
+        });
+        //-- 📦 STORAGE DATI (NO LOGICA)
+        markers.push({
+          marker,
+          category: parseInt(e.id_categoria),
+          start: new Date(e.ev_inizio),
+          end: e.ev_fine ? new Date(e.ev_fine) : null,
+          active: e.ev_attivo
+        });
+      });
+        updateMarkerVisibility();
+    }
 
   // potenzialmente da CANCELLARE MA ATTENZIONE dovrebbe ordinare i marker per orario per la spiderizzazione ma fino a quando non c'è un filtro dal database non funziona. 
 oms.addListener('click', function (marker) {
@@ -1206,19 +1201,19 @@ function openOrderedPopup(marker) {
     .openOn(map);
 }
   
-// Dimensione dei Markers  
-function createIcon(color, state, intensity) {
-  const size = markerSizes[state] || 10;
-  return L.divIcon({
-  className: '',
-  html: `
-  <div class="pulse ${state}"
-  style="--c:${color};width:${size}px;height:${size}px;">
-  </div>
-  `,
-  iconSize: [size, size]
-  });
-}
+    // Dimensione dei Markers  
+    function createIcon(color, state, intensity) {
+      const size = markerSizes[state] || 10;
+      return L.divIcon({
+      className: '',
+      html: `
+      <div class="pulse ${state}"
+      style="--c:${color};width:${size}px;height:${size}px;">
+      </div>
+      `,
+      iconSize: [size, size]
+      });
+    }
 
     /* Mostra o nasconde i Marker delle categorie */
     function updateMarkerVisibility(start, end) {
@@ -1255,54 +1250,54 @@ function createIcon(color, state, intensity) {
       // updateTicker(); // Aggiorna le News ***** ATTENZIONE Disabilitata temporaneamente, aggiornava le news ogni minuto 
     }
 
-// Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
-function buildCategoryMenu() {
-  console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
-  // console.trace(); // mostra da dove è stata chiamata
-  const menuItemsDiv = document.getElementById('menu-items');
-  // checkbox per ogni categoria
-  categories.forEach(cat => {
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.id = `cat-${cat.id_categoria}`;
-    cb.checked = true;
-    cb.className = 'category-checkbox';
-    const label = document.createElement('label');
-    label.htmlFor = `cat-${cat.id_categoria}`;
-    label.className = 'category-label';
-    label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo link per icone : https://www.svgrepo.com/
-    // label.textContent = cat.mc_descrizione; // questa è solo descrizione 
-    // Applichiamo il colore dell’evento
-    label.style.backgroundColor = cat.mc_colore;
-    label.style.color = getContrastColor(cat.mc_colore);
-    label.style.setProperty('--cat-color', cat.mc_colore);
-    menuItemsDiv.appendChild(cb);
-    menuItemsDiv.appendChild(label);
-    });
-    // toggle menu
-    const toggleBtn = document.getElementById('menu-toggle');
-    toggleBtn.addEventListener('click', () => {
-    if (menuItemsDiv.style.display === 'none' || menuItemsDiv.style.display === '') {
-    menuItemsDiv.style.display = 'block';
-    } else { menuItemsDiv.style.display = 'none'; }});
-    // Checkbox Singola Categoria
-    menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
-    const selectAllToggle = document.getElementById('select-all-toggle');
-    selectAllToggle.checked = true;
-    // Checkbox Globale Seleziona/Deseleziona
-    selectAllToggle.addEventListener('change', () => {
-    const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
-    updateMarkerVisibility();
-    });
-    // aggiorna lo stato del checkbox
-    function updateSelectAllToggle() {
-    const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
-    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-    selectAllToggle.checked = allChecked;
-    }
-    menuItemsDiv.addEventListener('change', updateSelectAllToggle);
-  }
+    // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
+    function buildCategoryMenu() {
+      console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
+      // console.trace(); // mostra da dove è stata chiamata
+      const menuItemsDiv = document.getElementById('menu-items');
+      // checkbox per ogni categoria
+      categories.forEach(cat => {
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.id = `cat-${cat.id_categoria}`;
+        cb.checked = true;
+        cb.className = 'category-checkbox';
+        const label = document.createElement('label');
+        label.htmlFor = `cat-${cat.id_categoria}`;
+        label.className = 'category-label';
+        label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo link per icone : https://www.svgrepo.com/
+        // label.textContent = cat.mc_descrizione; // questa è solo descrizione 
+        // Applichiamo il colore dell’evento
+        label.style.backgroundColor = cat.mc_colore;
+        label.style.color = getContrastColor(cat.mc_colore);
+        label.style.setProperty('--cat-color', cat.mc_colore);
+        menuItemsDiv.appendChild(cb);
+        menuItemsDiv.appendChild(label);
+        });
+        // toggle menu
+        const toggleBtn = document.getElementById('menu-toggle');
+        toggleBtn.addEventListener('click', () => {
+        if (menuItemsDiv.style.display === 'none' || menuItemsDiv.style.display === '') {
+        menuItemsDiv.style.display = 'block';
+        } else { menuItemsDiv.style.display = 'none'; }});
+        // Checkbox Singola Categoria
+        menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
+        const selectAllToggle = document.getElementById('select-all-toggle');
+        selectAllToggle.checked = true;
+        // Checkbox Globale Seleziona/Deseleziona
+        selectAllToggle.addEventListener('change', () => {
+        const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
+        updateMarkerVisibility();
+        });
+        // aggiorna lo stato del checkbox
+        function updateSelectAllToggle() {
+        const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        selectAllToggle.checked = allChecked;
+        }
+        menuItemsDiv.addEventListener('change', updateSelectAllToggle);
+      }
 
     /* Compone il giorno ed il mese corrente nel rettangolo */  
     function updateDateUI() {
@@ -1445,280 +1440,274 @@ function buildCategoryMenu() {
         .openOn(map);       
       };
 
-window.openDetailPopup = function(e, latlng) {
-  const content = `
-    <div style="text-align:center;min-width:220px;font-size:12px;">
-      <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:6px;">
-        ${e.ev_titolo}
-      </div>
-      <hr>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-        <div>
-          Location:
-          ${[e.comuni?.co_descrizione, e.luoghi?.lu_location]
-            .filter(Boolean)
-            .join(' • ')}
-        </div>
-        <a
-          href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
-          target="_blank"
-          class="action-btn map-btn">
-          Map
-        </a>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-        ${
-          Number(e.ev_costo) > 0
-          ?
-          `
-          <div>
-            Price €:
-            <span style="font-weight:700;">
-              ${e.ev_costo}
-            </span>
+    window.openDetailPopup = function(e, latlng) {
+      const content = `
+        <div style="text-align:center;min-width:220px;font-size:12px;">
+          <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:6px;">
+            ${e.ev_titolo}
           </div>
-          <a
-            href="#"
-            class="action-btn buy-btn"
-            onclick="alert('In Progress!');return false;">
-            Buy
-          </a>
-          `
-          :
-          `
-          <div style="width:100%;text-align:center;color:#dc2626;font-weight:700;font-size:14px;">
-            Free Entry
+          <hr>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+            <div>
+              Location:
+              ${[e.comuni?.co_descrizione, e.luoghi?.lu_location]
+                .filter(Boolean)
+                .join(' • ')}
+            </div>
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
+              target="_blank"
+              class="action-btn map-btn">
+              Map
+            </a>
           </div>
-          `
-        }
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-        <div>I'll be there!</div>
-        <a
-          href="#"
-          class="action-btn book-btn"
-          onclick="alert('In Progress!');return false;">
-          Book
-        </a>
-      </div>
-      <hr>
-      ${
-        e.ev_copertina
-        ?
-        `
-        <div style="text-align:center;">
-          <img
-            src="${e.ev_copertina}"
-            style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+            ${
+              Number(e.ev_costo) > 0
+              ?
+              `
+              <div>
+                Price €:
+                <span style="font-weight:700;">
+                  ${e.ev_costo}
+                </span>
+              </div>
+              <a
+                href="#"
+                class="action-btn buy-btn"
+                onclick="alert('In Progress!');return false;">
+                Buy
+              </a>
+              `
+              :
+              `
+              <div style="width:100%;text-align:center;color:#dc2626;font-weight:700;font-size:14px;">
+                Free Entry
+              </div>
+              `
+            }
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+            <div>I'll be there!</div>
+            <a
+              href="#"
+              class="action-btn book-btn"
+              onclick="alert('In Progress!');return false;">
+              Book
+            </a>
+          </div>
+          <hr>
+          ${
+            e.ev_copertina
+            ?
+            `
+            <div style="text-align:center;">
+              <img
+                src="${e.ev_copertina}"
+                style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
+            </div>
+            <hr>
+            `
+            :
+            ''
+          }
+          ${e.ev_descrizione || ''}
         </div>
-        <hr>
-        `
-        :
-        ''
-      }
-      ${e.ev_descrizione || ''}
-    </div>
-  `;
-  L.popup()
-    .setLatLng(latlng)
-    .setContent(content)
-    .openOn(map);
-};
-
+      `;
+      L.popup()
+        .setLatLng(latlng)
+        .setContent(content)
+        .openOn(map);
+    };
   
-  // Calcola il range della Timeline
-  function getTimelineRange () {
-    let start, end;
-    if (timelineMode === 'live') {
-      start = getAppTime('live'); // Ora corrente
-      end = new Date(start);
-      end.setDate(end.getDate() + 1) ; // Domani
-      end.setHours(23, 59, 59, 999);  // fine giornata domani
-      } else {
-      start = getAppTime('startOfDay'); // Inizio Giorno
-      end = getAppTime('endOfDay'); // Fine Giorno
-      }
-  console.log("Mode:", timelineMode, "→ start:", start.toLocaleString(), "end:", end.toLocaleString());
-      return { start, end };
-  }
+    // Calcola il range della Timeline
+    function getTimelineRange () {
+      let start, end;
+      if (timelineMode === 'live') {
+        start = getAppTime('live'); // Ora corrente
+        end = new Date(start);
+        end.setDate(end.getDate() + 1) ; // Domani
+        end.setHours(23, 59, 59, 999);  // fine giornata domani
+        } else {
+        start = getAppTime('startOfDay'); // Inizio Giorno
+        end = getAppTime('endOfDay'); // Fine Giorno
+        }
+    console.log("Mode:", timelineMode, "→ start:", start.toLocaleString(), "end:", end.toLocaleString());
+        return { start, end };
+    }
 
-  // Posiziona la mezzanotte nella Timeline
-function getMidnightPosition(totalHours) {
-  if (timelineMode === 'live') {
-    const currentHour = new Date().getHours();
-    const remainingToday = 24 - currentHour;
-    return remainingToday / totalHours;
-  }
-  return 0;
-}
+    // Posiziona la mezzanotte nella Timeline
+    function getMidnightPosition(totalHours) {
+      if (timelineMode === 'live') {
+        const currentHour = new Date().getHours();
+        const remainingToday = 24 - currentHour;
+        return remainingToday / totalHours;
+      }
+      return 0;
+    }
  
-  // Genera la timeline
-  function setupTimeline() {
-    console.log("Crea la TimeLine", new Date().toLocaleTimeString());
-    //-- distrugge vecchio slider per ricrearlo da zero
-    if (slider.noUiSlider) {
-    slider.noUiSlider.destroy();
-    slider.noUiSlider = null;
-    }
-    const { start, end } = getTimelineRange();
-    // ore totali reali del range
-    totalHours = Math.ceil((end - start) / 3600000);
-    //-- Controllo di sicurezza per evitare errori.
-    if (!totalHours || isNaN(totalHours)) {
-    console.error("Invalid timeline range", totalHours);
-    return;
-    }
-    //-- Crea lo slider con doppia maniglia
-    noUiSlider.create(slider, {
-    start: [0, totalHours],
-    connect: true,
-    step: 1,
-    range: {
-      min: 0,
-      max: totalHours
+    // Genera la timeline
+    function setupTimeline() {
+      console.log("Crea la TimeLine", new Date().toLocaleTimeString());
+      //-- distrugge vecchio slider per ricrearlo da zero
+      if (slider.noUiSlider) {
+      slider.noUiSlider.destroy();
+      slider.noUiSlider = null;
       }
-    });
-    console.log("Slider Creato",);
-    //-- Ad ogni movimento dello slider agiorna la mappa
-    slider.noUiSlider.on('update', updateHandles);
-    console.log("Listener Update Aggiunto",);
-    
-  //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
-    const midnight = document.getElementById('midnight');
-    if (timelineMode === 'live') {
-    midnightPercent = getMidnightPosition(totalHours);
-    midnight.style.display = "block"; 
-    midnight.style.left = `${midnightPercent * 100}%`;
-    } else {
-    // nascondi barra in day mode
-    midnight.style.display = "none";
+      const { start, end } = getTimelineRange();
+      // ore totali reali del range
+      totalHours = Math.ceil((end - start) / 3600000);
+      //-- Controllo di sicurezza per evitare errori.
+      if (!totalHours || isNaN(totalHours)) {
+      console.error("Invalid timeline range", totalHours);
+      return;
+      }
+      //-- Crea lo slider con doppia maniglia
+      noUiSlider.create(slider, {
+      start: [0, totalHours],
+      connect: true,
+      step: 1,
+      range: {
+        min: 0,
+        max: totalHours
+        }
+      });
+      console.log("Slider Creato",);
+      //-- Ad ogni movimento dello slider agiorna la mappa
+      slider.noUiSlider.on('update', updateHandles);
+      console.log("Listener Update Aggiunto",);
+    //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
+      const midnight = document.getElementById('midnight');
+      if (timelineMode === 'live') {
+      midnightPercent = getMidnightPosition(totalHours);
+      midnight.style.display = "block"; 
+      midnight.style.left = `${midnightPercent * 100}%`;
+      } else {
+      // nascondi barra in day mode
+      midnight.style.display = "none";
+      }
     }
-  }
-    
-   //-- Se slider si muove, aggiorna orari labels in base a posizione slider
-  function updateHandles(values) {
-  console.log("Aggiorno Slider", new Date().toLocaleTimeString());
-  // console.trace(); // mostra da dove è stata chiamata
+    //-- Se slider si muove, aggiorna orari labels in base a posizione slider
+    function updateHandles(values) {
+    console.log("Aggiorno Slider", new Date().toLocaleTimeString());
+    // console.trace(); // mostra da dove è stata chiamata
     //-- Offset
-    const startOffset = Math.round(values[0]);
-    const endOffset = Math.round(values[1]);
-
-     // baseTime coerente con la modalità timeline
-    const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
-    const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
-    const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
-   
+      const startOffset = Math.round(values[0]);
+      const endOffset = Math.round(values[1]);
+    // baseTime coerente con la modalità timeline
+      const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
+      const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
+      const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
     //-- Crea le etichette delle maniglie
-    const formatTime = (date) =>
-    date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
-    const startLabel = formatTime(startDate);
-    const endLabel   = formatTime(endDate);
-    const handles = slider.querySelectorAll('.noUi-handle');
-    handles.forEach((h, i) => {
-      let label =
-        h.querySelector('.handle-label');
-      if (!label) {
-        label = document.createElement('div');
-        label.className = 'handle-label';
-        h.appendChild(label);
-      }
-      //-- Inserisce ora di inizio e di fine
+      const formatTime = (date) =>
+      date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
+      const startLabel = formatTime(startDate);
+      const endLabel   = formatTime(endDate);
+      const handles = slider.querySelectorAll('.noUi-handle');
+      handles.forEach((h, i) => {
+        let label =
+          h.querySelector('.handle-label');
+        if (!label) {
+          label = document.createElement('div');
+          label.className = 'handle-label';
+          h.appendChild(label);
+        }
+    //-- Inserisce ora di inizio e di fine
       label.innerText = i === 0 ? startLabel : endLabel;
     });
     //-- Aggiorna i marker della mappa in base ad orari inizio-fine
     updateMarkerVisibility(startDate,endDate);
-console.log("START:", startDate,"END:", endDate);
+    console.log("START:", startDate,"END:", endDate);
   }
-    
-  // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
-  function getContrastColor(hex) {
-    hex = hex.replace('#', '');
-    const r = parseInt(hex.substr(0,2),16);
-    const g = parseInt(hex.substr(2,2),16);
-    const b = parseInt(hex.substr(4,2),16);
-    const brightness =
-    (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 150
-    ? '#111'
-    : '#fff';
-  }
+    // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
+    function getContrastColor(hex) {
+      hex = hex.replace('#', '');
+      const r = parseInt(hex.substr(0,2),16);
+      const g = parseInt(hex.substr(2,2),16);
+      const b = parseInt(hex.substr(4,2),16);
+      const brightness =
+      (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 150
+      ? '#111'
+      : '#fff';
+    }
 
-  function prevDay() {
-  if (timelineMode === 'live') {
+    function prevDay() {
+    if (timelineMode === 'live') {
+      timelineMode = 'past';
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+      return;
+    }
+    // Gli altri casi: spostamento effettivo indietro di un giorno
+    currentDate.setDate(currentDate.getDate() - 1);
     timelineMode = 'past';
-    updateDateUI();
-    setupTimeline();
-    renderEvents();
-    return;
+    updateTimelineMode();
   }
-  // Gli altri casi: spostamento effettivo indietro di un giorno
-  currentDate.setDate(currentDate.getDate() - 1);
-  timelineMode = 'past';
-  updateTimelineMode();
-}
 
-function nextDay() {
- const today = new Date();
-  today.setHours(0,0,0,0);
-  const current = new Date(currentDate);
-  current.setHours(0,0,0,0);
-  if (timelineMode === 'past' &&
-    current.getTime() === today.getTime()) {   
-  timelineMode = 'live';
-  updateTimelineMode();
-  return;
-  }
-  currentDate.setDate(currentDate.getDate() + 1);
-  timelineMode = 'day';
-  updateTimelineMode();
-}
+    function nextDay() {
+     const today = new Date();
+      today.setHours(0,0,0,0);
+      const current = new Date(currentDate);
+      current.setHours(0,0,0,0);
+      if (timelineMode === 'past' &&
+        current.getTime() === today.getTime()) {   
+      timelineMode = 'live';
+      updateTimelineMode();
+      return;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+      timelineMode = 'day';
+      updateTimelineMode();
+    }
   
-  function getUpcomingEvents(hours = 12) {
-  console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
-  // console.trace(); // mostra da dove è stata chiamata
-  const now = timelineMode === 'live'
-      ? getAppTime('live')
-      : getAppTime('startOfDay');
-  const limit = new Date(now);
-  limit.setHours(limit.getHours() + hours);    
-  return events.filter(e => {
-    const start = new Date(e.ev_inizio);
-    return start > now && start <= limit;
-  }).sort((a,b)=>
-    new Date(a.ev_inizio) - new Date(b.ev_inizio)
-  );
-}
+    function getUpcomingEvents(hours = 12) {
+    console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
+    // console.trace(); // mostra da dove è stata chiamata
+    const now = timelineMode === 'live'
+        ? getAppTime('live')
+        : getAppTime('startOfDay');
+    const limit = new Date(now);
+    limit.setHours(limit.getHours() + hours);    
+    return events.filter(e => {
+      const start = new Date(e.ev_inizio);
+      return start > now && start <= limit;
+    }).sort((a,b)=>
+      new Date(a.ev_inizio) - new Date(b.ev_inizio)
+    );
+  }
 
-  function updateTicker(){
-  console.log("Aggiorno Striscia News", new Date().toLocaleTimeString());
-  // console.trace(); // mostra da dove è stata chiamata
-  const list = getUpcomingEvents(20); // Numero di News da visualizzare
-  const html = list.map(e => {
-  const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
-  return `
-      <span style="margin-right:20px;
-          padding:2px 8px;
-          border-radius:12px;
-          background:${color}33;
-          border:0px solid ${color}66;
-          border-left:4px solid ${color};
-          white-space:nowrap;
-      ">
-        ⏰ ${formatTime(e.ev_inizio)}
-        • ${e.luoghi?.comuni?.co_descrizione || ''}
-        • ${e.luoghi.lu_location}
-        • ${e.ev_titolo}
-        • ${e.ev_descrizione}
-      </span>
-    `;
-  }).join('');
-  document.getElementById('eventTickerContent').innerHTML = html;
-}
+    function updateTicker(){
+    console.log("Aggiorno Striscia News", new Date().toLocaleTimeString());
+    // console.trace(); // mostra da dove è stata chiamata
+    const list = getUpcomingEvents(20); // Numero di News da visualizzare
+    const html = list.map(e => {
+    const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
+    return `
+        <span style="margin-right:20px;
+            padding:2px 8px;
+            border-radius:12px;
+            background:${color}33;
+            border:0px solid ${color}66;
+            border-left:4px solid ${color};
+            white-space:nowrap;
+        ">
+          ⏰ ${formatTime(e.ev_inizio)}
+          • ${e.luoghi?.comuni?.co_descrizione || ''}
+          • ${e.luoghi.lu_location}
+          • ${e.ev_titolo}
+          • ${e.ev_descrizione}
+        </span>
+      `;
+    }).join('');
+    document.getElementById('eventTickerContent').innerHTML = html;
+  }
 
-function latLngToCanvasXY(lat, lng) {
-  const point = map.latLngToContainerPoint([lat, lng]);
-  return { x: point.x, y: point.y };
-}
+    function latLngToCanvasXY(lat, lng) {
+      const point = map.latLngToContainerPoint([lat, lng]);
+      return { x: point.x, y: point.y };
+    }
   
 // ====================================================
 // FIREWORKS SCENICI SUL CANVAS
