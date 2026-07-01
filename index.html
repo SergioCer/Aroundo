@@ -1124,10 +1124,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
       events.forEach(e => {
         //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
-        const formatDay = (dateString) => {
-        const d = new Date(dateString);
-        return `${daysLong[d.getDay()]} ${d.getDate()}`;
-        };
+    
+    // ========================
+    // CANDIDATO ALLA RIMOZIONE
+    // Data: 01/07/2026
+    // ***** ///// *****
+    //  const formatDay = (dateString) => {
+    //   const d = new Date(dateString);
+    //    return `${daysLong[d.getDay()]} ${d.getDate()}`;
+    //    };
+    // ***** ///// *****
+    // Atteso:
+    // Nessuna modifica grafica o funzionale.
+    // Motivo:
+    // La variabile "formatday" non viene richiamata
+    // e risulta inutilizzata nel codice.
+    // Verifica:
+    // Corretto funzionamento Della data.
+    // ========================
+        
         const stateData = getEventState(
           new Date(e.ev_inizio),
           e.ev_fine ? new Date(e.ev_fine) : null
@@ -1206,7 +1221,7 @@ function openOrderedPopup(marker) {
   const first = group[0];
   const e = first.__eventData; // recupero dati evento
   const content = `
-    <div style="min-width:180px; font-size:12px; line-height:1.3;">
+    <div style="min-width:140px; font-size:12px; line-height:1.3;">
       <div style="text-align:center; font-weight:700; margin-bottom:6px;">
         ${e.ev_titolo}
       </div>
