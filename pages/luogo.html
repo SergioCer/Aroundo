@@ -503,10 +503,16 @@ map.on("click", async (e) => {
     [e.latlng.lat, e.latlng.lng],
     [comune.lat, comune.lng]
   );
-  if (distanzaComune > 15000) { // è una approssimazione, usare GeoJSON ISTAT per mappa poligonale
-    alert("La posizione è troppo distante dal comune selezionato.");
-    return;
-  }
+    if (distanzaComune > 15000) {
+      await askCoordDialog(
+        "",
+        "",
+        "",
+        "",
+        "La posizione è troppo distante dal comune selezionato."
+      );
+      return;
+    }
   const { lat, lng } = e.latlng;
   const latF = lat.toFixed(6);
   const lngF = lng.toFixed(6);
