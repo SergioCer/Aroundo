@@ -494,6 +494,19 @@ function initMapLuogo() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(map);
+
+fetch("https://nominatim.openstreetmap.org/search?city=Palermo&country=Italy&format=geojson&polygon_geojson=1")
+  .then(r => r.json())
+  .then(data => {
+    L.geoJSON(data, {
+      style: {
+        color: "blue",
+        weight: 2,
+        fillOpacity: 0.05
+      }
+    }).addTo(map);
+  });
+  
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
