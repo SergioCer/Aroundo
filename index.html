@@ -1137,8 +1137,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Atteso:
     // Nessuna modifica grafica o funzionale.
     // Motivo:
-    // La variabile "formatday" non viene richiamata
-    // e risulta inutilizzata nel codice.
+    // Non risultano chiamate a formatday() 
+    // all'interno del progetto.
     // Verifica:
     // Corretto funzionamento Della data.
     // ========================
@@ -1157,13 +1157,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Atteso:
     // Nessuna modifica grafica o funzionale.
     // Motivo:
-    // La variabile "intensity" non viene richiamata
-    // e risulta inutilizzata nel codice.
+    // getEventState() non restituisce più la proprietà 'intensity'
+    // Il parametro passato a createIcon() risulta sempre undefinied.
     // Verifica:
     // Corretto funzionamento dei markers.
     // NOTE: 
     // (1) è stato disabilitato in basso il suo richiamo.
-    // (2) è legata a :  function createIcon(color, state, intensity) {
+    // (2) è legata a :  function createIcon(color, state, intensity) { 
+    // se tutto funziona, correggere la funzione togliendo il riferimento a intensity.
     // ========================
         
         //-- 🎨 ICONA
