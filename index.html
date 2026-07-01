@@ -958,7 +958,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
   // 3. Crea il menu Categorie
   buildCategoryMenu();
-  initCategoryMenuToggle();
   // 4. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
   setupTimeline();
@@ -1337,18 +1336,16 @@ oms.addListener('click', function (marker) {
         menuItemsDiv.appendChild(cb);
         menuItemsDiv.appendChild(label);
         });
-      // ----------------------
-        // toggle menu ***** DISABILITATO TEMPORANEAMENTE, VEDI FUNCION initCategoryMenuToggle()
-        // const toggleBtn = document.getElementById('menu-toggle');
+         toggle menu ***** DISABILITATO TEMPORANEAMENTE, VEDI FUNCION initCategoryMenuToggle()
+         const toggleBtn = document.getElementById('menu-toggle');
         // ****** const menuItemsDiv = document.getElementById('menu-items'); CANCELLARE DUPLICATO da non abilitare qui */ 
-        // const arrow = document.getElementById('menu-arrow');
-        //  toggleBtn.addEventListener('click', () => {
-        //  menuItemsDiv.classList.toggle('open');
-        // const isOpen = menuItemsDiv.classList.contains('open');
-        //  menuItemsDiv.style.display = isOpen ? 'block' : 'none';
-        //  arrow.textContent = isOpen ? '▲' : '▼';
-        // });
-      // --------------------
+         const arrow = document.getElementById('menu-arrow');
+          toggleBtn.addEventListener('click', () => {
+          menuItemsDiv.classList.toggle('open');
+         const isOpen = menuItemsDiv.classList.contains('open');
+          menuItemsDiv.style.display = isOpen ? 'block' : 'none';
+          arrow.textContent = isOpen ? '▲' : '▼';
+        });
         // Checkbox Singola Categoria
         menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
         const selectAllToggle = document.getElementById('select-all-toggle');
@@ -1368,17 +1365,6 @@ oms.addListener('click', function (marker) {
         menuItemsDiv.addEventListener('change', updateSelectAllToggle);
       }
 
-    function initCategoryMenuToggle() {
-      const toggleBtn = document.getElementById('menu-toggle');
-      const menuItemsDiv = document.getElementById('menu-items');
-      const arrow = document.getElementById('menu-arrow');
-        toggleBtn.addEventListener('click', () => {
-        menuItemsDiv.classList.toggle('open');
-        const isOpen = menuItemsDiv.classList.contains('open');
-        arrow.textContent = isOpen ? '▲' : '▼';
-      });
-    }
-  
     /* Compone il giorno ed il mese corrente nel rettangolo */  
     function updateDateUI() {
       // console.log("Aggiorno Data e mese", new Date().toLocaleTimeString());
