@@ -810,9 +810,6 @@
 <script type="module">
   import { supabase } from './supabase.js';
     
-  // variabili [] Array (lista di valori ordinati)  {} Oggetto (insieme di proprietà)
-  // let colori = ["rosso", "verde", "blu"]; - console.log(colori[0]); // rosso - console.log(colori[1]); // verde
-  // let persona = {nome: "Marco",eta: 30}; - console.log(persona.nome); // Marco - console.log(persona.eta); // 30
   let categories = [];
   let icons = {};
   let events = [];
@@ -1077,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Preleva le Categorie da supabase
   async function fetchCategories() {
-    console.log("Creo le Categorie", new Date().toLocaleTimeString());
+    // console.log("Creo le Categorie", new Date().toLocaleTimeString());
     const { data, error } = await supabase
       .from('categorie')
       .select('*')
@@ -1092,7 +1089,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Preleva gli Eventi ed Organizzatori da supabase
   async function fetchEvents() {
-    console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
+    // console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
     // console.trace(); // IMPORTANTE mostra da dove è stata chiamata
     let query = supabase      
       .from('eventi')
@@ -1118,7 +1115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Ricrea i markers 
     function renderEvents() {
-      console.log("Aggiorno Markers", new Date().toLocaleTimeString());
+      // console.log("Aggiorno Markers", new Date().toLocaleTimeString());
       // pulizia markers precedenti
       markers.forEach(m => {
       // ferma eventuali fireworks attivi
@@ -1235,7 +1232,6 @@ oms.addListener('click', function (marker) {
     m.marker.getLatLng().lng === marker.getLatLng().lng
   );
   group.sort((a, b) => a.marker.evTime - b.marker.evTime);
-  /* CANCELLARE console.log(group.map(g => new Date(g.marker.evTime).toLocaleTimeString())); */
   openOrderedPopup(marker);
 });
 
@@ -1320,8 +1316,7 @@ oms.addListener('click', function (marker) {
 
     // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
     function buildCategoryMenu() {
-      console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
-      // console.trace(); // mostra da dove è stata chiamata
+      // console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
       const menuItemsDiv = document.getElementById('menu-items');
       // checkbox per ogni categoria
       categories.forEach(cat => {
@@ -1333,8 +1328,7 @@ oms.addListener('click', function (marker) {
         const label = document.createElement('label');
         label.htmlFor = `cat-${cat.id_categoria}`;
         label.className = 'category-label';
-        label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; // icona + testo link per icone : https://www.svgrepo.com/
-        // label.textContent = cat.mc_descrizione; // questa è solo descrizione 
+        label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; 
         // Applichiamo il colore dell’evento
         label.style.backgroundColor = cat.mc_colore;
         label.style.color = getContrastColor(cat.mc_colore);
@@ -1373,8 +1367,7 @@ oms.addListener('click', function (marker) {
 
     /* Compone il giorno ed il mese corrente nel rettangolo */  
     function updateDateUI() {
-      console.log("Aggiorno Data e mese", new Date().toLocaleTimeString());
-      // console.trace(); // mostra da dove è stata chiamata
+      // console.log("Aggiorno Data e mese", new Date().toLocaleTimeString());
       dayText.innerText = currentDate.getDate();
       dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
     // -- Posizionamento di -day
@@ -1604,7 +1597,7 @@ oms.addListener('click', function (marker) {
         start = getAppTime('startOfDay'); // Inizio Giorno
         end = getAppTime('endOfDay'); // Fine Giorno
         }
-    console.log("Mode:", timelineMode, "→ start:", start.toLocaleString(), "end:", end.toLocaleString());
+    // console.log("Mode:", timelineMode, "→ start:", start.toLocaleString(), "end:", end.toLocaleString());
         return { start, end };
     }
 
@@ -1620,7 +1613,7 @@ oms.addListener('click', function (marker) {
  
     // Genera la timeline
     function setupTimeline() {
-      console.log("Crea la TimeLine", new Date().toLocaleTimeString());
+      // console.log("Crea la TimeLine", new Date().toLocaleTimeString());
       //-- distrugge vecchio slider per ricrearlo da zero
       if (slider.noUiSlider) {
       slider.noUiSlider.destroy();
@@ -1644,11 +1637,11 @@ oms.addListener('click', function (marker) {
         max: totalHours
         }
       });
-      console.log("Slider Creato",);
+      // console.log("Slider Creato",);
       //-- Ad ogni movimento dello slider agiorna la mappa
       slider.noUiSlider.on('update', updateHandles);
-      console.log("Listener Update Aggiunto",);
-    //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
+      // console.log("Listener Update Aggiunto",);
+      //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
       const midnight = document.getElementById('midnight');
       if (timelineMode === 'live') {
       midnightPercent = getMidnightPosition(totalHours);
@@ -1661,7 +1654,7 @@ oms.addListener('click', function (marker) {
     }
     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
     function updateHandles(values) {
-    console.log("Aggiorno Slider", new Date().toLocaleTimeString());
+    // console.log("Aggiorno Slider", new Date().toLocaleTimeString());
     // console.trace(); // mostra da dove è stata chiamata
     //-- Offset
       const startOffset = Math.round(values[0]);
@@ -1689,7 +1682,7 @@ oms.addListener('click', function (marker) {
     });
     //-- Aggiorna i marker della mappa in base ad orari inizio-fine
     updateMarkerVisibility(startDate,endDate);
-    console.log("START:", startDate,"END:", endDate);
+    // console.log("START:", startDate,"END:", endDate);
   }
     // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
     function getContrastColor(hex) {
@@ -1735,8 +1728,7 @@ oms.addListener('click', function (marker) {
     }
   
     function getUpcomingEvents(hours = 12) {
-    console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
-    // console.trace(); // mostra da dove è stata chiamata
+    // console.log("Aggiorna Eventi News", new Date().toLocaleTimeString());
     const now = timelineMode === 'live'
         ? getAppTime('live')
         : getAppTime('startOfDay');
@@ -1751,8 +1743,7 @@ oms.addListener('click', function (marker) {
   }
 
     function updateTicker(){
-    console.log("Aggiorno Striscia News", new Date().toLocaleTimeString());
-    // console.trace(); // mostra da dove è stata chiamata
+    // console.log("Aggiorno Striscia News", new Date().toLocaleTimeString());
     const list = getUpcomingEvents(20); // Numero di News da visualizzare
     const html = list.map(e => {
     const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
