@@ -621,7 +621,6 @@ function renderMarkers(list) {
   }
   return;
 }
-  // CANCELLARE const bounds = [];
   valid.forEach(l => {
     const isCurrent = l.id_luogo == currentId;
     const m = L.marker(
@@ -636,7 +635,6 @@ function renderMarkers(list) {
     if (isCurrent) {
       marker = m; // marker globale del luogo attivo
     }
-    // CANCELLARE bounds.push([l.lu_lat, l.lu_lng]);
   });
 }
 
