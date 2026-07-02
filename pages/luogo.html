@@ -943,22 +943,22 @@ async function loadEventiLuogo(idLuogo) {
 }
 
 async function loadOrganizzatoriLuogo(idLuogo) {
-  const map = new Map();
+  const orgMap = new Map();
   eventiList.forEach(e => {
     if (!e.organizzatori) return;
     const id = e.organizzatori.id_organizzatore;
-    if (!map.has(id)) {
-      map.set(id, {
+    if (!orgMap.has(id)) {
+      orgMap.set(id, {
         id_organizzatore: id,
         or_nome: e.organizzatori.or_nome,
         or_descrizione: "",
         num_eventi: 1
       });
     } else {
-      map.get(id).num_eventi++;
+      orgMap.get(id).num_eventi++;
     }
   });
-  organizzatoriList = [...map.values()]
+  organizzatoriList = [...orgMap.values()]
       .sort((a, b) => a.or_nome.localeCompare(b.or_nome));
   renderOrganizzatori();
 }
