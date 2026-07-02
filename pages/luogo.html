@@ -203,6 +203,15 @@ textarea:disabled {
 .card.locked .map-btn {
   pointer-events: none;
 }
+
+#popupMapTitle {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+#popupMapSubtitle {
+  margin-top: 2px;
+}  
   
 </style>
 </head>
@@ -229,7 +238,7 @@ textarea:disabled {
   <!-- LOCATION -->
   <div class="section-title">Location:</div>
   <input id="lu_location"style="font-size:16px; font-weight:600; text-align:left;"
-         oninput="markDirty()">
+         oninput="markDirty(); updateMapPopupTitle()">
 
   <!-- DESCRIZIONE -->
   <div class="section-title">Descrizione:</div>
@@ -398,7 +407,8 @@ textarea:disabled {
     overflow:hidden;
   ">
     <div style="padding:10px; display:flex; justify-content:space-between;">
-      <div id="mapTitle" style="font-weight:bold;">Mappa</div>
+      <div id="popupMapTitle" style="font-weight:bold; text-align:center;"></div>
+      <div id="popupMapSubtitle" style="font-size:12px; color:#666; text-align:center;"></div>
       <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
     </div>
     <div id="map" style="height:calc(100% - 50px);"></div>
@@ -711,11 +721,23 @@ window.coordAction = (type) => {
   document.getElementById("coordDialog").style.display = "none";
   coordResolve(type);
 };  
+
+function updateMapPopupTitle() {
+  const comuneNome = id_comune.value || "Comune";
+  const subtitle = lu_location.value?.trim();
+  const title = isNew
+    ? `${comuneNome}: Nuovo punto sulla mappa`
+    : `${comuneNome}: Modifica posizione`;
+  document.getElementById("popupMapTitle").textContent = title;
+  const subEl = document.getElementById("popupMapSubtitle");
+  subEl.textContent = (!isNew && subtitle) ? subtitle : "";
+}
   
 window.openMapLuogo = async () => {
   if (isNew && !id_comune_hidden.value) return;
   document.getElementById("mapModal").style.display = "block";
   initMapLuogo();
+  updateMapPopupTitle()
   const idComune = id_comune_hidden.value;
    if (idComune) {
     await loadMapLuoghi(idComune);
@@ -732,6 +754,7 @@ window.onComuneInput = (text) => {
   id_comune_hidden.value = "";
   searchComuni(text);
   markDirty();
+  updateMapPopupTitle()
 };
 
   
@@ -770,6 +793,7 @@ async function load() {
   }
   original = JSON.stringify(data);
   lu_location.value = data.lu_location || '';
+  updateMapPopupTitle()
   id_comune_hidden.value = data.id_comune || '';
   const com = await supabase
   .from("comuni")
