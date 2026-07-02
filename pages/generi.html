@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<title>Generi</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f2f4f7;
+  margin: 0;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.bck-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+}
+
+.bck-btn:hover {
+  background: #d1d5db;
+}
+
+/* ACCORDION */
+.section-box {
+  margin: 10px 15px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 10px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+
+.section-header:hover {
+  background: #f8fafc;
+}
+
+.section-panel {
+  border-top: 1px solid #eee;
+  padding: 10px;
+}
+
+/* SERVIZI */
+.service-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+
+.service-row:hover {
+  background: #eef6ff;
+}
+
+.icon {
+  width: 20px;
+}
+
+/* STATUS */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.active {
+  background: #22c55e;
+}
+
+.dot.inactive {
+  background: #9ca3af;
+}
+
+/* EDIT INLINE */
+.inline-input {
+  font-size: 14px;
+  padding: 4px;
+  width: 60%;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+/* BUTTONS */
+.small-btn {
+  border: none;
+  cursor: pointer;
+  background: #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+
+.small-btn:hover {
+  background: #d1d5db;
+}
+
+.add-btn {
+  margin-top: 8px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background: #16a34a;
+}
+
+.edit-btn {
+  background: #3b82f6;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <button class="bck-btn" onclick="history.back()">←</button>
+  <div class="title">Generi</div>
+</div>
+
+<div id="container"></div>
+
+<script type="module">
+import { supabase } from '../supabase.js';
+
+let generi = [];
+let servizi = [];
+let expanded = new Set();
+let editingGenere = null;
+
+/* LOAD */
+async function load() {
+  const g = await supabase.from('generi').select('*');
+  const s = await supabase.from('servizi').select('*');
+
+  generi = g.data || [];
+  servizi = s.data || [];
+
+  render();
+}
+
+/* GROUP SERVIZI */
+function getServizi(id_genere) {
+  return servizi.filter(s => s.id_genere == id_genere);
+}
+
+/* RENDER */
+function render() {
+  const container = document.getElementById("container");
+  container.innerHTML = "";
+
+  generi.forEach(g => {
+    const count = getServizi(g.id_genere).length;
+    const open = expanded.has(g.id_genere);
+
+    const box = document.createElement("div");
+    box.className = "section-box";
+
+    // HEADER
+    const header = document.createElement("div");
+    header.className = "section-header";
+
+    header.innerHTML = `
+      <span>${open ? "▼" : "▶"}</span>
+      <span>${g.gen_icona || ""}</span>
+      <span style="flex:1">
+        ${g.gen_descrizione}
+      </span>
+      <span>(${count})</span>
+    `;
+
+    header.onclick = () => {
+      if (expanded.has(g.id_genere)) {
+        expanded.delete(g.id_genere);
+      } else {
+        expanded.add(g.id_genere);
+      }
+      render();
+    };
+
+    box.appendChild(header);
+
+    // PANEL
+    if (open) {
+      const panel = document.createElement("div");
+      panel.className = "section-panel";
+
+      // DESCRIZIONE ESTESA
+      const desc = document.createElement("div");
+      desc.style.marginBottom = "10px";
+      desc.textContent = g.gen_descrizione_estesa || "";
+      panel.appendChild(desc);
+
+      // EDIT GENERE (INLINE RENAME)
+      const editRow = document.createElement("div");
+      editRow.style.display = "flex";
+      editRow.style.gap = "6px";
+      editRow.style.marginBottom = "8px";
+
+      if (editingGenere === g.id_genere) {
+        const input = document.createElement("input");
+        input.className = "inline-input";
+        input.value = g.gen_descrizione;
+
+        input.onblur = async () => {
+          if (!input.value.trim()) {
+            alert("Descrizione obbligatoria");
+            return;
+          }
+
+          await supabase
+            .from("generi")
+            .update({ gen_descrizione: input.value })
+            .eq("id_genere", g.id_genere);
+
+          editingGenere = null;
+          load();
+        };
+
+        input.onkeydown = (e) => {
+          if (e.key === "Enter") input.blur();
+        };
+
+        editRow.appendChild(input);
+      } else {
+        const editBtn = document.createElement("button");
+        editBtn.className = "small-btn edit-btn";
+        editBtn.textContent = "✏";
+
+        editBtn.onclick = () => {
+          editingGenere = g.id_genere;
+          render();
+        };
+
+        editRow.appendChild(editBtn);
+      }
+
+      panel.appendChild(editRow);
+
+      // SERVIZI
+      getServizi(g.id_genere).forEach(s => {
+        const row = document.createElement("div");
+        row.className = "service-row";
+
+        const status = document.createElement("span");
+        status.className = "dot " + (s.sv_attivo ? "active" : "inactive");
+
+        row.innerHTML = `
+          ${status.outerHTML}
+          <span class="icon">${s.sv_icona || ""}</span>
+          <span style="flex:1">${s.sv_servizio}</span>
+          <span>${s.livello || ""}</span>
+        `;
+
+        row.onclick = () => {
+          window.location.href = `servizio.html?id=${s.id_servizio}`;
+        };
+
+        panel.appendChild(row);
+      });
+
+      // + ADD SERVIZIO
+      const addBtn = document.createElement("button");
+      addBtn.className = "add-btn";
+      addBtn.textContent = "+ Aggiungi servizio";
+
+      addBtn.onclick = () => {
+        window.location.href =
+          `servizio.html?new=1&id_genere=${g.id_genere}`;
+      };
+
+      panel.appendChild(addBtn);
+
+      box.appendChild(panel);
+    }
+
+    container.appendChild(box);
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
