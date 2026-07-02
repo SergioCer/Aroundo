@@ -413,8 +413,21 @@ textarea:disabled {
     <div id="popupMapSubtitle"
          style="font-size:12px; color:#666; margin-top:4px;">
     </div>
-      <button onclick="closeMap()" style="border:none;background:#ef4444;color:white;width:30px;height:30px;border-radius:15px;">✕</button>
-    </div>
+  </div>
+  <!-- BOTTONE CHIUDI (FUORI DAL FLUSSO DEL TESTO) -->
+  <button onclick="closeMap()" style="
+    position:absolute;
+    top:10px;
+    right:10px;
+    border:none;
+    background:#ef4444;
+    color:white;
+    width:30px;
+    height:30px;
+    border-radius:15px;
+    cursor:pointer;
+    z-index:10;
+  ">✕</button>    
     <div id="map" style="height:calc(100% - 50px);"></div>
   </div>
 </div>
