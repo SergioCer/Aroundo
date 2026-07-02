@@ -634,6 +634,7 @@ function renderMarkers(list) {
   return;
 }
   const bounds = [];
+  console.log(valid); // CANCELLARE è un controllo 
   valid.forEach(l => {
     const isCurrent = l.id_luogo == currentId;
     const m = L.marker(
