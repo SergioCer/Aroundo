@@ -601,7 +601,6 @@ async function drawComuneConfine(nomeComune) {
   if (!nomeComune) return;
   const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(nomeComune)}&country=Italy&format=geojson&polygon_geojson=1`;
   const res = await fetch(url);
-  console.log(data.features); // CANCELLARE serve per verifica 
   const data = await res.json();
   console.log(data.features);
   if (!data.features || !data.features.length) return;
