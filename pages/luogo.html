@@ -440,7 +440,6 @@ const isNew = params.has('new') || !id;
 const lat = params.get("lat");
 const lng = params.get("lng");
 const comune = params.get("comune");
-const maxKm = 45; // Distanza massima accettata dal centro geografico del comune. 
 
 let original = "{}";
 let dirty = false;
@@ -514,21 +513,6 @@ map.on("click", async (e) => {
   );
   return;
 }
-  /* CANCELLARE const distanzaComune = map.distance(
-    [e.latlng.lat, e.latlng.lng],
-    [comune.lat, comune.lng]
-  );
-    if (distanzaComune > maxKm * 1000) {
-      await askCoordDialog(
-        "",
-        "",
-        "",
-        "",
-        "La posizione è troppo distante dal comune selezionato."
-      );
-      return;
-    }*/ 
-  
   const { lat, lng } = e.latlng;
   const latF = lat.toFixed(6);
   const lngF = lng.toFixed(6);
@@ -637,7 +621,7 @@ function renderMarkers(list) {
   }
   return;
 }
-  const bounds = [];
+  // CANCELLARE const bounds = [];
   valid.forEach(l => {
     const isCurrent = l.id_luogo == currentId;
     const m = L.marker(
@@ -652,9 +636,8 @@ function renderMarkers(list) {
     if (isCurrent) {
       marker = m; // marker globale del luogo attivo
     }
-    bounds.push([l.lu_lat, l.lu_lng]);
+    // CANCELLARE bounds.push([l.lu_lat, l.lu_lng]);
   });
-    // CANCELLARE se tutto funziona map.fitBounds(bounds, { padding: [30, 30] });
 }
 
 function checkDistance(lat, lng, list) {
@@ -726,15 +709,6 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     });
   }
 
-    // Preleva la distanza dal comune selezionato per verificare se è coerente usando il raggio 
-    function isInsideComune(lat, lng, comuneLat, comuneLng) {
-      const d = map.distance(
-        [lat, lng],
-        [comuneLat, comuneLng]
-      );
-      return d <= maxKm * 1000;
-    }
-  
 window.coordAction = (type) => {
   document.getElementById("coordDialog").style.display = "none";
   coordResolve(type);
@@ -748,7 +722,7 @@ window.openMapLuogo = async () => {
    if (idComune) {
     await loadMapLuoghi(idComune);
     const nomeComune = id_comune.value;
-    drawComuneConfine(nomeComune,map);
+    drawComuneConfine(nomeComune);
   }
   setTimeout(() => {
     map.invalidateSize();
