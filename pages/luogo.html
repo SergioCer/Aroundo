@@ -603,6 +603,7 @@ async function drawComuneConfine(nomeComune) {
   const res = await fetch(url);
   console.log(data.features); // CANCELLARE serve per verifica 
   const data = await res.json();
+  console.log(data.features);
   if (!data.features || !data.features.length) return;
   if (comuneLayer) {
     map.removeLayer(comuneLayer);
@@ -635,7 +636,6 @@ function renderMarkers(list) {
   return;
 }
   const bounds = [];
-  console.log(valid); // CANCELLARE è un controllo 
   valid.forEach(l => {
     const isCurrent = l.id_luogo == currentId;
     const m = L.marker(
