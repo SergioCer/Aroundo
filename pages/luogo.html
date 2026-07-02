@@ -602,12 +602,16 @@ async function drawComuneConfine(nomeComune) {
   const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(nomeComune)}&country=Italy&format=geojson&polygon_geojson=1`;
   const res = await fetch(url);
   const data = await res.json();
-  console.log(data.features);
   if (!data.features || !data.features.length) return;
+  // prende solo il confine amministrativo del comune
+  const feature = data.features.find(f =>
+    f.properties.category === "boundary"
+  );
+  if (!feature) return;
   if (comuneLayer) {
     map.removeLayer(comuneLayer);
   }
-  comuneLayer = L.geoJSON(data, {
+  comuneLayer = L.geoJSON(feature, {
     style: {
       color: "blue",
       weight: 2,
@@ -615,9 +619,8 @@ async function drawComuneConfine(nomeComune) {
     }
   }).addTo(map);
   map.fitBounds(comuneLayer.getBounds());
-  comuneGeoJson = data.features[0]; // Polygon o MultiPolygon del comune
+  comuneGeoJson = feature;
 }
-
   
 function renderMarkers(list) {
   markers.forEach(m => map.removeLayer(m));
