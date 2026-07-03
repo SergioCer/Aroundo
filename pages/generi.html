@@ -17,10 +17,7 @@ body{
     background:#f2f4f7;
 }
 
-
-/*==========================
-TOP BAR
-==========================*/
+/* TOP BAR */
 
 .topbar{
     display:flex;
@@ -52,10 +49,7 @@ TOP BAR
     background:#d1d5db;
 }
 
-
-/*==========================
-GENERI
-==========================*/
+/* GENERI */
 
 .genre-box{
     margin:0 15px 15px;
@@ -89,10 +83,7 @@ GENERI
     font-weight:600;
 }
 
-
-/*==========================
-ICONE
-==========================*/
+/* ICONE */
 
 .material-symbols-outlined{
     font-size:22px;
@@ -105,10 +96,7 @@ ICONE
     font-weight:bold;
 }
 
-
-/*==========================
-STATO
-==========================*/
+/* STATO */
 
 .state{
     width:16px;
@@ -125,16 +113,7 @@ STATO
     color:#ef4444;
 }
 
-
-/*==========================
-BOX PULSANTI
-==========================*/
-
-.action-box{
-    display:flex;
-    gap:6px;
-    margin-left:12px;
-}
+/* BOX PULSANTI */
 
 .icon-btn{
     width:32px;
@@ -161,10 +140,7 @@ BOX PULSANTI
     color:white;
 }
 
-
-/*==========================
-PANNELLO
-==========================*/
+/* PANNELLO */
 
 .genre-panel{
     border-top:1px solid #e5e7eb;
@@ -178,10 +154,7 @@ PANNELLO
     font-size:14px;
 }
 
-
-/*==========================
-SERVIZI
-==========================*/
+/* SERVIZI */
 
 .service-row{
     display:flex;
@@ -218,10 +191,7 @@ SERVIZI
     font-weight:bold;
 }
 
-
-/*==========================
-DIALOG
-==========================*/
+/* DIALOG */
 
 .dialog-overlay{
     display:none;
@@ -280,71 +250,56 @@ DIALOG
     background:#ef4444;
     color:white;
 }
+
+.inline-input{
+    flex:1;
+    padding:8px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    font-size:14px;
+}
+    
 </style>
-
 </head>
-
 <body>
 
 <div class="topbar">
-
     <button
         class="back-btn"
         onclick="history.back()">
         ←
     </button>
-
     <div class="page-title">
         Generi Servizi
     </div>
-
 </div>
-
-
 <div id="generiContainer"></div>
-
-
-<!-- ===================================================== -->
 <!-- DIALOG RENAME GENERE                                 -->
-<!-- ===================================================== -->
-
 <div id="renameDialog" class="dialog-overlay">
-
     <div class="dialog">
-
         <div class="dialog-title">
             Modifica genere
         </div>
-
         <div class="dialog-body">
-
             <input
                 id="renameInput"
                 type="text"
                 maxlength="80">
-
         </div>
-
         <div class="dialog-buttons">
-
             <button
                 class="btn-green"
                 onclick="saveRename()">
                 Salva
             </button>
-
             <button
                 class="btn-red"
                 onclick="closeRename()">
                 Annulla
             </button>
-
         </div>
-
     </div>
-
 </div>
-
 
 <script type="module">
 
@@ -354,8 +309,6 @@ let generi = [];
 let servizi = [];
 let expanded = new Set();
 let editingGenere = null;
-let opened = new Set();
-let currentRename = null;
 
 /* LOAD DATI                                             */
 async function load() {
@@ -371,13 +324,6 @@ async function load() {
 }
 
 
-/* HELPERS                                               */
-function getServiziByGenere(id_genere) {
-    return servizi.filter(s =>
-        s.id_genere == id_genere
-    );
-}
-
 /* HELP: servizi per genere */
 function getServizi(id_genere) {
   return servizi.filter(s => s.id_genere == id_genere);
@@ -385,16 +331,16 @@ function getServizi(id_genere) {
 
 /* RENDER */
 function render() {
-  const container = document.getElementById("container");
+  const container = document.getElementById("generiContainer");
   container.innerHTML = "";
   generi.forEach(g => {
     const list = getServizi(g.id_genere);
     const open = expanded.has(g.id_genere);
     const box = document.createElement("div");
-    box.className = "section-box";
+    box.className = "genre-box";
     /* HEADER */
     const header = document.createElement("div");
-    header.className = "section-header";
+    header.className = "genre-header";
     header.innerHTML = `
       <span>${open ? "▼" : "▶"}</span>
       <span class="icon">${g.gen_icona || ""}</span>
@@ -415,7 +361,7 @@ function render() {
     /* PANEL */
     if (open) {
       const panel = document.createElement("div");
-      panel.className = "section-panel";
+      panel.className = "genre-panel";
       /* DESCRIZIONE ESTESA */
       const ext = document.createElement("div");
       ext.style.marginBottom = "10px";
@@ -445,7 +391,7 @@ function render() {
         editRow.appendChild(input);
       } else {
         const btn = document.createElement("button");
-        btn.className = "small-btn edit-btn";
+        btn.className = "icon-btn edit-btn";
         btn.textContent = "✏";
 
         btn.onclick = () => {
@@ -472,7 +418,7 @@ function render() {
       });
       /* ADD SERVIZIO */
       const add = document.createElement("button");
-      add.className = "add-btn";
+      add.className="icon-btn add-btn";
       add.textContent = "+ Aggiungi servizio";
       add.onclick = () => {
         window.location.href =
