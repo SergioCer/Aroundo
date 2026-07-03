@@ -258,6 +258,17 @@ body{
     border-radius:8px;
     font-size:14px;
 }
+
+.service-icons{
+    width:90px;            /* spazio fisso per max 3 icone */
+    display:flex;
+    gap:4px;
+    justify-content:flex-start;
+}
+
+.service-icons .material-symbols-outlined{
+    font-size:20px;
+}    
     
 </style>
 </head>
@@ -385,12 +396,15 @@ function render() {
       ext.style.marginBottom = "10px";
       ext.textContent = g.gen_descrizione_estesa || "";
       panel.appendChild(ext);
-      /* INLINE EDIT GENERE */
+
+/* INLINE EDIT GENERE
       const editRow = document.createElement("div");
       editRow.style.display = "flex";
       editRow.style.gap = "6px";
-      editRow.style.marginBottom = "10px";
-      if (editingGenere === g.id_genere) {
+      editRow.style.marginBottom = "10px"; 
+*/
+/* 
+        if (editingGenere === g.id_genere) {
         const input = document.createElement("input");
         input.className = "inline-input";
         input.value = g.gen_descrizione;
@@ -419,21 +433,31 @@ function render() {
         editRow.appendChild(btn);
       }
       panel.appendChild(editRow);
-      /* SERVIZI LIST */
-      getServizi(g.id_genere).forEach(s => {
-        const row = document.createElement("div");
-        row.className = "service-row";
-        row.innerHTML = `
-          <span class="dot ${s.sv_attivo ? "active" : "inactive"}"></span>
-          <span class="icon">${s.sv_icona || ""}</span>
-          <span style="flex:1">${s.sv_servizio}</span>
-          <span>${s.livello}</span>
-        `;
-        row.onclick = () => {
-          window.location.href = `servizio.html?id=${s.id_servizio}`;
-        };
-        panel.appendChild(row);
-      });
+*/
+      
+        /* SERVIZI LIST */
+        getServizi(g.id_genere).forEach(s => {
+          const row = document.createElement("div");
+          row.className = "service-row";
+          row.innerHTML = `
+            <!-- ICONE MATERIAL (max 3 in linea, spazio fisso) -->
+            <span class="service-icons">
+              <span class="material-symbols-outlined">${s.sv_icona || ""}</span>
+            </span>
+            <!-- NOME SERVIZIO -->
+            <span class="service-name">
+              ${s.sv_servizio}
+            </span>
+            <!-- LIVELLO -->
+            <span class="service-level">
+              ${s.livello}
+            </span>
+          `;
+          row.onclick = () => {
+            window.location.href = `servizio.html?id=${s.id_servizio}`;
+          };
+          panel.appendChild(row);
+        });
       /* ADD SERVIZIO */
       const add = document.createElement("button");
       add.className="icon-btn add-btn";
