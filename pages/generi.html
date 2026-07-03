@@ -384,7 +384,7 @@ let editingGenere = null;
 async function load() {
     const g = await supabase
         .from("servizi_genere")
-        .select("*");
+        .select("*")
         .order("gen_order", { ascending: true });
     const s = await supabase
         .from("servizi")
