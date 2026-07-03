@@ -301,13 +301,32 @@ body{
     width:20px;
     text-align:center;
     font-size:14px;
+    font-weight:bold;
 }
 
-.service-state{
+/* ATTIVO */
+.service-state.on{
     color:#22c55e;
 }
-.service-state:has(:contains("✕")){
+
+/* NON ATTIVO */
+.service-state.off{
     color:#ef4444;
+}
+
+.genre-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px;
+    cursor:pointer;
+    user-select:none;
+    background:#f8fafc;   /* 👈 nuovo sfondo */
+    border-bottom:1px solid #e5e7eb;
+}
+
+.genre-header:hover{
+    background:#eef6ff;
 }
     
 </style>
@@ -366,6 +385,7 @@ async function load() {
     const g = await supabase
         .from("servizi_genere")
         .select("*");
+        .order("gen_order", { ascending: true });
     const s = await supabase
         .from("servizi")
         .select("*");
@@ -455,10 +475,9 @@ function render() {
             ${s.livello}
           </span>
           <!-- STATO (✔ / ✖) -->
-          <span class="service-state">
+            <span class="service-state ${s.sv_attivo ? "on" : "off"}">
             ${s.sv_attivo ? "●" : "✕"}
-          </span>
-        `;
+            </span>        `;
           row.onclick = () => {
             window.location.href = `servizio.html?id=${s.id_servizio}`;
           };
