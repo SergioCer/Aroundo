@@ -8,7 +8,8 @@
 <title>Servizi</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+    
 <style>
 
 body{
@@ -328,6 +329,17 @@ body{
 .genre-header:hover{
     background:#eef6ff;
 }
+
+.drag-handle{
+    cursor:grab;
+    color:#6b7280;
+    user-select:none;
+    flex:0 0 24px;
+}
+
+.drag-handle:active{
+    cursor:grabbing;
+}    
     
 </style>
 </head>
@@ -410,11 +422,16 @@ function render() {
     const open = expanded.has(g.id_genere);
     const box = document.createElement("div");
     box.className = "genre-box";
+    box.dataset.id = g.id_genere;  
     /* HEADER */
     const header = document.createElement("div");
     header.className = "genre-header";
         header.innerHTML = `
-          <!-- FRECCIA -->
+        <!-- DRAG Indicator -->
+        <span class="drag-handle material-symbols-outlined">
+        drag_indicator
+        </span>
+        <!-- FRECCIA -->
           <span class="arrow">
             ${open ? "▼" : "▶"}
           </span>
@@ -465,8 +482,13 @@ function render() {
         getServizi(g.id_genere).forEach(s => {
           const row = document.createElement("div");
           row.className = "service-row";
+          row.dataset.id = s.id_servizio;  
         row.innerHTML = `
-          <!-- ICONA -->
+        <!-- DRAG Indicator -->
+        <span class="drag-handle material-symbols-outlined">
+        drag_indicator
+        </span>
+        <!-- ICONA -->
           <span class="service-icons">
             <span class="material-symbols-outlined">${s.sv_icona || ""}</span>
           </span>
@@ -491,6 +513,41 @@ function render() {
     }
     container.appendChild(box);
   });
+new Sortable(container,{
+    animation:150,
+    handle:".drag-handle",
+    onEnd: async ()=>{
+        const items=[...container.querySelectorAll(".genre-box")];
+        for(let i=0;i<items.length;i++){
+            await supabase
+            .from("servizi_genere")
+            .update({
+                gen_order:i+1
+            })
+            .eq("id_genere",items[i].dataset.id);
+        }
+        load();
+    }
+});
+document.querySelectorAll(".genre-panel").forEach(panel=>{
+    new Sortable(panel,{
+        animation:150,
+        handle:".drag-handle",
+        draggable:".service-row",
+        onEnd: async ()=>{
+            const rows=[...panel.querySelectorAll(".service-row")];
+            for(let i=0;i<rows.length;i++){
+                await supabase
+                .from("servizi")
+                .update({
+                    sv_order:i+1
+                })
+                .eq("id_servizio",rows[i].dataset.id);
+            }
+            load();
+        }
+    });
+});    
 }
 
         window.openAdd = (id_genere) => {
