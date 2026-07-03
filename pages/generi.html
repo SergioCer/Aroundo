@@ -388,7 +388,8 @@ async function load() {
         .order("gen_order", { ascending: true });
     const s = await supabase
         .from("servizi")
-        .select("*");
+        .select("*")
+        .order("sv_order", { ascending: true, nullsLast: true });
     generi = g.data || [];
     servizi = s.data || [];
     render();
