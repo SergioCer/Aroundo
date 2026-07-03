@@ -364,11 +364,31 @@ body{
             Modifica genere
         </div>
         <div class="dialog-body">
+            <label>Descrizione</label>
             <input
-                id="renameInput"
+                id="renameDescrizione"
                 type="text"
                 maxlength="80">
-        </div>
+            <label style="display:block;margin-top:14px;">
+                Descrizione estesa
+            </label>
+            <textarea
+                id="renameEstesa"
+                rows="4"
+                maxlength="500"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    margin-top:6px;
+                    padding:10px;
+                    border:1px solid #d1d5db;
+                    border-radius:8px;
+                    resize:vertical;
+                    font-family:inherit;
+                    font-size:14px;
+                "></textarea>
+        </div>            
+    </div>
         <div class="dialog-buttons">
             <button
                 class="btn-green"
@@ -392,7 +412,8 @@ let generi = [];
 let servizi = [];
 let expanded = new Set();
 let editingGenere = null;
-
+let currentGenere = null;
+    
 /* LOAD DATI                                             */
 async function load() {
     const g = await supabase
@@ -557,10 +578,44 @@ document.querySelectorAll(".genre-panel").forEach(panel=>{
         };
 
         window.openEdit = (id_genere) => {
-          editingGenere = id_genere;
-          render();
+            const g = generi.find(x => x.id_genere == id_genere);
+            currentGenere = id_genere;
+            document.getElementById("renameDescrizione").value =
+                g.gen_descrizione || "";
+            document.getElementById("renameEstesa").value =
+                g.gen_descrizione_estesa || "";
+            document.getElementById("renameDialog").style.display = "flex";
+        };  
+
+        window.closeRename = () => {
+            document.getElementById("renameDialog").style.display = "none";
+            currentGenere = null;
+        };    
+
+        window.saveRename = async () => {
+            const descrizione =
+                document.getElementById("renameDescrizione")
+                .value
+                .trim();
+            const estesa =
+                document.getElementById("renameEstesa")
+                .value
+                .trim();
+            if (!descrizione) {
+                alert("La descrizione è obbligatoria.");
+                return;
+            }
+            await supabase
+                .from("servizi_genere")
+                .update({
+                    gen_descrizione: descrizione,
+                    gen_descrizione_estesa: estesa
+                })
+                .eq("id_genere", currentGenere);
+            closeRename();
+            load();
         };
-  
+    
 load();
 
 </script>
