@@ -163,7 +163,7 @@ let editingGenere = null;
 
 /* LOAD */
 async function load() {
-  const g = await supabase.from('generi').select('*');
+  const g = await supabase.from('servizi_genere').select('*');
   const s = await supabase.from('servizi').select('*');
 
   generi = g.data || [];
