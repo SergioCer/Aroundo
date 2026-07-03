@@ -454,6 +454,7 @@ function render() {
       /* DESCRIZIONE ESTESA */
       const ext = document.createElement("div");
       ext.style.marginBottom = "10px";
+      ext.style.background:#f8fafc;
       ext.textContent = g.gen_descrizione_estesa || "";
       panel.appendChild(ext);
 
@@ -483,16 +484,6 @@ function render() {
           };
           panel.appendChild(row);
         });
-/* ADD SERVIZIO 
-      const add = document.createElement("button");
-      add.className="icon-btn add-btn";
-      add.textContent = "+";
-      add.onclick = () => {
-        window.location.href =
-          `servizio.html?new=1&id_genere=${g.id_genere}`;
-      };
-      panel.appendChild(add);
-*/      
       box.appendChild(panel);
     }
     container.appendChild(box);
