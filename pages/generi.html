@@ -260,7 +260,7 @@ body{
 }
 
 .service-icons{
-    width:90px;            /* spazio fisso per max 3 icone */
+    width:60px;            /* spazio fisso per max 3 icone */
     display:flex;
     gap:4px;
     justify-content:flex-start;
@@ -269,6 +269,45 @@ body{
 .service-icons .material-symbols-outlined{
     font-size:20px;
 }    
+
+.service-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 4px;
+    border-bottom:1px solid #eef2f7;
+    cursor:pointer;
+}
+
+/* nome prende tutto lo spazio */
+.service-name{
+    flex:1;
+    font-weight:700;
+    font-size:15px;
+}
+
+/* livello sempre a destra del nome ma prima dello stato */
+.service-level{
+    min-width:40px;
+    text-align:right;
+    font-size:12px;
+    font-weight:bold;
+    color:#374151;
+}
+
+/* stato estrema destra */
+.service-state{
+    width:20px;
+    text-align:center;
+    font-size:14px;
+}
+
+.service-state{
+    color:#22c55e;
+}
+.service-state:has(:contains("✕")){
+    color:#ef4444;
+}
     
 </style>
 </head>
@@ -397,62 +436,28 @@ function render() {
       ext.textContent = g.gen_descrizione_estesa || "";
       panel.appendChild(ext);
 
-/* INLINE EDIT GENERE
-      const editRow = document.createElement("div");
-      editRow.style.display = "flex";
-      editRow.style.gap = "6px";
-      editRow.style.marginBottom = "10px"; 
-*/
-/* 
-        if (editingGenere === g.id_genere) {
-        const input = document.createElement("input");
-        input.className = "inline-input";
-        input.value = g.gen_descrizione;
-        input.onblur = async () => {
-          if (!input.value.trim()) return;
-          await supabase
-            .from("servizi_genere")
-            .update({ gen_descrizione: input.value })
-            .eq("id_genere", g.id_genere);
-          editingGenere = null;
-          load();
-        };
-        input.onkeydown = (e) => {
-          if (e.key === "Enter") input.blur();
-        };
-        editRow.appendChild(input);
-      } else {
-        const btn = document.createElement("button");
-        btn.className = "icon-btn edit-btn";
-        btn.textContent = "✏";
-
-        btn.onclick = () => {
-          editingGenere = g.id_genere;
-          render();
-        };
-        editRow.appendChild(btn);
-      }
-      panel.appendChild(editRow);
-*/
-      
         /* SERVIZI LIST */
         getServizi(g.id_genere).forEach(s => {
           const row = document.createElement("div");
           row.className = "service-row";
-          row.innerHTML = `
-            <!-- ICONE MATERIAL (max 3 in linea, spazio fisso) -->
-            <span class="service-icons">
-              <span class="material-symbols-outlined">${s.sv_icona || ""}</span>
-            </span>
-            <!-- NOME SERVIZIO -->
-            <span class="service-name">
-              ${s.sv_servizio}
-            </span>
-            <!-- LIVELLO -->
-            <span class="service-level">
-              ${s.livello}
-            </span>
-          `;
+        row.innerHTML = `
+          <!-- ICONA -->
+          <span class="service-icons">
+            <span class="material-symbols-outlined">${s.sv_icona || ""}</span>
+          </span>
+          <!-- TESTO SERVIZIO -->
+          <span class="service-name">
+            ${s.sv_servizio}
+          </span>
+          <!-- LIVELLO (sempre a destra) -->
+          <span class="service-level">
+            ${s.livello}
+          </span>
+          <!-- STATO (✔ / ✖) -->
+          <span class="service-state">
+            ${s.sv_attivo ? "●" : "✕"}
+          </span>
+        `;
           row.onclick = () => {
             window.location.href = `servizio.html?id=${s.id_servizio}`;
           };
@@ -482,7 +487,6 @@ function render() {
           editingGenere = id_genere;
           render();
         };
-    
   
 load();
 
