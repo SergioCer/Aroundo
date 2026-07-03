@@ -341,14 +341,32 @@ function render() {
     /* HEADER */
     const header = document.createElement("div");
     header.className = "genre-header";
-    header.innerHTML = `
-      <span>${open ? "▼" : "▶"}</span>
-      <span class="icon">${g.gen_icona || ""}</span>
-      <span style="flex:1">
-        ${g.gen_descrizione}
-      </span>
-      <span>(${list.length})</span>
-    `;
+        header.innerHTML = `
+          <!-- FRECCIA -->
+          <span class="arrow">
+            ${open ? "▼" : "▶"}
+          </span>
+          <!-- NUMERO SERVIZI (blocco fisso 2 cifre) -->
+          <span class="genre-count" style="width:28px; text-align:center;">
+            ${String(list.length).padStart(2, "0")}
+          </span>
+          <!-- ICONA MATERIAL -->
+          <span class="material-symbols-outlined">
+            ${g.gen_icona || ""}
+          </span>
+          <!-- DESCRIZIONE GENERE -->
+          <span class="genre-title">
+            ${g.gen_descrizione}
+          </span>
+          <!-- BOX VERDE + -->
+          <button class="icon-btn add-btn" onclick="event.stopPropagation(); openAdd(${g.id_genere})">
+            +
+          </button>
+          <!-- BOX BLU MATITA -->
+          <button class="icon-btn edit-btn" onclick="event.stopPropagation(); openEdit(${g.id_genere})">
+            ✎
+          </button>
+        `;      
     header.onclick = () => {
       if (expanded.has(g.id_genere)) {
         expanded.delete(g.id_genere);
@@ -431,6 +449,15 @@ function render() {
   });
 }
 
+        window.openAdd = (id_genere) => {
+          window.location.href = `servizio.html?new=1&id_genere=${id_genere}`;
+        };
+
+        window.openEdit = (id_genere) => {
+          editingGenere = id_genere;
+          render();
+        };
+    
   
 load();
 
