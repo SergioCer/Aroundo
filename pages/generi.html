@@ -453,9 +453,11 @@ function render() {
       panel.className = "genre-panel";
       /* DESCRIZIONE ESTESA */
       const ext = document.createElement("div");
-      ext.style.marginBottom = "10px";
-      ext.style.background:#f8fafc;
-      ext.textContent = g.gen_descrizione_estesa || "";
+        ext.style.marginBottom = "10px";
+        ext.style.background = "#f8fafc";
+        ext.style.padding = "10px";
+        ext.style.borderRadius = "8px";
+        ext.textContent = g.gen_descrizione_estesa || "";
       panel.appendChild(ext);
 
         /* SERVIZI LIST */
