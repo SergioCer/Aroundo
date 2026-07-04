@@ -233,53 +233,52 @@ input, textarea {
   </div>
 
 <div class="section-box">
-<div class="section-header" onclick="toggleSection('eventi')">
-<span id="eventiArrow">▶</span>
-<span id="eventiTitle">Eventi (0)</span>
-</div>
-<div class="section-panel" id="eventiPanel" style="display:none;">
-<table class="mini-table"><tbody id="eventiBody"></tbody></table>
-</div>
-</div>
-
-<div class="section-box">
-<div class="section-header" onclick="toggleSection('luoghi')">
-<span id="luoghiArrow">▶</span>
-<span id="luoghiTitle">Luoghi (0)</span>
-</div>
-<div class="section-panel" id="luoghiPanel" style="display:none;">
-<table class="mini-table"><tbody id="luoghiBody"></tbody></table>
-</div>
-</div>
-
-<div class="section-box">
-<div class="section-header" onclick="toggleSection('serie')">
-<span id="serieArrow">▶</span>
-<span id="serieTitle">Serie (0)</span>
-
-<!-- pulsante + -->
-<button onclick="createSerie(event)" style="
-  margin-left:auto;
-  width:26px;
-  height:26px;
-  border-radius:13px;
-  border:none;
-  background:#22c55e;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-">+</button>
-
-</div>
+  <div class="section-header" onclick="toggleSection('serie')">
+    <span id="serieArrow">▶</span>
+    <span id="serieTitle">Serie (0)</span>
+  <!-- pulsante + -->
+  <button onclick="createSerie(event)" style="
+      margin-left:auto;
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      border:#000000;
+      background:#22c55e;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      font-size: 20px;
+      border-style: solid;
+      ">+</button>
 
 <div class="section-panel" id="seriePanel" style="display:none;">
-<table class="mini-table">
-<tbody id="serieBody"></tbody>
-</table>
-</div>
+  <table class="mini-table">
+    <tbody id="serieBody"></tbody>
+    </table>
+    </div>
+  </div>
+    
+<div class="section-box">
+  <div class="section-header" onclick="toggleSection('eventi')">
+    <span id="eventiArrow">▶</span>
+    <span id="eventiTitle">Eventi (0)</span>
+    </div>
+    <div class="section-panel" id="eventiPanel" style="display:none;">
+    <table class="mini-table"><tbody id="eventiBody"></tbody></table>
+    </div>
+  </div>
+
+<div class="section-box">
+  <div class="section-header" onclick="toggleSection('luoghi')">
+    <span id="luoghiArrow">▶</span>
+    <span id="luoghiTitle">Luoghi (0)</span>
+    </div>
+    <div class="section-panel" id="luoghiPanel" style="display:none;">
+    <table class="mini-table"><tbody id="luoghiBody"></tbody></table>
+    </div>
+    </div>
 </div>
 
-  
   <!-- CREATO -->
   <div class="footer" id="or_creato"></div>
   
