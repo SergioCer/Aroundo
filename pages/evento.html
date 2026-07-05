@@ -737,21 +737,6 @@ function updateCover() {
   }
 }  
 
-function updateDupButton() {
-  const btn = document.getElementById('btnDuplicate');
-  if (isNew) {
-    btn.disabled = true;
-    btn.style.background = "#9ca3af";
-    btn.style.cursor = "not-allowed";
-    btn.style.opacity = "0.6";
-  } else {
-    btn.disabled = false;
-    btn.style.background = "#3b82f6";
-    btn.style.cursor = "pointer";
-    btn.style.opacity = "1";
-  }
-}
-  
 function initMap() {
   if (map) return;
   map = L.map('map');
@@ -871,7 +856,20 @@ function updateMapButton() {
   }
 }
 
-  
+function updateDupButton() {
+  const btn = document.getElementById('btnDuplicate');
+  if (isNew) {
+    btn.disabled = true;
+    btn.style.background = "#9ca3af";
+    btn.style.cursor = "not-allowed";
+    btn.style.opacity = "0.6";
+  } else {
+    btn.disabled = false;
+    btn.style.background = "#3b82f6";
+    btn.style.cursor = "pointer";
+    btn.style.opacity = "1";
+  }
+}
   
 await loadComuni();  
 await loadSelects();
