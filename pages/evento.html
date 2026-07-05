@@ -429,10 +429,8 @@ async function loadSelects() {
 }
 
 async function loadSeriesByOrganizzatore(idOrg) {
-  console.log("STEP SERIES - load per organizzatore:", idOrg);
   const select = document.getElementById("id_event_series");
   if (!idOrg) {
-    console.log("STEP SERIES - nessun organizzatore -> reset");
     select.innerHTML = `<option value="">Nessuna serie</option>`;
     select.disabled = true;
     return;
@@ -446,7 +444,6 @@ async function loadSeriesByOrganizzatore(idOrg) {
     console.error("STEP SERIES - errore:", error);
     return;
   }
-  console.log("STEP SERIES - trovate serie:", data?.length || 0);
   seriesCache = data || [];
   select.innerHTML = `<option value="">Nessuna serie</option>`;
   (data || []).forEach(s => {
@@ -514,7 +511,6 @@ async function load() {
       await loadSeriesByOrganizzatore(data.id_organizzatore);
       if (data.id_event_series) {
         document.getElementById("id_event_series").value = data.id_event_series;
-        console.log("STEP LOAD - serie assegnata:", data.id_event_series);
       }
     }
   updateCover();
@@ -660,7 +656,6 @@ window.searchOrganizzatori = async (text) => {
     div.style.cursor = "pointer";
     div.innerText = o.or_nome;
     div.onclick = async () => {
-    console.log("STEP ORG - selezionato:", o.id_organizzatore);
     id_organizzatore.value = o.or_nome;
     id_organizzatore_hidden.value = o.id_organizzatore;
     markDirty();
