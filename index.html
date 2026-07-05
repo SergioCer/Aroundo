@@ -1526,11 +1526,21 @@ oms.addListener('click', function (marker) {
               Map
             </a>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-            ${
-              Number(e.ev_costo) > 0
-              ?
-              `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+          ${
+            e.ev_costo === null || e.ev_costo === undefined || e.ev_costo === ''
+            ? `
+              <div style="width:100%;text-align:center;color:#6b7280;font-weight:600;font-size:14px;">
+                Price: TBA
+              </div>
+            `
+            : Number(e.ev_costo) === 0
+            ? `
+              <div style="width:100%;text-align:center;color:#16a34a;font-weight:700;font-size:14px;">
+                Free Entry
+              </div>
+            `
+            : `
               <div>
                 Price €:
                 <span style="font-weight:700;">
@@ -1543,15 +1553,9 @@ oms.addListener('click', function (marker) {
                 onclick="alert('In Progress!');return false;">
                 Buy
               </a>
-              `
-              :
-              `
-              <div style="width:100%;text-align:center;color:#dc2626;font-weight:700;font-size:14px;">
-                Free Entry
-              </div>
-              `
-            }
-          </div>
+            `
+          }          
+        </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
             <div>I'll be there!</div>
             <a
