@@ -504,7 +504,7 @@ function formatDateTime(dt) {
   if (!dt) return '';
   const [date, time] = dt.split('T');
   const hhmm = time ? time.slice(0, 5) : '';
-  return `${date} ${hhmm}`;
+  return `${date} · ${hhmm}`;
 }  
   
 await loadComuni();
