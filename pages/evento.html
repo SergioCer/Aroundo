@@ -603,8 +603,9 @@ window.duplicateEvent = async () => {
     console.error(err2);
     return;
   }
-  // redirect a pagina eventi
-    location.href = `eventi.html`;
+  // redirect per modifica nuovo evento
+    // location.href = `eventi.html`;
+  location.href = `evento.html?id=${newRow.id_evento}`;
 };
 
 window.searchComuni = async (text) => {
