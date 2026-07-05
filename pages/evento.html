@@ -135,6 +135,10 @@ input, select, textarea {
   padding: 6px 10px;
   border-bottom: 1px solid #eee;
 }
+
+button:disabled {
+  pointer-events: none;
+}  
   
 </style>
 </head>
@@ -146,7 +150,7 @@ input, select, textarea {
     <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
     <div>Evento</div>
   </div>
-  <button onclick="duplicateEvent()" style="
+  <button id="btnDuplicate" onclick="duplicateEvent()" style="
     width:34px;
     height:34px;
     border-radius:17px;
@@ -514,7 +518,8 @@ async function load() {
       }
     }
   updateCover();
-updateMapButton()  
+  updateMapButton()  
+  updateDupButton()
 }
 
 async function loadComuni() {
@@ -578,8 +583,8 @@ window.duplicateEvent = async () => {
     return;
   }
   const payload = {
-    ev_titolo: data.ev_titolo,
-    ev_descrizione: data.ev_descrizione,
+    ev_titolo: '',
+    ev_descrizione: '',
     id_categoria: data.id_categoria,
     id_luogo: data.id_luogo,
     id_organizzatore: data.id_organizzatore,
@@ -736,6 +741,21 @@ function updateCover() {
   }
 }  
 
+function updateDupButton() {
+  const btn = document.getElementById('btnDuplicate');
+  if (isNew) {
+    btn.disabled = true;
+    btn.style.background = "#9ca3af";
+    btn.style.cursor = "not-allowed";
+    btn.style.opacity = "0.6";
+  } else {
+    btn.disabled = false;
+    btn.style.background = "#3b82f6";
+    btn.style.cursor = "pointer";
+    btn.style.opacity = "1";
+  }
+}
+  
 function initMap() {
   if (map) return;
   map = L.map('map');
