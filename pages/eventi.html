@@ -303,7 +303,7 @@ import { supabase } from '../supabase.js';
 let data = [];
 let state = {
   filters: {},
-  sortField: null,
+  sortField: 'inizio',
   sortDir: 'asc',
 };
 
@@ -431,6 +431,7 @@ function render() {
     tbody.appendChild(tr);
   });
 }
+
 // FILTER
 window.setFilter = (k,v) => {
   state.filters[k] = v;
