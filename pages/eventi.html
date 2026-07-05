@@ -425,7 +425,7 @@ function render() {
       <td>${r.ev_descrizione || ''}</td>
       <td>${comune}</td>
       <td>${org}</td>
-      <td>${r.ev_inizio || ''}</td>
+      <td>${formatDateTime(r.ev_inizio)}</td>
       <td>${r.ev_attivo ?? ''}</td>
     `;
     tbody.appendChild(tr);
@@ -498,6 +498,14 @@ function fillCategorieDropdown(rows) {
     select.value = state.filters.categoria;
   }
 }
+
+// Elimina la T tra Data ed Ora ed elimina i secondi
+function formatDateTime(dt) {
+  if (!dt) return '';
+  const [date, time] = dt.split('T');
+  const hhmm = time ? time.slice(0, 5) : '';
+  return `${date} ${hhmm}`;
+}  
   
 await loadComuni();
 await loadLuoghi();
