@@ -270,7 +270,7 @@ textarea:disabled {
         type="checkbox"
         id="lu_environment"
         style="width:auto;"
-        onclick="cycleEnvironment(); return false;">
+        onclick="cycleEnvironment();">
       <div style="font-size:11px;line-height:1.15;">
         <div id="envIndoor" style="padding:1px 6px;border-radius:4px;">Indoor</div>
         <div id="envOutdoor" style="padding:1px 6px;border-radius:4px;">Outdoor</div>
@@ -909,6 +909,7 @@ function updateMapPopupTitle() {
 }
 
 function cycleEnvironment() {
+  event.preventDefault();
   if (environmentValue === null) {
     environmentValue = true;
   }
