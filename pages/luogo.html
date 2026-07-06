@@ -908,20 +908,16 @@ function updateMapPopupTitle() {
   subEl.textContent = (!isNew && subtitle) ? subtitle : "";
 }
 
-function cycleEnvironment() {
-  event.preventDefault();
-  if (environmentValue === null) {
-    environmentValue = true;
-  }
-  else if (environmentValue === true) {
-    environmentValue = false;
-  }
-  else {
-    environmentValue = null;
-  }
-  updateEnvironmentUI();
-  markDirty();
-}
+window.cycleEnvironment = function () {
+    if (environmentValue === null)
+        environmentValue = true;
+    else if (environmentValue === true)
+        environmentValue = false;
+    else
+        environmentValue = null;
+    updateEnvironmentUI();
+    markDirty();
+};
 
 function updateEnvironmentUI() {
   const chk = document.getElementById("lu_environment");
