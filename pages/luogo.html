@@ -264,6 +264,22 @@ textarea:disabled {
   </div>
 
   <div style="flex:1;">
+    <div class="section-title" style="margin-top:0;">Environment</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input
+        type="checkbox"
+        id="lu_environment"
+        style="width:auto;"
+        onclick="cycleEnvironment(); return false;">
+      <div style="font-size:11px;line-height:1.15;">
+        <div id="envIndoor" style="padding:1px 6px;border-radius:4px;">Indoor</div>
+        <div id="envOutdoor" style="padding:1px 6px;border-radius:4px;">Outdoor</div>
+        <div id="envBoth" style="padding:1px 6px;border-radius:4px;">Both</div>
+      </div>
+    </div>
+  </div>
+  
+  <div style="flex:1;">
     <input id="lu_lat" oninput="markDirty()">
   </div>
 
@@ -483,6 +499,155 @@ let orgOpen = false;
 let coordResolve;
 let comuneLayer;
 let comuneGeoJson;  
+let environmentValue = null;
+
+/* LOAD */
+async function load() {
+  if (isNew) {
+    original = JSON.stringify({}); // base vuoto
+    document.getElementById("mapTitle").textContent = "Aggiungi Luogo";
+    updatePageState();
+    return;
+  } else {
+    document.getElementById("mapTitle").textContent =  "Luogo Attuale";
+  }
+  const { data, error } = await supabase
+    .from('luoghi')
+    .select('*')
+    .eq('id_luogo', id)
+    .single();
+  if (error) {
+    console.error(error);
+    return;
+  }
+  original = JSON.stringify(data);
+  lu_location.value = data.lu_location || '';
+  updateMapPopupTitle()
+  id_comune_hidden.value = data.id_comune || '';
+  const com = await supabase
+  .from("comuni")
+  .select("co_descrizione")
+  .eq("id_comune", data.id_comune)
+  .single();
+if (com.data) {
+  id_comune.value = com.data.co_descrizione;
+}
+  lu_descrizione.value = data.lu_descrizione || '';
+  lu_note.value = data.lu_note || '';
+  lu_lat.value = data.lu_lat || '';
+  lu_lng.value = data.lu_lng || '';
+  lu_capienza.value = data.lu_capienza || '';
+  environmentValue = data.lu_environment;
+  document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
+  updatePageState();
+  updateEnvironmentUI();
+}
+
+/* COMUNI */
+async function loadComuni() {
+  const { data = [] } = await supabase
+    .from('comuni')
+    .select('id_comune, co_lat, co_lng');
+  comuniCoords = {};
+  data.forEach(c => {
+    comuniCoords[c.id_comune] = {
+      lat: c.co_lat,
+      lng: c.co_lng
+    };
+  });
+}
+
+async function loadMapLuoghi(idComune) {
+  const { data } = await supabase
+    .from("luoghi")
+    .select("*")
+    .eq("id_comune", idComune);
+  renderMarkers(data || []);
+}
+
+async function loadEventiLuogo(idLuogo) {
+  const { data } = await supabase
+    .from("eventi")
+    .select(`
+      id_evento,
+      ev_titolo,
+      ev_descrizione,
+      ev_inizio,
+      id_organizzatore,
+      organizzatori (
+        id_organizzatore,
+        or_nome
+      )
+    `)
+    .eq("id_luogo", idLuogo);
+  eventiList = sortEventi(data || []);
+  renderEventi();
+  
+}
+
+async function loadOrganizzatoriLuogo(idLuogo) {
+  const orgMap = new Map();
+  eventiList.forEach(e => {
+    if (!e.organizzatori) return;
+    const id = e.organizzatori.id_organizzatore;
+    if (!orgMap.has(id)) {
+      orgMap.set(id, {
+        id_organizzatore: id,
+        or_nome: e.organizzatori.or_nome,
+        or_descrizione: "",
+        num_eventi: 1
+      });
+    } else {
+      orgMap.get(id).num_eventi++;
+    }
+  });
+  organizzatoriList = [...orgMap.values()]
+      .sort((a, b) => a.or_nome.localeCompare(b.or_nome));
+  renderOrganizzatori();
+}  
+  
+/* SAVE */
+async function save() {
+  const payload = {
+    lu_location: lu_location.value,
+    id_comune: id_comune_hidden.value,
+    lu_descrizione: lu_descrizione.value,
+    lu_note: lu_note.value,
+    lu_lat: lu_lat.value ? parseFloat(lu_lat.value) : null,
+    lu_lng: lu_lng.value ? parseFloat(lu_lng.value) : null,
+    lu_environment: environmentValue,
+    lu_capienza: lu_capienza.value
+      ? parseInt(lu_capienza.value)
+      : null
+  };
+  let result;
+  if (isNew) {
+    result = await supabase
+      .from('luoghi')
+      .insert(payload)
+      .select()
+      .single();
+  } else {
+    result = await supabase
+      .from('luoghi')
+      .update(payload)
+      .eq('id_luogo', id)
+      .select()
+      .single();
+  }
+  const { data, error } = result;
+  if (error) {
+    console.error(error);
+    alert("Errore salvataggio");
+    return false;
+  }
+  dirty = false;
+  // 🔥 redirect solo dopo insert
+  if (isNew) {
+    location.href = `luogo.html?id=${data.id_luogo}`;
+  }
+  return true;
+}  
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -516,8 +681,6 @@ function updatePageState() {
       : "Seleziona il Comune per accedere";
 }
 
-window.dialogAction = dialogAction;
-  
 function initMapLuogo() {
   if (map) return;
   map = L.map('map');
@@ -734,11 +897,6 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     });
   }
 
-window.coordAction = (type) => {
-  document.getElementById("coordDialog").style.display = "none";
-  coordResolve(type);
-};  
-
 function updateMapPopupTitle() {
   const comuneNome = id_comune.value || "Comune";
   const subtitle = lu_location.value?.trim();
@@ -749,7 +907,48 @@ function updateMapPopupTitle() {
   const subEl = document.getElementById("popupMapSubtitle");
   subEl.textContent = (!isNew && subtitle) ? subtitle : "";
 }
+
+function cycleEnvironment() {
+  if (environmentValue === null) {
+    environmentValue = true;
+  }
+  else if (environmentValue === true) {
+    environmentValue = false;
+  }
+  else {
+    environmentValue = null;
+  }
+  updateEnvironmentUI();
+  markDirty();
+}
+
+function updateEnvironmentUI() {
+  const chk = document.getElementById("lu_environment");
+  chk.checked = environmentValue === true;
+  chk.indeterminate = environmentValue === null;
+  ["Indoor","Outdoor","Both"].forEach(name=>{
+    const el = document.getElementById("env"+name);
+    el.style.background = "";
+    el.style.color = "#666";
+  });
+  let active;
+  if (environmentValue === true)
+    active = document.getElementById("envIndoor");
+  else if (environmentValue === false)
+    active = document.getElementById("envOutdoor");
+  else
+    active = document.getElementById("envBoth");
+  active.style.background = "#22c55e";
+  active.style.color = "white";
+}
+
+window.dialogAction = dialogAction;
   
+window.coordAction = (type) => {
+  document.getElementById("coordDialog").style.display = "none";
+  coordResolve(type);
+};  
+
 window.openMapLuogo = async () => {
   if (isNew && !id_comune_hidden.value) return;
   document.getElementById("mapModal").style.display = "block";
@@ -774,111 +973,6 @@ window.onComuneInput = (text) => {
   updateMapPopupTitle()
 };
 
-  
-/* COMUNI */
-async function loadComuni() {
-  const { data = [] } = await supabase
-    .from('comuni')
-    .select('id_comune, co_lat, co_lng');
-  comuniCoords = {};
-  data.forEach(c => {
-    comuniCoords[c.id_comune] = {
-      lat: c.co_lat,
-      lng: c.co_lng
-    };
-  });
-}
-
-/* LOAD */
-async function load() {
-  if (isNew) {
-    original = JSON.stringify({}); // base vuoto
-    document.getElementById("mapTitle").textContent = "Aggiungi Luogo";
-    updatePageState();
-    return;
-  } else {
-    document.getElementById("mapTitle").textContent =  "Luogo Attuale";
-  }
-  const { data, error } = await supabase
-    .from('luoghi')
-    .select('*')
-    .eq('id_luogo', id)
-    .single();
-  if (error) {
-    console.error(error);
-    return;
-  }
-  original = JSON.stringify(data);
-  lu_location.value = data.lu_location || '';
-  updateMapPopupTitle()
-  id_comune_hidden.value = data.id_comune || '';
-  const com = await supabase
-  .from("comuni")
-  .select("co_descrizione")
-  .eq("id_comune", data.id_comune)
-  .single();
-if (com.data) {
-  id_comune.value = com.data.co_descrizione;
-}
-  lu_descrizione.value = data.lu_descrizione || '';
-  lu_note.value = data.lu_note || '';
-  lu_lat.value = data.lu_lat || '';
-  lu_lng.value = data.lu_lng || '';
-  lu_capienza.value = data.lu_capienza || '';
-  document.getElementById('lu_creato').textContent = data.lu_creato ? new Date(data.lu_creato).toLocaleString() : '';
-  updatePageState();
-}
-
-async function loadMapLuoghi(idComune) {
-  const { data } = await supabase
-    .from("luoghi")
-    .select("*")
-    .eq("id_comune", idComune);
-  renderMarkers(data || []);
-}
-  
-/* SAVE */
-async function save() {
-  const payload = {
-    lu_location: lu_location.value,
-    id_comune: id_comune_hidden.value,
-    lu_descrizione: lu_descrizione.value,
-    lu_note: lu_note.value,
-    lu_lat: lu_lat.value ? parseFloat(lu_lat.value) : null,
-    lu_lng: lu_lng.value ? parseFloat(lu_lng.value) : null,
-    lu_capienza: lu_capienza.value
-      ? parseInt(lu_capienza.value)
-      : null
-  };
-  let result;
-  if (isNew) {
-    result = await supabase
-      .from('luoghi')
-      .insert(payload)
-      .select()
-      .single();
-  } else {
-    result = await supabase
-      .from('luoghi')
-      .update(payload)
-      .eq('id_luogo', id)
-      .select()
-      .single();
-  }
-  const { data, error } = result;
-  if (error) {
-    console.error(error);
-    alert("Errore salvataggio");
-    return false;
-  }
-  dirty = false;
-  // 🔥 redirect solo dopo insert
-  if (isNew) {
-    location.href = `luogo.html?id=${data.id_luogo}`;
-  }
-  return true;
-}
-
 /* DIRTY */
 window.markDirty = () => {
   // Nessun comune selezionato: non è possibile salvare
@@ -895,6 +989,7 @@ window.markDirty = () => {
     lu_note: lu_note.value,
     lu_lat: lu_lat.value,
     lu_lng: lu_lng.value,
+    lu_environment: environmentValue,
     lu_capienza: lu_capienza.value
   });
   dirty = current !== original;
@@ -961,47 +1056,6 @@ window.requestBack = async () => {
   document.getElementById("mapModal").style.display = "none";
 };
 
-async function loadEventiLuogo(idLuogo) {
-  const { data } = await supabase
-    .from("eventi")
-    .select(`
-      id_evento,
-      ev_titolo,
-      ev_descrizione,
-      ev_inizio,
-      id_organizzatore,
-      organizzatori (
-        id_organizzatore,
-        or_nome
-      )
-    `)
-    .eq("id_luogo", idLuogo);
-  eventiList = sortEventi(data || []);
-  renderEventi();
-  
-}
-
-async function loadOrganizzatoriLuogo(idLuogo) {
-  const orgMap = new Map();
-  eventiList.forEach(e => {
-    if (!e.organizzatori) return;
-    const id = e.organizzatori.id_organizzatore;
-    if (!orgMap.has(id)) {
-      orgMap.set(id, {
-        id_organizzatore: id,
-        or_nome: e.organizzatori.or_nome,
-        or_descrizione: "",
-        num_eventi: 1
-      });
-    } else {
-      orgMap.get(id).num_eventi++;
-    }
-  });
-  organizzatoriList = [...orgMap.values()]
-      .sort((a, b) => a.or_nome.localeCompare(b.or_nome));
-  renderOrganizzatori();
-}
- 
 function renderEventi() {
   const body = document.getElementById("eventiBody");
   body.innerHTML = "";
