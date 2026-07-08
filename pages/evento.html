@@ -336,9 +336,7 @@ input, select, textarea {
     <div style="margin-bottom:18px; font-weight:600;">
       Vuoi salvare le modifiche?
     </div>
-
     <div style="display:flex; gap:10px; justify-content:center;">
-
       <button onclick="dialogAction('yes')" style="
         flex:1;
         background:#22c55e;
@@ -349,7 +347,6 @@ input, select, textarea {
         cursor:pointer;
         font-weight:600;
       ">Sì</button>
-
       <button onclick="dialogAction('no')" style="
         flex:1;
         background:#ef4444;
@@ -360,7 +357,6 @@ input, select, textarea {
         cursor:pointer;
         font-weight:600;
       ">No</button>
-
       <button onclick="dialogAction('cancel')" style="
         flex:1;
         background:#9ca3af;
@@ -371,10 +367,49 @@ input, select, textarea {
         cursor:pointer;
         font-weight:600;
       ">Annulla</button>
-
     </div>
   </div>
 </div>
+
+<div id="warningDialog" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  z-index:99999;
+  align-items:center;
+  justify-content:center;
+">
+  <div style="
+    background:white;
+    padding:22px;
+    border-radius:12px;
+    width:300px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  ">
+    <div id="warningMessage" style="
+      margin-bottom:18px;
+      font-weight:600;
+    ">
+    </div>
+    <button onclick="closeWarning()" style="
+      width:100%;
+      background:#9ca3af;
+      color:white;
+      border:none;
+      padding:10px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    ">
+      Annulla
+    </button>
+  </div>
+</div>  
 
 <script type="module">
 import { supabase } from '../supabase.js';
@@ -676,6 +711,17 @@ window.searchOrganizzatori = async (text) => {
   
 /* SAVE */
 async function save() {
+    const durata = parseInt(ev_durata.value);
+      if (!isNaN(durata)) {
+        if (durata < 3) {
+          showWarning("Incoerenza di durata dell'evento");
+          return false;
+        }
+        if (durata > 2160) {
+          showWarning("Un singolo evento non dovrebbe durare più di 36 ore");
+          return false;
+        }
+      }
   const payload = {
     ev_titolo: ev_titolo.value,
     ev_descrizione: ev_descrizione.value,
@@ -911,6 +957,15 @@ window.aggiornaFineDaInizio = function() {
     `${anno}-${mese}-${giorno}T${ore}:${minuti}`;
 calcolaDurata()
 };
+
+function showWarning(message) {
+  document.getElementById("warningMessage").textContent = message;
+  document.getElementById("warningDialog").style.display = "flex";
+}
+
+window.closeWarning = function() {
+  document.getElementById("warningDialog").style.display = "none";
+};  
   
 await loadComuni();  
 await loadSelects();
