@@ -496,7 +496,8 @@ async function load() {
   }
   ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
   ev_fine.value = data.ev_fine ? data.ev_fine.replace(' ', 'T') : '';
-  ev_costo.value = data.ev_costo || '';
+  // ev_costo.value = data.ev_costo || ''; // non esponeva Zero e Null ( vedi sotto )
+  ev_costo.value = data.ev_costo === null ? 'TBA' : data.ev_costo;
   ev_capienza.value = data.ev_capienza || '';
   ev_link.value = data.ev_link || '';
   ev_copertina.value = data.ev_copertina || '';
@@ -576,8 +577,8 @@ window.duplicateEvent = async () => {
     return;
   }
   const payload = {
-    ev_titolo: '',
-    ev_descrizione: '',
+    ev_titolo: data.ev_titolo,
+    ev_descrizione: data.ev_descrizione,
     id_categoria: data.id_categoria,
     id_luogo: data.id_luogo,
     id_organizzatore: data.id_organizzatore,
