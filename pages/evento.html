@@ -753,6 +753,10 @@ window.requestBack = async () => {
           showWarning("La data di fine evento non può precedere la data di inizio");
           return;
         }
+        if (durata < 3) {
+          showWarning("Incoerenza di durata dell'evento");
+          return;
+        }
         if (durata > 2160) {
           showWarning("Un singolo evento non dovrebbe durare più di 36 ore");
           return false;
