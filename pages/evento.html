@@ -231,11 +231,11 @@ input, select, textarea {
 <div class="inline">
   <div style="flex:1;">
     <div class="section-title" style="margin-top:0;">Start</div>
-    <input id="ev_inizio" type="datetime-local" oninput="aggiornaFineDaInizio(); markDirty()">
+    <input id="ev_inizio" type="datetime-local" step="300"; oninput="aggiornaFineDaInizio(); markDirty()">
   </div>
   <div style="flex:1;">
     <div class="section-title" style="margin-top:0;">End</div>
-    <input id="ev_fine" type="datetime-local" oninput="markDirty(); calcolaDurata()">
+    <input id="ev_fine" type="datetime-local" step="300"; oninput="markDirty(); calcolaDurata()">
   </div>
     <div style="flex:1;">
     <div class="section-title" style="margin-top:0;">Durata</div>
@@ -752,10 +752,6 @@ window.requestBack = async () => {
         if (durata < 0) {
           showWarning("La data di fine evento non può precedere la data di inizio");
           return;
-        }
-        if (durata < 3) {
-          showWarning("Incoerenza di durata dell'evento");
-          return false;
         }
         if (durata > 2160) {
           showWarning("Un singolo evento non dovrebbe durare più di 36 ore");
