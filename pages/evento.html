@@ -897,7 +897,7 @@ function formatDateTime(dt) {
 }  
 
 // Calcola automaticamente la data fine evento aggiungendo 60 Minuti
-function aggiornaFineDaInizio() {
+window.aggiornaFineDaInizio = function() {
   const inizio = document.getElementById('ev_inizio').value;
   if (!inizio) return;
   const dataInizio = new Date(inizio);
@@ -909,7 +909,7 @@ function aggiornaFineDaInizio() {
   const minuti = String(dataInizio.getMinutes()).padStart(2, '0');
   document.getElementById('ev_fine').value =
     `${anno}-${mese}-${giorno}T${ore}:${minuti}`;
-}
+};
   
 await loadComuni();  
 await loadSelects();
