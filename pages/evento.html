@@ -231,11 +231,15 @@ input, select, textarea {
 <div class="inline">
   <div style="flex:1;">
     <div class="section-title" style="margin-top:0;">Start</div>
-    <input id="ev_inizio" type="datetime-local" oninput="markDirty()">
+    <input id="ev_inizio" type="datetime-local" oninput="markDirty(); calcolaDurata()">
   </div>
   <div style="flex:1;">
     <div class="section-title" style="margin-top:0;">End</div>
-    <input id="ev_fine" type="datetime-local" oninput="markDirty()">
+    <input id="ev_fine" type="datetime-local" oninput="markDirty(); calcolaDurata()">
+  </div>
+    <div style="flex:1;">
+    <div class="section-title" style="margin-top:0;">Durata</div>
+    <input id="ev_durata" readonly>
   </div>
   <div style="flex:1;">
     <div class="section-title" style="margin-top:0;">Price — null = TBA · 0 = Free</div>
@@ -496,6 +500,7 @@ async function load() {
   }
   ev_inizio.value = data.ev_inizio ? data.ev_inizio.replace(' ', 'T') : '';
   ev_fine.value = data.ev_fine ? data.ev_fine.replace(' ', 'T') : '';
+  calcolaDurata()
   // ev_costo.value = data.ev_costo || ''; // non esponeva Zero e Null ( vedi sotto )
   ev_costo.value = data.ev_costo === null ? 'TBA' : data.ev_costo;
   ev_capienza.value = data.ev_capienza || '';
@@ -875,6 +880,20 @@ function formatDateTime(dt) {
   const [date, time] = dt.split('T');
   const hhmm = time ? time.slice(0, 5) : '';
   return `${date} ${hhmm}`;
+}  
+
+// Calcola durata dell'evento in minuti. 
+  function calcolaDurata() {
+  const inizio = document.getElementById('ev_inizio').value;
+  const fine = document.getElementById('ev_fine').value;
+  if (!inizio || !fine) {
+    ev_durata.value = '';
+    return;
+  }
+  const start = new Date(inizio);
+  const end = new Date(fine);
+  const minuti = Math.round((end - start) / 60000);
+  ev_durata.value = minuti >= 0 ? minuti : '';
 }  
   
 await loadComuni();  
