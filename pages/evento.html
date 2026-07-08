@@ -749,6 +749,10 @@ async function save() {
 window.requestBack = async () => {
     const durata = parseInt(ev_durata.value);
       if (!isNaN(durata)) {
+        if (durata < 0) {
+          showWarning("La data di fine evento non può precedere la data di inizio");
+          return;
+        }
         if (durata < 3) {
           showWarning("Incoerenza di durata dell'evento");
           return false;
@@ -932,7 +936,7 @@ window.calcolaDurata = function() {
   const start = new Date(inizio);
   const end = new Date(fine);
   const minuti = Math.round((end - start) / 60000);
-  ev_durata.value = minuti >= 0 ? minuti : '';
+  ev_durata.value = minuti;
 }  
 
 // Calcola automaticamente la data fine evento aggiungendo 60 Minuti
