@@ -883,7 +883,7 @@ function formatDateTime(dt) {
 }  
 
 // Calcola durata dell'evento in minuti. 
-  function calcolaDurata() {
+window.calcolaDurata = function() {
   const inizio = document.getElementById('ev_inizio').value;
   const fine = document.getElementById('ev_fine').value;
   if (!inizio || !fine) {
