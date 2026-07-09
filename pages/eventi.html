@@ -161,6 +161,19 @@ td {
 td:last-child {
   border-right: none;
 }
+
+.table-container {
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 5;
+}
+  
 </style>
 </head>
 
@@ -174,6 +187,7 @@ td:last-child {
   </div>
 </div>
 
+<div class="table-container">  
 <table>
 <colgroup>
   <col style="width: 40px;">
@@ -296,7 +310,8 @@ td:last-child {
 
 <tbody id="tbody"></tbody>
 </table>
-
+</div>
+  
 <script type="module">
 import { supabase } from '../supabase.js';
 
