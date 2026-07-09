@@ -1985,11 +1985,9 @@ toggle.addEventListener('click', openOverlay);
 setTimeout(() => { minimizeOverlay(); }, timeout);
 
 // per il service-worker.js
-<script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js');
 }
-</script>
   
 </script>
 </body>
