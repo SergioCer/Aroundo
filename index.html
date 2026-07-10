@@ -82,7 +82,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      height: 34px;
+      height: 38px;
       margin-top: 4px;
       font-size: 14px;
       color: #6b6b6b;
@@ -98,33 +98,36 @@
       width: 5px;
     }
 
-    /* arco verso il basso */
-    .subtitle span:nth-child(1)  { transform: translateY(0px) rotate(-12deg); }
-    .subtitle span:nth-child(2)  { transform: translateY(1px) rotate(-10deg); }
-    .subtitle span:nth-child(3)  { transform: translateY(2px) rotate(-8deg); }
-    .subtitle span:nth-child(4)  { transform: translateY(3px) rotate(-6deg); }
-    .subtitle span:nth-child(5)  { transform: translateY(4px) rotate(-4deg); }
-    .subtitle span:nth-child(6)  { transform: translateY(5px) rotate(-3deg); }
-    .subtitle span:nth-child(7)  { transform: translateY(6px) rotate(-2deg); }
-    .subtitle span:nth-child(8)  { transform: translateY(7px) rotate(-1deg); }
-    /* seconda parola */
-    .subtitle span:nth-child(10) { transform: translateY(9px) rotate(0deg); }
-    .subtitle span:nth-child(11) { transform: translateY(10px) rotate(2deg); }
-    .subtitle span:nth-child(12) { transform: translateY(11px) rotate(3deg); }
-    .subtitle span:nth-child(13) { transform: translateY(12px) rotate(4deg); }
-    .subtitle span:nth-child(14) { transform: translateY(13px) rotate(5deg); }
-    .subtitle span:nth-child(15) { transform: translateY(14px) rotate(6deg); }
-    /* terza parola */
-    .subtitle span:nth-child(17) { transform: translateY(13px) rotate(5deg); }
-    .subtitle span:nth-child(18) { transform: translateY(12px) rotate(4deg); }
-    .subtitle span:nth-child(19) { transform: translateY(11px) rotate(3deg); }
-    .subtitle span:nth-child(20) { transform: translateY(10px) rotate(2deg); }
-    .subtitle span:nth-child(21) { transform: translateY(9px) rotate(1deg); }
-    .subtitle span:nth-child(22) { transform: translateY(8px) rotate(0deg); }
-    /* ultima parola */
-    .subtitle span:nth-child(24) { transform: translateY(6px) rotate(-2deg); }
-    .subtitle span:nth-child(25) { transform: translateY(5px) rotate(-3deg); }
-    .subtitle span:nth-child(26) { transform: translateY(4px) rotate(-4deg); }
+/* arco inferiore centrato */
+.subtitle span:nth-child(1)  { transform:translate(-78px,0px) rotate(-14deg); }
+.subtitle span:nth-child(2)  { transform:translate(-72px,2px) rotate(-12deg); }
+.subtitle span:nth-child(3)  { transform:translate(-66px,4px) rotate(-10deg); }
+.subtitle span:nth-child(4)  { transform:translate(-60px,6px) rotate(-8deg); }
+.subtitle span:nth-child(5)  { transform:translate(-54px,8px) rotate(-6deg); }
+.subtitle span:nth-child(6)  { transform:translate(-48px,10px) rotate(-4deg); }
+.subtitle span:nth-child(7)  { transform:translate(-42px,12px) rotate(-2deg); }
+.subtitle span:nth-child(8)  { transform:translate(-36px,14px) rotate(-1deg); }
+
+
+.subtitle span:nth-child(10) { transform:translate(-25px,17px) rotate(0deg); }
+.subtitle span:nth-child(11) { transform:translate(-19px,19px) rotate(2deg); }
+.subtitle span:nth-child(12) { transform:translate(-13px,20px) rotate(3deg); }
+.subtitle span:nth-child(13) { transform:translate(-7px,21px) rotate(4deg); }
+.subtitle span:nth-child(14) { transform:translate(0px,22px) rotate(5deg); }
+.subtitle span:nth-child(15) { transform:translate(7px,21px) rotate(6deg); }
+
+
+.subtitle span:nth-child(17) { transform:translate(18px,20px) rotate(5deg); }
+.subtitle span:nth-child(18) { transform:translate(24px,18px) rotate(4deg); }
+.subtitle span:nth-child(19) { transform:translate(30px,16px) rotate(3deg); }
+.subtitle span:nth-child(20) { transform:translate(36px,14px) rotate(2deg); }
+.subtitle span:nth-child(21) { transform:translate(42px,12px) rotate(1deg); }
+.subtitle span:nth-child(22) { transform:translate(48px,10px) rotate(0deg); }
+
+
+.subtitle span:nth-child(24) { transform:translate(60px,7px) rotate(-2deg); }
+.subtitle span:nth-child(25) { transform:translate(66px,5px) rotate(-4deg); }
+.subtitle span:nth-child(26) { transform:translate(72px,3px) rotate(-6deg); }
     
     /* -- Rettangolo Aroundo trasparente */
     .map-overlay {
