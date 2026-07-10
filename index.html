@@ -655,7 +655,7 @@
     .copyright a {
       color: inherit;
       text-decoration: none;
-      font-size: 14px;
+      font-size: 16px;
       margin-left: 2px;
     }
 
@@ -663,7 +663,11 @@
       cursor: pointer;
       margin-top: 8px;
       color: #ef4444;
-      text-decoration: underline;
+      background: none;
+      border: none;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: inherit;
     }
 
     .location-control.enabled {
@@ -822,9 +826,9 @@
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:8px;">
     📲 Install Aroundo
   </div>
-  <div id="locationBtn" class="date-day location-control">
+  <button id="locationBtn" class="date-day location-control">
     📍 Location
-  </div>
+  </button>
 <div id="locationMessage" class="location-message"></div>
 </div>
   
@@ -1636,17 +1640,27 @@ oms.addListener('click', function (marker) {
     }
   }
 
-    // Attiva / Disattiva la Geolocalizzazione
-    locationBtn.onclick = () => {
+    // Attiva / aggiorna la Geolocalizzazione
+    locationBtn.addEventListener("click", () => {
       navigator.geolocation.getCurrentPosition(
-        () => {
+        (position) => {
+          console.log(
+            "Location:",
+            position.coords.latitude,
+            position.coords.longitude
+          );
           updateLocationStatus(true);
         },
-        () => {
+        (error) => {
+          console.log("Location error:", error.message);
           updateLocationStatus(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000
         }
       );
-    };
+    });
   
     // Calcola il range della Timeline
     function getTimelineRange () {
