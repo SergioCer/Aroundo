@@ -659,27 +659,11 @@
       margin-left: 2px;
     }
 
-    .location-control {
-      cursor: pointer;
+    .geo-status {
       margin-top: 8px;
-      color: #ef4444;
-      background: none;
-      border: none;
-      text-decoration: none;
-      font-family: inherit;
-      font-size: inherit;
-    }
-
-    .location-control.enabled {
-      color: #22c55e;
-    }
-
-    .location-message {
-      font-size: 11px;
-      color: rgba(255,255,255,0.75);
-      margin-top: 4px;
-      max-width: 250px;
       text-align: center;
+      font-size: 12px;
+      font-weight: 500;
     }
     
     @keyframes tickerScroll{
@@ -826,9 +810,8 @@
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:8px;">
     📲 Install Aroundo
   </div>
-  <button id="locationBtn" class="date-day location-control">
-    📍 Location
-  </button>
+  <div id="geoStatus" class="geo-status"></div>
+  -->
 <div id="locationMessage" class="location-message"></div>
 </div>
   
@@ -928,9 +911,6 @@
   zoomToBoundsOnClick: true
   });
 
-  const locationBtn = document.getElementById('locationBtn');
-  const locationMessage = document.getElementById('locationMessage');
-  
   map.addLayer(markersCluster);
   const oms = new OverlappingMarkerSpiderfier(map, {
     nearbyDistance: 15,    // distanza dei marker da considerare spiderizzabili
@@ -1031,17 +1011,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 4. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
   // 5. Verifica Geolocalizzazione attiva 
-  if ("geolocation" in navigator) {
-      navigator.permissions.query({name:"geolocation"})
-      .then(permission => {
-        updateLocationStatus(permission.state === "granted");
-        permission.onchange = () => {
-          updateLocationStatus(permission.state === "granted");
-        };
-      });
-    } else {
-      updateLocationStatus(false);
-    }
+  navigator.permissions.query({name:"geolocation"})
+    .then(permission => {
+      updateGeoStatus(permission.state === "granted");
+      permission.onchange = () => {
+        updateGeoStatus(permission.state === "granted");
+      };
+    });
   setupTimeline();
   renderEvents();
   updateDateUI();
@@ -1626,41 +1602,17 @@ oms.addListener('click', function (marker) {
     document.getElementById("installBtn").style.display = "none";
   });
 
-  // Messaggio di avviso se la geolocalizzazione è Attiva o Disattiva
-  function updateLocationStatus(enabled) {
-    if (enabled) {
-      locationBtn.innerHTML = "📍 Location";
-      locationBtn.classList.add("enabled");
-      locationMessage.textContent = "";
-    } else {
-      locationBtn.innerHTML = "📍 Location";
-      locationBtn.classList.remove("enabled");
-      locationMessage.textContent =
-        "Location access disabled. Default location will be used.";
+    const geoStatus = document.getElementById("geoStatus");
+    function updateGeoStatus(active) {
+      if (active) {
+        geoStatus.textContent = "🔴 Geo active";
+        geoStatus.style.color = "#22c55e";
+      } else {
+        geoStatus.textContent = "🔴 Geo inactive";
+        geoStatus.style.color = "#ef4444";
+      }
     }
-  }
-
-    // Attiva / aggiorna la Geolocalizzazione
-    locationBtn.addEventListener("click", () => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log(
-            "Location:",
-            position.coords.latitude,
-            position.coords.longitude
-          );
-          updateLocationStatus(true);
-        },
-        (error) => {
-          console.log("Location error:", error.message);
-          updateLocationStatus(false);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000
-        }
-      );
-    });
+  
   
     // Calcola il range della Timeline
     function getTimelineRange () {
