@@ -886,8 +886,6 @@
   const dayText = document.getElementById("day-text");
   const dateText = document.getElementById("date-text");
   const slider = document.getElementById('time-range');
-  const geoDot = document.getElementById("geoDot");
-  const geoText = document.getElementById("geoText");
   const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
   // NON USATO const daysShort = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
   const daysLong  = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
@@ -1014,6 +1012,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   buildCategoryMenu();
   // 4. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
+  // 5. Verifica se Geolocalizzazione Attiva o Disattiva
+  checkGeoStatus()
   setupTimeline();
   renderEvents();
   updateDateUI();
@@ -1600,6 +1600,8 @@ oms.addListener('click', function (marker) {
 
     // Verifica se Geolocalizzazione è Attiva o Disattiva
     const geoStatus = document.getElementById("geoStatus");
+    const geoDot = document.getElementById("geoDot");
+    const geoText = document.getElementById("geoText");
     function updateGeoStatus(active) {
       if (active) {
         geoDot.style.background = "#22c55e";
@@ -1612,15 +1614,26 @@ oms.addListener('click', function (marker) {
       }
     }
 
-    // Aggiorna lo stato della Geolocalizzazione
+    // aggiornamento quando ritorni nell'app
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        navigator.permissions.query({name:"geolocation"})
-        .then(permission => {
-          updateGeoStatus(permission.state === "granted");
-        });
+        checkGeoStatus();
       }
     });
+
+    function checkGeoStatus() {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          updateGeoStatus(true);
+        },
+        () => {
+          updateGeoStatus(false);
+        },
+        {
+          timeout: 5000
+        }
+      );
+    }
   
     // Calcola il range della Timeline
     function getTimelineRange () {
