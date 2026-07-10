@@ -639,10 +639,15 @@
     .map-btn  { background:#3b82f6; }    /* blu standard */
     
     .copyright {
+      position: fixed;
       text-align: center;
       font-size: 10px;
       color: rgba(255,255,255,0.65);
+      bottom: 4px;
       margin-top: 4px;
+      left: 0;
+      width: 100%;
+      z-index: 3000;
     }
     
     @keyframes tickerScroll{
@@ -823,12 +828,12 @@
 </div>
 <div id="map"></div>
 <canvas id="fx-canvas"></canvas>  
-  <div id="eventTicker">
-  <div id="eventTickerContent"></div>
     <div class="copyright">
     © 2026 Aroundo™ · Concept, design & development by Sergio Cernigliaro · 
     <a href="mailto:sergiocernigliaro@gmail.com">Contact</a>
   </div>    
+  <div id="eventTicker">
+  <div id="eventTickerContent"></div>
 </div>  
   
 <script type="module">
