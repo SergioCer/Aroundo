@@ -53,12 +53,30 @@
     
     /* Titolo */
     .title {
-      font-weight: 600;
-      font-size: 20px;
+      font-size: 22px;
+      font-size: 22px;
       color: #3b82f6;
-      text-align: center;
+      letter-spacing: 1px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 1px;
+      height: 35px;
     }
 
+    .title span {
+      display: inline-block;
+    }
+
+    .title span:nth-child(1) { transform: translateY(8px) rotate(-18deg); }
+    .title span:nth-child(2) { transform: translateY(4px) rotate(-12deg); }
+    .title span:nth-child(3) { transform: translateY(1px) rotate(-6deg); }
+    .title span:nth-child(4) { transform: translateY(0px); }
+    .title span:nth-child(5) { transform: translateY(1px) rotate(6deg); }
+    .title span:nth-child(6) { transform: translateY(4px) rotate(12deg); }
+    .title span:nth-child(7) { transform: translateY(8px) rotate(18deg); }
+      
     /* Sotto titolo */
     .subtitle {
       font-size: 14px;
@@ -704,30 +722,6 @@
     font-weight: bold;
     }
   
-    .title {
-      font-size: 22px;
-      font-size: 22px;
-      letter-spacing: 1px;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 1px;
-      height: 35px;
-    }
-
-    .title span {
-      display: inline-block;
-    }
-
-    .title span:nth-child(1) { transform: translateY(8px) rotate(-18deg); }
-    .title span:nth-child(2) { transform: translateY(4px) rotate(-12deg); }
-    .title span:nth-child(3) { transform: translateY(1px) rotate(-6deg); }
-    .title span:nth-child(4) { transform: translateY(0px); }
-    .title span:nth-child(5) { transform: translateY(1px) rotate(6deg); }
-    .title span:nth-child(6) { transform: translateY(4px) rotate(12deg); }
-    .title span:nth-child(7) { transform: translateY(8px) rotate(18deg); }
-      
     .subtitle {
       font-size: 12px;
     }
