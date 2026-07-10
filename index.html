@@ -88,16 +88,6 @@
       color: #6b6b6b;
     }
 
-    .subtitle span {
-      display: inline-block;
-      transform-origin: center bottom;
-    }
-
-    /* spazi tra parole */
-    .subtitle .space {
-      width: 4px;
-    }
-
     /* -- Rettangolo Aroundo trasparente */
     .map-overlay {
       position: fixed;
@@ -851,15 +841,7 @@
     <span id="geoDot"></span>
     <span id="geoText"></span>
   </div>
-    <div class="subtitle">
-      <span>D</span><span>i</span><span>s</span><span>c</span><span>o</span><span>v</span><span>e</span><span>r</span>
-      <span class="space"></span>
-      <span>w</span><span>h</span><span>a</span><span>t</span><span>'</span><span>s</span>
-      <span class="space"></span>
-      <span>a</span><span>r</span><span>o</span><span>u</span><span>n</span><span>d</span>
-      <span class="space"></span>
-      <span>y</span><span>o</span><span>u</span>
-    </div>
+    <div class="subtitle">Discover what's around you</div>
   </div>
 <div id="overlayToggle">🔓</div>
 <div class="map-overlay2" id="category-menu">
@@ -1053,7 +1035,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEvents();
   updateDateUI();
   updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news. 
-  curveSubtitle();
 });
       
     noUiSlider.create(slider, {
@@ -1671,25 +1652,6 @@ oms.addListener('click', function (marker) {
       );
     }
 
-    function curveSubtitle() {
-      const letters = document.querySelectorAll(".subtitle span:not(.space)");
-      const count = letters.length;
-      const center = (count - 1) / 2;
-      const spacing = 2.4;       // distanza orizzontale tra le lettere
-      const depth = 70;         // profondità arco
-      const maxRotate = 70;     // inclinazione estremi
-      letters.forEach((letter, index) => {
-        const x = index - center;
-        // posizione sull'arco
-        const normalized = x / center;
-        const y = depth * (1 - normalized * normalized);
-        // rotazione proporzionale alla posizione
-        const rotate = -normalized * maxRotate;
-        letter.style.transform =
-          `translate(${x * spacing}px, ${y}px) rotate(${rotate}deg)`;
-      });
-    }
-  
     // Calcola il range della Timeline
     function getTimelineRange () {
       let start, end;
