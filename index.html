@@ -665,6 +665,15 @@
       font-size: 12px;
       font-weight: 500;
     }
+
+    #geoDot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      background: #ef4444;
+    }
     
     @keyframes tickerScroll{
       from{
@@ -810,9 +819,10 @@
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:8px;">
     📲 Install Aroundo
   </div>
-  <div id="geoStatus" class="geo-status"></div>
-  -->
-<div id="locationMessage" class="location-message"></div>
+    <div id="geoStatus" class="geo-status">
+    <span id="geoDot"></span>
+    <span id="geoText"></span>
+  </div>
 </div>
   
 <div id="overlayToggle">🔓</div>
@@ -876,6 +886,8 @@
   const dayText = document.getElementById("day-text");
   const dateText = document.getElementById("date-text");
   const slider = document.getElementById('time-range');
+  const geoDot = document.getElementById("geoDot");
+  const geoText = document.getElementById("geoText");
   const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
   // NON USATO const daysShort = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
   const daysLong  = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
@@ -920,14 +932,6 @@
     spiralLengthFactor: 8,     // all'aumentare dei marker a spirale quanto aumenta la distanza
     keepSpiderfied: true       // click sul marker lascia aperta la spiderizzazione
   });
-    // ==========================================================
-    // Listener globale OMS
-    // Data: 01/07/2026
-    // Proviene da riga 118x prima di updateMarkerState(
-    // Chiusura del popup quando OMS spiderizza i marker.
-    // Spostato da renderEvents() dove veniva registrato
-    // una volta per ogni evento.
-    // ==========================================================
     oms.addListener('spiderfy', function(markers) {map.closePopup();
   });
 
@@ -1010,14 +1014,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   buildCategoryMenu();
   // 4. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
-  // 5. Verifica Geolocalizzazione attiva 
-  navigator.permissions.query({name:"geolocation"})
-    .then(permission => {
-      updateGeoStatus(permission.state === "granted");
-      permission.onchange = () => {
-        updateGeoStatus(permission.state === "granted");
-      };
-    });
   setupTimeline();
   renderEvents();
   updateDateUI();
@@ -1602,17 +1598,29 @@ oms.addListener('click', function (marker) {
     document.getElementById("installBtn").style.display = "none";
   });
 
+    // Verifica se Geolocalizzazione è Attiva o Disattiva
     const geoStatus = document.getElementById("geoStatus");
     function updateGeoStatus(active) {
       if (active) {
-        geoStatus.textContent = "🔴 Geo active";
-        geoStatus.style.color = "#22c55e";
+        geoDot.style.background = "#22c55e";
+        geoText.textContent = "Geo active";
+        geoText.style.color = "#22c55e";
       } else {
-        geoStatus.textContent = "🔴 Geo inactive";
-        geoStatus.style.color = "#ef4444";
+        geoDot.style.background = "#ef4444";
+        geoText.textContent = "Geo inactive";
+        geoText.style.color = "#ef4444";
       }
     }
-  
+
+    // Aggiorna lo stato della Geolocalizzazione
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        navigator.permissions.query({name:"geolocation"})
+        .then(permission => {
+          updateGeoStatus(permission.state === "granted");
+        });
+      }
+    });
   
     // Calcola il range della Timeline
     function getTimelineRange () {
