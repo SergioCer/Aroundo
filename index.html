@@ -82,7 +82,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      height: 39px;
+      height: 46px;
       margin-top: -16px;
       font-size: 12px;
       color: #6b6b6b;
@@ -95,7 +95,7 @@
 
     /* spazi tra parole */
     .subtitle .space {
-      width: 5px;
+      width: 4px;
     }
 
     /* -- Rettangolo Aroundo trasparente */
@@ -1675,9 +1675,9 @@ oms.addListener('click', function (marker) {
       const letters = document.querySelectorAll(".subtitle span:not(.space)");
       const count = letters.length;
       const center = (count - 1) / 2;
-      const spacing = 3;       // distanza orizzontale tra le lettere
+      const spacing = 2.6;       // distanza orizzontale tra le lettere
       const depth = 46;         // profondità arco
-      const maxRotate = 38;     // inclinazione estremi
+      const maxRotate = 46;     // inclinazione estremi
       letters.forEach((letter, index) => {
         const x = index - center;
         // posizione sull'arco
