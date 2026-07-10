@@ -79,82 +79,52 @@
       
     /* Sotto titolo */
     .subtitle {
-      font-size: 14px;
-      color: #6b6b6b;
-      margin-top: 2px;
-      text-align: center;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      height: 28px
-    }    
+      height: 34px;
+      margin-top: 4px;
+      font-size: 14px;
+      color: #6b6b6b;
+    }
 
     .subtitle span {
       display: inline-block;
+      transform-origin: center bottom;
     }
 
-    .subtitle span:nth-child(1),
-    .subtitle span:nth-child(23) {
-      transform: translateY(0px);
+    /* spazi tra parole */
+    .subtitle .space {
+      width: 5px;
     }
 
-    .subtitle span:nth-child(2),
-    .subtitle span:nth-child(22) {
-      transform: translateY(2px);
-    }
-
-    .subtitle span:nth-child(3),
-    .subtitle span:nth-child(21) {
-      transform: translateY(4px);
-    }
-
-    .subtitle span:nth-child(4),
-    .subtitle span:nth-child(20) {
-      transform: translateY(6px);
-    }
-
-    .subtitle span:nth-child(5),
-    .subtitle span:nth-child(19) {
-      transform: translateY(8px);
-    }
-    
-    .subtitle span:nth-child(6),
-    .subtitle span:nth-child(18) {
-      transform: translateY(10px);
-    }
-    
-    .subtitle span:nth-child(7),
-    .subtitle span:nth-child(17) {
-      transform: translateY(12px);
-    }
-    
-    .subtitle span:nth-child(8),
-    .subtitle span:nth-child(16) {
-      transform: translateY(14px);
-    }
-    
-    .subtitle span:nth-child(9),
-    .subtitle span:nth-child(15) {
-      transform: translateY(16px);
-    }
-    
-    .subtitle span:nth-child(10),
-    .subtitle span:nth-child(14) {
-      transform: translateY(18px);
-    }
-    
-    .subtitle span:nth-child(11),
-    .subtitle span:nth-child(13) {
-      transform: translateY(20px);
-    }
-    
-    .subtitle span:nth-child(12) {
-      transform: translateY(22px);
-    }
-    
-    
-    
-    
+    /* arco verso il basso */
+    .subtitle span:nth-child(1)  { transform: translateY(0px) rotate(-12deg); }
+    .subtitle span:nth-child(2)  { transform: translateY(1px) rotate(-10deg); }
+    .subtitle span:nth-child(3)  { transform: translateY(2px) rotate(-8deg); }
+    .subtitle span:nth-child(4)  { transform: translateY(3px) rotate(-6deg); }
+    .subtitle span:nth-child(5)  { transform: translateY(4px) rotate(-4deg); }
+    .subtitle span:nth-child(6)  { transform: translateY(5px) rotate(-3deg); }
+    .subtitle span:nth-child(7)  { transform: translateY(6px) rotate(-2deg); }
+    .subtitle span:nth-child(8)  { transform: translateY(7px) rotate(-1deg); }
+    /* seconda parola */
+    .subtitle span:nth-child(10) { transform: translateY(9px) rotate(0deg); }
+    .subtitle span:nth-child(11) { transform: translateY(10px) rotate(2deg); }
+    .subtitle span:nth-child(12) { transform: translateY(11px) rotate(3deg); }
+    .subtitle span:nth-child(13) { transform: translateY(12px) rotate(4deg); }
+    .subtitle span:nth-child(14) { transform: translateY(13px) rotate(5deg); }
+    .subtitle span:nth-child(15) { transform: translateY(14px) rotate(6deg); }
+    /* terza parola */
+    .subtitle span:nth-child(17) { transform: translateY(13px) rotate(5deg); }
+    .subtitle span:nth-child(18) { transform: translateY(12px) rotate(4deg); }
+    .subtitle span:nth-child(19) { transform: translateY(11px) rotate(3deg); }
+    .subtitle span:nth-child(20) { transform: translateY(10px) rotate(2deg); }
+    .subtitle span:nth-child(21) { transform: translateY(9px) rotate(1deg); }
+    .subtitle span:nth-child(22) { transform: translateY(8px) rotate(0deg); }
+    /* ultima parola */
+    .subtitle span:nth-child(24) { transform: translateY(6px) rotate(-2deg); }
+    .subtitle span:nth-child(25) { transform: translateY(5px) rotate(-3deg); }
+    .subtitle span:nth-child(26) { transform: translateY(4px) rotate(-4deg); }
     
     /* -- Rettangolo Aroundo trasparente */
     .map-overlay {
@@ -911,8 +881,11 @@
   </div>
     <div class="subtitle">
       <span>D</span><span>i</span><span>s</span><span>c</span><span>o</span><span>v</span><span>e</span><span>r</span>
+      <span class="space"></span>
       <span>w</span><span>h</span><span>a</span><span>t</span><span>'</span><span>s</span>
+      <span class="space"></span>
       <span>a</span><span>r</span><span>o</span><span>u</span><span>n</span><span>d</span>
+      <span class="space"></span>
       <span>y</span><span>o</span><span>u</span>
     </div>
   </div>
