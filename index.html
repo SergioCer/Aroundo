@@ -1675,14 +1675,14 @@ oms.addListener('click', function (marker) {
       const letters = document.querySelectorAll(".subtitle span:not(.space)");
       const count = letters.length;
       const center = (count - 1) / 2;
-      const radius = 160;       // larghezza curva
+      const radius = 140;       // larghezza curva
       const depth = 18;         // profondità arco
       const maxRotate = 14;     // inclinazione estremi
       letters.forEach((letter, index) => {
         const x = index - center;
         // posizione sull'arco
         const normalized = x / center;
-        const y = depth * (normalized * normalized);
+        const y = depth * (1 - normalized * normalized);
         // rotazione proporzionale alla posizione
         const rotate = -normalized * maxRotate;
         letter.style.transform =
