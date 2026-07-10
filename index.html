@@ -770,6 +770,13 @@
       }
     }
 
+    .copyright {
+      text-align: center;
+      font-size: 10px;
+      color: rgba(255,255,255,0.65);
+      margin-top: 4px;
+    }
+    
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
 </head>
@@ -788,11 +795,11 @@
   
 <div class="map-overlay2" id="category-menu">
 <div class="menu-header filter-all-container">
-  <label class="toggle-pill" title="Seleziona tutte le categorie">
+  <label class="toggle-pill" title="Select all categories">
     <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
   </label>
-  <button id="menu-toggle" title="Apri/chiudi filtro categorie">
-    <span id="menu-label">Categorie</span>
+  <button id="menu-toggle" title="Open/close category filter">
+    <span id="menu-label">Categories</span>
     <span id="menu-arrow">▼</span></button>
 </div>
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
@@ -819,6 +826,10 @@
 <canvas id="fx-canvas"></canvas>  
   <div id="eventTicker">
   <div id="eventTickerContent"></div>
+    <div class="copyright">
+    © 2026 Aroundo™ · Concept, design & development by Sergio Cernigliaro · 
+    <a href="mailto:sergiocernigliaro@gmail.com">Contact</a>
+  </div>    
 </div>  
   
 <script type="module">
