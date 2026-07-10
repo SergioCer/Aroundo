@@ -705,9 +705,29 @@
     }
   
     .title {
-      font-size: 16px;
+      font-size: 22px;
+      font-size: 22px;
+      letter-spacing: 1px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 1px;
+      height: 35px;
     }
 
+    .title span {
+      display: inline-block;
+    }
+
+    .title span:nth-child(1) { transform: translateY(8px) rotate(-18deg); }
+    .title span:nth-child(2) { transform: translateY(4px) rotate(-12deg); }
+    .title span:nth-child(3) { transform: translateY(1px) rotate(-6deg); }
+    .title span:nth-child(4) { transform: translateY(0px); }
+    .title span:nth-child(5) { transform: translateY(1px) rotate(6deg); }
+    .title span:nth-child(6) { transform: translateY(4px) rotate(12deg); }
+    .title span:nth-child(7) { transform: translateY(8px) rotate(18deg); }
+      
     .subtitle {
       font-size: 12px;
     }
@@ -812,7 +832,9 @@
 <body>
 
 <div class="map-overlay" id="mapOverlay">
-  <div class="title">Aroundo</div>
+  <div class="title">
+    <span>A</span><span>R</span><span>O</span><span>U</span><span>N</span><span>D</span><span>O</span>
+  </div>
   <div class="subtitle">Discover what’s around you</div>
   <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;">
     Login</div>
