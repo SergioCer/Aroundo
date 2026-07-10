@@ -644,8 +644,19 @@
       font-size: 9px;
       color: rgba(0,0,255,1);
       bottom: 36px;
+      left: 0;
+      right: 0;
+      white-space: nowrap;
+      transform: scale(0.9);
       width: 100%;
       z-index: 3000;
+    }
+
+    .copyright a {
+      color: inherit;
+      text-decoration: none;
+      font-size: 11px;
+      margin-left: 4px;
     }
     
     @keyframes tickerScroll{
@@ -827,9 +838,9 @@
 <div id="map"></div>
 <canvas id="fx-canvas"></canvas>  
     <div class="copyright">
-    © 2026 Aroundo™ · Concept, design & development by Sergio Cernigliaro · 
-    <a href="mailto:sergiocernigliaro@gmail.com">Contact</a>
-  </div>    
+      © 2026 Aroundo™ · Concept, design & development by Sergio Cernigliaro · 
+      <a href="mailto:sergiocernigliaro@gmail.com" title="Email">✉</a>
+    </div>    
   <div id="eventTicker">
   <div id="eventTickerContent"></div>
 </div>  
