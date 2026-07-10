@@ -98,37 +98,6 @@
       width: 5px;
     }
 
-/* arco inferiore centrato */
-.subtitle span:nth-child(1)  { transform:translate(-78px,0px) rotate(-14deg); }
-.subtitle span:nth-child(2)  { transform:translate(-72px,2px) rotate(-12deg); }
-.subtitle span:nth-child(3)  { transform:translate(-66px,4px) rotate(-10deg); }
-.subtitle span:nth-child(4)  { transform:translate(-60px,6px) rotate(-8deg); }
-.subtitle span:nth-child(5)  { transform:translate(-54px,8px) rotate(-6deg); }
-.subtitle span:nth-child(6)  { transform:translate(-48px,10px) rotate(-4deg); }
-.subtitle span:nth-child(7)  { transform:translate(-42px,12px) rotate(-2deg); }
-.subtitle span:nth-child(8)  { transform:translate(-36px,14px) rotate(-1deg); }
-
-
-.subtitle span:nth-child(10) { transform:translate(-25px,17px) rotate(0deg); }
-.subtitle span:nth-child(11) { transform:translate(-19px,19px) rotate(2deg); }
-.subtitle span:nth-child(12) { transform:translate(-13px,20px) rotate(3deg); }
-.subtitle span:nth-child(13) { transform:translate(-7px,21px) rotate(4deg); }
-.subtitle span:nth-child(14) { transform:translate(0px,22px) rotate(5deg); }
-.subtitle span:nth-child(15) { transform:translate(7px,21px) rotate(6deg); }
-
-
-.subtitle span:nth-child(17) { transform:translate(18px,20px) rotate(5deg); }
-.subtitle span:nth-child(18) { transform:translate(24px,18px) rotate(4deg); }
-.subtitle span:nth-child(19) { transform:translate(30px,16px) rotate(3deg); }
-.subtitle span:nth-child(20) { transform:translate(36px,14px) rotate(2deg); }
-.subtitle span:nth-child(21) { transform:translate(42px,12px) rotate(1deg); }
-.subtitle span:nth-child(22) { transform:translate(48px,10px) rotate(0deg); }
-
-
-.subtitle span:nth-child(24) { transform:translate(60px,7px) rotate(-2deg); }
-.subtitle span:nth-child(25) { transform:translate(66px,5px) rotate(-4deg); }
-.subtitle span:nth-child(26) { transform:translate(72px,3px) rotate(-6deg); }
-    
     /* -- Rettangolo Aroundo trasparente */
     .map-overlay {
       position: fixed;
@@ -1084,6 +1053,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEvents();
   updateDateUI();
   updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news. 
+  curveSubtitle();
 });
       
     noUiSlider.create(slider, {
@@ -1699,6 +1669,25 @@ oms.addListener('click', function (marker) {
           timeout: 5000
         }
       );
+    }
+
+    function curveSubtitle() {
+      const letters = document.querySelectorAll(".subtitle span:not(.space)");
+      const count = letters.length;
+      const center = (count - 1) / 2;
+      const radius = 160;       // larghezza curva
+      const depth = 18;         // profondità arco
+      const maxRotate = 14;     // inclinazione estremi
+      letters.forEach((letter, index) => {
+        const x = index - center;
+        // posizione sull'arco
+        const normalized = x / center;
+        const y = depth * (normalized * normalized);
+        // rotazione proporzionale alla posizione
+        const rotate = -normalized * maxRotate;
+        letter.style.transform =
+          `translate(${x * 6}px, ${y}px) rotate(${rotate}deg)`;
+      });
     }
   
     // Calcola il range della Timeline
