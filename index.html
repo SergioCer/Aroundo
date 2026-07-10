@@ -83,7 +83,15 @@
       color: #6b6b6b;
       margin-top: 2px;
       text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 28px
     }    
+
+    .subtitle span {
+      display: inline-block;
+    }
     
     /* -- Rettangolo Aroundo trasparente */
     .map-overlay {
@@ -419,7 +427,7 @@
     
     .date-day {
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 500;
       text-align: center;
       color: #3b82f6;
     }
@@ -829,7 +837,6 @@
   <div class="title">
     <span>A</span><span>R</span><span>O</span><span>U</span><span>N</span><span>D</span><span>O</span>
   </div>
-  <div class="subtitle">Discover what’s around you</div>
   <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;">
     Login</div>
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:8px;">
@@ -839,6 +846,7 @@
     <span id="geoDot"></span>
     <span id="geoText"></span>
   </div>
+    <div class="subtitle">Discover what’s around you</div>
 </div>
   
 <div id="overlayToggle">🔓</div>
