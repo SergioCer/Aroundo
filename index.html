@@ -92,6 +92,69 @@
     .subtitle span {
       display: inline-block;
     }
+
+    .subtitle span:nth-child(1),
+    .subtitle span:nth-child(23) {
+      transform: translateY(0px);
+    }
+
+    .subtitle span:nth-child(2),
+    .subtitle span:nth-child(22) {
+      transform: translateY(2px);
+    }
+
+    .subtitle span:nth-child(3),
+    .subtitle span:nth-child(21) {
+      transform: translateY(4px);
+    }
+
+    .subtitle span:nth-child(4),
+    .subtitle span:nth-child(20) {
+      transform: translateY(6px);
+    }
+
+    .subtitle span:nth-child(5),
+    .subtitle span:nth-child(19) {
+      transform: translateY(8px);
+    }
+    
+    .subtitle span:nth-child(6),
+    .subtitle span:nth-child(18) {
+      transform: translateY(10px);
+    }
+    
+    .subtitle span:nth-child(7),
+    .subtitle span:nth-child(17) {
+      transform: translateY(12px);
+    }
+    
+    .subtitle span:nth-child(8),
+    .subtitle span:nth-child(16) {
+      transform: translateY(14px);
+    }
+    
+    .subtitle span:nth-child(9),
+    .subtitle span:nth-child(15) {
+      transform: translateY(16px);
+    }
+    
+    .subtitle span:nth-child(10),
+    .subtitle span:nth-child(14) {
+      transform: translateY(18px);
+    }
+    
+    .subtitle span:nth-child(11),
+    .subtitle span:nth-child(13) {
+      transform: translateY(20px);
+    }
+    
+    .subtitle span:nth-child(12) {
+      transform: translateY(22px);
+    }
+    
+    
+    
+    
     
     /* -- Rettangolo Aroundo trasparente */
     .map-overlay {
@@ -846,11 +909,13 @@
     <span id="geoDot"></span>
     <span id="geoText"></span>
   </div>
-    <div class="subtitle">Discover what’s around you</div>
-</div>
-  
+    <div class="subtitle">
+      <span>D</span><span>i</span><span>s</span><span>c</span><span>o</span><span>v</span><span>e</span><span>r</span>
+      <span>w</span><span>h</span><span>a</span><span>t</span><span>'</span><span>s</span>
+      <span>a</span><span>r</span><span>o</span><span>u</span><span>n</span><span>d</span>
+      <span>y</span><span>o</span><span>u</span>
+    </div>
 <div id="overlayToggle">🔓</div>
-  
 <div class="map-overlay2" id="category-menu">
 <div class="menu-header filter-all-container">
   <label class="toggle-pill" title="Select all categories">
