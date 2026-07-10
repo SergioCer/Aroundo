@@ -775,6 +775,8 @@
   <div class="subtitle">Discover what’s around you</div>
   <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;">
     Login</div>
+  <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:8px;">
+    📲 Installa Aroundo </div>
 </div>
   
 <div id="overlayToggle">🔓</div>
@@ -823,6 +825,7 @@
   let currentDate = new Date(); // Data odierna di riferimento
   let midnightPercent = 0; // Posizione barra della Mezzanotte
   let totalHours; // Ore totali della Slidebar
+  let deferredPrompt = null; // Verifica se è stata installata l'APP sui sistemi che accedono
   
   // Coordinate di default (Centro provincia Trapani / Sicilia occidentale)
   const defaultLat = 37.87; /* 37.55 */
@@ -991,20 +994,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
       updateDateUI();
       setupTimeline();
-    // ========================
-    // CANDIDATO ALLA RIMOZIONE
-    // Data: 01/07/2026
-    // ***** ///// *****
-    //  const values = slider.noUiSlider.get();
-    // ***** ///// *****
-    // Atteso:
-    // Nessuna modifica grafica o funzionale.
-    // Motivo:
-    // La variabile "values" veniva letta dallo slider ma non
-    // risultava utilizzata in alcun punto del codice.
-    // Verifica:
-    // Controllare il corretto funzionamento del cambio giorno.
-    // ========================
       renderEvents();
     });
 
@@ -1012,20 +1001,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateTimelineMode();
       updateDateUI();
       setupTimeline();
-    // ========================
-    // CANDIDATO ALLA RIMOZIONE
-    // Data: 01/07/2026
-    // ***** ///// *****
-    //  const values = slider.noUiSlider.get();
-    // ***** ///// *****
-    // Atteso:
-    // Nessuna modifica grafica o funzionale.
-    // Motivo:
-    // La variabile "values" veniva letta dallo slider ma non
-    // risultava utilizzata in alcun punto del codice.
-    // Verifica:
-    // Controllare il corretto funzionamento del cambio giorno.
-    // ========================
       renderEvents();
     });
 
@@ -1135,49 +1110,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         new Date(a.ev_inizio) - new Date(b.ev_inizio)
     );
       events.forEach(e => {
-        //-- 🔵 STATO EVENTO (Data; inizio; fine; stato; intensità)
-    
-    // ========================
-    // CANDIDATO ALLA RIMOZIONE
-    // Data: 01/07/2026
-    // ***** ///// *****
-    //  const formatDay = (dateString) => {
-    //   const d = new Date(dateString);
-    //    return `${daysLong[d.getDay()]} ${d.getDate()}`;
-    //    };
-    // ***** ///// *****
-    // Atteso:
-    // Nessuna modifica grafica o funzionale.
-    // Motivo:
-    // Non risultano chiamate a formatday() 
-    // all'interno del progetto.
-    // Verifica:
-    // Corretto funzionamento Della data.
-    // ========================
-        
         const stateData = getEventState(
           new Date(e.ev_inizio),
           e.ev_fine ? new Date(e.ev_fine) : null
         );
         const stateClass = stateData.state;
-    // ========================
-    // CANDIDATO ALLA RIMOZIONE
-    // Data: 01/07/2026
-    // ***** ///// *****
-    //  const intensity = stateData.intensity;
-    // ***** ///// *****
-    // Atteso:
-    // Nessuna modifica grafica o funzionale.
-    // Motivo:
-    // getEventState() non restituisce più la proprietà 'intensity'
-    // Il parametro passato a createIcon() risulta sempre undefinied.
-    // Verifica:
-    // Corretto funzionamento dei markers.
-    // NOTE: 
-    // (1) è stato disabilitato in basso il suo richiamo.
-    // (2) è legata a :  function createIcon(color, state, intensity) { 
-    // se tutto funziona, correggere la funzione togliendo il riferimento a intensity.
-    // ========================
         
         //-- 🎨 ICONA
         const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
@@ -1343,7 +1280,6 @@ oms.addListener('click', function (marker) {
         });
         // toggle menu
          const toggleBtn = document.getElementById('menu-toggle');
-        // ****** const menuItemsDiv = document.getElementById('menu-items'); CANCELLARE DUPLICATO da non abilitare qui */ 
          const arrow = document.getElementById('menu-arrow');
           toggleBtn.addEventListener('click', () => {
           menuItemsDiv.classList.toggle('open');
@@ -1593,6 +1529,28 @@ oms.addListener('click', function (marker) {
         .setContent(content)
         .openOn(map);
     };
+
+  // ***** INSTALLAZIONE APP ***** //
+  // Intercetta la richiesta di installazione
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById("installBtn").style.display = "block";
+  });
+
+  // Click su Installazione
+  document.getElementById("installBtn").onclick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById("installBtn").style.display = "none";
+  };
+
+  // Quando viene installata
+  window.addEventListener('appinstalled', () => {
+    document.getElementById("installBtn").style.display = "none";
+  });
   
     // Calcola il range della Timeline
     function getTimelineRange () {
