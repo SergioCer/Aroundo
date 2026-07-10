@@ -1675,9 +1675,9 @@ oms.addListener('click', function (marker) {
       const letters = document.querySelectorAll(".subtitle span:not(.space)");
       const count = letters.length;
       const center = (count - 1) / 2;
-      const radius = 140;       // larghezza curva
-      const depth = 18;         // profondità arco
-      const maxRotate = 14;     // inclinazione estremi
+      const radius = 100;       // larghezza curva
+      const depth = 22;         // profondità arco
+      const maxRotate = 18;     // inclinazione estremi
       letters.forEach((letter, index) => {
         const x = index - center;
         // posizione sull'arco
