@@ -75,7 +75,7 @@
       transform: translate(-50%, -50%);
       z-index: 999;
       padding: 20px;
-      border-radius: 16px;
+      border-radius: 50%;
       background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
       backdrop-filter: blur(8px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.1);
@@ -643,7 +643,7 @@
       text-align: center;
       font-size: 9px;
       color: rgba(0,0,255,1);
-      bottom: 36px;
+      bottom: 32px;
       left: 0;
       right: 0;
       white-space: nowrap;
@@ -655,8 +655,27 @@
     .copyright a {
       color: inherit;
       text-decoration: none;
+      font-size: 14px;
+      margin-left: 2px;
+    }
+
+    .location-control {
+      cursor: pointer;
+      margin-top: 8px;
+      color: #ef4444;
+      text-decoration: underline;
+    }
+
+    .location-control.enabled {
+      color: #22c55e;
+    }
+
+    .location-message {
       font-size: 11px;
-      margin-left: 4px;
+      color: rgba(255,255,255,0.75);
+      margin-top: 4px;
+      max-width: 250px;
+      text-align: center;
     }
     
     @keyframes tickerScroll{
@@ -801,7 +820,12 @@
   <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;">
     Login</div>
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:8px;">
-    📲 Install Aroundo </div>
+    📲 Install Aroundo
+  </div>
+  <div id="locationBtn" class="date-day location-control">
+    📍 Location
+  </div>
+<div id="locationMessage" class="location-message"></div>
 </div>
   
 <div id="overlayToggle">🔓</div>
@@ -899,6 +923,9 @@
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
   });
+
+  const locationBtn = document.getElementById('locationBtn');
+  const locationMessage = document.getElementById('locationMessage');
   
   map.addLayer(markersCluster);
   const oms = new OverlappingMarkerSpiderfier(map, {
@@ -987,7 +1014,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      console.warn("Per una migliore fruizione di Aroundo, si suggerisce di attivare la Geolocalizzazione, in mancanza di tale autorizzazione si utilizzano le coordinate di default");
+      console.warn("Aroundo works best with location access enabled. If not available, default coordinates will be used.");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
@@ -999,6 +1026,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   buildCategoryMenu();
   // 4. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
+  // 5. Verifica Geolocalizzazione attiva 
+  if ("geolocation" in navigator) {
+      navigator.permissions.query({name:"geolocation"})
+      .then(permission => {
+        updateLocationStatus(permission.state === "granted");
+        permission.onchange = () => {
+          updateLocationStatus(permission.state === "granted");
+        };
+      });
+    } else {
+      updateLocationStatus(false);
+    }
   setupTimeline();
   renderEvents();
   updateDateUI();
@@ -1582,6 +1621,32 @@ oms.addListener('click', function (marker) {
   window.addEventListener('appinstalled', () => {
     document.getElementById("installBtn").style.display = "none";
   });
+
+  // Messaggio di avviso se la geolocalizzazione è Attiva o Disattiva
+  function updateLocationStatus(enabled) {
+    if (enabled) {
+      locationBtn.innerHTML = "📍 Location";
+      locationBtn.classList.add("enabled");
+      locationMessage.textContent = "";
+    } else {
+      locationBtn.innerHTML = "📍 Location";
+      locationBtn.classList.remove("enabled");
+      locationMessage.textContent =
+        "Location access disabled. Default location will be used.";
+    }
+  }
+
+    // Attiva / Disattiva la Geolocalizzazione
+    locationBtn.onclick = () => {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          updateLocationStatus(true);
+        },
+        () => {
+          updateLocationStatus(false);
+        }
+      );
+    };
   
     // Calcola il range della Timeline
     function getTimelineRange () {
