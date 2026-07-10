@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
   <title>Aroundo - Territory Map</title>
   <!--  per usarla come APP -->
   <link rel="manifest" href="manifest.json">
@@ -369,7 +374,7 @@
       width: 140px; /* larghezza */
       padding: 6px 10px;
       border-radius: 999px;
-      text-allign: center;
+      text-align: center;
       font-size: 12px;
       font-weight: 500;
       background: linear-gradient(90deg, #3b82f6, #60a5fa);
@@ -776,7 +781,7 @@
   <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;">
     Login</div>
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:8px;">
-    📲 Installa Aroundo </div>
+    📲 Install Aroundo </div>
 </div>
   
 <div id="overlayToggle">🔓</div>
@@ -786,7 +791,9 @@
   <label class="toggle-pill" title="Seleziona tutte le categorie">
     <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
   </label>
-  <button id="menu-toggle" title="Apri/chiudi filtro categorie">Categorie<span id="menu-arrow">▼</span></button>
+  <button id="menu-toggle" title="Apri/chiudi filtro categorie">
+    <span id="menu-label">Categorie</span>
+    <span id="menu-arrow">▼</span></button>
 </div>
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
 </div>
