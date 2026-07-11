@@ -1352,6 +1352,13 @@ oms.addListener('click', function (marker) {
          const isOpen = menuItemsDiv.classList.contains('open');
           menuItemsDiv.style.display = isOpen ? 'block' : 'none';
           arrow.textContent = isOpen ? '▲' : '▼';
+          // Se Tutte le categorie sono selezionate, le deseleziona tutte, altrimenti lascia la selezione corrente.
+          if (isOpen && selectAllToggle.checked) {
+            const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            selectAllToggle.checked = false;
+            updateMarkerVisibility();
+        }            
         });
         // Checkbox Singola Categoria
         menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
