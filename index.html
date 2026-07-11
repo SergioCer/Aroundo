@@ -262,6 +262,18 @@
       background:#0d6efd;
     }
 
+    .toggle-pill.partial::after {
+      content:"";
+      position:absolute;
+      width:8px;
+      height:8px;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      border-radius:50%;
+      background:white;
+    }
+    
     /* Checkbox Categorie */
     .category-checkbox {
       position: absolute;
@@ -1350,8 +1362,12 @@ oms.addListener('click', function (marker) {
         // aggiorna lo stato del checkbox
         function updateSelectAllToggle() {
         const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        const allChecked = checkedCount === checkboxes.length;
+        const partialChecked = checkedCount > 0 && checkedCount < checkboxes.length;  
+        // CANCELLARE const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         selectAllToggle.checked = allChecked;
+        selectAllToggle.parentElement.classList.toggle('partial', partialChecked);  
         }
         menuItemsDiv.addEventListener('change', updateSelectAllToggle);
       }
