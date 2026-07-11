@@ -240,8 +240,8 @@
     .toggle-pill::before {
       content: "";
       position: absolute;
-      width: 16px;
-      height: 16px;
+      width: 22px;
+      height: 22px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -253,8 +253,8 @@
     .toggle-pill:has(.toggle-checkbox:checked)::after {
       content:"";
       position:absolute;
-      width:8px;
-      height:8px;
+      width:12px;
+      height:12px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -271,47 +271,6 @@
       height: 0;
     }
     
-    /* CANCELLARE ????? Checkbox specifiche grafiche 
-    .toggle-checkbox {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.9);
-      background: rgba(255,255,255,0.15);
-      cursor: pointer;
-      vertical-align: middle;
-      margin-right: 6px;
-      font-size: 12px;
-      position: relative;
-      transition:
-        background 0.2s ease,
-        transform 0.2s ease,
-        opacity 0.2s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    /* Checkbox Attiva 
-    .toggle-checkbox:checked {
-      background: linear-gradient(90deg, #3b82f6, #60a5fa);
-      border-color: white;
-    }
-    
-    /* Checkbox Piccolo punto bianco interno 
-    .toggle-checkbox:checked::after {
-      content: "";
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: white;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    } 
-    CANCELLARE ????? */
-
     .toggle-checkbox {
       display: none;
     }
@@ -340,6 +299,7 @@
       display: inline-block;
       width: 14px;
       height: 14px;
+      flex: 0 0 14px; /* impedisce lo schiacciamento */
       border-radius: 50%;
       margin-right: 2px;
       border: 2px solid white;
