@@ -50,10 +50,6 @@
       margin: 4px 6px;
     }
 
-    .leaflet-popup-tip {
-      width: 0px;
-    }
-    
     #fx-canvas {
       position: absolute;
       top: 0;
@@ -1522,7 +1518,7 @@ oms.addListener('click', function (marker) {
       console.log("OPEN BASE POPUP");
       const markerPoint = map.latLngToContainerPoint(latlng);
         markerPoint.x += 0;
-        markerPoint.y -= 25;
+        markerPoint.y -= 20;
       const popupLatLng = map.containerPointToLatLng(markerPoint);
     L.popup()
       .setLatLng(popupLatLng)
