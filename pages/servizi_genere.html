@@ -85,7 +85,7 @@ td:last-child {
 
 <div class="header">
   <div class="title">
-    <button class="bck-btn" onclick="window.location.href='../tabelle.html'">←</button>
+    <button class="bck-btn" onclick="window.location.href='dashboard.html'">←</button>
     Genere di Servizi
   </div>
 </div>
@@ -113,6 +113,9 @@ td:last-child {
 </table>
 
 <script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();  
+  
 import { supabase } from '../supabase.js';
 
 let data = [];
