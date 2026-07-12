@@ -43,8 +43,10 @@
   import { supabase } from '../supabase.js';
 
 const { data, error } = await supabase.auth.getSession();
-
 console.log("SESSIONE:", data.session);
+console.log("USER:", data.user);
+console.log("EMAIL:", data.user?.email);
+console.log("ID:", data.user?.id);
 console.log("ERRORE:", error);
   
   document.querySelectorAll('.in-progress').forEach(link => {
