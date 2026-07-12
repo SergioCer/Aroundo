@@ -265,8 +265,8 @@
     .toggle-pill.partial::after {
       content:"";
       position:absolute;
-      width:8px;
-      height:8px;
+      width:4px;
+      height:4px;
       top:50%;
       left:50%;
       transform:translate(-50%, -50%);
@@ -1357,6 +1357,7 @@ oms.addListener('click', function (marker) {
         selectAllToggle.addEventListener('change', () => {
         const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
+        updateSelectAllToggle();
         updateMarkerVisibility();
         });
         // aggiorna lo stato del checkbox
