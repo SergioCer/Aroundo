@@ -1535,11 +1535,26 @@ oms.addListener('click', function (marker) {
           </div>
           <hr>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-            <div>
-              Location:
-              ${[e.comuni?.co_descrizione, e.luoghi?.lu_location]
+            <div style="text-align:left;">
+              <div style="font-weight:600;">
+                ${[
+                  e.luoghi?.comuni?.co_descrizione,
+                  e.luoghi?.lu_location
+                ]
                 .filter(Boolean)
                 .join(' • ')}
+              </div>
+              ${
+                e.luoghi?.lu_descrizione
+                ?
+                `
+                <div style="font-size:12px;color:#555;margin-top:2px;">
+                  ${e.luoghi.lu_descrizione}
+                </div>
+                `
+                :
+                ''
+              }
             </div>
             <a
               href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
@@ -1582,7 +1597,7 @@ oms.addListener('click', function (marker) {
             `
             : `
               <div>
-                Price €:
+                Price: €
                 <span style="font-weight:700;">
                   ${e.ev_costo}
                 </span>
