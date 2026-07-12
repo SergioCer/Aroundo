@@ -1379,7 +1379,6 @@ oms.addListener('click', function (marker) {
         const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
         const allChecked = checkedCount === checkboxes.length;
         const partialChecked = checkedCount > 0 && checkedCount < checkboxes.length;  
-        // CANCELLARE const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         selectAllToggle.checked = allChecked;
         selectAllToggle.parentElement.classList.toggle('partial', partialChecked);  
         }
@@ -1505,7 +1504,7 @@ oms.addListener('click', function (marker) {
           ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
         </div>
         <!-- DESCRIZIONE -->
-        <div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_descrizione || ''} </div>
+        <!--CANCELLARE ** div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_descrizione || ''} </div -->
         <!-- Organizzatore -->
         <div style="font-size: 12px; color:#555; line-height:1.35;">
           By:
