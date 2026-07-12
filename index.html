@@ -1622,10 +1622,14 @@ oms.addListener('click', function (marker) {
           </div>
         </div>
       `;
-      L.popup()
-        .setLatLng(latlng)
-        .setContent(content)
-        .openOn(map);
+      const markerPoint = map.latLngToContainerPoint(latlng);
+        markerPoint.x += 0;
+        markerPoint.y -= 20;
+      const popupLatLng = map.containerPointToLatLng(markerPoint);
+    L.popup()
+      .setLatLng(popupLatLng)
+      .setContent(content)
+      .openOn(map);
     };
 
   // ***** INSTALLAZIONE APP ***** //
