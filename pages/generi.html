@@ -405,6 +405,8 @@ body{
 </div>
 
 <script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();  
 
 import { supabase } from "../supabase.js";
 
