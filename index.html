@@ -49,6 +49,11 @@
     .leaflet-popup-content {
       margin: 4px 6px;
     }
+
+    .leaflet-popup-tip-container {
+      left: 18px;
+      margin-left: 0;
+    }
     
     #fx-canvas {
       position: absolute;
@@ -1314,7 +1319,9 @@ oms.addListener('click', function (marker) {
       </div>
     </div>
   `;
-  L.popup()
+  L.popup({
+    offset: [22, 0]
+  })
     .setLatLng(first.getLatLng())
     .setContent(content)
     .openOn(map);
