@@ -966,12 +966,14 @@
     const loginBtn = document.getElementById('loginBtn');
     // Click sinistro
     loginBtn.addEventListener('click', function() {
-    alert('In Progress!');
+    event.preventDefault(); // blocca il menu del browser
+    window.location.href = 'pages/login.html';
   });      
     // Click destro
     loginBtn.addEventListener('contextmenu', function(event) {
-    event.preventDefault(); // blocca il menu del browser
-    window.location.href = 'pages/login.html';
+    alert('Click errato!'); 
+    /* event.preventDefault(); // blocca il menu del browser
+    window.location.href = 'pages/login.html'; */
   });
     
   const canvas = document.getElementById('fx-canvas');
