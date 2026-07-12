@@ -1565,7 +1565,8 @@ oms.addListener('click', function (marker) {
           <div style="text-align:left; margin-top:8px; line-height:1.35;">
             ${e.ev_descrizione || ''}
           </div>
-                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+        <hr>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
           ${
             e.ev_costo === null || e.ev_costo === undefined || e.ev_costo === ''
             ? `
@@ -1578,7 +1579,6 @@ oms.addListener('click', function (marker) {
               <div style="width:100%;text-align:center;color:#16a34a;font-weight:700;font-size:14px;">
                 Free Entry
               </div>
-          <hr>
             `
             : `
               <div>
