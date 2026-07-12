@@ -202,7 +202,7 @@ textarea {
 
 <div class="header">
   <div class="title">
-    <button class="bck-btn" onclick="window.location.href='../tabelle.html'">←</button>
+    <button class="bck-btn" onclick="window.location.href='dashboard.html'">←</button>
     Luoghi
     <button class="add-btn" onclick="window.location.href='luogo.html?new=1'">+</button>
   </div>
@@ -333,6 +333,9 @@ textarea {
 </table>
 
 <script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();  
+  
 import { supabase } from '../supabase.js';
 
 let data = [];
