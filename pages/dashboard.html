@@ -41,19 +41,17 @@
 
 <script type="module">
   import { supabase } from '../supabase.js';
-
-const { data, error } = await supabase.auth.getSession();
-console.log("SESSIONE:", data.session);
-console.log("USER:", data.user);
-console.log("EMAIL:", data.user?.email);
-console.log("ID:", data.user?.id);
-console.log("ERRORE:", error);
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) {
+    window.location.href="login.html";
+  }  
   
-  document.querySelectorAll('.in-progress').forEach(link => {
+  /* CANCELLARE document.querySelectorAll('.in-progress').forEach(link => {
   link.addEventListener('click', function(event) {
     event.preventDefault();
     alert('In Progress!');
   });
 });
+  */ 
 </script>
 
