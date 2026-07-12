@@ -112,7 +112,7 @@ Login
       font-size:13px;
     ">
     </div>
-    <button id="loginErrorOkBtn" onclick="closeLoginError()" style="
+    <button id="loginErrorOkBtn" style="
       width:100%;
       background:#22c55e;
       color:white;
@@ -145,22 +145,17 @@ await supabase.auth.signInWithPassword({
  password
 });
 
-if(error) {
-  document.getElementById('loginErrorMessage').textContent =
-    error.message;
-  document.getElementById('loginErrorDialog').style.display = 'flex';
- return;
-}
-
 document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
   document.getElementById('loginErrorDialog').style.display = 'none';
 });
   
-/* window.closeLoginError = function() {
-  document.getElementById('loginErrorDialog').style.display = 'none';
-};  */
+if(error) {
+  document.getElementById('loginErrorMessage').textContent =
+    'Email o password non corretti';
+  document.getElementById('loginErrorDialog').style.display = 'flex';
+ return;
+}
 
-  
 window.location.href="dashboard.html";
 });
 
