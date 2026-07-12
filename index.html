@@ -1493,16 +1493,16 @@ oms.addListener('click', function (marker) {
         <div style="text-align:center; font-weight:700; margin-bottom:6px; color:${color};">
         ${dayLabel}
         </div>
-         <!-- TITOLO -->
-        <div style="font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
         <!-- ORARIO -->
         <div style="display:flex; flex-direction:column; align-items:${align}; color:${color}; font-weight:600; margin-bottom:6px;">
           ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
         </div>
+        <!-- TITOLO -->
+        <div style="text-align:center; font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
         <!-- DESCRIZIONE -->
         <!--CANCELLARE ** div style="font-size: 12px; color:#555; line-height:1.35; "> ${e.ev_descrizione || ''} </div -->
         <!-- Organizzatore -->
-        <div style="font-size: 12px; color:#555; line-height:1.35;">
+        <div style="font-size: 12px; color:#3b82f6; line-height:1.35;">
           By:
           <a class="organizzatore-link" 
               href="pages/organizzatore.html?id=${e.id_organizzatore}">
@@ -1510,7 +1510,9 @@ oms.addListener('click', function (marker) {
           </a>
         </div>
         <!-- BOTTONE DETTAGLI e relativo POPUP -->
-        <button onclick="window.openDetailPopup(window.currentEvent, window.currentLatLng)" style="margin-top:6px;">More...</button>
+        <button onclick="window.openDetailPopup(window.currentEvent, window.currentLatLng)"
+          style="margin-top:6px; background:#3b82f6; color:white; border:none; border-radius:6px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer;">
+          More...</button>
         </div>
        `;
         window.currentEvent = e;  // passa evento e coordinate al POPUP More...
