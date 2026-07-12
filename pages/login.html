@@ -112,7 +112,7 @@ Login
       font-size:13px;
     ">
     </div>
-    <button onclick="closeLoginError()" style="
+    <button id="loginErrorOkBtn" onclick="closeLoginError()" style="
       width:100%;
       background:#22c55e;
       color:white;
@@ -152,10 +152,13 @@ if(error) {
  return;
 }
 
-window.closeLoginError = function() {
-  // document.getElementById('loginErrorDialog').style.display = 'none';
-  document.getElementById('closeLoginError').style.display = 'none';
-};  
+document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
+  document.getElementById('loginErrorDialog').style.display = 'none';
+});
+  
+/* window.closeLoginError = function() {
+  document.getElementById('loginErrorDialog').style.display = 'none';
+};  */
 
   
 window.location.href="dashboard.html";
