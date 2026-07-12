@@ -1319,11 +1319,11 @@ oms.addListener('click', function (marker) {
       </div>
     </div>
   `;
-    const markerPoint = map.latLngToContainerPoint(first.getLatLng());
-    markerPoint.x += 150;   // sposta il popup a destra di 22px
-    markerPoint.y -= 100;   // leggero sollevamento (facoltativo)
-    const popupLatLng = map.containerPointToLatLng(markerPoint); // Nuove coordinate spostate
   console.log("OPEN ORDERED POPUP"); // CANCELLARE
+    const markerPoint = map.latLngToContainerPoint(first.getLatLng());
+    markerPoint.x += 20;   // sposta il popup a destra di 22px
+    markerPoint.y -= 10;   // leggero sollevamento (facoltativo)
+    const popupLatLng = map.containerPointToLatLng(markerPoint); // Nuove coordinate spostate
   L.popup()
     .setLatLng(popupLatLng) // invece di (first.getLatLng()) usa le nuove coordinate spostate
     .setContent(content)
@@ -1527,10 +1527,14 @@ oms.addListener('click', function (marker) {
         window.currentEvent = e;  // passa evento e coordinate al POPUP More...
         window.currentLatLng = latlng;
       console.log("OPEN BASE POPUP"); // CANCELLARE
-      L.popup()
-        .setLatLng(latlng)
-        .setContent(content)
-        .openOn(map);       
+    const markerPoint = map.latLngToContainerPoint(first.getLatLng());
+    markerPoint.x += 20;   // sposta il popup a destra di 22px
+    markerPoint.y -= 10;   // leggero sollevamento (facoltativo)
+    const popupLatLng = map.containerPointToLatLng(markerPoint); // Nuove coordinate spostate
+  L.popup()
+    .setLatLng(popupLatLng) // invece di (first.getLatLng()) usa le nuove coordinate spostate
+    .setContent(content)
+    .openOn(map);
       };
 
     window.openDetailPopup = function(e, latlng) {
@@ -1612,10 +1616,14 @@ oms.addListener('click', function (marker) {
         </div>
       `;
       console.log("OPEN DETAIL POPUP"); // CANCELLARE
-      L.popup()
-        .setLatLng(latlng)
-        .setContent(content)
-        .openOn(map);
+    const markerPoint = map.latLngToContainerPoint(first.getLatLng());
+    markerPoint.x += 20;   // sposta il popup a destra di 22px
+    markerPoint.y -= 10;   // leggero sollevamento (facoltativo)
+    const popupLatLng = map.containerPointToLatLng(markerPoint); // Nuove coordinate spostate
+  L.popup()
+    .setLatLng(popupLatLng) // invece di (first.getLatLng()) usa le nuove coordinate spostate
+    .setContent(content)
+    .openOn(map);
     };
 
   // ***** INSTALLAZIONE APP ***** //
