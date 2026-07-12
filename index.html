@@ -1504,7 +1504,7 @@ oms.addListener('click', function (marker) {
         <div style="font-size: 12px; color:#555; line-height:1.35;">
           By:
           <a class="organizzatore-link"
-              style="color:#3b82f6; font-weight:600; text-decoration:none;"
+              style="color:#3b82f6; font-weight:600;"
               href="pages/organizzatore.html?id=${e.id_organizzatore}">
             ${e.organizzatori?.or_nome || ''}
           </a>
@@ -1517,7 +1517,6 @@ oms.addListener('click', function (marker) {
        `;
         window.currentEvent = e;  // passa evento e coordinate al POPUP More...
         window.currentLatLng = latlng;
-      console.log("OPEN BASE POPUP");
       const markerPoint = map.latLngToContainerPoint(latlng);
         markerPoint.x += 0;
         markerPoint.y -= 20;
@@ -1549,7 +1548,25 @@ oms.addListener('click', function (marker) {
               Map
             </a>
           </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+          <hr>
+          ${
+            e.ev_copertina
+            ?
+            `
+            <div style="text-align:center;">
+              <img
+                src="${e.ev_copertina}"
+                style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
+            </div>
+            <hr>
+            `
+            :
+            ''
+          }
+          <div style="text-align:left; margin-top:8px; line-height:1.35;">
+            ${e.ev_descrizione || ''}
+          </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
           ${
             e.ev_costo === null || e.ev_costo === undefined || e.ev_costo === ''
             ? `
@@ -1588,22 +1605,6 @@ oms.addListener('click', function (marker) {
               Book
             </a>
           </div>
-          <hr>
-          ${
-            e.ev_copertina
-            ?
-            `
-            <div style="text-align:center;">
-              <img
-                src="${e.ev_copertina}"
-                style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
-            </div>
-            <hr>
-            `
-            :
-            ''
-          }
-          ${e.ev_descrizione || ''}
         </div>
       `;
       L.popup()
