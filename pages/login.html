@@ -148,14 +148,13 @@ await supabase.auth.signInWithPassword({
 if(error) {
   document.getElementById('loginErrorMessage').textContent =
     error.message;
-
   document.getElementById('loginErrorDialog').style.display = 'flex';
  return;
-}
-
 window.closeLoginError = function() {
   document.getElementById('loginErrorDialog').style.display = 'none';
 };  
+}
+
   
 window.location.href="dashboard.html";
 });
