@@ -1519,11 +1519,16 @@ oms.addListener('click', function (marker) {
        `;
         window.currentEvent = e;  // passa evento e coordinate al POPUP More...
         window.currentLatLng = latlng;
-        L.popup()
-        .setLatLng(latlng)
-        .setContent(content)
-        .openOn(map);       
-      };
+      console.log("OPEN BASE POPUP");
+      const markerPoint = map.latLngToContainerPoint(latlng);
+        markerPoint.x += 20;
+        markerPoint.y -= 10;
+      const popupLatLng = map.containerPointToLatLng(markerPoint);
+    L.popup()
+      .setLatLng(popupLatLng)
+      .setContent(content)
+      .openOn(map);
+    };
 
     window.openDetailPopup = function(e, latlng) {
       const content = `
