@@ -265,8 +265,8 @@
     .toggle-pill.partial::after {
       content:"";
       position:absolute;
-      width:5px;
-      height:5px;
+      width:8px;
+      height:8px;
       top:50%;
       left:50%;
       transform:translate(-50%, -50%);
@@ -683,27 +683,6 @@
       margin-right: 5px;
       background: #ef4444;
     }
-
-    #subcategory-items {
-      position: absolute;
-      left: 100%;
-      top: 32px;
-      margin-left: 6px;
-      min-width: 140px;
-      padding: 4px;
-      background: linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.25),
-        rgba(255,255,255,0.1)
-      );
-
-  border-radius: 14px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-
-  z-index: 1000;
-}
-
     
     @keyframes tickerScroll{
       from{
@@ -761,7 +740,6 @@
     }
   
     .map-overlay2 {
-      position: absolute;
       top: 76px;
       left: 0px;
       padding: 0px 0px;
@@ -868,7 +846,6 @@
     <span id="menu-arrow">▼</span></button>
 </div>
   <div id="menu-items" style="display:none; margin-top:4px;"></div>
-  <div id="subcategory-items"></div>
 </div>
 <div class="top-timebar">
   <!-- Sinistra -->
@@ -901,8 +878,7 @@
 <script type="module">
   import { supabase } from './supabase.js';
     
-  let categories = []; // gestione categorie
-  let subcategories = []; // Gestione sottocategorie
+  let categories = [];
   let icons = {};
   let events = [];
   let markers = [];
@@ -1009,7 +985,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. prende le categorie con relative icone e colori
   categories = await fetchCategories();
-  subcategories = await fetchSubCategories();
   icons = {};
   categories.forEach(cat => {
   icons[cat.id_categoria] = createIcon(cat.mc_colore);
@@ -1147,20 +1122,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return data;
       }
 
-    // Preleva le sottocategorie da Supabase
-    async function fetchSubCategories() {
-      const { data, error } = await supabase
-        .from('subcategorie')
-        .select('*')
-        .eq('sc_attiva', true)
-        .order('sc_ordine', { ascending: true });
-      if (error) {
-        console.error("Errore caricamento sottocategorie:", error);
-        return [];
-      }
-      return data;
-    }
-  
   // Preleva gli Eventi ed Organizzatori da supabase
   async function fetchEvents() {
     // console.log("Aggiorno Eventi", new Date().toLocaleTimeString());
@@ -1354,7 +1315,6 @@ oms.addListener('click', function (marker) {
     function buildCategoryMenu() {
       // console.log("Aggiorno Menù Categorie", new Date().toLocaleTimeString());
       const menuItemsDiv = document.getElementById('menu-items');
-      const subcategoryDiv = document.getElementById('subcategory-items');
       // checkbox per ogni categoria
       categories.forEach(cat => {
         const cb = document.createElement('input');
@@ -1372,42 +1332,6 @@ oms.addListener('click', function (marker) {
         label.style.setProperty('--cat-color', cat.mc_colore);
         menuItemsDiv.appendChild(cb);
         menuItemsDiv.appendChild(label);
-        // Gestisce le sottocategorie        
-        label.addEventListener('click', () => {
-        // se la categoria è spenta la attivo
-        if (!cb.checked) {
-          cb.checked = true;
-          updateMarkerVisibility();
-        }
-        // se clicco nuovamente la stessa categoria chiudo
-        if (subcategoryDiv.dataset.category === String(cat.id_categoria)) {
-          subcategoryDiv.style.display = 'none';
-          subcategoryDiv.innerHTML = '';
-          subcategoryDiv.dataset.category = '';
-          return;
-        }
-        // apro nuova sottocategoria
-        subcategoryDiv.innerHTML = '';
-        subcategoryDiv.dataset.category = cat.id_categoria;
-        const subCats = subcategories.filter(
-          sub => sub.id_categoria === cat.id_categoria
-        );
-        subCats.forEach(sub => {
-          const subCb = document.createElement('input');
-          subCb.type = 'checkbox';
-          subCb.checked = true;
-          subCb.className = 'category-checkbox';
-          const subLabel = document.createElement('label');
-          subLabel.className = 'category-label';
-          subLabel.innerHTML =
-            `${sub.sc_icona} ${sub.sc_descrizione}`;
-          subLabel.style.backgroundColor = sub.sc_colore;
-          subLabel.style.color = getContrastColor(sub.sc_colore);
-          subcategoryDiv.appendChild(subCb);
-          subcategoryDiv.appendChild(subLabel);
-          });
-        subcategoryDiv.style.display = 'block';
-      });
         });
         // toggle menu
          const toggleBtn = document.getElementById('menu-toggle');
@@ -1433,7 +1357,6 @@ oms.addListener('click', function (marker) {
         selectAllToggle.addEventListener('change', () => {
         const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
-        updateSelectAllToggle();
         updateMarkerVisibility();
         });
         // aggiorna lo stato del checkbox
