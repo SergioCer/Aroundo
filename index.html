@@ -1527,7 +1527,7 @@ oms.addListener('click', function (marker) {
         window.currentEvent = e;  // passa evento e coordinate al POPUP More...
         window.currentLatLng = latlng;
       console.log("OPEN BASE POPUP"); // CANCELLARE
-    const markerPoint = map.latLngToContainerPoint(popupLatLng);
+    const markerPoint = map.latLngToContainerPoint(LatLng);
     markerPoint.x += 20;   // sposta il popup a destra di 22px
     markerPoint.y -= 10;   // leggero sollevamento (facoltativo)
     const popupLatLng = map.containerPointToLatLng(markerPoint); // Nuove coordinate spostate
@@ -1616,7 +1616,7 @@ oms.addListener('click', function (marker) {
         </div>
       `;
       console.log("OPEN DETAIL POPUP"); // CANCELLARE
-    const markerPoint = map.latLngToContainerPoint(popupLatLng);
+    const markerPoint = map.latLngToContainerPoint(LatLng);
     markerPoint.x += 20;   // sposta il popup a destra di 22px
     markerPoint.y -= 10;   // leggero sollevamento (facoltativo)
     const popupLatLng = map.containerPointToLatLng(markerPoint); // Nuove coordinate spostate
