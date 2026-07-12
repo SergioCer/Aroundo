@@ -150,10 +150,12 @@ if(error) {
     error.message;
   document.getElementById('loginErrorDialog').style.display = 'flex';
  return;
-window.closeLoginError = function() {
-  document.getElementById('loginErrorDialog').style.display = 'none';
-};  
 }
+
+window.closeLoginError = function() {
+  // document.getElementById('loginErrorDialog').style.display = 'none';
+  document.getElementById('closeLoginError').style.display = 'none';
+};  
 
   
 window.location.href="dashboard.html";
