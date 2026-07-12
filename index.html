@@ -9,7 +9,9 @@
   <title>Aroundo - Territory Map</title>
   <!--  per usarla come APP -->
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="theme-color" content="#22c55e">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
@@ -985,10 +987,10 @@
    window.addEventListener('resize', resizeCanvas);
    map.on('move zoom resize', resizeCanvas);
 
-    // Aggiorna ogni minuto
-    setInterval(renderEvents, 60000);
-    // Preleva nuovamente eventi ogni 5 minuti
-    setInterval(async () => { const data = await fetchEvents(); if (data) { events = data; renderEvents(); } }, 5 * 60 * 1000);
+    // Aggiorna ogni 2 minuti
+    setInterval(renderEvents, 120000);
+    // Preleva nuovamente eventi ogni 10 minuti
+    setInterval(async () => { const data = await fetchEvents(); if (data) { events = data; renderEvents(); } }, 10 * 60 * 1000);
 
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1654,6 +1656,24 @@ oms.addListener('click', function (marker) {
   window.addEventListener('appinstalled', () => {
     document.getElementById("installBtn").style.display = "none";
   });
+ 
+  // Installazione iOS Safari
+  const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+    if (isIOS && !isStandalone) {
+      const installBtn = document.getElementById("installBtn");
+    if (installBtn) {
+      installBtn.style.display = "block";
+      installBtn.onclick = () => {
+        alert(
+          "Per installare Aroundo:\n\n" +
+          "1. Premi il pulsante Condividi ⬆️\n" +
+          "2. Seleziona 'Aggiungi alla schermata Home'\n\n" +
+          "Aroundo sarà disponibile come App."
+        );
+      };
+    }
+  }
 
     // Verifica se Geolocalizzazione è Attiva o Disattiva
     const geoStatus = document.getElementById("geoStatus");
