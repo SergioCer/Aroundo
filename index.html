@@ -46,10 +46,6 @@
       padding: 2px 0;
     }
 
-    .leaflet-popup {
-      transform: translate(22px, 0);
-    }
-    
     .leaflet-popup-content {
       margin: 4px 6px;
     }
@@ -1323,10 +1319,12 @@ oms.addListener('click', function (marker) {
       </div>
     </div>
   `;
-  L.popup({
-    offset: [100, 0]
-  })
-    .setLatLng(first.getLatLng())
+    const markerPoint = map.latLngToContainerPoint(first.getLatLng());
+    markerPoint.x += 22;   // sposta il popup a destra di 22px
+    markerPoint.y -= 10;   // leggero sollevamento (facoltativo)
+    const popupLatLng = map.containerPointToLatLng(markerPoint); // Nuove coordinate spostate
+  L.popup()
+    .setLatLng(popupLatLng) // invece di (first.getLatLng()) usa le nuove coordinate spostate
     .setContent(content)
     .openOn(map);
 }
