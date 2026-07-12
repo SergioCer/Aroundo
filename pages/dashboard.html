@@ -41,17 +41,20 @@
 
 <script type="module">
   import { supabase } from '../supabase.js';
-  const { data } = await supabase.auth.getSession();
-  if (!data.session) {
-    window.location.href="login.html";
-  }  
+  const { data, error } = await supabase.auth.getSession();
+    if (error || !data.session) {
+      window.location.href = "login.html";
+    }
+    if (!data.session) {
+      window.location.href="login.html";
+    }  
   
-  /* CANCELLARE document.querySelectorAll('.in-progress').forEach(link => {
+  document.querySelectorAll('.in-progress').forEach(link => {
   link.addEventListener('click', function(event) {
     event.preventDefault();
     alert('In Progress!');
   });
 });
-  */ 
+  
 </script>
 
