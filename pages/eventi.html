@@ -181,7 +181,7 @@ thead th {
 
 <div class="header">
   <div class="title">
-    <button class="bck-btn" onclick="window.location.href='../tabelle.html'">←</button>
+    <button class="bck-btn" onclick="window.location.href='dashboard.html'">←</button>
     Eventi
     <button class="add-btn" onclick="window.location.href='evento.html?new=1'">+</button>
   </div>
@@ -313,6 +313,9 @@ thead th {
 </div>
   
 <script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();  
+  
 import { supabase } from '../supabase.js';
 
 let data = [];
