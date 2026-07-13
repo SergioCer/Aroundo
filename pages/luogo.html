@@ -850,11 +850,30 @@ window.changeMapStyle = function () {
   currentMapStyle++;
   if (currentMapStyle >= mapStyles.length)
     currentMapStyle = 0;
-  map.removeLayer(baseLayer);
+  // rimuove la mappa corrente
+  if (baseLayer) {
+    map.removeLayer(baseLayer);
+  }
+  // rimuove eventuali etichette precedenti
+  if (labelsLayer) {
+    map.removeLayer(labelsLayer);
+    labelsLayer = null;
+  }
+  // carica nuova mappa
   baseLayer = L.tileLayer(
     mapStyles[currentMapStyle].url,
     mapStyles[currentMapStyle].options
   ).addTo(map);
+  // se richiesto aggiunge le etichette
+  if (mapStyles[currentMapStyle].labels) {
+    labelsLayer = L.tileLayer(
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+      {
+        attribution: "&copy; Esri",
+        maxZoom: 19
+      }
+    ).addTo(map);
+  }
   document.getElementById("mapStyleBtn").textContent =
     mapStyles[currentMapStyle].name;
 };
