@@ -17,6 +17,12 @@ body {
   background: #f2f4f7;
 }
 
+.leaflet-control-attribution {
+    font-size:8px;
+    background:rgba(255,255,255,.55);
+    padding:0 2px;
+}
+  
 /* TOPBAR */
 .topbar {
   display: flex;
@@ -909,7 +915,7 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     });
   }
 
-function updateMapPopupTitle() {
+window.updateMapPopupTitle = function {
   const comuneNome = id_comune.value || "Comune";
   const location = lu_location.value?.trim();
   const descrizione = lu_descrizione.value?.trim();
