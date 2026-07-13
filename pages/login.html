@@ -64,6 +64,7 @@ button:hover {
 <div class="login-box">
 <img src="../icon-512.png" alt="Aroundo">
 <h2>Aroundo</h2>
+<h2>Explore • Discover • Experience</h2>  
 <input 
  id="email"
  type="email"
@@ -80,7 +81,7 @@ Login
   font-size:13px;
   color:#666;
 ">
-  Non hai ancora un account?
+  Don't have an account yet?
   <br><br>
   <a href="#"
      id="registerLink"
@@ -89,9 +90,18 @@ Login
        text-decoration:underline;
        font-weight:600;
      ">
-     Registrati
+     Register
   </a>
-</div> 
+</div>
+<div style="
+    margin-top:35px;
+    font-size:11px;
+    color:#999;
+    text-align:center;
+">
+    Aroundo is continuously evolving.<br>
+    New features will become available over time.
+</div>  
 </div>
 
 
@@ -101,7 +111,8 @@ Login
   margin-bottom:15px;
   font-weight:700;
   color:#ef4444;
-  font-size:16px;">
+  font-size:16px;
+  ">
 </div>  
 <div id="loginErrorDialog" style="
   display:none;
@@ -123,15 +134,7 @@ Login
     text-align:center;
     box-shadow:0 10px 30px rgba(0,0,0,0.2);
   ">
-    <div style="
-      margin-bottom:15px;
-      font-weight:700;
-      color:#ef4444;
-      font-size:16px;
-    ">
-      Login non riuscito
-    </div>
-    <div id="loginErrorMessage" style="
+  <div id="loginErrorMessage" style="
       margin-bottom:18px;
       color:#555;
       font-size:13px;
@@ -155,9 +158,20 @@ Login
 <script type="module">
 
 import { supabase } from '../supabase.js';
-document
-.getElementById('loginBtn')
-.addEventListener('click', async () => {
+
+document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
+  document.getElementById('loginErrorDialog').style.display = 'none';
+});
+  
+document.getElementById('registerLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('loginErrorTitle').textContent = 'Register';
+  document.getElementById('loginErrorMessage').textContent =
+  'Registration user will become soon.';
+  document.getElementById('loginErrorDialog').style.display = 'flex';
+});
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
 const email =
 document.getElementById('email').value;
 
@@ -168,26 +182,14 @@ await supabase.auth.signInWithPassword({
  email,
  password
 });
-
-document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
-  document.getElementById('loginErrorDialog').style.display = 'none';
-});
   
 if(error) {
-  document.getElementById('loginErrorTitle').textContent = 'Login non riuscito';
-  document.getElementById('loginErrorMessage').textContent = 'Email o password non corretti.';
+  document.getElementById('loginErrorTitle').textContent = 'Invalid login';
+  document.getElementById('loginErrorMessage').textContent = 'Email or password wrong.';
   document.getElementById('loginErrorDialog').style.display = 'flex';
  return;
 }
 
-document.getElementById('registerLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  document.getElementById('loginErrorTitle').textContent = 'Registrazione';
-  document.getElementById('loginErrorMessage').textContent =
-  'La registrazione degli utenti sarà disponibile in una prossima versione. Aroundo è in continua evoluzione. Nuove funzionalità saranno disponibili progressivamente.';                                                       
-  document.getElementById('loginErrorDialog').style.display = 'flex';
-});
-  
 window.location.href="dashboard.html";
 });
 
