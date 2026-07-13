@@ -450,7 +450,7 @@ async function loadSelects() {
   .from('categorie')
   .select('*')
   .order('mc_ordine', { ascending: true });
-  id_categoria.innerHTML = `<option value="">Categoria...</option>`;
+  id_categoria.innerHTML = ``;
   (cat || []).forEach(c => {
     id_categoria.innerHTML += `<option value="${c.id_categoria}">${c.mc_descrizione}</option>`;
   });
