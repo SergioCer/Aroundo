@@ -115,26 +115,6 @@ Login
 
   
 <!-- LOGIN ERROR DIALOG -->
-<div id="loginErrorDialog" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.4);
-  z-index:99999;
-  align-items:center;
-  justify-content:center;
-">
-<div id="loginErrorTitle" style="
-  margin-bottom:15px;
-  font-weight:700;
-  color:#ef4444;
-  font-size:16px;
-  ">
-</div>  
-  
   <div style="
     background:white;
     padding:22px;
@@ -143,12 +123,31 @@ Login
     text-align:center;
     box-shadow:0 10px 30px rgba(0,0,0,0.2);
   ">
-  <div id="loginErrorMessage" style="
+  <div id="loginErrorDialog" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    z-index:99999;
+    align-items:center;
+    justify-content:center;
+  ">
+  <div id="loginErrorTitle" style="
+    margin-bottom:15px;
+    font-weight:700;
+    color:#ef4444;
+    font-size:16px;
+    ">
+  </div>      
+    <div id="loginErrorMessage" style="
       margin-bottom:18px;
       color:#555;
       font-size:13px;
     ">
-    </div>
+  </div>
     <button id="loginErrorOkBtn" style="
       width:100%;
       background:#22c55e;
