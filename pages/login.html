@@ -77,7 +77,33 @@ Login
 </button>
 </div>
 
+<div style="
+  margin-top:18px;
+  font-size:13px;
+  color:#666;
+">
+  Non hai ancora un account?
+  <br><br>
+  <a href="#"
+     id="registerLink"
+     style="
+       color:#3b82f6;
+       text-decoration:underline;
+       font-weight:600;
+     ">
+     Registrati
+  </a>
+</div> 
+
+
+  
 <!-- LOGIN ERROR DIALOG -->
+<div id="loginErrorTitle" style="
+  margin-bottom:15px;
+  font-weight:700;
+  color:#ef4444;
+  font-size:16px;">
+</div>  
 <div id="loginErrorDialog" style="
   display:none;
   position:fixed;
@@ -127,7 +153,6 @@ Login
   </div>
 </div>
 
-  
 <script type="module">
 
 import { supabase } from '../supabase.js';
@@ -150,12 +175,22 @@ document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
 });
   
 if(error) {
-  document.getElementById('loginErrorMessage').textContent =
-    'Email o password non corretti';
+  document.getElementById('loginErrorTitle').textContent = 'Login non riuscito';
+  document.getElementById('loginErrorMessage').textContent = 'Email o password non corretti.';
   document.getElementById('loginErrorDialog').style.display = 'flex';
  return;
 }
 
+document.getElementById('registerLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('loginErrorTitle').textContent = 'Registrazione';
+  document.getElementById('loginErrorMessage').textContent =
+  'La registrazione degli utenti sarà disponibile in una prossima versione.';
+  <br>
+  'Aroundo è in continua evoluzione. Nuove funzionalità saranno disponibili progressivamente.';                                                       
+  document.getElementById('loginErrorDialog').style.display = 'flex';
+});
+  
 window.location.href="dashboard.html";
 });
 
