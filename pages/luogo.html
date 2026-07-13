@@ -450,7 +450,24 @@ textarea:disabled {
     border-radius:15px;
     cursor:pointer;
     z-index:10;
-  ">✕</button>    
+  ">✕</button>
+    <button
+      id="mapStyleBtn"
+      onclick="changeMapStyle()"
+      style="
+        position:absolute;
+        top:10px;
+        right:50px;
+        border:none;
+        background:#2563eb;
+        color:white;
+        padding:6px 12px;
+        border-radius:16px;
+        cursor:pointer;
+        z-index:10;
+    ">
+    Base
+    </button>    
     <div id="map" style="height:calc(100% - 50px);"></div>
   </div>
 </div>
@@ -510,7 +527,38 @@ let coordResolve;
 let comuneLayer;
 let comuneGeoJson;  
 let environmentValue = null;
+let baseLayer;
+let currentMapStyle = 0;
 
+const mapStyles = [
+  {
+    name: "Base",
+    url: "https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png",
+    options: {
+      attribution: "&copy; OpenStreetMap & CARTO",
+      subdomains: "abcd",
+      maxZoom: 19
+    }
+  },
+  {
+    name: "Neutra",
+    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    options: {
+      attribution: "&copy; OpenStreetMap & CARTO",
+      subdomains: "abcd",
+      maxZoom: 19
+    }
+  },
+  {
+    name: "OSM",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    options: {
+      attribution: "&copy; OpenStreetMap",
+      maxZoom: 19
+    }
+  }
+];
+  
 /* LOAD */
 async function load() {
   if (isNew) {
@@ -698,7 +746,11 @@ function initMapLuogo() {
   });
 // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(map); // Mappa Base di Aroundo
 // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map); // Mappa Neutra
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+// L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+baseLayer = L.tileLayer(
+  mapStyles[currentMapStyle].url,
+  mapStyles[currentMapStyle].options
+).addTo(map);
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
@@ -774,6 +826,19 @@ map.on("click", async (e) => {
   markDirty();
   });
 }
+
+window.changeMapStyle = function () {
+  currentMapStyle++;
+  if (currentMapStyle >= mapStyles.length)
+    currentMapStyle = 0;
+  map.removeLayer(baseLayer);
+  baseLayer = L.tileLayer(
+    mapStyles[currentMapStyle].url,
+    mapStyles[currentMapStyle].options
+  ).addTo(map);
+  document.getElementById("mapStyleBtn").textContent =
+    mapStyles[currentMapStyle].name;
+};
 
 function isPointInComune(latlng) {
   if (!comuneGeoJson) return true;
@@ -981,6 +1046,8 @@ window.openMapLuogo = async () => {
   setTimeout(() => {
     map.invalidateSize();
   }, 200);
+  document.getElementById("mapStyleBtn").textContent =
+    mapStyles[currentMapStyle].name;
 };
 
 window.onComuneInput = (text) => {
