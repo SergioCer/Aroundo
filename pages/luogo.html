@@ -244,7 +244,7 @@ textarea:disabled {
 <div class="card">
 
   <!-- LOCATION -->
-  <div class="section-title">Location:</div>
+  <div class="section-title">Locality:</div>
   <input id="lu_location"style="font-size:16px; font-weight:600; text-align:left;"
          oninput="markDirty(); updateMapPopupTitle()">
 
@@ -529,11 +529,12 @@ let comuneLayer;
 let comuneGeoJson;  
 let environmentValue = null;
 let baseLayer;
+let labelsLayer = null;  
 let currentMapStyle = 0;
 
 const mapStyles = [
   {
-    name: "Base",
+    name: "Basic",
     url: "https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png",
     options: {
       attribution: "&copy; OpenStreetMap & CARTO",
@@ -542,7 +543,7 @@ const mapStyles = [
     }
   },
   {
-    name: "Neutra",
+    name: "Neutral",
     url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
     options: {
       attribution: "&copy; OpenStreetMap & CARTO",
@@ -557,7 +558,24 @@ const mapStyles = [
       attribution: "&copy; OpenStreetMap",
       maxZoom: 19
     }
-  }
+  },
+  {
+    name: "Sat",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    options: {
+      attribution: "&copy; Esri",
+      maxZoom: 19
+    }
+  },
+ {
+    name: "Sat +",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    options: {
+      attribution: "&copy; Esri",
+      maxZoom: 19
+    },
+    labels: true
+  } 
 ];
   
 /* LOAD */
