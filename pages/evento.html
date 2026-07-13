@@ -485,7 +485,7 @@ async function loadSeriesByOrganizzatore(idOrg) {
     return;
   }
   seriesCache = data || [];
-  select.innerHTML = `<option value="">Nessuna serie</option>`;
+  select.innerHTML = ``;
   (data || []).forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.id_event_series;
