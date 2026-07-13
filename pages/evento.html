@@ -578,13 +578,13 @@ window.filterLuoghi = async (selectedId = null) => {
   if (!idComune) return;
   const { data } = await supabase
     .from('luoghi')
-    .select('id_luogo, lu_location')
+    .select('id_luogo, lu_location, lu_descrizione')
     .eq('id_comune', idComune)
     .order('lu_location');
   (data || []).forEach(l => {
     id_luogo.innerHTML += `
       <option value="${l.id_luogo}">
-        ${l.lu_location}
+        ${l.lu_location}${l.lu_descrizione ? ' - ' + l.lu_descrizione : ''}
       </option>
     `;
   });
