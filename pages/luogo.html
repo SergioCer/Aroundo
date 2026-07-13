@@ -915,7 +915,7 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     });
   }
 
-window.updateMapPopupTitle = function {
+window.updateMapPopupTitle = function () {
   const comuneNome = id_comune.value || "Comune";
   const location = lu_location.value?.trim();
   const descrizione = lu_descrizione.value?.trim();
