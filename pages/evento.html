@@ -274,12 +274,49 @@ input, select, textarea {
   <div class="section-title">Link</div>
   <input id="ev_link" oninput="markDirty()">
 
-  <!-- COPERTINA -->
-  <div class="section-title">Copertina</div>
-  <input id="ev_copertina" oninput="markDirty(); updateCover()">
-
-  <img id="coverPreview" style="width:200px; height:200px; object-fit:contain; border-radius:8px; margin-top:8px; display:none; background:#f3f4f6; margin-inline:auto;" />
-
+<!-- COPERTINA -->
+<div class="section-title">Event Image</div>
+<div id="coverBox"
+     style="
+       width:220px;
+       min-height:220px;
+       border:2px dashed #cbd5e1;
+       border-radius:12px;
+       display:flex;
+       flex-direction:column;
+       align-items:center;
+       justify-content:center;
+       margin:auto;
+       cursor:pointer;
+       background:#f8fafc;
+       text-align:center;
+       padding:10px;
+     "
+     onclick="selectCoverFile()">
+  <img id="coverPreview"
+       style="
+       max-width:200px;
+       max-height:200px;
+       object-fit:contain;
+       border-radius:8px;
+       display:none;
+       ">
+  <div id="coverPlaceholder">
+    📷<br>
+    Carica copertina
+    <br>
+    <span style="font-size:11px;color:#777;">
+    JPG, PNG, WEBP<br>
+    convertita automaticamente in JPG
+    </span>
+  </div>
+</div>
+<input id="coverFile"
+       type="file"
+       accept="image/jpeg,image/png,image/webp"
+       style="display:none"
+<input type="hidden" id="ev_copertina">
+  
   <!-- MAP POPUP -->
 <div id="mapModal" style="
   display:none;
@@ -424,6 +461,8 @@ const duplicateId = params.get('duplicate');
 
 let original = "{}";
 let dirty = false;
+let selectedCoverFile = null;
+let coverChanged = false;  
 let comuniMap = {};
 let map;
 let markers = [];
@@ -545,6 +584,7 @@ async function load() {
   ev_capienza.value = data.ev_capienza || '';
   ev_link.value = data.ev_link || '';
   ev_copertina.value = data.ev_copertina || '';
+  updateCoverPreview();
   ev_attivo.checked = !!data.ev_attivo;
   ev_creato.textContent = data.ev_creato
     ? new Date(data.ev_creato).toLocaleString()
@@ -555,7 +595,6 @@ async function load() {
         document.getElementById("id_event_series").value = data.id_event_series;
       }
     }
-  updateCover();
   updateMapButton()  
   updateDupButton()
   if (duplicateId) {
@@ -753,17 +792,6 @@ window.requestBack = async () => {
   }
 };
   
-function updateCover() {
-  const url = ev_copertina.value;
-  const img = document.getElementById('coverPreview');
-  if (url) {
-    img.src = url;
-    img.style.display = 'block';
-  } else {
-    img.style.display = 'none';
-  }
-}  
-
 function initMap() {
   if (map) return;
   map = L.map('map');
