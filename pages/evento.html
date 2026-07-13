@@ -558,6 +558,11 @@ async function load() {
   updateCover();
   updateMapButton()  
   updateDupButton()
+  if (duplicateId) {
+    dirty = true;
+    document.getElementById('backBtn')
+      .classList.add('dirty');
+  }
 }
 
 async function loadComuni() {
