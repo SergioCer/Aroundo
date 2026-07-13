@@ -754,16 +754,17 @@ window.requestBack = async () => {
 };
   
 function updateCover() {
-  const url = ev_copertina.value;
+  // const url = ev_copertina.value; // Copertina di Github
   const img = document.getElementById('coverPreview');
-  if (url) {
+  const file = ev_copertina.value.trim();
+  if (file) {const url = "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/" + file; // Copertina di Supabase
     img.src = url;
     img.style.display = 'block';
   } else {
     img.style.display = 'none';
   }
-}  
-
+}
+  
 function initMap() {
   if (map) return;
   map = L.map('map');
