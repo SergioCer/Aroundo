@@ -688,8 +688,9 @@ function updatePageState() {
 function initMapLuogo() {
   if (map) return;
   map = L.map('map');
-  // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: ''}).addTo(map); //
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: ''}).addTo(map); // Mappa Base di Aroundo
+// L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map); // Mappa Neutra
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
