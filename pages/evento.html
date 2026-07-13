@@ -420,6 +420,7 @@ import { supabase } from '../supabase.js';
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const isNew = params.has('new') || !id;
+const duplicateId = params.get('duplicate');  
 
 let original = "{}";
 let dirty = false;
@@ -496,14 +497,14 @@ async function loadSeriesByOrganizzatore(idOrg) {
 
 /* LOAD */
 async function load() {
-  if (isNew) {
+  if (isNew && !duplicateId) {
     original = JSON.stringify({});
     return;
   }
   const { data, error } = await supabase
     .from('eventi')
     .select('*')
-    .eq('id_evento', id)
+    .eq('id_evento', duplicateId || id)
     .single();
   if (error) {
     console.error(error);
@@ -608,44 +609,9 @@ window.markDirty = () => {
     .classList.toggle('dirty', dirty);
 };
 
-window.duplicateEvent = async () => {
+window.duplicateEvent = () => {
   if (!id) return;
-  const { data, error } = await supabase
-    .from('eventi')
-    .select('*')
-    .eq('id_evento', id)
-    .single();
-  if (error) {
-    console.error(error);
-    return;
-  }
-  const payload = {
-    ev_titolo: data.ev_titolo,
-    ev_descrizione: data.ev_descrizione,
-    id_categoria: data.id_categoria,
-    id_luogo: data.id_luogo,
-    id_organizzatore: data.id_organizzatore,
-    id_event_series: data.id_event_series,
-    ev_inizio: data.ev_inizio,
-    ev_fine: data.ev_fine,
-    ev_costo: data.ev_costo,
-    ev_capienza: data.ev_capienza,
-    ev_link: data.ev_link,
-    ev_copertina: data.ev_copertina,
-    ev_attivo: data.ev_attivo
-  };
-  const result = await supabase
-    .from('eventi')
-    .insert(payload)
-    .select()
-    .single();
-  const { data: newRow, error: err2 } = result;
-  if (err2) {
-    console.error(err2);
-    return;
-  }
-  // redirect per modifica nuovo evento mantenendo la pagina
-  location.href = `evento.html?id=${newRow.id_evento}`;
+  location.href = `evento.html?new=1&duplicate=${id}`;
 };
 
 window.searchComuni = async (text) => {
