@@ -64,7 +64,15 @@ button:hover {
 <div class="login-box">
 <img src="../icon-512.png" alt="Aroundo">
 <h2>Aroundo</h2>
-<h2>Explore • Discover • Experience</h2>  
+<div style="
+    margin-top:-10px;
+    margin-bottom:18px;
+    font-size:14px;
+    color:#666;
+    letter-spacing:.5px;
+">
+    Explore • Discover • Experience
+</div>
 <input 
  id="email"
  type="email"
@@ -107,13 +115,6 @@ Login
 
   
 <!-- LOGIN ERROR DIALOG -->
-<div id="loginErrorTitle" style="
-  margin-bottom:15px;
-  font-weight:700;
-  color:#ef4444;
-  font-size:16px;
-  ">
-</div>  
 <div id="loginErrorDialog" style="
   display:none;
   position:fixed;
@@ -126,6 +127,14 @@ Login
   align-items:center;
   justify-content:center;
 ">
+<div id="loginErrorTitle" style="
+  margin-bottom:15px;
+  font-weight:700;
+  color:#ef4444;
+  font-size:16px;
+  ">
+</div>  
+  
   <div style="
     background:white;
     padding:22px;
@@ -167,7 +176,7 @@ document.getElementById('registerLink').addEventListener('click', (e) => {
   e.preventDefault();
   document.getElementById('loginErrorTitle').textContent = 'Register';
   document.getElementById('loginErrorMessage').textContent =
-  'Registration user will become soon.';
+  'User registration will be available soon.';
   document.getElementById('loginErrorDialog').style.display = 'flex';
 });
 
@@ -185,7 +194,7 @@ await supabase.auth.signInWithPassword({
   
 if(error) {
   document.getElementById('loginErrorTitle').textContent = 'Invalid login';
-  document.getElementById('loginErrorMessage').textContent = 'Email or password wrong.';
+  document.getElementById('loginErrorMessage').textContent = 'Invalid email or password.';
   document.getElementById('loginErrorDialog').style.display = 'flex';
  return;
 }
