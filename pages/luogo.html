@@ -687,10 +687,12 @@ function updatePageState() {
 
 function initMapLuogo() {
   if (map) return;
-  map = L.map('map');
-// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: ''}).addTo(map); // Mappa Base di Aroundo
-// L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map); // Mappa Neutra
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+  map = L.map('map', {
+    zoomControl: false
+  });
+// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(map); // Mappa Base di Aroundo
+// L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map); // Mappa Neutra
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
@@ -822,8 +824,14 @@ function renderMarkers(list) {
       { icon: isCurrent ? selectedIcon : defaultIcon }
     ).addTo(map);
     m.bindTooltip(
-      l.lu_location || "",
-      { direction: "top", sticky: true }
+      `
+      <b>${l.lu_location || ""}</b><br>
+      ${l.lu_descrizione || ""}
+      `,
+      {
+        direction: "top",
+        sticky: true
+      }
     );
     markers.push(m);
     if (isCurrent) {
@@ -903,13 +911,16 @@ function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
 
 function updateMapPopupTitle() {
   const comuneNome = id_comune.value || "Comune";
-  const subtitle = lu_location.value?.trim();
-  const title = isNew
-    ? `${comuneNome}: Nuovo punto sulla mappa`
-    : `${comuneNome}: Modifica posizione`;
-  document.getElementById("popupMapTitle").textContent = title;
-  const subEl = document.getElementById("popupMapSubtitle");
-  subEl.textContent = (!isNew && subtitle) ? subtitle : "";
+  const location = lu_location.value?.trim();
+  const descrizione = lu_descrizione.value?.trim();
+  document.getElementById("popupMapTitle").textContent =
+    isNew ? "Nuovo punto sulla mappa" : "Modifica posizione";
+    const subEl = document.getElementById("popupMapSubtitle");
+  let parts = [];
+  if (comuneNome) parts.push(comuneNome);
+  if (location) parts.push(location);
+  if (descrizione) parts.push(descrizione);
+  subEl.textContent = parts.join("  •  ");
 }
 
 window.cycleEnvironment = function () {
