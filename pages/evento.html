@@ -574,7 +574,7 @@ async function loadComuni() {
 
 window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
-  id_luogo.innerHTML = `<option value="">Luogo...</option>`;
+  id_luogo.innerHTML = ``;
   if (!idComune) return;
   const { data } = await supabase
     .from('luoghi')
@@ -584,7 +584,7 @@ window.filterLuoghi = async (selectedId = null) => {
   (data || []).forEach(l => {
     id_luogo.innerHTML += `
       <option value="${l.id_luogo}">
-        ${l.lu_location}${l.lu_descrizione ? ' - ' + l.lu_descrizione : ''}
+        ${l.lu_location}${l.lu_descrizione ? ' • ' + l.lu_descrizione : ''}
       </option>
     `;
   });
