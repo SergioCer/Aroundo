@@ -471,7 +471,7 @@ async function loadSelects() {
 async function loadSeriesByOrganizzatore(idOrg) {
   const select = document.getElementById("id_event_series");
   if (!idOrg) {
-    select.innerHTML = `<option value="">Nessuna serie</option>`;
+    select.innerHTML = ``;
     select.disabled = true;
     return;
   }
