@@ -776,6 +776,8 @@ if (coverDeleted) {
   coverDeleted = false;
 }
 if (selectedCoverFile) {
+              console.log("ID EVENTO GENERATO:", data.id_evento);
+              console.log("FILE COPERTINA:", selectedCoverFile);
   const fileName = await uploadCover(data.id_evento);
   await supabase
     .from('eventi')
@@ -1175,6 +1177,7 @@ async function loadCoverPreview(file) {
   if (!file || !file.type.startsWith('image/')) {
     return;
   }
+  coverDeleted = false;
   file = await optimizeCover(file);
   selectedCoverFile = file;
   const reader = new FileReader();
