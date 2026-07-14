@@ -805,15 +805,25 @@ window.requestBack = async () => {
   }
 };
   
-function updateCover() {
-  // const url = ev_copertina.value; // Copertina di Github
-  const img = document.getElementById('coverPreview');
+  /* Mostra la Copertina se presente */
+  function updateCover() {
   const file = ev_copertina.value.trim();
-  if (file) {const url = "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/" + file; // Copertina di Supabase
+  const img = document.getElementById('coverPreview');
+  const hint = document.getElementById('coverHint');
+  const removeBtn = document.getElementById('removeCoverBtn');
+  if (file) {
+    const url =
+      "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/"
+      + file;
     img.src = url;
     img.style.display = 'block';
+    hint.style.display = 'none';
+    removeBtn.style.display = 'inline-block';
   } else {
+    img.src = '';
     img.style.display = 'none';
+    hint.style.display = 'block';
+    removeBtn.style.display = 'none';
   }
 }
   
