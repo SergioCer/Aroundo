@@ -480,7 +480,8 @@ let map;
 let markers = [];
 let dialogResolve;
 let seriesCache = [];  
-
+let selectedCoverFile = null;
+  
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
@@ -989,6 +990,42 @@ function showWarning(message) {
 window.closeWarning = function() {
   document.getElementById("warningDialog").style.display = "none";
 };  
+
+// Gestione Copertina 
+  const coverBox = document.getElementById('coverBox');
+  const coverFileInput = document.getElementById('coverFileInput');
+  const removeCoverBtn = document.getElementById('removeCoverBtn');
+  const coverHint = document.getElementById('coverHint');
+  const coverPreview = document.getElementById('coverPreview');
+
+coverBox.addEventListener('click', () => {
+  coverFileInput.click();
+});
+coverFileInput.addEventListener('change', () => {
+  const file = coverFileInput.files[0];
+  if (!file) return;
+  selectedCoverFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    coverPreview.src = e.target.result;
+    coverPreview.style.display = 'block';
+    coverHint.style.display = 'none';
+    removeCoverBtn.style.display = 'inline-block';
+    markDirty();
+  };
+  reader.readAsDataURL(file);
+});
+removeCoverBtn.addEventListener('click', (event) => {
+  event.stopPropagation();
+  selectedCoverFile = null;
+  coverFileInput.value = '';
+  coverPreview.src = '';
+  coverPreview.style.display = 'none';
+  coverHint.style.display = 'block';
+  removeCoverBtn.style.display = 'none';
+  ev_copertina.value = '';
+  markDirty();
+});
   
 await loadComuni();  
 await loadSelects();
