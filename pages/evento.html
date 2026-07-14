@@ -775,11 +775,6 @@ async function save() {
     alert("Errore salvataggio");
     return false;
   }
-              console.log("PRIMA UPLOAD", {
-              selectedCoverFile,
-              currentCover,
-              coverDeleted
-              });
   dirty = false;
   if (isNew) {
     location.href = `evento.html?id=${data.id_evento}`;
@@ -812,7 +807,6 @@ window.requestBack = async () => {
   if (choice === "cancel") return;
   if (choice === "yes") {
     const success = await save();
-    return; // CANCELLARE 
     if (!success) return;
     location.href = 'eventi.html';
     return;
