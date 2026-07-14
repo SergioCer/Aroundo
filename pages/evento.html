@@ -758,28 +758,39 @@ async function save() {
   } else {
     result = await supabase.from('eventi').update(payload).eq('id_evento', id).select().single();
   }
-  const { data, error } = result;
-  if (coverDeleted) {
+ const { data, error } = result;
+if (error) {
+  console.error(error);
+  alert("Errore salvataggio");
+  return false;
+}
+if (coverDeleted) {
+  await deleteCover(data.id_evento);
   await supabase
     .from('eventi')
     .update({
       ev_copertina: null
     })
     .eq('id_evento', data.id_evento);
-
-  coverDeleted = false;
   currentCover = null;
+  coverDeleted = false;
 }
-  if (error) {
-    console.error(error);
-    alert("Errore salvataggio");
-    return false;
-  }
-  dirty = false;
-  if (isNew) {
-    location.href = `evento.html?id=${data.id_evento}`;
-  }
-  return true;
+if (selectedCoverFile) {
+  const fileName = await uploadCover(data.id_evento);
+  await supabase
+    .from('eventi')
+    .update({
+      ev_copertina: fileName
+    })
+    .eq('id_evento', data.id_evento);
+  currentCover = fileName;
+  selectedCoverFile = null;
+}
+dirty = false;
+if (isNew) {
+  location.href = `evento.html?id=${data.id_evento}`;
+}
+return true;
 }
 
 /* BACK */
@@ -918,6 +929,18 @@ async function backupCover(fileName) {
     throw error;
   }
 }
+
+async function deleteCover(idEvento) {
+  const fileName = `${idEvento}.jpg`;
+  const { error } = await supabase.storage
+    .from('eventi')
+    .remove([`copertine/${fileName}`]);
+  if (error) {
+    console.error("Errore eliminazione copertina:", error);
+    throw error;
+  }
+}
+  
   
 function initMap() {
   if (map) return;
