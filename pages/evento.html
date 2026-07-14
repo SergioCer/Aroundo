@@ -1011,20 +1011,37 @@ window.closeWarning = function() {
 coverBox.addEventListener('click', () => {
   coverFileInput.click();
 });
+
 coverFileInput.addEventListener('change', () => {
   const file = coverFileInput.files[0];
-  if (!file) return;
-  selectedCoverFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    coverPreview.src = e.target.result;
-    coverPreview.style.display = 'block';
-    coverHint.style.display = 'none';
-    removeCoverBtn.style.display = 'inline-block';
-    markDirty();
-  };
-  reader.readAsDataURL(file);
+  loadCoverPreview(file);
 });
+coverBox.addEventListener('dragover', e => {
+  e.preventDefault();
+  coverBox.style.background = '#eef2ff';
+});
+coverBox.addEventListener('dragleave', () => {
+  coverBox.style.background = '#fafafa';
+});
+coverBox.addEventListener('drop', e => {
+  e.preventDefault();
+  coverBox.style.background = '#fafafa';
+  const file = e.dataTransfer.files[0];
+  loadCoverPreview(file);
+});
+
+document.addEventListener('paste', e => {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile();
+      loadCoverPreview(file);
+      break;
+    }
+  }
+});
+  
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   selectedCoverFile = null;
@@ -1036,6 +1053,22 @@ removeCoverBtn.addEventListener('click', (event) => {
   ev_copertina.value = '';
   markDirty();
 });
+
+function loadCoverPreview(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    return;
+  }
+  selectedCoverFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    coverPreview.src = e.target.result;
+    coverPreview.style.display = 'block';
+    coverHint.style.display = 'none';
+    removeCoverBtn.style.display = 'inline-block';
+    markDirty();
+  };
+  reader.readAsDataURL(file);
+}  
   
 await loadComuni();  
 await loadSelects();
