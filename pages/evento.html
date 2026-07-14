@@ -329,7 +329,6 @@ input, select, textarea {
        type="file"
        accept="image/*"
        style="display:none">
-<input id="ev_copertina" type="hidden">
   
 <!-- MAP POPUP -->
 <div id="mapModal" style="
@@ -481,7 +480,6 @@ let markers = [];
 let dialogResolve;
 let seriesCache = [];  
 let selectedCoverFile = null;
-let removeCover = false;  
   
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -1207,10 +1205,6 @@ async function optimizeCover(file) {
   });
 }  
 
-window.testUploadCover = async function() {  // CANCELLARE
-  const nome = await uploadCover(999);
-};  
-  
 await loadComuni();  
 await loadSelects();
 await load();
