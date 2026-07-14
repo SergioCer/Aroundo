@@ -481,6 +481,7 @@ let markers = [];
 let dialogResolve;
 let seriesCache = [];  
 let selectedCoverFile = null;
+let removeCover = false;  
   
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -763,6 +764,15 @@ async function save() {
     console.error(error);
     alert("Errore salvataggio");
     return false;
+  }
+  if (selectedCoverFile) {
+  const fileName = await uploadCover(data.id_evento);
+  await supabase
+    .from('eventi')
+    .update({
+      ev_copertina: fileName
+    })
+    .eq('id_evento', data.id_evento);
   }
   dirty = false;
   if (isNew) {
