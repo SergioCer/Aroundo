@@ -481,6 +481,7 @@ let dialogResolve;
 let seriesCache = [];  
 let selectedCoverFile = null;
 let coverDeleted = false;
+let currentCover = null;
   
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -596,7 +597,7 @@ async function load() {
   ev_costo.value = data.ev_costo === null ? 'TBA' : data.ev_costo;
   ev_capienza.value = data.ev_capienza || '';
   ev_link.value = data.ev_link || '';
-  ev_copertina.value = data.ev_copertina || '';
+  currentCover = data.ev_copertina || null;
   ev_attivo.checked = !!data.ev_attivo;
   ev_creato.textContent = data.ev_creato
     ? new Date(data.ev_creato).toLocaleString()
@@ -816,7 +817,7 @@ window.requestBack = async () => {
   
   /* Mostra la Copertina se presente */
   function updateCover() {
-  const file = ev_copertina.value.trim();
+  const file = currentCover;
   const img = document.getElementById('coverPreview');
   const hint = document.getElementById('coverHint');
   const removeBtn = document.getElementById('removeCoverBtn');
