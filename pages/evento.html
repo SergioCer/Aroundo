@@ -735,7 +735,6 @@ window.searchOrganizzatori = async (text) => {
   });
 };
 
-  
 /* SAVE */
 async function save() {
   const payload = {
@@ -750,7 +749,7 @@ async function save() {
     ev_costo: ev_costo.value ? parseFloat(ev_costo.value) : null,
     ev_capienza: ev_capienza.value ? parseInt(ev_capienza.value) : null,
     ev_link: ev_link.value,
-    ev_copertina: null,
+    ev_copertina: currentCover,
     ev_attivo: ev_attivo.checked
     };
   let result;
@@ -760,6 +759,17 @@ async function save() {
     result = await supabase.from('eventi').update(payload).eq('id_evento', id).select().single();
   }
   const { data, error } = result;
+  if (coverDeleted) {
+  await supabase
+    .from('eventi')
+    .update({
+      ev_copertina: null
+    })
+    .eq('id_evento', data.id_evento);
+
+  coverDeleted = false;
+  currentCover = null;
+}
   if (error) {
     console.error(error);
     alert("Errore salvataggio");
