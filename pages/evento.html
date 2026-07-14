@@ -274,13 +274,64 @@ input, select, textarea {
   <div class="section-title">Link</div>
   <input id="ev_link" oninput="markDirty()">
 
-  <!-- COPERTINA -->
-  <div class="section-title">Copertina</div>
-  <input id="ev_copertina" oninput="markDirty(); updateCover()">
-
-  <img id="coverPreview" style="width:200px; height:200px; object-fit:contain; border-radius:8px; margin-top:8px; display:none; background:#f3f4f6; margin-inline:auto;" />
-
-  <!-- MAP POPUP -->
+<!-- COPERTINA -->
+<div class="section-title">Copertina</div>
+<div id="coverBox" style="
+  border:2px dashed #d1d5db;
+  border-radius:10px;
+  padding:15px;
+  text-align:center;
+  cursor:pointer;
+  background:#fafafa;
+">
+  <div id="coverHint" style="
+    color:#666;
+    font-size:14px;
+  ">
+    Trascina qui un'immagine<br>
+    oppure clicca per selezionarla<br>
+    <small>
+      JPG • PNG • WEBP • HEIC
+    </small>
+  </div>
+  <img id="coverPreview" style="
+    width:200px;
+    height:200px;
+    object-fit:contain;
+    border-radius:8px;
+    margin:10px auto;
+    display:none;
+    background:#f3f4f6;
+  ">
+  <button id="removeCoverBtn"
+    type="button"
+    style="
+      display:none;
+      background:#ef4444;
+      color:white;
+      border:none;
+      padding:8px 14px;
+      border-radius:8px;
+      cursor:pointer;
+    ">
+    Non mi piace
+  </button>
+</div>
+<input id="coverFileInput"
+       type="file"
+       accept="image/*"
+       style="display:none">
+<div style="
+  margin-top:8px;
+  font-size:11px;
+  color:#777;
+  text-align:center;
+">
+  L'immagine verrà ottimizzata automaticamente prima del salvataggio.
+</div>
+<input id="ev_copertina" type="hidden">
+  
+<!-- MAP POPUP -->
 <div id="mapModal" style="
   display:none;
   position:fixed;
