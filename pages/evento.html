@@ -775,8 +775,14 @@ async function save() {
     alert("Errore salvataggio");
     return false;
   }
+              console.log("PRIMA UPLOAD", {
+              selectedCoverFile,
+              currentCover,
+              coverDeleted
+              });
   if (selectedCoverFile) {
   const fileName = await uploadCover(data.id_evento);
+              console.log("DOPO UPLOAD", fileName);
   await supabase
     .from('eventi')
     .update({
