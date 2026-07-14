@@ -120,8 +120,8 @@
       right: 10px;
       left: auto;
       transform: none;
-      width: 35px;
-      height: 35px;
+      width: 32px;
+      height: 32px;
       padding: 0;
       border-radius: 50%;
       overflow: hidden;
@@ -133,8 +133,8 @@
       top: 20px;
       right: 10px;
       z-index: 1000;
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
       display: none;
       background: #3b82f6;
       color: white;
@@ -620,7 +620,7 @@
     bottom:0px;
     left:0;
     width:100%;
-    height:32px;
+    height:28px;
     background:transparent;
     color:black;
     overflow:hidden;
@@ -1355,13 +1355,24 @@ oms.addListener('click', function (marker) {
          const isOpen = menuItemsDiv.classList.contains('open');
           menuItemsDiv.style.display = isOpen ? 'block' : 'none';
           arrow.textContent = isOpen ? '▲' : '▼';
-          // Se Tutte le categorie sono selezionate, le deseleziona tutte, altrimenti lascia la selezione corrente.
+          // Apertura Menu: Se Tutte le categorie sono selezionate, le deseleziona tutte, altrimenti lascia la selezione corrente.
           if (isOpen && selectAllToggle.checked) {
             const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => cb.checked = false);
             selectAllToggle.checked = false;
             updateMarkerVisibility();
-        }            
+          }            
+          // Chiusura menu: Se Nessuna categoria è selezionata, le seleziona tutte, altrimenti lascia la selezione corrente
+          if (!isOpen) {
+            const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+              if (checkedCount === 0) {
+              checkboxes.forEach(cb => cb.checked = true);
+              selectAllToggle.checked = true;
+              updateSelectAllToggle();
+              updateMarkerVisibility();
+              }
+            }
         });
         // Checkbox Singola Categoria
         menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
@@ -1574,7 +1585,7 @@ oms.addListener('click', function (marker) {
             `
             <div style="text-align:center;">
               <img
-                src="${e.ev_copertina}"
+                src="https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${e.ev_copertina}"
                 style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
             </div>
             <hr>
