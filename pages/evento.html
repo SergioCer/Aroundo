@@ -1054,7 +1054,7 @@ removeCoverBtn.addEventListener('click', (event) => {
   markDirty();
 });
 
-function loadCoverPreview(file) {
+async function loadCoverPreview(file) {
   if (!file || !file.type.startsWith('image/')) {
     return;
   }
