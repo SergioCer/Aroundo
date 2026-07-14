@@ -847,12 +847,32 @@ async function uploadCover(idEvento) {
     return null;
   }
   const fileName = `${idEvento}.jpg`;
-  const { error } = await supabase.storage
+  const path = `copertine/${fileName}`;
+  // Verifica se il file esiste già
+  const { data: files, error: listError } = await supabase.storage
     .from('eventi')
-    .upload(`copertine/${fileName}`, selectedCoverFile, {
-      contentType: 'image/jpeg',
-      upsert: false
-    });
+    .list('copertine');
+  if (listError) {
+    console.error("Errore lettura copertine:", listError);
+    throw listError;
+  }
+  const exists = files.some(f => f.name === fileName);
+  let error;
+  if (exists) {
+    // Sostituisce il file esistente
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .update(path, selectedCoverFile, {
+        contentType: 'image/jpeg'
+      }));
+  } else {
+    // Carica un nuovo file
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .upload(path, selectedCoverFile, {
+        contentType: 'image/jpeg'
+      }));
+  }
   if (error) {
     console.error("Errore upload copertina:", error);
     throw error;
