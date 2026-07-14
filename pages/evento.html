@@ -826,6 +826,24 @@ window.requestBack = async () => {
     removeBtn.style.display = 'none';
   }
 }
+
+async function uploadCover(idEvento) {
+  if (!selectedCoverFile) {
+    return null;
+  }
+  const fileName = `${idEvento}.jpg`;
+  const { error } = await supabase.storage
+    .from('eventi')
+    .upload(`copertine/${fileName}`, selectedCoverFile, {
+      contentType: 'image/jpeg',
+      upsert: true
+    });
+  if (error) {
+    console.error("Errore upload copertina:", error);
+    throw error;
+  }
+  return fileName;
+}  
   
 function initMap() {
   if (map) return;
@@ -1116,6 +1134,11 @@ async function optimizeCover(file) {
     reader.readAsDataURL(file);
   });
 }  
+
+window.testUploadCover = async function() {  // CANCELLARE
+  const nome = await uploadCover(999);
+  console.log("Caricato:", nome);
+};  
   
 await loadComuni();  
 await loadSelects();
