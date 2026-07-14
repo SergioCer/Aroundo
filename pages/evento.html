@@ -468,11 +468,6 @@ await requireAuth();
 
 import { supabase } from '../supabase.js';
 
-// CANCELLARE serve per verificare l'autenticazione. 
-const { data: { session } } = await supabase.auth.getSession();
-console.log("SESSIONE:", session);
-console.log("USER:", session?.user);
-  
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const isNew = params.has('new') || !id;
@@ -857,9 +852,6 @@ async function uploadCover(idEvento) {
     throw listError;
   }
   const exists = files.some(f => f.name === fileName);
-  console.log("Files:", files);
-  console.log("Cerco:", fileName);
-  console.log("Esiste:", exists);
   let error;
   if (exists) {
     // Salva la vecchia copertina prima della sostituzione
@@ -1168,7 +1160,6 @@ async function loadCoverPreview(file) {
     markDirty();
   };
   reader.readAsDataURL(file);
-  console.log(selectedCoverFile); // CANCELLARE
 }  
 
 // Ridimensionamento immagine a 400px  
@@ -1218,7 +1209,6 @@ async function optimizeCover(file) {
 
 window.testUploadCover = async function() {  // CANCELLARE
   const nome = await uploadCover(999);
-  console.log("Caricato:", nome);
 };  
   
 await loadComuni();  
