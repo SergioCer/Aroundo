@@ -480,6 +480,7 @@ let markers = [];
 let dialogResolve;
 let seriesCache = [];  
 let selectedCoverFile = null;
+let coverDeleted = false;
   
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -748,7 +749,7 @@ async function save() {
     ev_costo: ev_costo.value ? parseFloat(ev_costo.value) : null,
     ev_capienza: ev_capienza.value ? parseInt(ev_capienza.value) : null,
     ev_link: ev_link.value,
-    ev_copertina: ev_copertina.value,
+    ev_copertina: null,
     ev_attivo: ev_attivo.checked
     };
   let result;
@@ -1134,6 +1135,7 @@ document.addEventListener('paste', e => {
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   selectedCoverFile = null;
+  coverDeleted = true;
   coverFileInput.value = '';
   coverPreview.src = '';
   coverPreview.style.display = 'none';
