@@ -822,6 +822,7 @@ window.requestBack = async () => {
   if (choice === "cancel") return;
   if (choice === "yes") {
     const success = await save();
+    return; // CANCELLARE 
     if (!success) return;
     location.href = 'eventi.html';
     return;
