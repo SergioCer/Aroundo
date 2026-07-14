@@ -659,7 +659,7 @@ window.markDirty = () => {
     ev_costo: ev_costo.value,
     ev_capienza: ev_capienza.value,
     ev_link: ev_link.value,
-    ev_copertina: ev_copertina.value,
+    ev_copertina: selectedCoverFile ? 'new_cover' : currentCover,
     ev_attivo: ev_attivo.checked
   });
   dirty = current !== original;
