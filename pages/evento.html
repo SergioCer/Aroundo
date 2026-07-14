@@ -468,6 +468,11 @@ await requireAuth();
 
 import { supabase } from '../supabase.js';
 
+// CANCELLARE serve per verificare l'autenticazione. 
+const { data: { session } } = await supabase.auth.getSession();
+console.log("SESSIONE:", session);
+console.log("USER:", session?.user);
+  
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const isNew = params.has('new') || !id;
