@@ -1142,7 +1142,10 @@ removeCoverBtn.addEventListener('click', (event) => {
   coverPreview.style.display = 'none';
   coverHint.style.display = 'block';
   removeCoverBtn.style.display = 'none';
-  ev_copertina.value = '';
+  selectedCoverFile = null;
+  currentCover = null;
+  coverDeleted = true;
+  updateCover();
   markDirty();
 });
 
