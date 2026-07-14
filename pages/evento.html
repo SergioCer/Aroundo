@@ -862,6 +862,8 @@ async function uploadCover(idEvento) {
   console.log("Esiste:", exists);
   let error;
   if (exists) {
+    // Salva la vecchia copertina prima della sostituzione
+    await backupCover(fileName);
     // Sostituisce il file esistente
     ({ error } = await supabase.storage
       .from('eventi')
@@ -881,6 +883,47 @@ async function uploadCover(idEvento) {
     throw error;
   }
   return fileName;
+}
+
+// Esegue una copia di Backup della copertina se presente
+async function backupCover(fileName) {
+  const source = `copertine/${fileName}`;
+  const destination = `copertine/backup/${fileName}`;
+  // Recupera il file originale
+  const { data: file, error: downloadError } = await supabase.storage
+    .from('eventi')
+    .download(source);
+  if (downloadError) {
+    console.error("Errore download backup:", downloadError);
+    throw downloadError;
+  }
+  // Verifica se il backup esiste già
+  const { data: files, error: listError } = await supabase.storage
+    .from('eventi')
+    .list('copertine/backup');
+  if (listError) {
+    console.error("Errore lettura backup:", listError);
+    throw listError;
+  }
+  const exists = files.some(f => f.name === fileName);
+  let error;
+  if (exists) {
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .update(destination, file, {
+        contentType: 'image/jpeg'
+      }));
+  } else {
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .upload(destination, file, {
+        contentType: 'image/jpeg'
+      }));
+  }
+    if (error) {
+    console.error("Errore creazione backup:", error);
+    throw error;
+  }
 }
   
 function initMap() {
