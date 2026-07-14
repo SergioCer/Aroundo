@@ -780,16 +780,6 @@ async function save() {
               currentCover,
               coverDeleted
               });
-  if (selectedCoverFile) {
-  const fileName = await uploadCover(data.id_evento);
-              console.log("DOPO UPLOAD", fileName);
-  await supabase
-    .from('eventi')
-    .update({
-      ev_copertina: fileName
-    })
-    .eq('id_evento', data.id_evento);
-  }
   dirty = false;
   if (isNew) {
     location.href = `evento.html?id=${data.id_evento}`;
