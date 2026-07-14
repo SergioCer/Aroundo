@@ -851,14 +851,14 @@ async function uploadCover(idEvento) {
     .from('eventi')
     .upload(`copertine/${fileName}`, selectedCoverFile, {
       contentType: 'image/jpeg',
-      upsert: true
+      upsert: false
     });
   if (error) {
     console.error("Errore upload copertina:", error);
     throw error;
   }
   return fileName;
-}  
+}
   
 function initMap() {
   if (map) return;
