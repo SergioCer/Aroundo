@@ -1136,15 +1136,13 @@ document.addEventListener('paste', e => {
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   selectedCoverFile = null;
+  currentCover = null;
   coverDeleted = true;
   coverFileInput.value = '';
   coverPreview.src = '';
   coverPreview.style.display = 'none';
   coverHint.style.display = 'block';
   removeCoverBtn.style.display = 'none';
-  selectedCoverFile = null;
-  currentCover = null;
-  coverDeleted = true;
   updateCover();
   markDirty();
 });
