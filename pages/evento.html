@@ -857,6 +857,9 @@ async function uploadCover(idEvento) {
     throw listError;
   }
   const exists = files.some(f => f.name === fileName);
+  console.log("Files:", files);
+  console.log("Cerco:", fileName);
+  console.log("Esiste:", exists);
   let error;
   if (exists) {
     // Sostituisce il file esistente
