@@ -95,7 +95,7 @@ body {
 .card {
   background: white;
   margin: 0 15px 20px;
-  padding: 15px;
+  padding: 12px;
   border-radius: 12px;
 }
 
@@ -103,7 +103,7 @@ body {
 .section-title {
   font-size: 11px;
   color: #777;
-  margin: 12px 0 4px;
+  margin: 8px 0 3px;
 }
 
 /* INPUT */
@@ -181,11 +181,8 @@ input, select, textarea {
   
   <!-- COMUNE -->
   <div class="section-title">Comune</div>
-  <input id="id_comune_evento" placeholder="Comune..." oninput="searchComuni(this.value)">
+  <input id="id_comune_evento" placeholder="min 3 chars to search..." oninput="searchComuni(this.value)">
   <input type="hidden" id="id_comune_evento_hidden">
-  <div style="font-size:11px;color:#888;margin-top:4px;">
-  Inserire almeno 3 caratteri per la ricerca
-</div>
 <div id="comuniResults"></div>
 
   <!-- LUOGO -->
@@ -215,7 +212,7 @@ input, select, textarea {
   <!-- ORGANIZZATORE -->
   <div class="section-title">Organizzatore</div>
   <div style="display:flex; gap:10px; align-items:center;">
-  <input id="id_organizzatore" placeholder="Organizzatore...(min 3 chars to search)" oninput="searchOrganizzatori(this.value)" style="flex:1;">
+  <input id="id_organizzatore" placeholder="min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
     
     <input type="hidden" id="id_organizzatore_hidden">
     
