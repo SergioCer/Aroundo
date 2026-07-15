@@ -313,9 +313,9 @@ input, select, textarea {
             oninput="markDirty()" 
             disabled
             style="flex:1;">
-      <option value="">No series</option>
+      <option value="">Select organizer first</option>
     </select>
-    <button id="btnAddSeries" type="button" class="btn-icon btn-green" onclick="window.location.href='event_series.html?new=1'">+</button>
+    <button id="btnAddSeries" type="button" class="btn-icon btn-green" style="display:none;" onclick="newEventSeries()">+</button>
     </div>
   </div>
 </div>
@@ -634,6 +634,7 @@ async function load() {
   ev_descrizione.value = data.ev_descrizione || '';
   id_categoria.value = data.id_categoria || '';
   id_organizzatore_hidden.value = data.id_organizzatore || '';
+  await updateEventSeries();
   if (data.id_luogo) {
   const { data: luogo } = await supabase
     .from('luoghi')
@@ -671,9 +672,10 @@ async function load() {
     ? new Date(data.ev_creato).toLocaleString()
     : '';
     if (data.id_organizzatore) {
-      await loadSeriesByOrganizzatore(data.id_organizzatore);
+      await updateEventSeries();
       if (data.id_event_series) {
-        document.getElementById("id_event_series").value = data.id_event_series;
+        document.getElementById("id_event_series").value =
+          data.id_event_series;
       }
     }
   updateCover();
@@ -793,6 +795,7 @@ window.searchOrganizzatori = async (text) => {
     div.onclick = async () => {
     id_organizzatore.value = o.or_nome;
     id_organizzatore_hidden.value = o.id_organizzatore;
+    await updateEventSeries();
     markDirty();
     box.innerHTML = '';
     // 🔥 reset serie quando cambia organizzatore
@@ -803,6 +806,12 @@ window.searchOrganizzatori = async (text) => {
     box.appendChild(div);
   });
 };
+
+async function updateEventSeries(){
+  const organizerId =
+    document.getElementById('id_organizzatore_hidden').value;
+  await loadSeriesByOrganizzatore(organizerId);
+}
 
 window.updateLinkButton = function() {
   const btn = document.getElementById("openLinkBtn");
@@ -931,6 +940,16 @@ function updateCover() {
   img.style.display = 'block';
   hint.style.display = 'none';
   removeBtn.style.display = 'inline-block';
+}
+
+function newEventSeries(){
+  const organizer =
+    document.getElementById('id_organizzatore_hidden').value;
+  if(!organizer){
+    return;
+  }
+  window.location.href =
+    `event_series.html?new=1&organizer=${organizer}`;
 }
 
 async function uploadCover(idEvento) {
