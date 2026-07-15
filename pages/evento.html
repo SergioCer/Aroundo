@@ -118,9 +118,14 @@ input, select, textarea {
 /* INLINE */
 .inline {
   display: flex;
-  gap: 25px;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
   margin-top: 15px;
+}
+
+.inline > div {
+  flex: 1 1 180px;
+  min-width: 180px;
 }
 
 /* FOOTER */
