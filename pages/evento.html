@@ -280,7 +280,7 @@ input, select, textarea {
   <input id="ev_link" oninput="markDirty()">
 
 <!-- COPERTINA -->
-<div class="section-title">Copertina</div>
+<div class="section-title">Copertina · immagine ottimizzata automaticamente</div>
 <div id="coverBox" style="
   border:2px dashed #d1d5db;
   border-radius:10px;
@@ -300,8 +300,9 @@ input, select, textarea {
     </small>
   </div>
   <img id="coverPreview" style="
-    width:400px;
-    height:400px;
+    width: min(400px, 100%);
+    height: 320px;
+    max-width: 100%;
     object-fit:contain;
     border-radius:8px;
     margin:10px auto;
@@ -321,14 +322,6 @@ input, select, textarea {
     ">
     Non mi piace
   </button>
-    <div style="
-      margin-top:8px;
-      font-size:11px;
-      color:#777;
-      text-align:center;
-      ">
-      L'immagine verrà ottimizzata automaticamente prima del salvataggio.
-    </div>
 </div>
 <input id="coverFileInput"
        type="file"
