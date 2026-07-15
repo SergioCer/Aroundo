@@ -334,8 +334,8 @@ input, select, textarea {
     color:#666;
     font-size:14px;
   ">
-    Trascina qui un'immagine<br>
-    oppure clicca per selezionarla<br>
+    Drop an image here<br>
+    or click to browse<br>
     <small>
       JPG • PNG • WEBP • HEIC
     </small>
@@ -349,6 +349,17 @@ input, select, textarea {
     margin:10px auto;
     display:none;
     background:#f3f4f6;
+    position:relative;
+  ">
+  <img id="coverBackupPreview" style="
+    display:none;
+    position:absolute;
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:8px;
+    border:2px solid white;
+    box-shadow:0 2px 8px rgba(0,0,0,0.25);
   ">
   <button id="removeCoverBtn"
     type="button"
@@ -649,6 +660,7 @@ async function load() {
       }
     }
   updateCover();
+  updateBackupCover();
   updateMapButton()  
   updateDupButton()
   if (duplicateId) {
@@ -1224,7 +1236,22 @@ async function loadCoverPreview(file) {
     markDirty();
   };
   reader.readAsDataURL(file);
-}  
+}
+  
+async function updateBackupCover() {
+  const img = document.getElementById('coverBackupPreview');
+  const fileName = currentCover || `${id}.jpg`;
+  const url =
+    "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/backup/"
+    + fileName;
+  const response = await fetch(url);
+  if (response.ok) {
+    img.src = url;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+}
 
 // Ridimensionamento immagine a 400px  
 async function optimizeCover(file) {
