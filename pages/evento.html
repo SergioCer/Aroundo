@@ -311,7 +311,7 @@ input, select, textarea {
   <div style="flex:1;">
     <div class="section-title" style="margin-top:0;">Event Series</div>
     <select id="id_event_series" oninput="markDirty()" disabled>
-      <option value="">Nessuna serie</option>
+      <option value="">No series</option>
     </select>
   </div>
 </div>
@@ -563,7 +563,7 @@ async function loadSelects() {
 async function loadSeriesByOrganizzatore(idOrg) {
   const select = document.getElementById("id_event_series");
   if (!idOrg) {
-    select.innerHTML = `<option value="">Nessuna serie</option>`;
+    select.innerHTML = `<option value="">No series</option>`;
     select.disabled = true;
     return;
   }
@@ -577,7 +577,7 @@ async function loadSeriesByOrganizzatore(idOrg) {
     return;
   }
   seriesCache = data || [];
-  select.innerHTML = `<option value="">Nessuna serie</option>`;
+  select.innerHTML = `<option value="">No series</option>`;
   (data || []).forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.id_event_series;
