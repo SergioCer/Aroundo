@@ -948,13 +948,13 @@ function updateCover() {
 }
 
 window.newEventSerie = function(){
-  const organizer =
+  const idOrganizzatore =
     document.getElementById('id_organizzatore_hidden').value;
-  if(!organizer){
-    return;
-  }
+//  if(!organizer){
+//     return;
+//  }
   window.location.href =
-    `event_serie.html?new=1&organizer=${organizer}`;
+    `event_serie.html?new=1&id_organizzatore=${idOrganizzatore}`;
 };
 
 async function uploadCover(idEvento) {
