@@ -337,11 +337,31 @@ input, select, textarea {
     </button>
   </div>
 </div>
+</div>
   
   <!-- LINK -->
-  <div class="section-title">Link</div>
-  <input id="ev_link" oninput="markDirty()">
-
+<div class="section-title">Link</div>
+<div style="display:flex; gap:10px; align-items:center;">
+  <input id="ev_link" 
+         oninput="markDirty(); updateLinkButton()"
+         style="flex:1;">
+  <button id="openLinkBtn"
+          type="button"
+          onclick="openEventLink()"
+          style="
+            display:none;
+            width:34px;
+            height:34px;
+            border-radius:17px;
+            border:none;
+            background:#dbeafe;
+            color:#1e3a8a;
+            cursor:pointer;
+          ">
+    ↗
+  </button>
+</div>
+  
 <!-- COPERTINA -->
 <div class="section-title">Cover · Image will be optimized automatically...</div>
 <div id="coverBox" style="
@@ -679,6 +699,7 @@ async function load() {
   ev_costo.value = data.ev_costo === null ? 'TBA' : data.ev_costo;
   ev_capienza.value = data.ev_capienza || '';
   ev_link.value = data.ev_link || '';
+  updateLinkButton();
   currentCover = data.ev_copertina || null;
   ev_attivo.checked = !!data.ev_attivo;
   updateStatusBox();
@@ -819,6 +840,23 @@ window.searchOrganizzatori = async (text) => {
   });
 };
 
+window.updateLinkButton = function() {
+  const btn = document.getElementById("openLinkBtn");
+  const value = ev_link.value.trim();
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    btn.style.display = "block";
+  } else {
+    btn.style.display = "none";
+  }
+};
+
+window.openEventLink = function() {
+  const url = ev_link.value.trim();
+  if (url) {
+    window.open(url, "_blank");
+  }
+};
+  
 /* SAVE */
 async function save() {
   const payload = {
