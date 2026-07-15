@@ -214,6 +214,35 @@ input, select, textarea {
 .btn-icon:active{
   transform:scale(.96);
 }  
+
+/* Campo di ricerca */  
+.search-results{
+  margin-top:4px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  background:#fff;
+  overflow:hidden;
+}
+
+.search-item{
+  padding:10px 12px;
+  border-bottom:1px solid #f0f0f0;
+  cursor:pointer;
+  font-size:15px;
+  transition:background .15s;
+}
+
+.search-item:last-child{
+  border-bottom:none;
+}
+
+.search-item:hover{
+  background:#f3f4f6;
+}
+
+.search-item:active{
+  background:#dbeafe;
+}
   
 </style>
 </head>
@@ -247,7 +276,7 @@ input, select, textarea {
   <div class="section-title">City</div>
   <input id="id_comune_evento" placeholder="min 3 chars to search..." oninput="searchComuni(this.value)">
   <input type="hidden" id="id_comune_evento_hidden">
-<div id="comuniResults"></div>
+<div id="comuniResults" class="search-results"></div>
 
   <!-- LUOGO -->
   <div class="section-title">Place</div>
@@ -270,7 +299,7 @@ input, select, textarea {
     
   <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'">+</button>
   </div>
-  <div id="organizzatoriResults"></div>
+  <div id="organizzatoriResults" class="search-results"></div>
   
 <div class="inline">
   <div style="flex:1;">
@@ -763,9 +792,7 @@ window.searchComuni = async (text) => {
   box.innerHTML = '';
   (data || []).forEach(c => {
     const div = document.createElement('div');
-        div.style.padding = "6px 8px";
-    div.style.borderBottom = "1px solid #eee";
-    div.style.cursor = "pointer";
+    div.className = "search-item";
     div.innerText = c.co_descrizione;
     div.onclick = async () => {
         id_comune_evento.value = c.co_descrizione;
@@ -793,9 +820,7 @@ window.searchOrganizzatori = async (text) => {
   box.innerHTML = '';
   (data || []).forEach(o => {
     const div = document.createElement('div');
-    div.style.padding = "6px 8px";
-    div.style.borderBottom = "1px solid #eee";
-    div.style.cursor = "pointer";
+    div.className = "search-item";
     div.innerText = o.or_nome;
     div.onclick = async () => {
     id_organizzatore.value = o.or_nome;
