@@ -765,6 +765,9 @@ if (error) {
   return false;
 }
 if (coverDeleted) {
+  if (currentCover) {
+    await backupCover(currentCover);
+  }
   await deleteCover(data.id_evento);
   await supabase
     .from('eventi')
