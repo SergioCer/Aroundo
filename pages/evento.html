@@ -608,7 +608,12 @@ const btn = document.getElementById("btnAddSeries");
     opt.textContent = s.es_title;
     select.appendChild(opt);
   });
-  select.disabled = false;
+    if (!data || data.length === 0) {
+      // nessuna serie per questo organizzatore
+      select.disabled = true;
+    } else {
+      select.disabled = false;
+    }
     if (btn) {
     btn.style.display = "block";
   }
