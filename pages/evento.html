@@ -831,23 +831,24 @@ window.requestBack = async () => {
 };
   
   /* Mostra la Copertina se presente */
-  function updateCover() {
-  const file = currentCover;
+function updateCover() {
   const img = document.getElementById('coverPreview');
   const hint = document.getElementById('coverHint');
   const removeBtn = document.getElementById('removeCoverBtn');
-  if (file) {
-    const url ="https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/" + file;
-    img.src = url + "?v=" + Date.now();
-    img.style.display = 'block';
-    hint.style.display = 'none';
-    removeBtn.style.display = 'inline-block';
-  } else {
+  if (coverDeleted || !currentCover) {
     img.src = '';
     img.style.display = 'none';
     hint.style.display = 'block';
     removeBtn.style.display = 'none';
+    return;
   }
+  const url =
+    "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/"
+    + currentCover;
+  img.src = url + "?v=" + Date.now();
+  img.style.display = 'block';
+  hint.style.display = 'none';
+  removeBtn.style.display = 'inline-block';
 }
 
 async function uploadCover(idEvento) {
@@ -1163,10 +1164,6 @@ removeCoverBtn.addEventListener('click', (event) => {
   selectedCoverFile = null;
   coverDeleted = true;
   coverFileInput.value = '';
-  coverPreview.src = '';
-  coverPreview.style.display = 'none';
-  coverHint.style.display = 'block';
-  removeCoverBtn.style.display = 'none';
   updateCover();
   markDirty();
 });
