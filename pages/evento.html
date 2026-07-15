@@ -330,6 +330,7 @@ input, select, textarea {
   cursor:pointer;
   background:#fafafa;
   position:relative;
+  min-height:350px;
 ">
   <div id="coverHint" style="
     color:#666;
@@ -1262,6 +1263,11 @@ async function updateBackupCover() {
   img.style.display = 'block';
 }
 
+const coverBackupPreview = document.getElementById('coverBackupPreview');
+coverBackupPreview.addEventListener('click', (event) => {
+  event.stopPropagation();
+});
+  
 // Ridimensionamento immagine a 400px  
 async function optimizeCover(file) {
   const maxSize = 400;
