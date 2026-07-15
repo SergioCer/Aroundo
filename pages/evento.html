@@ -329,6 +329,7 @@ input, select, textarea {
   text-align:center;
   cursor:pointer;
   background:#fafafa;
+  position:relative;
 ">
   <div id="coverHint" style="
     color:#666;
@@ -349,7 +350,6 @@ input, select, textarea {
     margin:10px auto;
     display:none;
     background:#f3f4f6;
-    position:relative;
   ">
   <img id="coverBackupPreview" style="
     display:none;
@@ -360,6 +360,8 @@ input, select, textarea {
     border-radius:8px;
     border:2px solid white;
     box-shadow:0 2px 8px rgba(0,0,0,0.25);
+    right:10px;
+    bottom:55px;
   ">
   <button id="removeCoverBtn"
     type="button"
@@ -1240,17 +1242,24 @@ async function loadCoverPreview(file) {
   
 async function updateBackupCover() {
   const img = document.getElementById('coverBackupPreview');
-  const fileName = currentCover || `${id}.jpg`;
-  const url =
+  if (!id) {
+    img.style.display = 'none';
+    return;
+  }
+  const fileName = `${id}.jpg`;
+  const { data, error } = await supabase.storage
+    .from('eventi')
+    .list('copertine/backup', {
+      search: fileName
+    });
+  if (error || !data || !data.some(f => f.name === fileName)) {
+    img.style.display = 'none';
+    return;
+  }
+  img.src =
     "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/backup/"
     + fileName;
-  const response = await fetch(url);
-  if (response.ok) {
-    img.src = url;
-    img.style.display = 'block';
-  } else {
-    img.style.display = 'none';
-  }
+  img.style.display = 'block';
 }
 
 // Ridimensionamento immagine a 400px  
