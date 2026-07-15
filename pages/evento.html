@@ -315,7 +315,7 @@ input, select, textarea {
             style="flex:1;">
       <option value="">Select organizer first</option>
     </select>
-    <button id="btnAddSeries" type="button" class="btn-icon btn-green" style="display:none;" onclick="newEventSeries()">+</button>
+    <button id="btnAddSeries" type="button" class="btn-icon btn-green" style="display:none;" onclick="newEventSerie()">+</button>
     </div>
   </div>
 </div>
@@ -947,7 +947,7 @@ function updateCover() {
   removeBtn.style.display = 'inline-block';
 }
 
-function newEventSeries(){
+window.newEventSerie = function(){
   const organizer =
     document.getElementById('id_organizzatore_hidden').value;
   if(!organizer){
@@ -955,7 +955,7 @@ function newEventSeries(){
   }
   window.location.href =
     `event_serie.html?new=1&organizer=${organizer}`;
-}
+};
 
 async function uploadCover(idEvento) {
   if (!selectedCoverFile) {
