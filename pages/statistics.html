@@ -285,11 +285,13 @@ class="footer-value">
 </div>
 
 </div>
-
-<script type="module" src="./statistics.js"></script>
-import { requireAuth } from './auth-check.js';
+<script type="module">
+import { requireAuth } from '../auth-check.js';
 await requireAuth();
 
 import { supabase } from '../supabase.js';
+import './statistics.js';
+
+</script>
 </body>
 </html>
