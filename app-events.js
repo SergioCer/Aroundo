@@ -35,17 +35,12 @@ function getPlatform(){
 }
 
 function getAnonymousId(){
-    let id =
-    localStorage.getItem(
-        "aroundo_device_id"
-    );
+    let id = localStorage.getItem("aroundo_device_id");
     if(!id){
-        id =
-        crypto.randomUUID();
-        localStorage.setItem(
-            "aroundo_device_id",
-            id
-        );
+        id = crypto.randomUUID()
+        ? crypto.randomUUID() // Per ambienti più vecchi
+        : Date.now().toString(36) + Math.random().toString(36).substring(2);
+        localStorage.setItem("aroundo_device_id",id);
     }
     return id;
 }
