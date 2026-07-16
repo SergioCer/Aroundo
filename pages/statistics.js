@@ -135,6 +135,50 @@ async function init(){
         "year",
         filterPeriod(data,"year")
     );
+    renderDevices(data);
     await loadFooter(data);
 }
 init();
+
+function renderDevices(data){
+    const opens =
+        data.filter(
+            x => x.action === "APP_OPEN"
+        );
+    const devices = {};
+    opens.forEach(row => {
+        const id = row.device_id;
+        if(!id) return;
+        if(!devices[id]){
+            devices[id] =
+            row.platform;
+        }
+    });
+    const total =
+        Object.keys(devices).length;
+    const counters = {};
+    Object.values(devices)
+    .forEach(platform => {
+        counters[platform] =
+        (counters[platform] || 0) + 1;
+    });
+    const container =
+    document.getElementById(
+        "deviceStats"
+    );
+    if(!container) return;
+    container.innerHTML = "";
+    Object.entries(counters)
+    .forEach(([platform,count])=>{
+        const percent =
+        Math.round(
+            (count / total) * 100
+        );
+        container.innerHTML += `
+        <div>
+            ${platform}
+            <strong>${percent}%</strong>
+        </div>
+        `;
+    });
+}
