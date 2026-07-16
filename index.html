@@ -1082,17 +1082,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateMarkerVisibility(start, end);
     });
 
-    document.getElementById("shareQR").onclick = async () => {
-        if (navigator.share) {
-            await navigator.share({
-                title: "Aroundo",
-                text: "Discover what's around you",
-                url: window.location.origin
-            });
-        } else {
-            navigator.clipboard.writeText(window.location.origin);
-        }
-    };
+const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
+
+document.getElementById("shareQR").onclick = async () => {
+    if (navigator.share) {
+        await navigator.share({
+            title: "Aroundo",
+            text: "Discover what's around you",
+            url: SHARE_URL
+        });
+    } else {
+        await navigator.clipboard.writeText(SHARE_URL);
+    }
+};
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
       updateDateUI();
