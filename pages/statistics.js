@@ -1,9 +1,3 @@
-import { requireAuth } from './auth-check.js';
-await requireAuth();
-
-import { supabase } from '../supabase.js';
-
-
 const ITEMS = [
 
     { icon:"👁", label:"Open", action:"APP_OPEN" },
