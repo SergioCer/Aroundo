@@ -32,3 +32,20 @@ function getPlatform(){
         return "macOS";
     return "Unknown";
 }
+
+function getAnonymousId(){
+    let id =
+    localStorage.getItem(
+        "aroundo_device_id"
+    );
+    if(!id){
+        id =
+        crypto.randomUUID();
+
+        localStorage.setItem(
+            "aroundo_device_id",
+            id
+        );
+    }
+    return id;
+}
