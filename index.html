@@ -826,6 +826,25 @@
       }
     }
 
+    #shareArea{
+        margin-top:12px;
+        text-align:center;
+    }
+
+    #shareQR{
+        width:80px;
+        height:80px;
+        border-radius:8px;
+        cursor:pointer;
+    }
+
+    #shareText{
+        margin-top:4px;
+        font-size:11px;
+        color:#999;
+        letter-spacing:0.5px;
+    }    
+
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
 </head>
@@ -845,6 +864,10 @@
     <span id="geoText"></span>
   </div>
     <div class="subtitle">Discover what's around you</div>
+      <div id="shareArea">
+        <img src="qr.png" id="shareQR" alt="Share Aroundo">
+        <div id="shareText">Scan · Share</div>
+    </div>
   </div>
 <div id="overlayToggle">🔓</div>
 <div class="map-overlay2" id="category-menu">
@@ -1058,6 +1081,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       const end = Math.round(values[1]);
       updateMarkerVisibility(start, end);
     });
+
+    document.getElementById("shareQR").onclick = async () => {
+        if (navigator.share) {
+            await navigator.share({
+                title: "Aroundo",
+                text: "Discover what's around you",
+                url: window.location.origin
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.origin);
+        }
+    };
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
       updateDateUI();
