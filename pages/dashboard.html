@@ -40,6 +40,9 @@
 </html>
 
 <script type="module">
+  import { requireAuth } from './auth-check.js';
+  await requireAuth(); 
+  
   import { supabase } from '../supabase.js';
   const { data, error } = await supabase.auth.getSession();
     if (error || !data.session) {
