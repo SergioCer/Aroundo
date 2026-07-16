@@ -7,7 +7,7 @@ export async function trackEvent(action) {
                 action: action,
                 app_version: window.APP_VERSION ?? "unknown",
                 platform: getPlatform()
-                 device_id: getAnonymousId()
+                 // device_id: getAnonymousId()
             });
     } catch (error) {
         console.error(
