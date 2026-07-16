@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Statistics</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f2f4f7;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+.topbar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:16px;
+}
+
+.btn-icon{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    background:#e5e7eb;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.card{
+
+    background:white;
+
+    margin:15px;
+
+    border-radius:12px;
+
+    padding:18px;
+
+}
+
+.card-title{
+
+    font-size:12px;
+
+    color:#6b7280;
+
+    margin-bottom:15px;
+
+    font-weight:bold;
+
+}
+
+.row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:5px 0;
+
+}
+
+.label{
+
+    color:#374151;
+
+}
+
+.value{
+
+    font-weight:bold;
+
+    color:#111827;
+
+}
+
+.footer{
+
+    margin:20px 15px;
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:15px;
+
+    text-align:center;
+
+    font-size:12px;
+
+}
+
+.footer-title{
+
+    color:#6b7280;
+
+    margin-bottom:4px;
+
+}
+
+.footer-value{
+
+    font-weight:bold;
+
+    color:#111827;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div style="display:flex;align-items:center;gap:20px;">
+
+<button class="btn-icon"
+onclick="history.back()">
+
+←
+
+</button>
+
+<div style="font-size:30px;">
+
+Statistics
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+
+TODAY
+
+</div>
+
+<div id="today"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+
+THIS WEEK
+
+</div>
+
+<div id="week"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+
+THIS MONTH
+
+</div>
+
+<div id="month"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+
+THIS YEAR
+
+</div>
+
+<div id="year"></div>
+
+</div>
+
+
+
+<div class="footer">
+
+<div>
+
+<div class="footer-title">
+
+Version
+
+</div>
+
+<div
+id="appVersion"
+class="footer-value">
+
+-
+
+</div>
+
+</div>
+
+
+
+<div>
+
+<div class="footer-title">
+
+Database
+
+</div>
+
+<div
+id="dbStatus"
+class="footer-value">
+
+-
+
+</div>
+
+</div>
+
+
+
+<div>
+
+<div class="footer-title">
+
+Last update
+
+</div>
+
+<div
+id="lastUpdate"
+class="footer-value">
+
+-
+
+</div>
+
+</div>
+
+
+
+<div>
+
+<div class="footer-title">
+
+Records
+
+</div>
+
+<div
+id="totalRecords"
+class="footer-value">
+
+-
+
+</div>
+
+</div>
+
+</div>
+
+<script type="module" src="./statistics.js"></script>
+
+</body>
+
+</html>
