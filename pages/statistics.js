@@ -103,6 +103,23 @@ function renderBlock(elementId, data){
         `;
         box.appendChild(row);
     });
+         // ***** ACCESS MODE WEB / APP *****
+        const mode = countAccessMode(data);
+        const modeRow =
+        document.createElement("div");
+        modeRow.className="row";
+        modeRow.innerHTML=`
+            <div class="label">
+                🌐 WEB : ${mode.web}
+            </div>
+            <div class="value">
+                📲 APP : ${mode.pwa}
+                &nbsp;
+                ${mode.percent}%
+            </div>
+        `;
+        box.appendChild(modeRow);
+    } 
 }
 
 function loadFooter(data){
@@ -304,4 +321,36 @@ function countWebUsers(data){
         )
         .map(x => x.device_id)
     ).size;
+}
+
+function countAccessMode(data){
+    const devices = {};
+    data
+    .filter(x => 
+        x.action === "APP_OPEN" &&
+        x.device_id
+    )
+    .forEach(x=>{
+        if(
+            !devices[x.device_id] ||
+            new Date(x.created_at) >
+            new Date(devices[x.device_id].created_at)
+        ){
+            devices[x.device_id]=x;
+        }
+    });
+    let pwa=0;
+    let web=0;
+    Object.values(devices)
+    .forEach(x=>{
+        if(x.app_mode==="PWA")
+            pwa++;
+        else
+            web++;
+    });
+    return {
+        pwa,
+        web,
+        total:pwa+web
+    };
 }
