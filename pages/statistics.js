@@ -21,7 +21,8 @@ async function loadStatistics(){
         action,
         platform,
         device_id,
-        app_version
+        app_version,
+        app_mode
     `)
     .gte(
         "created_at",
@@ -277,4 +278,28 @@ function countNewUsers(data){
         -
         countReturningUsers(data)
     );
+}
+
+function countInstalledUsers(data){
+    return new Set(
+        data
+        .filter(x =>
+            x.action === "APP_OPEN" &&
+            x.device_id &&
+            x.app_mode === "PWA"
+        )
+        .map(x => x.device_id)
+    ).size;
+}
+
+function countWebUsers(data){
+    return new Set(
+        data
+        .filter(x =>
+            x.action === "APP_OPEN" &&
+            x.device_id &&
+            x.app_mode === "WEB"
+        )
+        .map(x => x.device_id)
+    ).size;
 }
