@@ -249,6 +249,47 @@ function getGPSStats(data){
     };
 }
 
+function getPlatformStats(data){
+    const devices = {};
+    data
+    .filter(
+        x =>
+        x.action==="APP_OPEN" &&
+        x.device_id
+    )
+    .forEach(x=>{
+        if(
+            !devices[x.device_id]
+        ){
+            devices[x.device_id] = x.platform;
+        }
+    });
+    const counters = {};
+    Object.values(devices)
+    .forEach(platform=>{
+        counters[platform] =
+        (counters[platform] || 0) + 1;
+    });
+    const total =
+    Object.keys(devices).length;
+    return Object.entries(counters)
+    .map(
+        ([platform,count])=>({
+            platform,
+            count,
+            percent:
+            total
+            ?
+            Math.round(
+                (count / total) * 100
+            )
+            :
+            0
+        })
+    );
+}
+
+
 function count(data,action){
     return data.filter(
         x=>x.action===action
@@ -383,6 +424,21 @@ function renderDashboard(
         )
         }
     </div>`;
+    +
+`<div class="metrics">
+${
+getPlatformStats(data)
+.map(p =>
+createMetric(
+    "💻",
+    p.platform,
+    `${p.count} (${p.percent}%)`,
+    "Dispositivi unici per sistema operativo"
+)
+)
+.join("")
+}
+</div>`
 }
 
 // FOOTER
