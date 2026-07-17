@@ -211,8 +211,7 @@ function renderDevices(data){
         );
         container.innerHTML += `
         <div>
-            ${platform}
-            <strong>${percent}%</strong>
+            ${platform}<strong>${percent}%</strong>
         </div>
         `;
     });
