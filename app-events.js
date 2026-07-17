@@ -7,7 +7,8 @@ export async function trackEvent(action) {
                 action: action,
                 app_version: window.APP_VERSION ?? "unknown",
                 platform: getPlatform(),
-                  device_id: getAnonymousId()
+                device_id: getAnonymousId(),
+                app_mode: getAppMode()
             });
     } catch (error) {
         console.error(
@@ -26,6 +27,18 @@ function getPlatform(){
     if (ua.includes("mac")) return "macOS";
     if (ua.includes("linux")) return "Linux";
     return "Unknown";
+}
+
+function getAppMode(){
+    if(
+        window.matchMedia(
+            "(display-mode: standalone)"
+        ).matches ||
+        window.navigator.standalone === true
+    ){
+        return "PWA";
+    }
+    return "WEB";
 }
 
 function getAnonymousId(){
