@@ -221,21 +221,13 @@ function createMetric(
     tooltip
 ){
     return `
-    <div
-    class="metric"
-    title="${tooltip}">
-        <span
-        class="metric-icon">
-            ${icon}
-        </span>
-        <span
-        class="metric-label">
-            ${label}
-        </span>
-        <span
-        class="metric-value">
+     <div class="metric" title="${tooltip}">
+        <div class="metric-header">
+            ${icon} ${label}
+        </div>
+        <div class="metric-value">
             ${value}
-        </span>
+        </div>
     </div>
     `;
 }
