@@ -1754,21 +1754,32 @@ oms.addListener('click', function (marker) {
     });
 
     function checkGeoStatus() {
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          updateGeoStatus(true);
-          trackEvent("GPS_SUCCESS");
-        },
-        () => {
-          updateGeoStatus(false);
-          trackEvent("GPS_FAILED");
-        },
-        {
-          timeout: 5000
-        }
-      );
+        navigator.geolocation.getCurrentPosition(
+            () => {
+                updateGeoStatus(true);
+                trackEvent("GPS_GRANTED");
+            },
+            (err) => {
+                updateGeoStatus(false);
+                if(err.code === 1){
+                    // PERMISSION_DENIED
+                    trackEvent("GPS_PERMISSION_DENIED");
+                }
+                else if(err.code === 2){
+                    // POSITION_UNAVAILABLE
+                    trackEvent("GPS_UNAVAILABLE");
+                }
+                else if(err.code === 3){
+                    // TIMEOUT
+                    trackEvent("GPS_TIMEOUT");
+                }
+            },
+            {
+                timeout:5000
+            }
+        );
     }
-
+    
     // Calcola il range della Timeline
     function getTimelineRange () {
       let start, end;
