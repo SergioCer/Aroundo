@@ -119,6 +119,23 @@ function renderBlock(elementId, data){
             </div>
         `;
         box.appendChild(modeRow);
+        const gps = countGPS(data);
+        const gpsRow =
+        document.createElement("div");
+        gpsRow.className="row";
+        gpsRow.innerHTML=`
+            <div class="label">
+                📍 OK : ${gps.granted}
+            </div>
+            <div class="value">
+                ❌ ${gps.denied}
+                &nbsp;
+                ${gps.success}%
+                ⚠️ ${gps.unavailable}
+                ⏱ ${gps.timeout}
+            </div>
+        `;
+        box.appendChild(gpsRow);
     }
 
 function loadFooter(data){
@@ -355,5 +372,32 @@ function countAccessMode(data){
         percent: total
         ? Math.round((pwa / total) * 100)
         : 0
+    };
+}
+
+function countGPS(data){
+    const granted =
+        countAction(data,"GPS_GRANTED");
+    const denied =
+        countAction(data,"GPS_PERMISSION_DENIED");
+    const unavailable =
+        countAction(data,"GPS_UNAVAILABLE");
+    const timeout =
+        countAction(data,"GPS_TIMEOUT");
+    const total =
+        granted +
+        denied +
+        unavailable +
+        timeout;
+    return {
+        granted,
+        denied,
+        unavailable,
+        timeout,
+        success: total
+            ? Math.round(
+                (granted / total) * 100
+              )
+            : 0
     };
 }
