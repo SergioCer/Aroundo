@@ -3,10 +3,6 @@ import { supabase } from '../supabase.js';
 const ITEMS = [
     { icon:"👁", label:"Open", action:"APP_OPEN" },
     { icon:"🔑", label:"Login", action:"LOGIN_SUCCESS" },
-    { icon:"📍", label:"GPS Granted", action:"GPS_GRANTED" },
-    { icon:"🚫", label:"GPS Denied", action:"GPS_PERMISSION_DENIED" },
-    { icon:"⚠️", label:"GPS Unavailable", action:"GPS_UNAVAILABLE" },
-    { icon:"⏱", label:"GPS Timeout", action:"GPS_TIMEOUT" },
     { icon:"📤", label:"Share", action:"SHARE_CLICK" },
     { icon:"📲", label:"Install", action:"PWA_INSTALL" }
 ];
