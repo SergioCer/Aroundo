@@ -142,7 +142,7 @@ function loadFooter(data){
     averageOpenPerUser(today);
 }
 
-function init(){
+await function init(){
     const data =
         await loadStatistics();
     renderBlock(
