@@ -232,20 +232,6 @@ function createMetric(
     `;
 }
 
-function renderSection(
-    title,
-    metrics
-){
-    return `
-    <div class="section-title">
-        ${title}
-    </div>
-    <div class="metrics">
-        ${metrics.join("")}
-    </div>
-    `;
-}
-
 function renderDashboard(
     elementId,
     data
@@ -261,89 +247,100 @@ function renderDashboard(
     const gps =
     getGPSStats(data);
     box.innerHTML =
-    renderSection(
-        "Utilizzo",
-        [
+    `<div class="metrics">
+        ${
         createMetric(
             "👁",
             "Open",
             usage.open,
             "Numero totale di aperture nel periodo"
-        ),
+        )
+        }
+        ${
         createMetric(
             "📱",
             "Devices",
             usage.devices,
-            "Numero di dispositivi unici che hanno aperto Aroundo"
-        ),
+            "Numero di dispositivi unici"
+        )
+        }
+        ${
         createMetric(
             "🔑",
             "Login",
             usage.login,
             "Numero di accessi completati"
         )
-        ]
-    )
-    +
-    renderSection(
-        "App",
-        [
+        }
+    </div>
+    <div class="metrics">
+        ${
         createMetric(
             "📲",
             "App",
             app.app,
-            "Dispositivi il cui ultimo accesso è stato tramite PWA installata"
-        ),
+            "Dispositivi che usano la PWA"
+        )
+        }
+        ${
         createMetric(
             "%",
             "PWA",
-            app.percent+"%",
-            "Percentuale dispositivi attivi che utilizzano la PWA"
-        ),
+            app.percent + "%",
+            "Percentuale dispositivi che usano la PWA"
+        )
+        }
+        ${
         createMetric(
             "⬇️",
             "Install",
             app.install,
-            "Numero installazioni PWA completate"
-        ),
+            "Installazioni completate"
+        )
+        }
+        ${
         createMetric(
             "📤",
             "Share",
             app.share,
-            "Numero utilizzi della funzione condividi"
+            "Condivisioni"
         )
-        ]
-    )
-    +
-    renderSection(
-        "GPS",
-        [
+        }
+    </div>
+    <div class="metrics">
+        ${
         createMetric(
             "✅",
             "Granted",
             gps.granted,
             "Permessi GPS concessi"
-        ),
+        )
+        }
+        ${
         createMetric(
             "🚫",
             "Denied",
             gps.denied,
-            "Permessi GPS rifiutati"
-        ),
+            "Permessi GPS negati"
+        )
+        }
+        ${
         createMetric(
             "%",
             "Success",
-            gps.success+"%",
+            gps.success + "%",
             "Percentuale richieste GPS riuscite"
-        ),
+        )
+        }
+        ${
         createMetric(
             "⚠️",
             "Error",
             gps.error,
             "GPS non disponibile o timeout"
         )
-        ]
-    );
+        }
+    </div>`;
 }
 
 // FOOTER
