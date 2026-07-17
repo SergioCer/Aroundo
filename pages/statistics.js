@@ -119,8 +119,7 @@ function renderBlock(elementId, data){
             </div>
         `;
         box.appendChild(modeRow);
-    } 
-}
+    }
 
 function loadFooter(data){
     document
@@ -348,6 +347,7 @@ function countAccessMode(data){
         else
             web++;
     });
+    const total = pwa + web;
     return {
         pwa,
         web,
