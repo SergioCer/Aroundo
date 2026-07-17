@@ -227,3 +227,43 @@ function averageOpenPerUser(data){
         opens / users
     ).toFixed(2);
 }
+
+function countReturningUsers(data){
+    const today = filterPeriod(data,"today");
+    const todayDevices = new Set(
+        today
+        .filter(x =>
+            x.action==="APP_OPEN" &&
+            x.device_id
+        )
+        .map(x => x.device_id)
+    );
+    const previousDevices = new Set(
+        data
+        .filter(x => {
+            const d = new Date(x.created_at);
+            return (
+                x.action==="APP_OPEN" &&
+                x.device_id &&
+                d.toDateString() !== new Date().toDateString()
+            );
+        })
+        .map(x => x.device_id)
+    );
+    let returning = 0;
+    todayDevices.forEach(id=>{
+        if(previousDevices.has(id))
+            returning++;
+    });
+    return returning;
+}
+
+function countNewUsers(data){
+    return (
+        countUniqueDevices(
+            filterPeriod(data,"today")
+        )
+        -
+        countReturningUsers(data)
+    );
+}
