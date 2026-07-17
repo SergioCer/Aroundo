@@ -286,7 +286,7 @@ function renderDashboard(
         createMetric(
             "%",
             "PWA",
-            app.percent + "%",
+            app.percent,
             "Percentuale dispositivi che usano la PWA"
         )
         }
@@ -328,7 +328,7 @@ function renderDashboard(
         createMetric(
             "%",
             "Success",
-            gps.success + "%",
+            gps.success,
             "Percentuale richieste GPS riuscite"
         )
         }
