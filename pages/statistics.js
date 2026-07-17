@@ -102,13 +102,18 @@ function renderBlock(elementId, data){
     });
 }
 
-async function loadFooter(data){
+function loadFooter(data){
     document
     .getElementById("totalRecords")
     .textContent=data.length;
     document
     .getElementById("dbStatus")
     .textContent="Online";
+    const today =
+    filterPeriod(
+        data,
+        "today"
+    );
     const last =
         data.length
         ?
@@ -123,9 +128,21 @@ async function loadFooter(data){
         last.toLocaleString("it-IT")
         :
         "-";
+    document
+    .getElementById(
+        "todayUsers"
+    )
+    .textContent =
+    countUniqueDevices(today);
+    document
+    .getElementById(
+        "avgOpen"
+    )
+    .textContent =
+    averageOpenPerUser(today);
 }
 
-async function init(){
+function init(){
     const data =
         await loadStatistics();
     renderBlock(
