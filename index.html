@@ -1757,11 +1757,11 @@ oms.addListener('click', function (marker) {
       navigator.geolocation.getCurrentPosition(
         () => {
           updateGeoStatus(true);
-          trackEvent("GPS_GRANTED");
+          trackEvent("GPS_SUCCESS");
         },
         () => {
           updateGeoStatus(false);
-          trackEvent("GPS_DENIED");
+          trackEvent("GPS_FAILED");
         },
         {
           timeout: 5000
