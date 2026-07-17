@@ -79,6 +79,48 @@ function filterPeriod(data,period){
     });
 }
 
+function countReturningUsers(data){
+    const today = filterPeriod(data,"today");
+    const todayDevices = new Set(
+        today
+        .filter(x =>
+            x.action==="APP_OPEN" &&
+            x.device_id
+        )
+        .map(x => x.device_id)
+    );
+    const previousDevices = new Set(
+        data
+        .filter(x => {
+            const d =
+            new Date(x.created_at);
+            return (
+                x.action==="APP_OPEN" &&
+                x.device_id &&
+                d.toDateString() !==
+                new Date().toDateString()
+            );
+        })
+        .map(x => x.device_id)
+    );
+    let returning = 0;
+    todayDevices.forEach(id=>{
+        if(previousDevices.has(id))
+            returning++;
+    });
+    return returning;
+}
+
+function countNewUsers(data){
+    return (
+        getUsageStats(
+            filterPeriod(data,"today")
+        ).devices
+        -
+        countReturningUsers(data)
+    );
+}
+
 // METRICHE UTILIZZO
 function getUsageStats(data){
     const open =
@@ -347,7 +389,7 @@ function renderDashboard(
 function loadFooter(data){
     document
     .getElementById("dbStatus")
-    .textContent="Online";
+    .textContent = "Online";
     document
     .getElementById("lastUpdate")
     .textContent =
@@ -355,8 +397,7 @@ function loadFooter(data){
     ?
     new Date(
         data[0].created_at
-    )
-    .toLocaleString("it-IT")
+    ).toLocaleString("it-IT")
     :
     "-";
     const today =
@@ -364,22 +405,29 @@ function loadFooter(data){
         data,
         "today"
     );
-    const devices =
+    const usage =
     getUsageStats(today);
     document
     .getElementById("todayUsers")
     .textContent =
-    devices.devices;
+    usage.devices;
+    document
+    .getElementById("newUsers")
+    .textContent =
+    countNewUsers(data);
+    document
+    .getElementById("returningUsers")
+    .textContent =
+    countReturningUsers(data);
     document
     .getElementById("avgOpen")
     .textContent =
-    devices.devices
+    usage.devices
     ?
     (
-        devices.open /
-        devices.devices
-    )
-    .toFixed(2)
+        usage.open /
+        usage.devices
+    ).toFixed(2)
     :
     0;
 }
