@@ -133,6 +133,18 @@ function loadFooter(data){
     countUniqueDevices(today);
     document
     .getElementById(
+        "returningUsers"
+    )
+    .textContent =
+    countReturningUsers(data);
+    document
+    .getElementById(
+        "newUsers"
+    )
+    .textContent =
+    countNewUsers(data);
+    document
+    .getElementById(
         "avgOpen"
     )
     .textContent =
