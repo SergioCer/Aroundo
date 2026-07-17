@@ -104,9 +104,6 @@ function renderBlock(elementId, data){
 
 function loadFooter(data){
     document
-    .getElementById("totalRecords")
-    .textContent=data.length;
-    document
     .getElementById("dbStatus")
     .textContent="Online";
     const today =
