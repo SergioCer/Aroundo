@@ -107,7 +107,7 @@ function renderBlock(elementId, data){
         const mode = countAccessMode(data);
         const modeRow =
         document.createElement("div");
-        modeRow.className="row";
+        modeRow.className="row summary";
         modeRow.innerHTML=`
             <div class="label">
                 🌐 WEB : ${mode.web}
@@ -122,7 +122,7 @@ function renderBlock(elementId, data){
         const gps = countGPS(data);
         const gpsRow =
         document.createElement("div");
-        gpsRow.className="row";
+        gpsRow.className="row summary";
         gpsRow.innerHTML=`
             <div class="label">
                 📍 OK : ${gps.granted}
