@@ -79,6 +79,24 @@ function filterPeriod(data,period){
     });
 }
 
+function getRetention(data){
+    const today =
+    filterPeriod(
+        data,
+        "today"
+    );
+    const devices =
+    getUsageStats(today)
+    .devices;
+    const returning =
+    countReturningUsers(data);
+    if(devices===0)
+        return 0;
+    return Math.round(
+        (returning / devices) * 100
+    );
+}
+
 function countReturningUsers(data){
     const today = filterPeriod(data,"today");
     const todayDevices = new Set(
@@ -474,6 +492,10 @@ function loadFooter(data){
     .getElementById("returningUsers")
     .textContent =
     countReturningUsers(data);
+    document
+    .getElementById("retention")
+    .textContent =
+    getRetention(data) + "%";
     document
     .getElementById("avgOpen")
     .textContent =
