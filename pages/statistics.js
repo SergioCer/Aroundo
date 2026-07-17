@@ -351,6 +351,9 @@ function countAccessMode(data){
     return {
         pwa,
         web,
-        total:pwa+web
+        total,
+        percent: total
+        ? Math.round((pwa / total) * 100)
+        : 0
     };
 }
