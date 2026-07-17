@@ -142,7 +142,7 @@ function loadFooter(data){
     averageOpenPerUser(today);
 }
 
-await function init(){
+async function init(){
     const data =
         await loadStatistics();
     renderBlock(
@@ -162,7 +162,7 @@ await function init(){
         filterPeriod(data,"year")
     );
     renderDevices(data);
-    await loadFooter(data);
+    loadFooter(data);
 }
 init();
 
