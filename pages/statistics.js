@@ -423,9 +423,8 @@ function renderDashboard(
             "GPS non disponibile o timeout"
         )
         }
-    </div>`;
-    +
-`<div class="metrics">
+    </div>
+<div class="metrics">
 ${
 getPlatformStats(data)
 .map(p =>
@@ -438,7 +437,7 @@ createMetric(
 )
 .join("")
 }
-</div>`
+</div>`;
 }
 
 // FOOTER
