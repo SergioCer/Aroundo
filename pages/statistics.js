@@ -15,12 +15,21 @@ async function loadStatistics(){
         from.getFullYear() - 1
     );
     const { data, error } = await supabase
-        .from("statistics")
-        .select("*")
-        .gte(
-            "created_at",
-            from.toISOString()
-        );
+    .from("statistics")
+    .select(`
+        created_at,
+        action,
+        platform,
+        device_id,
+        app_version
+    `)
+    .gte(
+        "created_at",
+        from.toISOString()
+    )
+    .order("created_at", {
+        ascending:false
+    });
     if(error){
         console.error(
             "Statistics load error:",
@@ -181,4 +190,26 @@ function renderDevices(data){
         </div>
         `;
     });
+}
+
+function countUniqueDevices(data){
+    return new Set(
+        data
+        .filter(x =>
+            x.action === "APP_OPEN" &&
+            x.device_id
+        )
+        .map(x => x.device_id)
+    ).size;
+}
+
+function averageOpenPerUser(data){
+    const opens =
+        countAction(data,"APP_OPEN");
+    const users =
+        countUniqueDevices(data);
+    if(users===0) return 0;
+    return (
+        opens / users
+    ).toFixed(2);
 }
