@@ -234,21 +234,9 @@ function getGPSStats(data){
         data,
         "GPS_PERMISSION_DENIED"
     );
-    const unavailable =
-    count(
-        data,
-        "GPS_UNAVAILABLE"
-    );
-    const timeout =
-    count(
-        data,
-        "GPS_TIMEOUT"
-    );
     const total =
     granted +
-    denied +
-    unavailable +
-    timeout;
+    denied;
     return {
         granted,
         denied,
@@ -260,8 +248,6 @@ function getGPSStats(data){
         )
         :
         0,
-        error:
-        unavailable + timeout
     };
 }
 
