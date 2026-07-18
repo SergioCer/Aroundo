@@ -377,6 +377,14 @@ function renderDashboard(
     <div class="metrics">
         ${
         createMetric(
+            "🌐",
+            "Web",
+            app.web,
+            "Dispositivi che utilizzano Aroundo tramite browser"
+        )
+        }
+        ${
+        createMetric(
             "📲",
             "App",
             app.app,
