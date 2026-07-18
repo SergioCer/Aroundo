@@ -191,13 +191,10 @@ function getAppStats(data){
         }
     });
     let app=0;
+    let web=0;
     Object.values(devices)
-    .forEach(x=>{
-        if(
-            x.app_mode==="PWA"
-        ){
-            app++;
-        }
+    .forEach(x=>{if(x.app_mode==="PWA"){app++;}
+        else{web++;}
     });
     const total =
     Object.keys(devices).length;
@@ -210,6 +207,7 @@ function getAppStats(data){
         x=>x.action==="SHARE_CLICK"
     ).length;
     return {
+        web,
         app,
         percent:
         total
