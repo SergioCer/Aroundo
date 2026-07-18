@@ -335,7 +335,10 @@ function renderDashboard(
     `<div class="metrics">
         ${
         createMetric(
-            "👁",
+                `<svg viewBox="0 0 24 24">
+                <path fill="currentColor"
+                d="M12 5C7 5 3.2 8 1.5 12c1.7 4 5.5 7 10.5 7s8.8-3 10.5-7C20.8 8 17 5 12 5zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+                </svg>`,
             "Open",
             usage.open,
             "Numero totale di aperture nel periodo"
