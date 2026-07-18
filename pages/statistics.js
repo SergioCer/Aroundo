@@ -371,6 +371,14 @@ function renderDashboard(
             "Numero di accessi completati"
         )
         }
+        ${
+        createMetric(
+            "⬇️",
+            "Install",
+            app.install,
+            "Installazioni completate"
+        )
+        }
     </div>
     <div class="metrics">
         ${
@@ -395,14 +403,6 @@ function renderDashboard(
             "PWA",
             app.percent,
             "Percentuale dispositivi che usano la PWA"
-        )
-        }
-        ${
-        createMetric(
-            "⬇️",
-            "Install",
-            app.install,
-            "Installazioni completate"
         )
         }
         ${
