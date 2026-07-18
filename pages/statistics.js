@@ -335,7 +335,7 @@ function renderDashboard(
     `<div class="metrics">
         ${
         createMetric(
-            "🌐",
+            "👁",
             "Open",
             usage.open,
             "Numero totale di aperture nel periodo"
