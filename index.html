@@ -911,7 +911,7 @@
   
 <script type="module">
   import { supabase } from './supabase.js';
-  import { trackEvent } from './app-events.js';
+  import { trackEvent, trackGPSDecision } from './app-events.js';
   
   let categories = [];
   let icons = {};
@@ -1032,7 +1032,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
       (pos) => {
-      trackEvent("GPS_GRANTED");
+      trackGPSDecision("GPS_GRANTED");
       const userLat = pos.coords.latitude;
       const userLng = pos.coords.longitude;
       // Calcolo approssimativo dello zoom in base agli eventi vicini
@@ -1048,7 +1048,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      trackEvent("GPS_PERMISSION_DENIED");
+      trackGPSDecision("GPS_PERMISSION_DENIED");
       console.warn("Aroundo works best with location access enabled. If not available, default coordinates will be used.");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
