@@ -489,10 +489,6 @@ function loadFooter(data){
     const usage =
     getUsageStats(today);
     document
-    .getElementById("todayUsers")
-    .textContent =
-    usage.devices;
-    document
     .getElementById("newUsers")
     .textContent =
     countNewUsers(data);
