@@ -420,17 +420,9 @@ function renderDashboard(
         ${
         createMetric(
             "%",
-            "Success",
+            "Trust",
             gps.success,
             "Percentuale richieste GPS riuscite"
-        )
-        }
-        ${
-        createMetric(
-            "⚠️",
-            "Error",
-            gps.error,
-            "GPS non disponibile o timeout"
         )
         }
     </div>
