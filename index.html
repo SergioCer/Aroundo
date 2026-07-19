@@ -911,7 +911,8 @@
   
 <script type="module">
   import { supabase } from './supabase.js';
-  import { trackEvent, trackGPSDecision } from './app-events.js';
+  import { trackEvent, trackGPSDecision } from './app-events.js'; // Vecchie statistiche
+  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS } from './analytics-events.js'; // Nuove statistiche
   
   let categories = [];
   let icons = {};
@@ -992,6 +993,7 @@
     // Click sinistro
     loginBtn.addEventListener('click', function() {
     event.preventDefault(); // blocca il menu del browser
+    await analyticsLogin();      
     window.location.href = 'pages/login.html';
   });      
     // Click destro
@@ -1032,7 +1034,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
       (pos) => {
-      trackGPSDecision("GPS_GRANTED");
+      trackGPSDecision("GPS_GRANTED"); // vecchie statistiche
+      analyticsGPS(true);  // nuove statistiche
       const userLat = pos.coords.latitude;
       const userLng = pos.coords.longitude;
       // Calcolo approssimativo dello zoom in base agli eventi vicini
@@ -1048,7 +1051,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      trackGPSDecision("GPS_PERMISSION_DENIED");
+      trackGPSDecision("GPS_PERMISSION_DENIED"); // vecchie statistiche
+      analyticsGPS(false); // nuove statistiche
       console.warn("Aroundo works best with location access enabled. If not available, default coordinates will be used.");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
@@ -1067,7 +1071,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEvents();
   updateDateUI();
   updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news.
-  trackEvent("APP_OPEN");
+  trackEvent("APP_OPEN"); // vecchie statistiche
+  analyticsOpen(); // Nuove statistiche
 });
       
     noUiSlider.create(slider, {
@@ -1090,7 +1095,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
 
 document.getElementById("shareQR").onclick = async () => {
-  await trackEvent("SHARE_CLICK");
+  await trackEvent("SHARE_CLICK"); // vecchie statistiche
+  await analyticsShare(); // nuove statistiche
     if (navigator.share) {
         await navigator.share({
             title: "Aroundo",
@@ -1710,7 +1716,8 @@ oms.addListener('click', function (marker) {
 
   // Quando viene installata
   window.addEventListener('appinstalled', () => {
-    trackEvent("PWA_INSTALL");
+    trackEvent("PWA_INSTALL"); // vecchie statistiche
+    analyticsInstall(); // nuove statistiche
     document.getElementById("installBtn").style.display = "none";
   });
  
