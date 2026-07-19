@@ -912,7 +912,7 @@
 <script type="module">
   import { supabase } from './supabase.js';
   import { trackEvent, trackGPSDecision } from './app-events.js'; // Vecchie statistiche
-  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS } from './analytics-events.js'; // Nuove statistiche
+  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin } from './analytics-events.js'; // Nuove statistiche
   
   let categories = [];
   let icons = {};
@@ -991,9 +991,9 @@
     // Seleziona il div "Login"
     const loginBtn = document.getElementById('loginBtn');
     // Click sinistro
-    loginBtn.addEventListener('click', function() {
-    analyticsLogin();      
+    loginBtn.addEventListener('click', async function() {
     event.preventDefault(); // blocca il menu del browser
+    await analyticsLogin();      
     window.location.href = 'pages/login.html';
   });      
     // Click destro
