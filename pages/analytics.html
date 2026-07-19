@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analytics</title>
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f2f4f7;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+/* HEADER */
+.topbar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:10px;
+}
+
+.btn-icon{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    background:#e5e7eb;
+    cursor:pointer;
+    font-size:18px;
+}
+
+/* CARD PERIODO */
+.card{
+    background:white;
+    margin:6px;
+    border-radius:30px;
+    padding:10px;
+}
+
+.card-title{
+    text-align:center;
+    font-size:14px;
+    color:#6b7280;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+/* SEZIONI */
+.section-title{
+    font-size:12px;
+    color:#6b7280;
+    font-weight:bold;
+    margin:
+    8px 0 6px 5px;
+    text-transform:uppercase;
+}
+
+/* GRID METRICHE */
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:4px;
+}
+
+.metric{
+    text-align:center;
+    padding:2px 2px;
+}
+
+.metric-header{
+    font-size:12px;
+    color:#6b7280;
+    font-weight:bold;
+}    
+
+.metric-value{
+    font-size:16px;
+    font-weight:bold;
+    color:#111827;
+}
+
+/* FOOTER */
+.footer{
+    margin:12px 15px;
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:15px;
+    text-align:center;
+    font-size:14px;
+}
+
+.footer-title{
+    color:#6b7280;
+    margin-bottom:4px;
+}
+
+.footer-value{
+    font-weight:bold;
+    color:#111827;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+    .metrics{
+        grid-template-columns:repeat(4,1fr);
+    }
+    .metric-value{
+        font-size:16px;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div style="display:flex;align-items:center;gap:20px;">
+
+        <button 
+        class="btn-icon"
+        onclick="history.back()">←</button>
+        <div style="font-size:30px;">
+            Analytics
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">
+        TODAY
+    </div>
+    <div id="today"></div>
+</div>
+
+<div class="card">
+    <div class="card-title">
+        THIS WEEK
+    </div>
+    <div id="week"></div>
+</div>
+
+<div class="card">
+    <div class="card-title">
+        THIS MONTH
+    </div>
+    <div id="month"></div>
+</div>
+
+<div class="card">
+    <div class="card-title">
+        THIS YEAR
+    </div>
+    <div id="year"></div>
+</div>
+
+<div class="footer">
+<div>
+<div class="footer-title">Db</div>
+<div id="dbStatus" class="footer-value">-</div>
+</div>
+<div>
+<div class="footer-title">Last update</div>
+<div id="lastUpdate" class="footer-value">-</div>
+</div>
+<div>
+<div class="footer-title">New</div>
+<div id="newUsers" class="footer-value">-</div>
+</div>
+<div>
+<div class="footer-title">Return</div>
+<div id="returningUsers" class="footer-value">-</div>
+</div>
+<div>
+<div class="footer-title">Retention</div>
+<div id="retention" class="footer-value">-</div>
+</div>
+<div>
+<div class="footer-title">Avg Open</div>
+<div id="avgOpen" class="footer-value">-</div>
+</div>
+</div>
+
+<script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();
+import './analytics.js';
+
+</script>
+</body>
+</html>
