@@ -77,15 +77,12 @@ body {
 }
 
 </style>
-
 </head>
 <body>
-
+  
   <div class="container">
-
     <aside class="sidebar">
       <h2>Admin Panel</h2>
-
       <nav>
         <a href="luoghi.html">Venues</a>
         <a href="organizzatori.html">Organizers</a>
@@ -102,16 +99,55 @@ body {
         <a href="analytics.html">Analytics</a>        
         <a href="../index.html">Aroundo</a>
       </nav>
-
     </aside>
-
     <main class="content">
       <h1>Dashboard</h1>
       <p>Select from menu.</p>
     </main>
-
   </div>
 
+<!-- MESSAGE DIALOG -->
+<div id="messageDialog" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+z-index:99999;
+align-items:center;
+justify-content:center;
+">
+<div style="
+background:white;
+padding:22px;
+border-radius:12px;
+width:300px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+">
+<div id="messageText" style="
+margin-bottom:18px;
+font-weight:600;
+">
+</div>
+
+<button onclick="closeMessage()" style="
+width:100%;
+background:#3b82f6;
+color:white;
+border:none;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+">
+OK
+</button>
+</div>
+</div>
+  
 </body>
 </html>
 
@@ -127,11 +163,21 @@ body {
     if (!data.session) {
       window.location.href="login.html";
     }  
+
+window.showMessage=function(text){
+document.getElementById("messageText").textContent=text;
+document.getElementById("messageDialog").style.display="flex";
+}
+
+window.closeMessage=function(){
+document.getElementById("messageDialog").style.display="none";
+}
   
   document.querySelectorAll('.in-progress').forEach(link => {
   link.addEventListener('click', function(event) {
     event.preventDefault();
-    alert('In Progress!');
+    // alert('In Progress!');
+    showMessage("Funzione in sviluppo!");    
   });
 });
   
