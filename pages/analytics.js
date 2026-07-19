@@ -40,14 +40,6 @@ async function loadAnalytics(){
     rows:data||[],
     lastUpdate:info?.ai_last_update??null
     };
-    if(error){
-        console.error(
-            "Analytics load error:",
-            error
-        );
-        return [];
-    }
-    return data || [];
 }
 
 
@@ -348,16 +340,16 @@ p.platform,
 }
 
 // FOOTER
-function loadFooter(data){
+function loadFooter(data,lastUpdate){
 document
 .getElementById("dbStatus")
 .textContent =
 "Online";
 
 document.getElementById("lastUpdate").textContent=
-analytics.lastUpdate
+lastUpdate
 ?
-new Date(analytics.lastUpdate).toLocaleString("it-IT")
+new Date(lastUpdate).toLocaleString("it-IT")
 :
 "-";
 const today =
@@ -431,7 +423,10 @@ renderDashboard(
 "year",
 filterPeriod(data,"year")
 );
-loadFooter(data);
+loadFooter(
+    data,
+    analytics.lastUpdate
+);
 }
 
 init();
