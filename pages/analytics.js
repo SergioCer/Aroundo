@@ -151,25 +151,27 @@ function getAppStats(data){
 
 // GPS
 function getGPSStats(data){
-    let granted = 0;
-    let denied = 0;
+    let granted=0;
+    let denied=0;
+    let none=0;
     data.forEach(x=>{
-        if(x.an_gps === true)
+        if(x.an_gps===true)
             granted++;
-        if(x.an_gps === false)
+        else if(x.an_gps===false)
             denied++;
+        else
+            none++;
     });
-    const total =
-    granted + denied;
+    const total=
+    granted+denied+none;
     return {
         granted,
         denied,
+        none,
         success:
         total
         ?
-        Math.round(
-            (granted/total)*100
-        )
+        Math.round((granted/total)*100)
         :
         0
     };
@@ -316,6 +318,7 @@ ${createMetric("📤","Share",app.share,"Condivisioni")}
 <div class="metrics">
 ${createMetric("✅","Granted",gps.granted,"GPS concessi")}
 ${createMetric("🚫","Denied",gps.denied,"GPS negati")}
+${createMetric("❔","None",gps.none,"GPS non scelto")}
 ${createMetric("%","Trust",gps.success,"Successo GPS")}
 </div>
 <div class="metrics">
