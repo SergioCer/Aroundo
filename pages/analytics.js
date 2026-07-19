@@ -31,6 +31,15 @@ async function loadAnalytics(){
             ascending:false
         }
     );
+    const { data:info } =
+    await supabase
+    .from("analytics_info")
+    .select("ai_last_update")
+    .single();
+    return{
+    rows:data||[],
+    lastUpdate:info?.ai_last_update??null
+    };
     if(error){
         console.error(
             "Analytics load error:",
@@ -345,12 +354,10 @@ document
 .textContent =
 "Online";
 
-document
-.getElementById("lastUpdate")
-.textContent =
-data.length
+document.getElementById("lastUpdate").textContent=
+analytics.lastUpdate
 ?
-data[0].an_date
+new Date(analytics.lastUpdate).toLocaleString("it-IT")
 :
 "-";
 const today =
@@ -403,9 +410,11 @@ usage.devices
 
 // START
 async function init(){
-const data =
+const analytics=
 await loadAnalytics();
-
+const data=
+analytics.rows;
+    
 renderDashboard(
 "today",
 filterPeriod(data,"today")
