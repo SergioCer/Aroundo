@@ -143,6 +143,12 @@ async function updateAnalytics(values){
             "id_analytics",
             current.id_analytics
         );
+        await supabase
+        .from("analytics_info")
+        .update({
+            ai_last_update:new Date().toISOString()
+        })
+        .eq("id_analytics_info",1);
         return;
     }
     const insert = {
@@ -168,6 +174,12 @@ async function updateAnalytics(values){
     await supabase
     .from("analytics")
     .insert(insert);
+    await supabase
+        .from("analytics_info")
+        .update({
+            ai_last_update:new Date().toISOString()
+        })
+        .eq("id_analytics_info",1);
 }
 
 export function analyticsOpen(){
