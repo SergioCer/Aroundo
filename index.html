@@ -992,8 +992,8 @@
     const loginBtn = document.getElementById('loginBtn');
     // Click sinistro
     loginBtn.addEventListener('click', function() {
+    analyticsLogin();      
     event.preventDefault(); // blocca il menu del browser
-    await analyticsLogin();      
     window.location.href = 'pages/login.html';
   });      
     // Click destro
