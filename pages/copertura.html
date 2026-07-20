@@ -194,16 +194,7 @@ await loadRegions();
 }
 
 init();
-function getComuneState(c){
-let oggi=new Date();
-let d=new Date(oggi.getFullYear(),oggi.getMonth(),1);
-let att=c.co_attivato?new Date(c.co_attivato):null;
-let prev=c.co_previsto?new Date(c.co_previsto):null;
-if(att&&att<=d)return "active";
-if(prev&&prev<=d)return "planned";
-return null;
-}
-
+    
 function getComuniByProvincia(id){
 let provincia=APP.db.province.find(
 p=>p.pr_istat==id||p.id_provincia==id
