@@ -195,8 +195,8 @@ await loadRegions();
 
 init();
 function getComuneState(c){
-if(!APP.timelineDate)return null;
-let d=new Date(APP.timelineDate.getFullYear(),APP.timelineDate.getMonth(),1);
+let oggi=new Date();
+let d=new Date(oggi.getFullYear(),oggi.getMonth(),1);
 let att=c.co_attivato?new Date(c.co_attivato):null;
 let prev=c.co_previsto?new Date(c.co_previsto):null;
 if(att&&att<=d)return "active";
