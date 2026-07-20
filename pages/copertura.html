@@ -209,12 +209,18 @@ return APP.db.comuni.filter(c=>c.id_provincia==id);
 }
 
 function getComuniByRegione(id){
-let p=APP.db.province.filter(x=>x.id_regione==id).map(x=>x.id_provincia);
+let regione=APP.db.regioni.find(r=>r.rg_istat==id||r.id_regione==id);
+if(!regione)return[];
+let p=APP.db.province
+.filter(x=>x.id_regione==regione.id_regione)
+.map(x=>x.id_provincia);
 return APP.db.comuni.filter(c=>p.includes(c.id_provincia));
 }
 
 function getProvinceByRegione(id){
-return APP.db.province.filter(p=>p.id_regione==id);
+let regione=APP.db.regioni.find(r=>r.rg_istat==id||r.id_regione==id);
+if(!regione)return[];
+return APP.db.province.filter(p=>p.id_regione==regione.id_regione);
 }
 
 function getCoverage(list){
@@ -301,7 +307,7 @@ updateInfo(list);
 }
 
 function getRegionData(id){
-let region=APP.db.regioni.find(r=>r.id_regione==id);
+let region=APP.db.regioni.find(r=>r.rg_istat==id||r.id_regione==id);
 if(!region)return null;
 return {
 id:region.id_regione,
