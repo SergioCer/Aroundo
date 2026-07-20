@@ -464,11 +464,11 @@ updateTimeline();
 });
 
 const GEOJSON={
-regioni:"URL_GEOJSON_REGIONI",
-province:"URL_GEOJSON_PROVINCE",
-comuni:"URL_GEOJSON_COMUNI"
+regioni:"https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson",
+province:"https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson",
+comuni:"https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_municipalities.geojson"
 };
-
+    
 async function loadGeoJSON(type){
 if(APP.cache.geojson[type])return APP.cache.geojson[type];
 let r=await fetch(GEOJSON[type]);
