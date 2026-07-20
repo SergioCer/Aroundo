@@ -206,22 +206,141 @@ function aggiornaStatistiche(lista){
     `Comuni attivi: ${attivi}/${totale} - Copertura: ${perc}%`;
 }
 
+const geoJsonSources = {
+    regioni: "URL_REGIONI_GEOJSON",
+    province: "URL_PROVINCE_GEOJSON",
+    comuni: "URL_COMUNI_GEOJSON"
+};
+    
 // GEOJSON
-async function loadGeoJsonLivello(tipo,codice){
-    /*
-       Punto di collegamento futuro.
+let livelloCorrente = "regioni";
+let storicoLivelli = [];
+let geoLayer = null;
 
-       Qui verrà inserito il recupero
-       del GeoJSON online:
-
-       stato.geojson
-       regione.geojson
-       provincia.geojson
-       comune.geojson
-    */
-
-    return null;
+// CARICAMENTO GEOJSON
+async function loadGeoJsonLivello(tipo) {
+    const response = await fetch(
+        geoJsonSources[tipo]
+    );
+    return await response.json();
 }
+
+// STILE ELEMENTI
+function stileElemento(feature, tipo) {
+    let codice;
+    if(tipo==="comuni"){
+        codice =
+        feature.properties.co_istat ||
+        feature.properties.PRO_COM;
+    }
+    if(tipo==="province"){
+        codice =
+        feature.properties.pr_istat ||
+        feature.properties.COD_PRO;
+    }
+    if(tipo==="regioni"){
+        codice =
+        feature.properties.rg_codice ||
+        feature.properties.COD_REG;
+    }
+    let comuniElemento =
+    comuni.filter(c=>{
+        if(tipo==="comuni")
+            return c.co_istat==codice;
+        if(tipo==="province")
+            return c.id_provincia==codice;
+        if(tipo==="regioni")
+            return c.id_regione==codice;
+    });
+    let attivi =
+    comuniElemento.filter(c=>
+        statoComune(c)==="attivo"
+    );
+    let previsti =
+    comuniElemento.filter(c=>
+        statoComune(c)==="previsto"
+    );
+    let colore="#999";
+    if(attivi.length)
+        colore="#3cb371";
+    else if(previsti.length)
+        colore="#f5d76e";
+    return {
+        color:colore,
+        weight:
+        attivi.length===comuniElemento.length &&
+        comuniElemento.length>0
+        ?
+        3
+        :
+        2,
+        fillColor:colore,
+        fillOpacity:
+        tipo==="comuni"
+        ?
+        0.65
+        :
+        0.15
+    };
+}
+
+// DISEGNA LIVELLO
+async function mostraLivello(tipo){
+    if(geoLayer)
+        map.removeLayer(geoLayer);
+    const geojson =
+    await loadGeoJsonLivello(tipo);
+    geoLayer =
+    L.geoJSON(
+        geojson,
+        {
+        style:function(feature){
+            return stileElemento(
+                feature,
+                tipo
+            );
+        },
+        onEachFeature:function(feature,layer){
+            layer.on({
+                click:function(e){
+                    L.DomEvent.stopPropagation(e);
+                    if(tipo==="regioni"){
+                        storicoLivelli.push("regioni");
+                        mostraLivello("province");
+                    }
+                    else if(tipo==="province"){
+                        storicoLivelli.push("province");
+                        mostraLivello("comuni");
+                    }
+                },
+                dblclick:function(){
+                    /*
+                       qui verrà inserita
+                       apertura pagina dettaglio
+                    */
+                }
+            });
+        }
+        }
+    )
+    .addTo(map);
+    livelloCorrente=tipo;
+    map.fitBounds(
+        geoLayer.getBounds()
+    );
+}
+
+// RITORNO LIVELLO
+map.on(
+"click",
+function(){
+    if(storicoLivelli.length){
+        let precedente =
+        storicoLivelli.pop();
+        mostraLivello(precedente);
+    }
+});
+
 
 // TIMELINE
 function inizializzaTimeline(){
