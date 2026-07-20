@@ -218,13 +218,61 @@ let storicoLivelli = [];
 let geoLayer = null;
 
 // CARICAMENTO GEOJSON
-async function loadGeoJsonLivello(tipo) {
-    const response = await fetch(
-        geoJsonSources[tipo]
-    );
-    return await response.json();
+async function loadGeoJsonLivello(tipo, codicePadre = null){
+    let url;
+    if(tipo==="regioni"){
+        url = GEOJSON_REGIONI;
+    }
+    if(tipo==="province"){
+        url = GEOJSON_PROVINCE;
+    }
+    if(tipo==="comuni"){
+        url = GEOJSON_COMUNI;
+    }
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!codicePadre)
+        return data;
+    return {
+        type:"FeatureCollection",
+        features:
+        data.features.filter(f=>{
+            if(tipo==="province")
+                return f.properties.REGIONE === codicePadre;
+            if(tipo==="comuni")
+                return f.properties.PROVINCIA === codicePadre;
+        })
+    };
 }
 
+layer.on("click",()=>{
+    if(tipo==="regioni"){
+        storico.push({
+            livello:"regioni",
+            codice:null
+        });
+        elementoCorrente =
+        feature.properties.COD_REG;
+        mostraLivello(
+            "province",
+            elementoCorrente
+        );
+    }
+    if(tipo==="province"){
+        storico.push({
+            livello:"province",
+            codice:
+            elementoCorrente
+        });
+        elementoCorrente =
+        feature.properties.COD_PRO;
+        mostraLivello(
+            "comuni",
+            elementoCorrente
+        );
+    }
+});
+    
 // STILE ELEMENTI
 function stileElemento(feature, tipo) {
     let codice;
