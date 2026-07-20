@@ -138,7 +138,9 @@ cur.setMonth(cur.getMonth()+1);
 }
 let today=new Date();
 APP.timelineIndex=APP.timeline.findIndex(v=>v.getMonth()==today.getMonth()&&v.getFullYear()==today.getFullYear());
-if(APP.timelineIndex<0)APP.timelineIndex=0;
+if(APP.timelineIndex<0){
+APP.timelineIndex=APP.timeline.length-1;
+}
 APP.timelineDate=APP.timeline[APP.timelineIndex];
 updateTimeline();
 }
@@ -260,25 +262,25 @@ fillOpacity:.25
 }
 if(state==="active"){
 return {
-color:COLORS.borderYellow,
+color:"#2e8b57",
 weight:2,
-fillColor:COLORS.green,
-fillOpacity:.18
+fillColor:"#4caf50",
+fillOpacity:.35
 };
 }
 if(state==="planned"){
 return {
-color:COLORS.borderYellow,
+color:"#d8b400",
 weight:2,
-fillColor:COLORS.yellow,
-fillOpacity:.18
+fillColor:"#f5d76e",
+fillOpacity:.35
 };
 }
 return {
-color:COLORS.gray,
-weight:1,
-fillColor:COLORS.gray,
-fillOpacity:.05
+color:"#4a90c2",
+weight:1.5,
+fillColor:"#ffffff",
+fillOpacity:0
 };
 }
 function updateStatistics(){
@@ -537,6 +539,7 @@ handleDoubleClick(type,feature);
 },
 mouseover:function(){
 layer.setStyle({
+color:"#0057a8",
 weight:3
 });
 },
