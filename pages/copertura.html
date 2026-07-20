@@ -205,7 +205,13 @@ return null;
 }
 
 function getComuniByProvincia(id){
-return APP.db.comuni.filter(c=>c.id_provincia==id);
+let provincia=APP.db.province.find(
+p=>p.pr_istat==id||p.id_provincia==id
+);
+if(!provincia)return[];
+return APP.db.comuni.filter(
+c=>c.id_provincia==provincia.id_provincia
+);
 }
 
 function getComuniByRegione(id){
