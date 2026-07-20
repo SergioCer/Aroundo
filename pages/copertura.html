@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Copertura</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<style>
+body {
+    margin:0;
+    font-family: Arial, sans-serif;
+}
+
+#timelineContainer {
+    height:90px;
+    position:relative;
+    background:#fff;
+}
+
+#timeline {
+    position:absolute;
+    left:5%;
+    right:5%;
+    top:55px;
+    height:4px;
+    background:#999;
+}
+
+#cursor {
+    position:absolute;
+    top:35px;
+    width:0;
+    height:0;
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-top:15px solid #000;
+    cursor:pointer;
+}
+
+#selectedDate {
+    position:absolute;
+    top:5px;
+    width:100%;
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+}
+
+#todayPoint {
+    position:absolute;
+    bottom:5px;
+    left:50%;
+    width:12px;
+    height:12px;
+    background:#0066ff;
+    border-radius:50%;
+    cursor:pointer;
+}
+
+#map {
+    height:75vh;
+}
+
+#legend {
+    height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    font-size:14px;
+}
+
+.colorBox {
+    width:15px;
+    height:15px;
+    display:inline-block;
+}
+
+.yellow {
+    background:#f5d76e;
+}
+
+.green {
+    background:#3cb371;
+}
+</style>
+</head>
+<body>
+<div id="timelineContainer">
+    <div id="selectedDate"></div>
+    <div id="timeline"></div>
+    <div id="cursor"></div>
+    <div id="todayPoint"></div>
+</div>
+<div id="map"></div>
+<div id="legend">
+    <span>
+        <span class="colorBox yellow"></span>
+        Previsto
+    </span>
+    <span>
+        <span class="colorBox green"></span>
+        Attivo
+    </span>
+    <span id="info">
+        Comuni attivi: 0/0 - Copertura: 0%
+    </span>
+</div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();
+import { supabase } from '../supabase.js';
+
+// DATI GLOBALI
+let comuni = [];
+let province = [];
+let regioni = [];
+let stati = [];
+let livello = "stato";
+let dataSelezionata = new Date();
+let layerCorrente = null;
+
+// MAPPA
+const mapStyles = [
+{
+    name:"Basic",
+    url:"https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png",
+    options:{
+        attribution:"&copy; OpenStreetMap & CARTO",
+        subdomains:"abcd",
+        maxZoom:19
+    }
+}
+];
+
+const map = L.map('map')
+.setView([41.9,12.5],6);
+
+L.tileLayer(
+    mapStyles[0].url,
+    mapStyles[0].options
+).addTo(map);
+
+// CARICAMENTO DATI
+async function loadData(){
+    let c = await supabase
+    .from("comuni")
+    .select("*");
+    comuni = c.data || [];
+    let p = await supabase
+    .from("province")
+    .select("*");
+    province = p.data || [];
+    let r = await supabase
+    .from("regioni")
+    .select("*");
+    regioni = r.data || [];
+    let s = await supabase
+    .from("stati")
+    .select("*");
+    stati = s.data || [];
+    inizializzaTimeline();
+}
+
+// STATO COMUNE
+function statoComune(comune){
+    if(!dataSelezionata)
+        return null;
+    let mese =
+    new Date(
+        dataSelezionata.getFullYear(),
+        dataSelezionata.getMonth(),
+        1
+    );
+    if(
+        comune.co_attivato &&
+        new Date(comune.co_attivato) <= mese
+    ){
+        return "attivo";
+    }
+    if(
+        comune.co_previsto &&
+        new Date(comune.co_previsto) <= mese
+    ){
+        return "previsto";
+    }
+    return null;
+}
+
+// STATISTICHE
+function aggiornaStatistiche(lista){
+    let totale = lista.length;
+    let attivi =
+    lista.filter(c =>
+        statoComune(c)==="attivo"
+    ).length;
+    let perc =
+    totale ?
+    ((attivi/totale)*100).toFixed(1)
+    :
+    0;
+    document.getElementById("info").textContent =
+    `Comuni attivi: ${attivi}/${totale} - Copertura: ${perc}%`;
+}
+
+// GEOJSON
+async function loadGeoJsonLivello(tipo,codice){
+    /*
+       Punto di collegamento futuro.
+
+       Qui verrà inserito il recupero
+       del GeoJSON online:
+
+       stato.geojson
+       regione.geojson
+       provincia.geojson
+       comune.geojson
+    */
+
+    return null;
+}
+
+// TIMELINE
+function inizializzaTimeline(){
+    let date=[];
+    comuni.forEach(c=>{
+        if(c.co_previsto)
+            date.push(new Date(c.co_previsto));
+        if(c.co_attivato)
+            date.push(new Date(c.co_attivato));
+    });
+    if(date.length){
+        date.sort(
+            (a,b)=>a-b
+        );
+        dataSelezionata=date[0];
+    }
+    aggiornaData();
+}
+
+function aggiornaData(){
+    let m =
+    String(dataSelezionata.getMonth()+1)
+    .padStart(2,"0");
+    let y =
+    String(dataSelezionata.getFullYear())
+    .slice(-2);
+    document.getElementById("selectedDate")
+    .textContent =
+    `${m}/${y}`;
+}
+
+// esempio spostamento mensile
+document.getElementById("timeline")
+.onclick=function(){
+    dataSelezionata.setMonth(
+        dataSelezionata.getMonth()+1
+    );
+    aggiornaData();
+};
+
+// reset oggi
+document.getElementById("todayPoint")
+.onclick=function(){
+    dataSelezionata=new Date();
+    aggiornaData();
+};
+
+loadData();
+
+</script>
+</body>
+</html>
