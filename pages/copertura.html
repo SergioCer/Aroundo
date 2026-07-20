@@ -233,6 +233,7 @@ document.getElementById("info").textContent=`Comuni attivi: ${c.active}/${c.tota
 }
 
 function updateStatistics(){
+return; // Momentaneamente disabilita la funzione    
 let list=[];
 if(APP.currentLevel==="regioni"&&APP.currentRegion){
 list=getComuniByRegione(APP.currentRegion);
