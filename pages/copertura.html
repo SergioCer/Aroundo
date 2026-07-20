@@ -229,27 +229,6 @@ if(!regione)return[];
 return APP.db.province.filter(p=>p.id_regione==regione.id_regione);
 }
 
-function getCoverage(list){
-let total=list.length;
-let active=list.filter(c=>getComuneState(c)=="active").length;
-let planned=list.filter(c=>getComuneState(c)=="planned").length;
-return {
-total:total,
-active:active,
-planned:planned,
-percent:total?((active/total)*100).toFixed(1):0
-};
-}
-
-function getElementStatus(list){
-let data=getCoverage(list);
-if(!data.total)return "none";
-if(data.active===data.total)return "complete";
-if(data.active>0)return "active";
-if(data.planned>0)return "planned";
-return "none";
-}
-
 function getLevelComuni(level,id){
 if(level==="regioni")return getComuniByRegione(id);
 if(level==="province")return getComuniByProvincia(id);
@@ -262,39 +241,6 @@ let c=getCoverage(list);
 document.getElementById("info").textContent=`Comuni attivi: ${c.active}/${c.total} - Copertura: ${c.percent}%`;
 }
 
-function getStyleByCoverage(list){
-let state=getElementStatus(list);
-if(state==="complete"){
-return {
-color:COLORS.borderGreen,
-weight:3,
-fillColor:COLORS.green,
-fillOpacity:.25
-};
-}
-if(state==="active"){
-return {
-color:"#2e8b57",
-weight:2,
-fillColor:"#4caf50",
-fillOpacity:.35
-};
-}
-if(state==="planned"){
-return {
-color:"#d8b400",
-weight:2,
-fillColor:"#f5d76e",
-fillOpacity:.35
-};
-}
-return {
-color:"#4a90c2",
-weight:1.5,
-fillColor:"#ffffff",
-fillOpacity:0
-};
-}
 function updateStatistics(){
 let list=[];
 if(APP.currentLevel==="regioni"&&APP.currentRegion){
@@ -342,21 +288,183 @@ comuni:[comune]
 };
 }
 
-function getGeoStyle(type,id){
-let list=[];
-if(type==="regioni"){
-list=getComuniByRegione(id);
-}
-if(type==="province"){
-list=getComuniByProvincia(id);
-}
-if(type==="comuni"){
-list=getComuniByProvincia(APP.currentProvince)
-.filter(c=>c.co_istat==id);
-}
-return getStyleByCoverage(list);
-}
+// Stato del Comune
+function getComuneState(comune){
+let oggi=new Date();
+oggi=new Date(oggi.getFullYear(),oggi.getMonth(),1);
+let att=comune.co_attivato?new Date(comune.co_attivato):null;
+let prev=comune.co_previsto?new Date(comune.co_previsto):null;
+if(att&&att<=oggi)return"active";
+if(prev&&prev<=oggi)return"planned";
+return"none";
+}    
 
+// Stato della Provincia
+function getProvinciaState(idProvincia){
+let comuni=getComuniByProvincia(idProvincia);
+if(!comuni.length)return"none";
+let attivi=comuni.filter(c=>getComuneState(c)=="active").length;
+let coperti=comuni.filter(c=>{
+let s=getComuneState(c);
+return s=="active"||s=="planned";
+}).length;
+if(attivi===comuni.length)return"complete";
+if(coperti>0)return"planned";
+return"none";
+}    
+
+// Stato della Regione
+function getRegioneState(idRegione){
+let provincia=APP.db.province.filter(p=>p.id_regione==idRegione);
+if(!provincia.length)return"none";
+let complete=0;
+let presenti=0;
+provincia.forEach(p=>{
+let s=getProvinciaState(p.id_provincia);
+if(s=="complete")complete++;
+if(s=="complete"||s=="planned")presenti++;
+});
+if(complete===provincia.length)return"complete";
+if(presenti>0)return"planned";
+return"none";
+}    
+
+// Stato dello Stato
+function getStatoState(idStato){
+let regioni=APP.db.regioni.filter(r=>r.id_stato==idStato);
+if(!regioni.length)return"none";
+let complete=0;
+let presenti=0;
+regioni.forEach(r=>{
+let s=getRegioneState(r.id_regione);
+if(s=="complete")complete++;
+if(s=="complete"||s=="planned")presenti++;
+});
+if(complete===regioni.length)return"complete";
+if(presenti>0)return"planned";
+return"none";
+}    
+
+// Stile del Comune
+function getComuneStyle(idComune){
+let comune=APP.db.comuni.find(c=>c.co_istat==idComune);
+if(!comune){
+return{
+color:"#4a90c2",
+weight:1.5,
+fillColor:"#ffffff",
+fillOpacity:0
+};
+}
+let s=getComuneState(comune);
+if(s=="active"){
+return{
+color:"#2e8b57",
+weight:2,
+fillColor:"#4caf50",
+fillOpacity:.35
+};
+}
+if(s=="planned"){
+return{
+color:"#d8b400",
+weight:2,
+fillColor:"#f5d76e",
+fillOpacity:.35
+};
+}
+return{
+color:"#4a90c2",
+weight:1.5,
+fillColor:"#ffffff",
+fillOpacity:0
+};
+}    
+
+// Stile della Provincia 
+function getProvinciaStyle(idProvincia){
+let s=getProvinciaState(idProvincia);
+if(s=="complete"){
+return{
+color:COLORS.borderGreen,
+weight:3,
+fillOpacity:0
+};
+}
+if(s=="planned"){
+return{
+color:"#d8b400",
+weight:3,
+fillOpacity:0
+};
+}
+return{
+color:"#4a90c2",
+weight:1.5,
+fillOpacity:0
+};
+}    
+
+// Stile della Regione 
+function getRegioneStyle(idRegione){
+let s=getRegioneState(idRegione);
+if(s=="complete"){
+return{
+color:COLORS.borderGreen,
+weight:3,
+fillOpacity:0
+};
+}
+if(s=="planned"){
+return{
+color:"#d8b400",
+weight:3,
+fillOpacity:0
+};
+}
+return{
+color:"#4a90c2",
+weight:1.5,
+fillOpacity:0
+};
+}    
+
+// Stile dello Stato
+function getStatoStyle(idStato){
+let s=getStatoState(idStato);
+if(s=="complete"){
+return{
+color:COLORS.borderGreen,
+weight:3,
+fillOpacity:0
+};
+}
+if(s=="planned"){
+return{
+color:"#d8b400",
+weight:3,
+fillOpacity:0
+};
+}
+return{
+color:"#4a90c2",
+weight:1.5,
+fillOpacity:0
+};
+}    
+
+function getGeoStyle(type,id){
+if(type=="comuni")return getComuneStyle(id);
+if(type=="province")return getProvinciaStyle(id);
+if(type=="regioni")return getRegioneStyle(id);
+if(type=="stati")return getStatoStyle(id);
+return{
+color:"#4a90c2",
+weight:1.5,
+fillOpacity:0
+};
+}    
+    
 function refreshMap(){
 if(!APP.geoLayer)return;
 APP.geoLayer.eachLayer(layer=>{
