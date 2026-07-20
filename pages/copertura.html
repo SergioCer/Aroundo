@@ -103,9 +103,9 @@ APP.baseLayer=L.tileLayer(MAPSTYLE.url,MAPSTYLE.options).addTo(APP.map);
 
 async function loadDB(){
 let r=await Promise.all([
-supabase.from("stato").select("*"),
-supabase.from("regione").select("*"),
-supabase.from("provincia").select("*"),
+supabase.from("stati").select("*"),
+supabase.from("regioni").select("*"),
+supabase.from("province").select("*"),
 supabase.from("comuni").select("*")
 ]);
 APP.db.stati=r[0].data||[];
