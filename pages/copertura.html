@@ -2,442 +2,676 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Copertura</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <style>
-body {
-    margin:0;
-    font-family: Arial, sans-serif;
-}
-
-#timelineContainer {
-    height:90px;
-    position:relative;
-    background:#fff;
-}
-
-#timeline {
-    position:absolute;
-    left:5%;
-    right:5%;
-    top:55px;
-    height:4px;
-    background:#999;
-}
-
-#cursor {
-    position:absolute;
-    top:35px;
-    width:0;
-    height:0;
-    border-left:10px solid transparent;
-    border-right:10px solid transparent;
-    border-top:15px solid #000;
-    cursor:pointer;
-}
-
-#selectedDate {
-    position:absolute;
-    top:5px;
-    width:100%;
-    text-align:center;
-    font-size:18px;
-    font-weight:bold;
-}
-
-#todayPoint {
-    position:absolute;
-    bottom:5px;
-    left:50%;
-    width:12px;
-    height:12px;
-    background:#0066ff;
-    border-radius:50%;
-    cursor:pointer;
-}
-
-#map {
-    height:75vh;
-}
-
-#legend {
-    height:40px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:20px;
-    font-size:14px;
-}
-
-.colorBox {
-    width:15px;
-    height:15px;
-    display:inline-block;
-}
-
-.yellow {
-    background:#f5d76e;
-}
-
-.green {
-    background:#3cb371;
-}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;font-family:Arial,Helvetica,sans-serif;background:#fff}
+body{display:flex;flex-direction:column}
+#topBar{height:90px;background:#fff;border-bottom:1px solid #ddd;position:relative;display:flex;align-items:center;justify-content:center}
+#timelineBox{position:relative;width:94%;height:90px}
+#timelineDate{position:absolute;top:4px;left:0;width:100%;text-align:center;font-size:18px;font-weight:700;color:#222}
+#timelineArrow{position:absolute;top:26px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:16px solid #444;transform:translateX(-50%);cursor:pointer;z-index:20}
+#timeline{position:absolute;left:0;right:0;top:48px;height:4px;background:#cfcfcf;border-radius:2px}
+#timelineTicks{position:absolute;left:0;right:0;top:42px;height:18px}
+.tick{position:absolute;width:1px;height:14px;background:#888}
+#todayBtn{position:absolute;left:50%;bottom:4px;width:12px;height:12px;background:#1976d2;border-radius:50%;transform:translateX(-50%);cursor:pointer}
+#map{flex:1}
+#bottomBar{height:42px;border-top:1px solid #ddd;background:#fff;display:flex;align-items:center;justify-content:center;gap:18px;font-size:14px}
+.legendItem{display:flex;align-items:center;gap:6px}
+.legendColor{width:16px;height:16px;border-radius:2px}
+#info{font-weight:700}
 </style>
+
 </head>
+
 <body>
-<div id="timelineContainer">
-    <div id="selectedDate"></div>
-    <div id="timeline"></div>
-    <div id="cursor"></div>
-    <div id="todayPoint"></div>
+
+<div id="topBar">
+<div id="timelineBox">
+<div id="timelineDate"></div>
+<div id="timelineArrow"></div>
+<div id="timeline"></div>
+<div id="timelineTicks"></div>
+<div id="todayBtn"></div>
 </div>
+</div>
+
 <div id="map"></div>
-<div id="legend">
-    <span>
-        <span class="colorBox yellow"></span>
-        Previsto
-    </span>
-    <span>
-        <span class="colorBox green"></span>
-        Attivo
-    </span>
-    <span id="info">
-        Comuni attivi: 0/0 - Copertura: 0%
-    </span>
+
+<div id="bottomBar">
+<div class="legendItem"><span class="legendColor" style="background:#f5d76e"></span><span>Previsto</span></div>
+<div class="legendItem"><span class="legendColor" style="background:#4caf50"></span><span>Attivo</span></div>
+<div id="info">Comuni attivi: 0/0 - Copertura: 0%</div>
 </div>
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script type="module">
+
 import { requireAuth } from './auth-check.js';
 await requireAuth();
+
 import { supabase } from '../supabase.js';
 
-// DATI GLOBALI
-let comuni = [];
-let province = [];
-let regioni = [];
-let stati = [];
-let livello = "stato";
-let dataSelezionata = new Date();
-let layerCorrente = null;
-
-// MAPPA
-const mapStyles = [
-{
-    name:"Basic",
-    url:"https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png",
-    options:{
-        attribution:"&copy; OpenStreetMap & CARTO",
-        subdomains:"abcd",
-        maxZoom:19
-    }
+const MAPSTYLE={
+name:"Basic",
+url:"https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png",
+options:{
+attribution:"&copy; OpenStreetMap & CARTO",
+subdomains:"abcd",
+maxZoom:19
 }
-];
-
-const map = L.map('map')
-.setView([41.9,12.5],6);
-
-L.tileLayer(
-    mapStyles[0].url,
-    mapStyles[0].options
-).addTo(map);
-
-// CARICAMENTO DATI
-async function loadData(){
-    let c = await supabase
-    .from("comuni")
-    .select("*");
-    comuni = c.data || [];
-    let p = await supabase
-    .from("province")
-    .select("*");
-    province = p.data || [];
-    let r = await supabase
-    .from("regioni")
-    .select("*");
-    regioni = r.data || [];
-    let s = await supabase
-    .from("stati")
-    .select("*");
-    stati = s.data || [];
-    inizializzaTimeline();
-}
-
-// STATO COMUNE
-function statoComune(comune){
-    if(!dataSelezionata)
-        return null;
-    let mese =
-    new Date(
-        dataSelezionata.getFullYear(),
-        dataSelezionata.getMonth(),
-        1
-    );
-    if(
-        comune.co_attivato &&
-        new Date(comune.co_attivato) <= mese
-    ){
-        return "attivo";
-    }
-    if(
-        comune.co_previsto &&
-        new Date(comune.co_previsto) <= mese
-    ){
-        return "previsto";
-    }
-    return null;
-}
-
-// STATISTICHE
-function aggiornaStatistiche(lista){
-    let totale = lista.length;
-    let attivi =
-    lista.filter(c =>
-        statoComune(c)==="attivo"
-    ).length;
-    let perc =
-    totale ?
-    ((attivi/totale)*100).toFixed(1)
-    :
-    0;
-    document.getElementById("info").textContent =
-    `Comuni attivi: ${attivi}/${totale} - Copertura: ${perc}%`;
-}
-
-const geoJsonSources = {
-    regioni: "URL_REGIONI_GEOJSON",
-    province: "URL_PROVINCE_GEOJSON",
-    comuni: "URL_COMUNI_GEOJSON"
 };
-    
-// GEOJSON
-let livelloCorrente = "regioni";
-let storicoLivelli = [];
-let geoLayer = null;
 
-// CARICAMENTO GEOJSON
-async function loadGeoJsonLivello(tipo, codicePadre = null){
-    let url;
-    if(tipo==="regioni"){
-        url = GEOJSON_REGIONI;
-    }
-    if(tipo==="province"){
-        url = GEOJSON_PROVINCE;
-    }
-    if(tipo==="comuni"){
-        url = GEOJSON_COMUNI;
-    }
-    const res = await fetch(url);
-    const data = await res.json();
-    if(!codicePadre)
-        return data;
-    return {
-        type:"FeatureCollection",
-        features:
-        data.features.filter(f=>{
-            if(tipo==="province")
-                return f.properties.REGIONE === codicePadre;
-            if(tipo==="comuni")
-                return f.properties.PROVINCIA === codicePadre;
-        })
-    };
+const COLORS={
+gray:"#d9d9d9",
+yellow:"#f5d76e",
+green:"#4caf50",
+borderYellow:"#e4d56b",
+borderGreen:"#2e8b57",
+selected:"#1976d2"
+};
+
+const APP={
+db:{
+stati:[],
+regioni:[],
+province:[],
+comuni:[]
+},
+map:null,
+baseLayer:null,
+labelsLayer:null,
+geoLayer:null,
+timeline:[],
+timelineIndex:0,
+timelineDate:null,
+navigation:[],
+currentLevel:"regioni",
+currentRegion:null,
+currentProvince:null,
+cache:{
+geojson:{}
+}
+};
+APP.map=L.map("map",{zoomControl:true,doubleClickZoom:false}).setView([41.9,12.5],6);
+
+APP.baseLayer=L.tileLayer(MAPSTYLE.url,MAPSTYLE.options).addTo(APP.map);
+
+async function loadDB(){
+let r=await Promise.all([
+supabase.from("stato").select("*"),
+supabase.from("regione").select("*"),
+supabase.from("provincia").select("*"),
+supabase.from("comuni").select("*")
+]);
+APP.db.stati=r[0].data||[];
+APP.db.regioni=r[1].data||[];
+APP.db.province=r[2].data||[];
+APP.db.comuni=r[3].data||[];
 }
 
-layer.on("click",()=>{
-    if(tipo==="regioni"){
-        storico.push({
-            livello:"regioni",
-            codice:null
-        });
-        elementoCorrente =
-        feature.properties.COD_REG;
-        mostraLivello(
-            "province",
-            elementoCorrente
-        );
-    }
-    if(tipo==="province"){
-        storico.push({
-            livello:"province",
-            codice:
-            elementoCorrente
-        });
-        elementoCorrente =
-        feature.properties.COD_PRO;
-        mostraLivello(
-            "comuni",
-            elementoCorrente
-        );
-    }
+function buildTimeline(){
+let d=[];
+APP.db.comuni.forEach(c=>{
+if(c.co_previsto)d.push(new Date(c.co_previsto));
+if(c.co_attivato)d.push(new Date(c.co_attivato));
 });
-    
-// STILE ELEMENTI
-function stileElemento(feature, tipo) {
-    let codice;
-    if(tipo==="comuni"){
-        codice =
-        feature.properties.co_istat ||
-        feature.properties.PRO_COM;
-    }
-    if(tipo==="province"){
-        codice =
-        feature.properties.pr_istat ||
-        feature.properties.COD_PRO;
-    }
-    if(tipo==="regioni"){
-        codice =
-        feature.properties.rg_codice ||
-        feature.properties.COD_REG;
-    }
-    let comuniElemento =
-    comuni.filter(c=>{
-        if(tipo==="comuni")
-            return c.co_istat==codice;
-        if(tipo==="province")
-            return c.id_provincia==codice;
-        if(tipo==="regioni")
-            return c.id_regione==codice;
-    });
-    let attivi =
-    comuniElemento.filter(c=>
-        statoComune(c)==="attivo"
-    );
-    let previsti =
-    comuniElemento.filter(c=>
-        statoComune(c)==="previsto"
-    );
-    let colore="#999";
-    if(attivi.length)
-        colore="#3cb371";
-    else if(previsti.length)
-        colore="#f5d76e";
-    return {
-        color:colore,
-        weight:
-        attivi.length===comuniElemento.length &&
-        comuniElemento.length>0
-        ?
-        3
-        :
-        2,
-        fillColor:colore,
-        fillOpacity:
-        tipo==="comuni"
-        ?
-        0.65
-        :
-        0.15
-    };
+if(!d.length){
+APP.timeline=[new Date()];
+APP.timelineIndex=0;
+APP.timelineDate=new Date();
+updateTimeline();
+return;
+}
+d.sort((a,b)=>a-b);
+let start=new Date(d[0].getFullYear(),d[0].getMonth(),1);
+let end=new Date(d[d.length-1].getFullYear(),d[d.length-1].getMonth(),1);
+APP.timeline=[];
+let cur=new Date(start);
+while(cur<=end){
+APP.timeline.push(new Date(cur));
+cur.setMonth(cur.getMonth()+1);
+}
+let today=new Date();
+APP.timelineIndex=APP.timeline.findIndex(v=>v.getMonth()==today.getMonth()&&v.getFullYear()==today.getFullYear());
+if(APP.timelineIndex<0)APP.timelineIndex=0;
+APP.timelineDate=APP.timeline[APP.timelineIndex];
+updateTimeline();
 }
 
-// DISEGNA LIVELLO
-async function mostraLivello(tipo){
-    if(geoLayer)
-        map.removeLayer(geoLayer);
-    const geojson =
-    await loadGeoJsonLivello(tipo);
-    geoLayer =
-    L.geoJSON(
-        geojson,
-        {
-        style:function(feature){
-            return stileElemento(
-                feature,
-                tipo
-            );
-        },
-        onEachFeature:function(feature,layer){
-            layer.on({
-                click:function(e){
-                    L.DomEvent.stopPropagation(e);
-                    if(tipo==="regioni"){
-                        storicoLivelli.push("regioni");
-                        mostraLivello("province");
-                    }
-                    else if(tipo==="province"){
-                        storicoLivelli.push("province");
-                        mostraLivello("comuni");
-                    }
-                },
-                dblclick:function(){
-                    /*
-                       qui verrà inserita
-                       apertura pagina dettaglio
-                    */
-                }
-            });
-        }
-        }
-    )
-    .addTo(map);
-    livelloCorrente=tipo;
-    map.fitBounds(
-        geoLayer.getBounds()
-    );
+function updateTimeline(){
+let d=APP.timelineDate;
+let m=String(d.getMonth()+1).padStart(2,"0");
+let y=String(d.getFullYear()).slice(-2);
+document.getElementById("timelineDate").textContent=`${m}/${y}`;
+let ticks=document.getElementById("timelineTicks");
+ticks.innerHTML="";
+let w=ticks.clientWidth;
+let step=APP.timeline.length>1?w/(APP.timeline.length-1):0;
+APP.timeline.forEach((v,i)=>{
+let t=document.createElement("div");
+t.className="tick";
+t.style.left=(i*step)+"px";
+ticks.appendChild(t);
+});
+let arrow=document.getElementById("timelineArrow");
+arrow.style.left=(APP.timelineIndex*step)+"px";
 }
 
-// RITORNO LIVELLO
-map.on(
-"click",
-function(){
-    if(storicoLivelli.length){
-        let precedente =
-        storicoLivelli.pop();
-        mostraLivello(precedente);
-    }
+document.getElementById("timeline").addEventListener("click",e=>{
+let r=e.target.getBoundingClientRect();
+let x=e.clientX-r.left;
+let i=Math.round((x/r.width)*(APP.timeline.length-1));
+if(i<0)i=0;
+if(i>=APP.timeline.length)i=APP.timeline.length-1;
+APP.timelineIndex=i;
+APP.timelineDate=APP.timeline[i];
+updateTimeline();
+refreshMap();
 });
 
+document.getElementById("todayBtn").addEventListener("click",()=>{
+let t=new Date();
+let i=APP.timeline.findIndex(v=>v.getMonth()==t.getMonth()&&v.getFullYear()==t.getFullYear());
+if(i>=0){
+APP.timelineIndex=i;
+APP.timelineDate=APP.timeline[i];
+updateTimeline();
+refreshMap();
+}
+});
 
-// TIMELINE
-function inizializzaTimeline(){
-    let date=[];
-    comuni.forEach(c=>{
-        if(c.co_previsto)
-            date.push(new Date(c.co_previsto));
-        if(c.co_attivato)
-            date.push(new Date(c.co_attivato));
-    });
-    if(date.length){
-        date.sort(
-            (a,b)=>a-b
-        );
-        dataSelezionata=date[0];
-    }
-    aggiornaData();
+async function init(){
+await loadDB();
+buildTimeline();
+await loadRegions();
 }
 
-function aggiornaData(){
-    let m =
-    String(dataSelezionata.getMonth()+1)
-    .padStart(2,"0");
-    let y =
-    String(dataSelezionata.getFullYear())
-    .slice(-2);
-    document.getElementById("selectedDate")
-    .textContent =
-    `${m}/${y}`;
+init();
+function getComuneState(c){
+if(!APP.timelineDate)return null;
+let d=new Date(APP.timelineDate.getFullYear(),APP.timelineDate.getMonth(),1);
+let att=c.co_attivato?new Date(c.co_attivato):null;
+let prev=c.co_previsto?new Date(c.co_previsto):null;
+if(att&&att<=d)return "active";
+if(prev&&prev<=d)return "planned";
+return null;
 }
 
-// esempio spostamento mensile
-document.getElementById("timeline")
-.onclick=function(){
-    dataSelezionata.setMonth(
-        dataSelezionata.getMonth()+1
-    );
-    aggiornaData();
+function getComuniByProvincia(id){
+return APP.db.comuni.filter(c=>c.id_provincia==id);
+}
+
+function getComuniByRegione(id){
+let p=APP.db.province.filter(x=>x.id_regione==id).map(x=>x.id_provincia);
+return APP.db.comuni.filter(c=>p.includes(c.id_provincia));
+}
+
+function getProvinceByRegione(id){
+return APP.db.province.filter(p=>p.id_regione==id);
+}
+
+function getCoverage(list){
+let total=list.length;
+let active=list.filter(c=>getComuneState(c)=="active").length;
+let planned=list.filter(c=>getComuneState(c)=="planned").length;
+return {
+total:total,
+active:active,
+planned:planned,
+percent:total?((active/total)*100).toFixed(1):0
+};
+}
+
+function getElementStatus(list){
+let data=getCoverage(list);
+if(!data.total)return "none";
+if(data.active===data.total)return "complete";
+if(data.active>0)return "active";
+if(data.planned>0)return "planned";
+return "none";
+}
+
+function getLevelComuni(level,id){
+if(level==="regioni")return getComuniByRegione(id);
+if(level==="province")return getComuniByProvincia(id);
+if(level==="comuni")return APP.db.comuni.filter(c=>c.co_istat==id);
+return [];
+}
+
+function updateInfo(list){
+let c=getCoverage(list);
+document.getElementById("info").textContent=`Comuni attivi: ${c.active}/${c.total} - Copertura: ${c.percent}%`;
+}
+
+function getStyleByCoverage(list){
+let state=getElementStatus(list);
+if(state==="complete"){
+return {
+color:COLORS.borderGreen,
+weight:3,
+fillColor:COLORS.green,
+fillOpacity:.25
+};
+}
+if(state==="active"){
+return {
+color:COLORS.borderYellow,
+weight:2,
+fillColor:COLORS.green,
+fillOpacity:.18
+};
+}
+if(state==="planned"){
+return {
+color:COLORS.borderYellow,
+weight:2,
+fillColor:COLORS.yellow,
+fillOpacity:.18
+};
+}
+return {
+color:COLORS.gray,
+weight:1,
+fillColor:COLORS.gray,
+fillOpacity:.05
+};
+}
+function updateStatistics(){
+let list=[];
+if(APP.currentLevel==="regioni"&&APP.currentRegion){
+list=getComuniByRegione(APP.currentRegion);
+}
+else if(APP.currentLevel==="province"&&APP.currentProvince){
+list=getComuniByProvincia(APP.currentProvince);
+}
+else if(APP.currentLevel==="comuni"&&APP.currentProvince){
+list=getComuniByProvincia(APP.currentProvince);
+}
+else{
+list=APP.db.comuni;
+}
+updateInfo(list);
+}
+
+function getRegionData(id){
+let region=APP.db.regioni.find(r=>r.id_regione==id);
+if(!region)return null;
+return {
+id:region.id_regione,
+name:region.rg_descrizione,
+comuni:getComuniByRegione(region.id_regione)
+};
+}
+
+function getProvinceData(id){
+let province=APP.db.province.find(p=>p.id_provincia==id);
+if(!province)return null;
+return {
+id:province.id_provincia,
+name:province.pr_descrizione,
+comuni:getComuniByProvincia(province.id_provincia)
+};
+}
+
+function getComuneData(id){
+let comune=APP.db.comuni.find(c=>c.co_istat==id);
+if(!comune)return null;
+return {
+id:comune.co_istat,
+name:comune.co_descrizione,
+comuni:[comune]
+};
+}
+
+function getGeoStyle(type,id){
+let list=[];
+if(type==="regioni"){
+list=getComuniByRegione(id);
+}
+if(type==="province"){
+list=getComuniByProvincia(id);
+}
+if(type==="comuni"){
+list=getComuniByProvincia(APP.currentProvince)
+.filter(c=>c.co_istat==id);
+}
+return getStyleByCoverage(list);
+}
+
+function refreshMap(){
+if(!APP.geoLayer)return;
+APP.geoLayer.eachLayer(layer=>{
+let p=layer.feature.properties;
+let id=null;
+if(APP.currentLevel==="regioni"){
+id=p.reg_istat_code_num||p.COD_REG;
+}
+if(APP.currentLevel==="province"){
+id=p.prov_istat_code_num||p.COD_PRO;
+}
+if(APP.currentLevel==="comuni"){
+id=p.com_istat_code_num||p.PRO_COM;
+}
+if(id!=null){
+layer.setStyle(getGeoStyle(APP.currentLevel,id));
+}
+});
+updateStatistics();
+}
+
+function resetStatistics(){
+document.getElementById("info").textContent="Comuni attivi: 0/0 - Copertura: 0%";
+}
+
+function setCurrentLevel(level,id=null){
+APP.currentLevel=level;
+APP.currentRegion=null;
+APP.currentProvince=null;
+if(level==="regioni"){
+APP.currentRegion=null;
+APP.currentProvince=null;
+}
+if(level==="province"){
+APP.currentRegion=id;
+}
+if(level==="comuni"){
+APP.currentProvince=id;
+}
+}
+
+function getRegionIdFromFeature(f){
+return f.properties.reg_istat_code_num||
+f.properties.COD_REG||
+f.properties.rg_codice||
+null;
+}
+
+function getProvinceIdFromFeature(f){
+return f.properties.prov_istat_code_num||
+f.properties.COD_PRO||
+f.properties.pr_istat||
+null;
+}
+
+function getComuneIdFromFeature(f){
+return f.properties.com_istat_code_num||
+f.properties.PRO_COM||
+f.properties.co_istat||
+null;
+}
+
+function prepareRegions(){
+return APP.db.regioni.map(r=>{
+return {
+id:r.id_regione,
+name:r.rg_descrizione,
+comuni:getComuniByRegione(r.id_regione)
+};
+});
+}
+
+function prepareProvinces(idRegione){
+return APP.db.province
+.filter(p=>p.id_regione==idRegione)
+.map(p=>{
+return {
+id:p.id_provincia,
+name:p.pr_descrizione,
+comuni:getComuniByProvincia(p.id_provincia)
+};
+});
+}
+
+function prepareMunicipalities(idProvincia){
+return APP.db.comuni
+.filter(c=>c.id_provincia==idProvincia)
+.map(c=>{
+return {
+id:c.co_istat,
+name:c.co_descrizione,
+comune:c
+};
+});
+}
+
+function calculateBorder(type,id){
+let list=[];
+if(type==="regioni"){
+list=getComuniByRegione(id);
+}
+if(type==="province"){
+list=getComuniByProvincia(id);
+}
+if(type==="comuni"){
+list=APP.db.comuni.filter(c=>c.co_istat==id);
+}
+let status=getCoverage(list);
+return status.total>0&&status.active===status.total?COLORS.borderGreen:status.active||status.planned?COLORS.borderYellow:COLORS.gray;
+}
+
+function refreshCurrentData(){
+refreshMap();
+updateStatistics();
+}
+
+window.addEventListener("resize",()=>{
+updateTimeline();
+});
+
+const GEOJSON={
+regioni:"URL_GEOJSON_REGIONI",
+province:"URL_GEOJSON_PROVINCE",
+comuni:"URL_GEOJSON_COMUNI"
 };
 
-// reset oggi
-document.getElementById("todayPoint")
-.onclick=function(){
-    dataSelezionata=new Date();
-    aggiornaData();
-};
+async function loadGeoJSON(type){
+if(APP.cache.geojson[type])return APP.cache.geojson[type];
+let r=await fetch(GEOJSON[type]);
+let j=await r.json();
+APP.cache.geojson[type]=j;
+return j;
+}
 
-loadData();
+function filterGeoJSON(data,type,id){
+if(!id)return data;
+let features=data.features.filter(f=>{
+if(type==="province"){
+return (f.properties.reg_istat_code_num||f.properties.COD_REG)==id;
+}
+if(type==="comuni"){
+return (f.properties.prov_istat_code_num||f.properties.COD_PRO)==id;
+}
+return true;
+});
+return {
+type:"FeatureCollection",
+features:features
+};
+}
+
+async function loadRegions(){
+setCurrentLevel("regioni");
+let data=await loadGeoJSON("regioni");
+drawLayer(data,"regioni");
+}
+
+async function loadProvinces(id){
+setCurrentLevel("province",id);
+let data=await loadGeoJSON("province");
+data=filterGeoJSON(data,"province",id);
+drawLayer(data,"province");
+}
+
+async function loadMunicipalities(id){
+setCurrentLevel("comuni",id);
+let data=await loadGeoJSON("comuni");
+data=filterGeoJSON(data,"comuni",id);
+drawLayer(data,"comuni");
+}
+
+function drawLayer(data,type){
+if(APP.geoLayer){
+APP.map.removeLayer(APP.geoLayer);
+}
+APP.geoLayer=L.geoJSON(data,{
+style:function(feature){
+let id;
+if(type==="regioni")id=getRegionIdFromFeature(feature);
+if(type==="province")id=getProvinceIdFromFeature(feature);
+if(type==="comuni")id=getComuneIdFromFeature(feature);
+return getGeoStyle(type,id);
+},
+onEachFeature:function(feature,layer){
+layer.on({
+click:function(e){
+L.DomEvent.stopPropagation(e);
+handleClick(type,feature,layer);
+},
+dblclick:function(){
+handleDoubleClick(type,feature);
+},
+mouseover:function(){
+layer.setStyle({
+weight:3
+});
+},
+mouseout:function(){
+refreshMap();
+}
+});
+}
+}).addTo(APP.map);
+APP.map.fitBounds(APP.geoLayer.getBounds());
+updateStatistics();
+}
+
+function handleClick(type,feature,layer){
+if(type==="regioni"){
+let id=getRegionIdFromFeature(feature);
+APP.navigation.push({
+level:"regioni",
+id:null
+});
+loadProvinces(id);
+}
+else if(type==="province"){
+let id=getProvinceIdFromFeature(feature);
+APP.navigation.push({
+level:"province",
+id:APP.currentRegion
+});
+loadMunicipalities(id);
+}
+else if(type==="comuni"){
+let id=getComuneIdFromFeature(feature);
+updateInfo(
+APP.db.comuni.filter(c=>c.co_istat==id)
+);
+}
+}
+
+APP.map.on("click",function(){
+if(!APP.navigation.length)return;
+let last=APP.navigation.pop();
+if(last.level==="regioni"){
+loadRegions();
+}
+else if(last.level==="province"){
+loadProvinces(last.id);
+}
+});
+
+APP.map.on("dblclick",function(e){
+L.DomEvent.stopPropagation(e);
+});
+
+function goBack(){
+let last=APP.navigation.pop();
+if(!last)return;
+if(last.level==="regioni"){
+loadRegions();
+}
+if(last.level==="province"){
+loadProvinces(last.id);
+}
+}
+
+function setTimelineDate(index){
+if(index<0||index>=APP.timeline.length)return;
+APP.timelineIndex=index;
+APP.timelineDate=APP.timeline[index];
+updateTimeline();
+refreshCurrentData();
+}
+
+function moveTimeline(step){
+let i=APP.timelineIndex+step;
+setTimelineDate(i);
+}
+
+document.getElementById("timelineArrow").addEventListener("click",()=>{
+moveTimeline(1);
+});
+
+function updateLayers(){
+if(!APP.geoLayer)return;
+APP.geoLayer.eachLayer(layer=>{
+let feature=layer.feature;
+let id=null;
+if(APP.currentLevel==="regioni"){
+id=getRegionIdFromFeature(feature);
+}
+if(APP.currentLevel==="province"){
+id=getProvinceIdFromFeature(feature);
+}
+if(APP.currentLevel==="comuni"){
+id=getComuneIdFromFeature(feature);
+}
+if(id!==null){
+layer.setStyle(getGeoStyle(APP.currentLevel,id));
+}
+});
+}
+
+function refreshMap(){
+updateLayers();
+updateStatistics();
+}
+
+function openDetail(type,id){
+/*
+collegamento futuro:
+stato.html
+regione.html
+provincia.html
+comune.html
+*/
+}
+
+function handleDoubleClick(type,feature){
+let id=null;
+if(type==="regioni"){
+id=getRegionIdFromFeature(feature);
+}
+if(type==="province"){
+id=getProvinceIdFromFeature(feature);
+}
+if(type==="comuni"){
+id=getComuneIdFromFeature(feature);
+}
+openDetail(type,id);
+}
+
+window.loadRegions=loadRegions;
+window.loadProvinces=loadProvinces;
+window.loadMunicipalities=loadMunicipalities;    
 
 </script>
 </body>
 </html>
+    
