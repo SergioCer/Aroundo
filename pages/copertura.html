@@ -610,16 +610,6 @@ if(type==="comuni")id=getComuneIdFromFeature(feature);
 layer.setStyle(getGeoStyle(type,id));
 }
 
-mouseout:function(){
-refreshMap();
-}
-});
-}
-}).addTo(APP.map);
-APP.map.fitBounds(APP.geoLayer.getBounds());
-updateStatistics();
-}
-
 function handleClick(type,feature,layer){
 if(type==="regioni"){
 let id=getRegionIdFromFeature(feature);
