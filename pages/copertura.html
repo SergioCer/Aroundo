@@ -255,10 +255,18 @@ return"none";
 }    
 
 // Stato della Provincia
-function getProvinciaState(idProvincia){
-let comuni=getComuniByProvincia(idProvincia);
+function getProvinciaState(id){
+let provincia=APP.db.province.find(
+p=>p.pr_istat==id||p.id_provincia==id
+);
+if(!provincia)return"none";
+let comuni=APP.db.comuni.filter(
+c=>c.id_provincia==provincia.id_provincia
+);
 if(!comuni.length)return"none";
-let attivi=comuni.filter(c=>getComuneState(c)=="active").length;
+let attivi=comuni.filter(
+c=>getComuneState(c)=="active"
+).length;
 let coperti=comuni.filter(c=>{
 let s=getComuneState(c);
 return s=="active"||s=="planned";
@@ -266,7 +274,7 @@ return s=="active"||s=="planned";
 if(attivi===comuni.length)return"complete";
 if(coperti>0)return"planned";
 return"none";
-}    
+}
 
 // Stato della Regione
 function getRegioneState(id){
