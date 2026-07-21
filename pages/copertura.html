@@ -322,17 +322,9 @@ return"none";
 function getComuneStyle(idComune){
 let comune=APP.db.comuni.find(c=>c.co_istat==idComune);
         // CANCELLARE
-        console.log(
-            "ID GEOJSON:",
-            idComune,
-            "COMUNE TROVATO:",
-            comune?.co_descrizione,
-            "ATTIVO:",
-            comune?.co_attivato,
-            "PREVISTO:",
-            comune?.co_previsto
-            );
-            // ***** FINO A QUI
+        console.log("ID GEOJSON:", idComune, "COMUNE TROVATO:", comune?.co_descrizione, "ATTIVO:", comune?.co_attivato, "PREVISTO:", comune?.co_previsto);
+        console.log("GeoJSON:",feature.properties.name,"ID:",id,"DB:",comune?.co_descrizione);
+        // ***** FINO A QUI
 if(!comune){
 return{
 color:"#4a90c2",
@@ -587,7 +579,6 @@ if(type==="province")id=getProvinceIdFromFeature(feature);
 // if(type==="comuni")id=getComuneIdFromFeature(feature);
 if(type==="comuni"){
 console.log(feature.properties);
-console.log("GeoJSON:",feature.properties.name,"ID:",id,"DB:",comune?.co_descrizione);
 id=getComuneIdFromFeature(feature);
 }
 return getGeoStyle(type,id);
