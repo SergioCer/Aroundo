@@ -194,6 +194,37 @@ await loadRegions();
 }
 
 init();
+
+function normalizeComuneName(value){
+return value
+.toLowerCase()
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"")
+.trim();
+}
+
+function getComuneFromFeature(feature){
+let nome=normalizeComuneName(
+feature.properties.name
+);
+let provincia=normalizeComuneName(
+feature.properties.prov_name
+);
+return APP.db.comuni.find(c=>{
+let nomeDB=normalizeComuneName(
+c.co_descrizione
+);
+let p=APP.db.province.find(
+x=>x.id_provincia==c.id_provincia
+);
+if(!p)return false;
+let provinciaDB=normalizeComuneName(
+p.pr_descrizione
+);
+return nomeDB===nome && provinciaDB===provincia;
+});
+}    
+    
     
 function getComuniByProvincia(id){
 let provincia=APP.db.province.find(
@@ -320,9 +351,10 @@ return"none";
 
 // Stile del Comune
 function getComuneStyle(idComune){
-let comune=APP.db.comuni.find(c=>c.co_istat==idComune);
+let comune=getComuneFromFeature(feature);
         // CANCELLARE
-        console.log("ID GEOJSON:", idComune, "COMUNE TROVATO:", comune?.co_descrizione, "ATTIVO:", comune?.co_attivato, "PREVISTO:", comune?.co_previsto);
+        // let comune=APP.db.comuni.find(c=>c.co_istat==idComune);
+        // console.log("ID GEOJSON:", idComune, "COMUNE TROVATO:", comune?.co_descrizione, "ATTIVO:", comune?.co_attivato, "PREVISTO:", comune?.co_previsto);
         // ***** FINO A QUI
 if(!comune){
 return{
@@ -494,7 +526,7 @@ return f.properties.prov_istat_code_num||
 f.properties.COD_PRO||
 f.properties.pr_istat||
 null;
-console.log("GeoJSON:",feature.properties.name,"ID:",id,"DB:",comune?.co_descrizione);
+// console.log("GeoJSON:",feature.properties.name,"ID:",id,"DB:",comune?.co_descrizione);
 }
 
 function getComuneIdFromFeature(f){
@@ -578,7 +610,7 @@ if(type==="province")id=getProvinceIdFromFeature(feature);
 // CANCELLARE Sostituita temporaneamente la riga di sopra con le 4 righe di sotto
 // if(type==="comuni")id=getComuneIdFromFeature(feature);
 if(type==="comuni"){
-console.log(feature.properties);
+// console.log(feature.properties);
 id=getComuneIdFromFeature(feature);
 }
 return getGeoStyle(type,id);
