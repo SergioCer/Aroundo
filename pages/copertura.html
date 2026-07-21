@@ -245,14 +245,18 @@ updateInfo(list);
 
 // Stato del Comune
 function getComuneState(comune){
-let oggi=new Date();
-oggi=new Date(oggi.getFullYear(),oggi.getMonth(),1);
+let riferimento=APP.timelineDate||new Date();
+let fineMese=new Date(
+riferimento.getFullYear(),
+riferimento.getMonth()+1,
+0
+);
 let att=comune.co_attivato?new Date(comune.co_attivato):null;
 let prev=comune.co_previsto?new Date(comune.co_previsto):null;
-if(att&&att<=oggi)return"active";
-if(prev&&prev<=oggi)return"planned";
+if(att&&att<=fineMese)return"active";
+if(prev&&prev<=fineMese)return"planned";
 return"none";
-}    
+}  
 
 // Stato della Provincia
 function getProvinciaState(id){
