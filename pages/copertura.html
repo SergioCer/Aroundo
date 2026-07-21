@@ -506,10 +506,16 @@ null;
 }
 
 function getComuneIdFromFeature(f){
-return f.properties.com_istat_code_num||
-f.properties.PRO_COM||
-f.properties.co_istat||
+let p=f.properties;
+let id=
+p.com_istat_code_num||
+p.com_istat||
+p.PRO_COM||
 null;
+if(id!==null){
+id=Number(id);
+}
+return id;
 }
 
 window.addEventListener("resize",()=>{
@@ -581,6 +587,7 @@ if(type==="province")id=getProvinceIdFromFeature(feature);
 // if(type==="comuni")id=getComuneIdFromFeature(feature);
 if(type==="comuni"){
 console.log(feature.properties);
+console.log("GeoJSON:",feature.properties.name,"ID:",id,"DB:",comune?.co_descrizione);
 id=getComuneIdFromFeature(feature);
 }
 return getGeoStyle(type,id);
