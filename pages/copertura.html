@@ -243,16 +243,6 @@ list=APP.db.comuni;
 updateInfo(list);
 }
 
-function getComuneData(id){
-let comune=APP.db.comuni.find(c=>c.co_istat==id);
-if(!comune)return null;
-return {
-id:comune.co_istat,
-name:comune.co_descrizione,
-comuni:[comune]
-};
-}
-
 // Stato del Comune
 function getComuneState(comune){
 let oggi=new Date();
@@ -492,45 +482,6 @@ f.properties.co_istat||
 null;
 }
 
-function prepareRegions(){
-return APP.db.regioni.map(r=>{
-return {
-id:r.id_regione,
-name:r.rg_descrizione,
-comuni:getComuniByRegione(r.id_regione)
-};
-});
-}
-
-function prepareProvinces(idRegione){
-return APP.db.province
-.filter(p=>p.id_regione==idRegione)
-.map(p=>{
-return {
-id:p.id_provincia,
-name:p.pr_descrizione,
-comuni:getComuniByProvincia(p.id_provincia)
-};
-});
-}
-
-function prepareMunicipalities(idProvincia){
-return APP.db.comuni
-.filter(c=>c.id_provincia==idProvincia)
-.map(c=>{
-return {
-id:c.co_istat,
-name:c.co_descrizione,
-comune:c
-};
-});
-}
-
-function refreshCurrentData(){
-refreshMap();
-updateStatistics();
-}
-
 window.addEventListener("resize",()=>{
 updateTimeline();
 });
@@ -697,26 +648,6 @@ setTimelineDate(i);
 document.getElementById("timelineArrow").addEventListener("click",()=>{
 moveTimeline(1);
 });
-
-function updateLayers(){
-if(!APP.geoLayer)return;
-APP.geoLayer.eachLayer(layer=>{
-let feature=layer.feature;
-let id=null;
-if(APP.currentLevel==="regioni"){
-id=getRegionIdFromFeature(feature);
-}
-if(APP.currentLevel==="province"){
-id=getProvinceIdFromFeature(feature);
-}
-if(APP.currentLevel==="comuni"){
-id=getComuneIdFromFeature(feature);
-}
-if(id!==null){
-layer.setStyle(getGeoStyle(APP.currentLevel,id));
-}
-});
-}
 
 function openDetail(type,id){
 /*
