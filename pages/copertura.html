@@ -583,7 +583,6 @@ if(type==="comuni"){
 console.log(feature.properties);
 id=getComuneIdFromFeature(feature);
 }
-    
 return getGeoStyle(type,id);
 },
 onEachFeature:function(feature,layer){
@@ -595,7 +594,6 @@ handleClick(type,feature,layer);
 dblclick:function(){
 handleDoubleClick(type,feature);
 },
-
 mouseover:function(){
 layer.setStyle({
 color:"#0057a8",
@@ -608,6 +606,12 @@ if(type==="regioni")id=getRegionIdFromFeature(feature);
 if(type==="province")id=getProvinceIdFromFeature(feature);
 if(type==="comuni")id=getComuneIdFromFeature(feature);
 layer.setStyle(getGeoStyle(type,id));
+}
+});
+}
+}).addTo(APP.map);
+APP.map.fitBounds(APP.geoLayer.getBounds());
+updateStatistics();
 }
 
 function handleClick(type,feature,layer){
