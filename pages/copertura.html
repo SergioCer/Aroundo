@@ -269,20 +269,26 @@ return"none";
 }    
 
 // Stato della Regione
-function getRegioneState(idRegione){
-let provincia=APP.db.province.filter(p=>p.id_regione==idRegione);
-if(!provincia.length)return"none";
+function getRegioneState(id){
+let regione=APP.db.regioni.find(
+r=>r.rg_istat==id||r.id_regione==id
+);
+if(!regione)return"none";
+let province=APP.db.province.filter(
+p=>p.id_regione==regione.id_regione
+);
+if(!province.length)return"none";
 let complete=0;
 let presenti=0;
-provincia.forEach(p=>{
+province.forEach(p=>{
 let s=getProvinciaState(p.id_provincia);
 if(s=="complete")complete++;
 if(s=="complete"||s=="planned")presenti++;
 });
-if(complete===provincia.length)return"complete";
+if(complete===province.length)return"complete";
 if(presenti>0)return"planned";
 return"none";
-}    
+}   
 
 // Stato dello Stato
 function getStatoState(idStato){
