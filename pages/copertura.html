@@ -321,6 +321,18 @@ return"none";
 // Stile del Comune
 function getComuneStyle(idComune){
 let comune=APP.db.comuni.find(c=>c.co_istat==idComune);
+        // CANCELLARE
+        console.log(
+            "ID GEOJSON:",
+            idComune,
+            "COMUNE TROVATO:",
+            comune?.co_descrizione,
+            "ATTIVO:",
+            comune?.co_attivato,
+            "PREVISTO:",
+            comune?.co_previsto
+            );
+            // ***** FINO A QUI
 if(!comune){
 return{
 color:"#4a90c2",
