@@ -323,7 +323,6 @@ function getComuneStyle(idComune){
 let comune=APP.db.comuni.find(c=>c.co_istat==idComune);
         // CANCELLARE
         console.log("ID GEOJSON:", idComune, "COMUNE TROVATO:", comune?.co_descrizione, "ATTIVO:", comune?.co_attivato, "PREVISTO:", comune?.co_previsto);
-        console.log("GeoJSON:",feature.properties.name,"ID:",id,"DB:",comune?.co_descrizione);
         // ***** FINO A QUI
 if(!comune){
 return{
@@ -495,6 +494,7 @@ return f.properties.prov_istat_code_num||
 f.properties.COD_PRO||
 f.properties.pr_istat||
 null;
+console.log("GeoJSON:",feature.properties.name,"ID:",id,"DB:",comune?.co_descrizione);
 }
 
 function getComuneIdFromFeature(f){
