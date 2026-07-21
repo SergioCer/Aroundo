@@ -220,12 +220,13 @@ if(!regione)return[];
 return APP.db.province.filter(p=>p.id_regione==regione.id_regione);
 }
 
-function getLevelComuni(level,id){
+/* CANCELLARE function getLevelComuni(level,id){
 if(level==="regioni")return getComuniByRegione(id);
 if(level==="province")return getComuniByProvincia(id);
 if(level==="comuni")return APP.db.comuni.filter(c=>c.co_istat==id);
 return [];
 }
+CANCELLARE */
 
 function updateInfo(list){
 let c=getCoverage(list);
@@ -250,7 +251,7 @@ list=APP.db.comuni;
 updateInfo(list);
 }
 
-function getRegionData(id){
+/* CANCELLARE function getRegionData(id){
 let region=APP.db.regioni.find(r=>r.rg_istat==id||r.id_regione==id);
 if(!region)return null;
 return {
@@ -259,8 +260,9 @@ name:region.rg_descrizione,
 comuni:getComuniByRegione(region.id_regione)
 };
 }
+CANCELLARE */ 
 
-function getProvinceData(id){
+/* CANCELLARE function getProvinceData(id){
 let province=APP.db.province.find(p=>p.id_provincia==id);
 if(!province)return null;
 return {
@@ -269,6 +271,7 @@ name:province.pr_descrizione,
 comuni:getComuniByProvincia(province.id_provincia)
 };
 }
+CANCELLARE */ 
 
 function getComuneData(id){
 let comune=APP.db.comuni.find(c=>c.co_istat==id);
@@ -553,7 +556,7 @@ comune:c
 });
 }
 
-function calculateBorder(type,id){
+/* CANCELLATE function calculateBorder(type,id){
 let list=[];
 if(type==="regioni"){
 list=getComuniByRegione(id);
@@ -567,6 +570,7 @@ list=APP.db.comuni.filter(c=>c.co_istat==id);
 let status=getCoverage(list);
 return status.total>0&&status.active===status.total?COLORS.borderGreen:status.active||status.planned?COLORS.borderYellow:COLORS.gray;
 }
+CANCELLARE */ 
 
 function refreshCurrentData(){
 refreshMap();
