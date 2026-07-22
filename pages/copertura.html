@@ -302,9 +302,9 @@ return"none";
 
 // Stato della Provincia
 function getProvinciaState(id){
-    console.log("PROVINCIA CONTROLLO:", id);
+    // CANCELLARE console.log("PROVINCIA CONTROLLO:", id);
 let provincia=APP.db.province.find(
-p=>p.pr_istat==id||p.id_provincia==id
+p=>p.pr_istat==id
 );
 if(!provincia)return"none";
 let comuni=APP.db.comuni.filter(
