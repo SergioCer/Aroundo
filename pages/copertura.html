@@ -634,8 +634,20 @@ mouseout:function(){
 let id;
 if(type==="regioni")id=getRegionIdFromFeature(feature);
 if(type==="province")id=getProvinceIdFromFeature(feature);
-if(type==="comuni")id=getComuneIdFromFeature(feature);
-layer.setStyle(getGeoStyle(type,id));
+// if(type==="comuni")id=getComuneIdFromFeature(feature); //Disabilitata temporaneamente
+// layer.setStyle(getGeoStyle(type,id)); //Disabilitata temporaneamente
+// nuova da qui
+if(type==="comuni"){
+    console.log("COMUNE GEOJSON:", feature.properties);
+    return {
+        color:"#4a90c2",
+        weight:1,
+        fillOpacity:0.2,
+        fillColor:"#cccccc"
+    };
+}
+return getGeoStyle(type,id);
+// nuova fino a qui     
 }
 });
 }
