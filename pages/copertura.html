@@ -337,7 +337,7 @@ if(!province.length)return"none";
 let complete=0;
 let presenti=0;
 province.forEach(p=>{
-let s=getProvinciaState(p.id_provincia);
+let s=getProvinciaState(p.pr_istat);
     console.log("REGIONE:", regione.rg_descrizione, "PROVINCIA:", p.pr_descrizione, "STATO:", s);
     
 if(s=="complete")complete++;
