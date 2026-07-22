@@ -351,26 +351,24 @@ return"none";
 
 // Stile del Comune
 function getComuneStyle(idComune){
-console.log(
-    "GEOJSON COMUNE:",
-    feature.properties.name,
-    "|",
-    feature.properties.prov_name,
-    "| ISTAT:",
-    idComune
-);
-return {
-    color:"#4a90c2",
-    weight:1,
-    fillColor:"#cccccc",
-    fillOpacity:0.3
-};
-/*
-let comune=APP.db.comuni.find(
-    c=>c.co_istat==idComune
-);
-*/    
-/* function getComuneStyle(idComune){
+// CANCELLARE visualizza comuni ed istat
+    if(type==="comuni"){
+    id=getComuneIdFromFeature(feature);
+    let comuneDB=APP.db.comuni.find(
+        c=>Number(c.co_istat)===Number(id)
+    );
+    console.log(
+        "JSON:",
+        feature.properties.name,
+        "| ISTAT:",
+        id,
+        " || TAB:",
+        comuneDB?.co_descrizione,
+        "| ISTAT:",
+        comuneDB?.co_istat
+    );
+}
+// CANCELLARE fino a qui    
 let comune=getComuneFromFeature(feature);
         // CANCELLARE
         // let comune=APP.db.comuni.find(c=>c.co_istat==idComune);
@@ -383,7 +381,6 @@ weight:1.5,
 fillColor:"#ffffff",
 fillOpacity:0
 };
-*/
 let s=getComuneState(comune);
 if(s=="active"){
 return{
@@ -408,6 +405,7 @@ fillColor:"#ffffff",
 fillOpacity:0
 };
 }
+}    
 
 
 // Stile della Provincia 
