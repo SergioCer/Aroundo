@@ -319,8 +319,8 @@ Total: ${c.total}
 </span>
 `;
 }
+    
 function updateStatistics(){
-return; // Momentaneamente disabilita la funzione    
 let list=[];
 if(APP.currentLevel==="regioni"&&APP.currentRegion){
 list=getComuniByRegione(APP.currentRegion);
@@ -574,10 +574,6 @@ layer.setStyle(getGeoStyle(APP.currentLevel,id));
 }
 });
 updateStatistics();
-}
-
-function resetStatistics(){
-document.getElementById("info").textContent="Comuni attivi: 0/0 - Copertura: 0%";
 }
 
 function setCurrentLevel(level,id=null){
