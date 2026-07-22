@@ -252,6 +252,29 @@ if(!regione)return[];
 return APP.db.province.filter(p=>p.id_regione==regione.id_regione);
 }
 
+function getCoverage(list){
+
+let result={
+    active:0,
+    planned:0,
+    late:0,
+    total:list.length
+};
+list.forEach(comune=>{
+    let state=getComuneState(comune);
+    if(state==="active"){
+        result.active++;
+    }
+    if(state==="planned"){
+        result.planned++;
+    }
+    if(state==="late"){
+        result.late++;
+    }
+});
+return result;
+}
+    
 function updateInfo(list){
 let c=getCoverage(list);
 document.getElementById("info").textContent=`Comuni attivi: ${c.active}/${c.total} - Copertura: ${c.percent}%`;
