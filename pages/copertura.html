@@ -277,9 +277,48 @@ return result;
     
 function updateInfo(list){
 let c=getCoverage(list);
-document.getElementById("info").textContent=`Comuni attivi: ${c.active}/${c.total} - Copertura: ${c.percent}%`;
+let total=c.total||1;
+let active=Math.round((c.active/total)*100);
+let planned=Math.round((c.planned/total)*100);
+let late=Math.round((c.late/total)*100);
+document.getElementById("info").innerHTML=`
+<span style="
+background:#4caf50;
+padding:4px 10px;
+border-radius:4px;
+color:white;
+font-weight:bold;
+">
+Active: ${c.active} (${active}%)
+</span>
+<span style="
+background:#f5d76e;
+padding:4px 10px;
+border-radius:4px;
+font-weight:bold;
+">
+Planned: ${c.planned} (${planned}%)
+</span>
+<span style="
+background:#e91e63;
+padding:4px 10px;
+border-radius:4px;
+color:white;
+font-weight:bold;
+">
+Delayed: ${c.late} (${late}%)
+</span>
+<span style="
+background:#1976d2;
+padding:4px 10px;
+border-radius:4px;
+color:white;
+font-weight:bold;
+">
+Total: ${c.total}
+</span>
+`;
 }
-
 function updateStatistics(){
 return; // Momentaneamente disabilita la funzione    
 let list=[];
