@@ -17,7 +17,7 @@ body{display:flex;flex-direction:column}
 #timeline{position:absolute;left:0;right:0;top:48px;height:4px;background:#cfcfcf;border-radius:2px}
 #timelineTicks{position:absolute;left:0;right:0;top:42px;height:18px}
 .tick{position:absolute;width:1px;height:14px;background:#888}
-#todayBtn{position:absolute;left:50%;bottom:4px;width:12px;height:12px;background:#1976d2;border-radius:50%;transform:translateX(-50%);cursor:pointer}
+#todayBtn{position:absolute;left:50%;bottom:4px;width:12px;height:12px;background:${COLORS.selected};border-radius:50%;transform:translateX(-50%);cursor:pointer}
 #map{flex:1}
 #bottomBar{height:42px;border-top:1px solid #ddd;background:#fff;display:flex;align-items:center;justify-content:center;gap:18px;font-size:14px}
 .legendItem{display:flex;align-items:center;gap:6px}
@@ -42,8 +42,8 @@ body{display:flex;flex-direction:column}
 <div id="map"></div>
 
 <div id="bottomBar">
-<div class="legendItem"><span class="legendColor" style="background:#f5d76e"></span><span>Previsto</span></div>
-<div class="legendItem"><span class="legendColor" style="background:#4caf50"></span><span>Attivo</span></div>
+<div class="legendItem"><span class="legendColor" style="background:${COLORS.yellow}"></span><span>Previsto</span></div>
+<div class="legendItem"><span class="legendColor" style="background:${COLORS.green}"></span><span>Attivo</span></div>
 <div id="info">Comuni attivi: 0/0 - Copertura: 0%</div>
 </div>
 
@@ -56,6 +56,16 @@ await requireAuth();
 
 import { supabase } from '../supabase.js';
 
+const COLORS={
+gray:"#d9d9d9",
+yellow:"#f5d76e",
+green:"#4caf50",
+borderYellow:"#e4d56b",
+borderGreen:"#2e8b57",
+selected:"#1976d2",
+late:"#e8a0b8"    
+};
+    
 const MAPSTYLE={
 name:"Basic",
 url:"https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png",
@@ -64,15 +74,6 @@ attribution:"&copy; OpenStreetMap & CARTO",
 subdomains:"abcd",
 maxZoom:19
 }
-};
-
-const COLORS={
-gray:"#d9d9d9",
-yellow:"#f5d76e",
-green:"#4caf50",
-borderYellow:"#e4d56b",
-borderGreen:"#2e8b57",
-selected:"#1976d2"
 };
 
 const APP={
@@ -283,7 +284,7 @@ let planned=Math.round((c.planned/total)*100);
 let late=Math.round((c.late/total)*100);
 document.getElementById("info").innerHTML=`
 <span style="
-background:#4caf50;
+background:${COLORS.green}
 padding:4px 10px;
 border-radius:4px;
 color:white;
@@ -292,7 +293,7 @@ font-weight:bold;
 Active: ${c.active} (${active}%)
 </span>
 <span style="
-background:#f5d76e;
+background:${COLORS.yellow}
 padding:4px 10px;
 border-radius:4px;
 font-weight:bold;
@@ -300,7 +301,7 @@ font-weight:bold;
 Planned: ${c.planned} (${planned}%)
 </span>
 <span style="
-background:#e91e63;
+background:${COLORS.late}
 padding:4px 10px;
 border-radius:4px;
 color:white;
@@ -309,7 +310,7 @@ font-weight:bold;
 Delayed: ${c.late} (${late}%)
 </span>
 <span style="
-background:#1976d2;
+background:${COLORS.selected}
 padding:4px 10px;
 border-radius:4px;
 color:white;
