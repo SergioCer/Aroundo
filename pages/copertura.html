@@ -301,6 +301,7 @@ return"none";
 
 // Stato della Provincia
 function getProvinciaState(id){
+    console.log("PROVINCIA CONTROLLO:", id);
 let provincia=APP.db.province.find(
 p=>p.pr_istat==id||p.id_provincia==id
 );
@@ -323,6 +324,7 @@ return"none";
 
 // Stato della Regione
 function getRegioneState(id){
+    console.log("REGIONE CONTROLLO:", id);
 let regione=APP.db.regioni.find(
 r=>r.rg_istat==id||r.id_regione==id
 );
