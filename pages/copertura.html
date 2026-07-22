@@ -23,6 +23,8 @@ body{display:flex;flex-direction:column}
 .legendItem{display:flex;align-items:center;gap:6px}
 .legendColor{width:16px;height:16px;border-radius:2px}
 #info{font-weight:700}
+
+
 </style>
 
 </head>
@@ -42,9 +44,7 @@ body{display:flex;flex-direction:column}
 <div id="map"></div>
 
 <div id="bottomBar">
-<div class="legendItem"><span class="legendColor" style="background:#f5d76e"></span><span>Previsto</span></div>
-<div class="legendItem"><span class="legendColor" style="background:#4caf50"></span><span>Attivo</span></div>
-<div id="info">Comuni attivi: 0/0 - Copertura: 0%</div>
+<div id="info">Total: 0</div>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -287,6 +287,7 @@ document.getElementById("info").innerHTML=`
 background:${COLORS.green};
 padding:4px 10px;
 border-radius:4px;
+margin-right:6px;
 color:white;
 font-weight:bold;
 ">
@@ -296,6 +297,7 @@ Active: ${c.active} (${active}%)
 background:${COLORS.yellow};
 padding:4px 10px;
 border-radius:4px;
+margin-right:6px;
 font-weight:bold;
 ">
 Planned: ${c.planned} (${planned}%)
@@ -304,6 +306,7 @@ Planned: ${c.planned} (${planned}%)
 background:${COLORS.late};
 padding:4px 10px;
 border-radius:4px;
+margin-right:6px;
 color:white;
 font-weight:bold;
 ">
@@ -313,6 +316,7 @@ Delayed: ${c.late} (${late}%)
 background:${COLORS.selected};
 padding:4px 10px;
 border-radius:4px;
+margin-right:6px;
 color:white;
 font-weight:bold;
 ">
