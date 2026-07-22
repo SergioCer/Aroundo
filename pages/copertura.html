@@ -284,7 +284,7 @@ let planned=Math.round((c.planned/total)*100);
 let late=Math.round((c.late/total)*100);
 document.getElementById("info").innerHTML=`
 <span style="
-background:${COLORS.green}
+background:${COLORS.green};
 padding:4px 10px;
 border-radius:4px;
 color:white;
@@ -293,7 +293,7 @@ font-weight:bold;
 Active: ${c.active} (${active}%)
 </span>
 <span style="
-background:${COLORS.yellow}
+background:${COLORS.yellow};
 padding:4px 10px;
 border-radius:4px;
 font-weight:bold;
@@ -301,7 +301,7 @@ font-weight:bold;
 Planned: ${c.planned} (${planned}%)
 </span>
 <span style="
-background:${COLORS.late}
+background:${COLORS.late};
 padding:4px 10px;
 border-radius:4px;
 color:white;
@@ -310,7 +310,7 @@ font-weight:bold;
 Delayed: ${c.late} (${late}%)
 </span>
 <span style="
-background:${COLORS.selected}
+background:${COLORS.selected};
 padding:4px 10px;
 border-radius:4px;
 color:white;
