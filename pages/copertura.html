@@ -325,9 +325,9 @@ return"none";
 
 // Stato della Regione
 function getRegioneState(id){
-    console.log("REGIONE CONTROLLO:", id);
+    // CANCELLARE console.log("REGIONE CONTROLLO:", id);
 let regione=APP.db.regioni.find(
-r=>r.rg_istat==id||r.id_regione==id
+r=>r.rg_istat==id
 );
 if(!regione)return"none";
 let province=APP.db.province.filter(
@@ -338,6 +338,8 @@ let complete=0;
 let presenti=0;
 province.forEach(p=>{
 let s=getProvinciaState(p.id_provincia);
+    console.log("REGIONE:", regione.rg_descrizione, "PROVINCIA:", p.pr_descrizione, "STATO:", s);
+    
 if(s=="complete")complete++;
 if(s=="complete"||s=="planned")presenti++;
 });
