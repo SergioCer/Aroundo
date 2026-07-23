@@ -274,6 +274,24 @@ list.forEach(comune=>{
 });
 return result;
 }
+
+// DA CANCELLARE 
+window.testComuneState = function(c){
+    if(c.co_attivato){
+        return "active";
+    }
+    if(c.co_previsto){
+        let oggi=new Date();
+        let previsto=new Date(c.co_previsto);
+        if(previsto >= oggi){
+            return "planned";
+        }else{
+            return "late";
+        }
+    }
+    return "none";
+}
+// DA CANCELLARE 
     
 function updateInfo(list){
 let c=getCoverage(list);
