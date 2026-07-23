@@ -358,7 +358,7 @@ if(APP.currentLevel==="province"){
     let active=0;
     let planned=0;
     province.forEach(p=>{
-        let s=getProvinciaState(p.id_provincia);
+        let s=getProvinciaState(p.pr_istat);
         if(s==="complete") active++;
         if(s==="planned") planned++;
     });
