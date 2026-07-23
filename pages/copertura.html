@@ -397,7 +397,7 @@ if(APP.currentLevel==="regioni"){
     let active=0;
     let planned=0;
     APP.db.regioni.forEach(r=>{
-        let s=getRegioneState(r.id_regione);
+        let s=getRegioneState(r.rg_istat);
         if(s==="complete") active++;
         if(s==="planned") planned++;
     });
