@@ -774,8 +774,10 @@ APP.geoLayer=L.geoJSON(data,{
 style:function(feature){
 let id;
 if(type==="regioni")id=getRegionIdFromFeature(feature);
-if(type==="province")id=getProvinceIdFromFeature(feature);
-
+if(type==="province"){
+    console.log("PROVINCIA GEOJSON:", feature.properties);
+    id=getProvinceIdFromFeature(feature);
+}
 if(type==="comuni"){
 id=getComuneIdFromFeature(feature);
 // CANCELLARE VERIFICA DB
