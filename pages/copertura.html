@@ -254,7 +254,6 @@ return APP.db.province.filter(p=>p.id_regione==regione.id_regione);
 }
 
 function getCoverage(list){
-
 let result={
     active:0,
     planned:0,
@@ -362,7 +361,7 @@ if(APP.currentLevel==="province"){
     border-radius:4px;
     margin-right:6px;
     font-weight:bold;">
-    Planned: ${planned} (${Math.round(planned/total*100)}%)
+    In Progress: ${planned} (${Math.round(planned/total*100)}%)
     </span>
     <span style="
     background:${COLORS.selected};
@@ -401,7 +400,7 @@ if(APP.currentLevel==="regioni"){
     border-radius:4px;
     margin-right:6px;
     font-weight:bold;">
-    Planned: ${planned} (${Math.round(planned/total*100)}%)
+    In Progress: ${planned} (${Math.round(planned/total*100)}%)
     </span>
     <span style="
     background:${COLORS.selected};
