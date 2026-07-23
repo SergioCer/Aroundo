@@ -24,9 +24,29 @@ body{display:flex;flex-direction:column}
 .legendColor{width:16px;height:16px;border-radius:2px}
 #info{font-weight:700}
 
+.btn-icon{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    background:#e5e7eb;
+    cursor:pointer;
+    font-size:18px;
+}
+    
 </style>
 </head>
 <body>
+<div class="topbar">
+    <div style="display:flex;align-items:center;gap:20px;">
+        <button 
+        class="btn-icon"
+        onclick="history.back()">←</button>
+        <div style="font-size:30px;">
+            Coverage
+        </div>
+    </div>
+</div>    
 
 <div id="topBar">
 <div id="timelineBox">
