@@ -324,6 +324,96 @@ Total: ${c.total}
 </span>
 `;
 }
+
+function updateFooter(){
+if(APP.currentLevel==="comuni"){
+    let list=[];
+    if(APP.currentProvince){
+        list=getComuniByProvincia(APP.currentProvince);
+    }
+    updateInfo(list);
+    return;
+}
+// province
+if(APP.currentLevel==="province"){
+    let region=APP.currentRegion;
+    let province=getProvinceByRegione(region);
+    let active=0;
+    let planned=0;
+    province.forEach(p=>{
+        let s=getProvinciaState(p.id_provincia);
+        if(s==="complete") active++;
+        if(s==="planned") planned++;
+    });
+    let total=province.length;
+    document.getElementById("info").innerHTML=`
+    <span style="
+    background:${COLORS.green};
+    padding:4px 10px;
+    border-radius:4px;
+    margin-right:6px;
+    color:white;
+    font-weight:bold;">
+    Active: ${active} (${Math.round(active/total*100)}%)
+    </span>
+    <span style="
+    background:${COLORS.yellow};
+    padding:4px 10px;
+    border-radius:4px;
+    margin-right:6px;
+    font-weight:bold;">
+    Planned: ${planned} (${Math.round(planned/total*100)}%)
+    </span>
+    <span style="
+    background:${COLORS.selected};
+    padding:4px 10px;
+    border-radius:4px;
+    color:white;
+    font-weight:bold;">
+    Total: ${total}
+    </span>
+    `;
+    return;
+}
+// regioni
+if(APP.currentLevel==="regioni"){
+    let active=0;
+    let planned=0;
+    APP.db.regioni.forEach(r=>{
+        let s=getRegioneState(r.id_regione);
+        if(s==="complete") active++;
+        if(s==="planned") planned++;
+    });
+    let total=APP.db.regioni.length;
+    document.getElementById("info").innerHTML=`
+    <span style="
+    background:${COLORS.green};
+    padding:4px 10px;
+    border-radius:4px;
+    margin-right:6px;
+    color:white;
+    font-weight:bold;">
+    Active: ${active} (${Math.round(active/total*100)}%)
+    </span>
+    <span style="
+    background:${COLORS.yellow};
+    padding:4px 10px;
+    border-radius:4px;
+    margin-right:6px;
+    font-weight:bold;">
+    Planned: ${planned} (${Math.round(planned/total*100)}%)
+    </span>
+    <span style="
+    background:${COLORS.selected};
+    padding:4px 10px;
+    border-radius:4px;
+    color:white;
+    font-weight:bold;">
+    Total: ${total}
+    </span>
+    `;
+}
+}
     
 function updateStatistics(){
 let list=[];
@@ -352,7 +442,7 @@ riferimento.getMonth()+1,
 );
 let att=comune.co_attivato?new Date(comune.co_attivato):null;
 let prev=comune.co_previsto?new Date(comune.co_previsto):null;
-    // CANCELLARE VERIFICA
+    /* // CANCELLARE VERIFICA 
     if(prev && prev<=fineMese){
     console.log(
         "PREVISTO:",
@@ -360,8 +450,7 @@ let prev=comune.co_previsto?new Date(comune.co_previsto):null;
         comune.co_istat,
         comune.co_previsto
     );
-}   
-// CANCELLARE VERIFICA    
+*/ }  // CANCELLARE VERIFICA    
 if(att&&att<=fineMese)return"active";
 if(prev&&prev<=fineMese){return "late";}
 if(prev)return"planned";
@@ -370,7 +459,6 @@ return"none";
 
 // Stato della Provincia
 function getProvinciaState(id){
-    // CANCELLARE console.log("PROVINCIA CONTROLLO:", id);
 let provincia=APP.db.province.find(
 p=>p.pr_istat==id
 );
@@ -393,7 +481,6 @@ return"none";
 
 // Stato della Regione
 function getRegioneState(id){
-    // CANCELLARE console.log("REGIONE CONTROLLO:", id);
 let regione=APP.db.regioni.find(
 r=>r.rg_istat==id
 );
@@ -406,7 +493,7 @@ let complete=0;
 let presenti=0;
 province.forEach(p=>{
 let s=getProvinciaState(p.pr_istat);
-    console.log("REGIONE:", regione.rg_descrizione, "PROVINCIA:", p.pr_descrizione, "STATO:", s);
+    // CANCELLARE console.log("REGIONE:", regione.rg_descrizione, "PROVINCIA:", p.pr_descrizione, "STATO:", s);
     
 if(s=="complete")complete++;
 if(s=="complete"||s=="planned")presenti++;
@@ -738,6 +825,7 @@ layer.setStyle(getGeoStyle(type,id));
 }).addTo(APP.map);
 APP.map.fitBounds(APP.geoLayer.getBounds());
 updateStatistics();
+updateFooter();
 }
 
 function handleClick(type,feature,layer){
