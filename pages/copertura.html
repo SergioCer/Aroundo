@@ -459,15 +459,6 @@ riferimento.getMonth()+1,
 );
 let att=comune.co_attivato?new Date(comune.co_attivato):null;
 let prev=comune.co_previsto?new Date(comune.co_previsto):null;
-    /* // CANCELLARE VERIFICA 
-    if(prev && prev<=fineMese){
-    console.log(
-        "PREVISTO:",
-        comune.co_descrizione,
-        comune.co_istat,
-        comune.co_previsto
-    );
-} */ // CANCELLARE VERIFICA    
 if(att&&att<=fineMese)return"active";
 if(prev&&prev<=fineMese){return "late";}
 if(prev)return"planned";
@@ -510,8 +501,6 @@ let complete=0;
 let presenti=0;
 province.forEach(p=>{
 let s=getProvinciaState(p.pr_istat);
-    // CANCELLARE console.log("REGIONE:", regione.rg_descrizione, "PROVINCIA:", p.pr_descrizione, "STATO:", s);
-    
 if(s=="complete")complete++;
 if(s=="complete"||s=="planned")presenti++;
 });
@@ -597,7 +586,6 @@ weight:3,
 fillOpacity:0
 };
 }
-console.log("STYLE PROVINCIA",idProvincia,getProvinciaState(idProvincia));    
 return{
 color:"#4a90c2",
 weight:1.5,
@@ -607,7 +595,6 @@ fillOpacity:0
 
 // Stile della Regione 
 function getRegioneStyle(idRegione){
-console.log("STYLE REGIONE:", idRegione);    
 let s=getRegioneState(idRegione);
 if(s=="complete"){
 return{
@@ -793,10 +780,7 @@ APP.geoLayer=L.geoJSON(data,{
 style:function(feature){
 let id;
 if(type==="regioni")id=getRegionIdFromFeature(feature);
-if(type==="province"){
-    console.log("PROVINCIA GEOJSON:", feature.properties);
-    id=getProvinceIdFromFeature(feature);
-}
+if(type==="province")id=getProvinceIdFromFeature(feature);
 if(type==="comuni"){
 id=getComuneIdFromFeature(feature);
 // CANCELLARE VERIFICA DB
@@ -806,14 +790,7 @@ id=getComuneIdFromFeature(feature);
     if(comune && 
        comune.co_descrizione.toLowerCase() !== feature.properties.name.toLowerCase()
     ){
-        console.log(
-            "DIFFERENZA:",
-            feature.properties.name,
-            id,
-            "DB:",
-            comune.co_descrizione,
-            comune.co_istat
-        );
+        console.log("DIFFERENZA:",feature.properties.name,id,"DB:",comune.co_descrizione,comune.co_istat);
     }
 // CANCELLARE VERIFICA DB
 }
