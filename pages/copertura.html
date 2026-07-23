@@ -60,6 +60,9 @@ green:"#4caf50",
 late:"#e8a0b8",
 borderYellow:"#e4d56b",
 borderGreen:"#2e8b57",
+borderLate:"#c2185b",
+borderNeutral:"#4a90c2",
+white:"#ffffff",    
 selected:"#1976d2"
 };
     
@@ -511,18 +514,18 @@ function getComuneStyle(idComune){
 let comune=APP.db.comuni.find(c=>Number(c.co_istat)===Number(idComune));
 if(!comune){
 return{
-color:"#4a90c2",
+color:COLORS.borderNeutral,
 weight:1.5,
-fillColor:"#ffffff",
+fillColor:COLORS.white,
 fillOpacity:0
 };
 }
 let s=getComuneState(comune);
 if(s=="active"){
 return{
-color:"#2e8b57",
+color:COLORS.borderGreen,
 weight:2,
-fillColor:"#4caf50",
+fillColor:COLORS.green,
 fillOpacity:.35
 };
 }
@@ -530,7 +533,7 @@ if(s=="planned"){
 return{
 color:COLORS.borderYellow,
 weight:2,
-fillColor:"#f5d76e",
+fillColor:COLORS.yellow,
 fillOpacity:.35
 };
 }
@@ -538,14 +541,14 @@ if(s=="late"){
 return{
 color:COLORS.borderLate,
 weight:2,
-fillColor:"#e91e63",
+fillColor:COLORS.late,
 fillOpacity:.35
 };
 }    
 return{
-color:"#4a90c2",
+color:COLORS.borderNeutral,
 weight:1.5,
-fillColor:"#ffffff",
+fillColor:COLORS.white,
 fillOpacity:0
 };
 }    
@@ -568,7 +571,7 @@ fillOpacity:0
 };
 }
 return{
-color:"#4a90c2",
+color:COLORS.borderNeutral,
 weight:1.5,
 fillOpacity:0
 };
@@ -592,7 +595,7 @@ fillOpacity:0
 };
 }
 return{
-color:"#4a90c2",
+color:COLORS.borderNeutral,
 weight:1.5,
 fillOpacity:0
 };
@@ -616,7 +619,7 @@ fillOpacity:0
 };
 }
 return{
-color:"#4a90c2",
+color:COLORS.borderNeutral,
 weight:1.5,
 fillOpacity:0
 };
@@ -628,7 +631,7 @@ if(type=="province")return getProvinciaStyle(id);
 if(type=="regioni")return getRegioneStyle(id);
 if(type=="stati")return getStatoStyle(id);
 return{
-color:"#4a90c2",
+color:COLORS.borderNeutral,
 weight:1.5,
 fillOpacity:0
 };
@@ -798,7 +801,7 @@ handleDoubleClick(type,feature);
 },
 mouseover:function(){
 layer.setStyle({
-color:"#0057a8",
+color:COLORS.selected,
 weight:3
 });
 },
