@@ -450,7 +450,7 @@ let prev=comune.co_previsto?new Date(comune.co_previsto):null;
         comune.co_istat,
         comune.co_previsto
     );
-*/ }  // CANCELLARE VERIFICA    
+} */ // CANCELLARE VERIFICA    
 if(att&&att<=fineMese)return"active";
 if(prev&&prev<=fineMese){return "late";}
 if(prev)return"planned";
