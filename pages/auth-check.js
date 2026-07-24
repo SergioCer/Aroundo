@@ -1,7 +1,6 @@
 import { supabase } from '../supabase.js';
 export async function requireAuth(options = {}) {
   const { data, error } = await supabase.auth.getSession();
-  console.log("SESSIONE LOGIN:", data.session);
   const isLogged = !error && !!data.session;
   // Caso pagina login:
   // se l'utente è già autenticato, vai alla dashboard
