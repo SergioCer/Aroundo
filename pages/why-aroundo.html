@@ -152,14 +152,12 @@ class="inactive-lang"
 onclick="changeLanguage('it')">
 IT
 </button>
-
 </div>
-
-
-<h1 id="pageTitle">
+<h1 id="pageTitle"
+data-en="Why Aroundo?"
+data-it="Perché Aroundo?">
 Why Aroundo?
 </h1>
-
 
 <details open>
 
@@ -347,77 +345,49 @@ dipende dalle persone che li utilizzano.
 </details>
 
 
-<div class="final-message">
-
-Aroundo starts with people.<br>
-Choose how you want to be part of it.
-
+<div class="final-message"
+     data-en="Aroundo starts with people.<br>Choose how you want to be part of it."
+     data-it="Aroundo nasce dalle persone.<br>Scegli come vuoi farne parte.">
 </div>
-
-
-<a class="button" href="login.html">
-Join Aroundo
+<a class="button"
+   href="login.html"
+   data-en="Join Aroundo"
+   data-it="Entra in Aroundo">
 </a>
-
-
 <div class="back">
-<a href="login.html">
-Back to login
+<a href="login.html"
+   data-en="Back to login"
+   data-it="Torna al login">
 </a>
 </div>
-
-
 </div>
-
 
 <script>
-
 const details = document.querySelectorAll("details");
 
 details.forEach((targetDetail)=>{
-
 targetDetail.addEventListener("toggle",()=>{
-
 if(targetDetail.open){
-
 details.forEach((detail)=>{
-
 if(detail !== targetDetail){
 detail.removeAttribute("open");
 }
-
 });
-
 }
-
 });
-
 });
-
-
 
 function changeLanguage(lang){
-
 document.querySelectorAll("[data-en]").forEach(el=>{
-
-el.textContent = el.getAttribute("data-"+lang);
-
+el.innerHTML = el.getAttribute("data-"+lang);
 });
-
-
 document.getElementById("enBtn").className =
 lang==="en" ? "active-lang" : "inactive-lang";
-
 document.getElementById("itBtn").className =
 lang==="it" ? "active-lang" : "inactive-lang";
-
-
 document.documentElement.lang = lang;
-
 }
 
 </script>
-
-
 </body>
 </html>
