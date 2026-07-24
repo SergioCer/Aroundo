@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
+
 <head>
 <meta charset="UTF-8">
-<title>Perché Aroundo?</title>
+<title>Why Aroundo?</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -37,63 +38,71 @@ body {
   border-radius:18px;
 }
 
+.lang {
+  text-align:right;
+  margin-top:10px;
+  margin-bottom:20px;
+}
+
+.lang button {
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-weight:700;
+  font-size:13px;
+}
+
+.active-lang {
+  color:#2563eb;
+}
+
+.inactive-lang {
+  color:#999;
+}
+
 h1 {
   text-align:center;
-  margin:10px 0 5px;
   font-size:26px;
+  margin:10px 0 20px;
 }
 
-.subtitle {
-  text-align:center;
-  color:#666;
-  font-size:15px;
-  margin-bottom:25px;
-}
-
-.section {
-  margin-top:25px;
-}
-
-.section h2 {
-  font-size:17px;
-  color:#2563eb;
-  margin-bottom:10px;
-}
-
-.section p {
-  font-size:14px;
-  line-height:1.55;
-  color:#444;
-}
-
-.roles {
-  margin-top:10px;
-}
-
-.role {
-  padding:12px;
-  margin-bottom:10px;
+details {
   background:#f8fafc;
   border-radius:10px;
+  padding:12px;
+  margin-bottom:10px;
 }
 
-.role strong {
-  color:#111827;
+summary {
+  cursor:pointer;
+  font-weight:700;
+  color:#2563eb;
 }
 
-.trust {
-  margin-top:25px;
-  padding:15px;
-  background:#ecfdf5;
-  border-radius:12px;
-  color:#166534;
+details p {
+  color:#555;
   font-size:14px;
+  line-height:1.55;
+}
+
+details li {
+  color:#555;
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.final-message {
+  margin-top:30px;
+  margin-bottom:20px;
+  text-align:center;
+  font-size:15px;
+  color:#555;
+  font-style:italic;
   line-height:1.5;
 }
 
 .button {
   display:block;
-  margin-top:25px;
   text-align:center;
   background:#22c55e;
   color:white;
@@ -113,93 +122,105 @@ h1 {
   font-size:13px;
 }
 
-details {
-  background:#f8fafc;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:10px;
-}
-
-summary {
-  cursor:pointer;
-  font-weight:700;
-  color:#2563eb;
-}
-
-details p {
-  color:#555;
-  line-height:1.5;
-  font-size:14px;
-}
-  
 </style>
 
 </head>
+
 
 <body>
 
 <div class="container">
 
+
 <div class="logo">
 <img src="../icon-512.png" alt="Aroundo">
 </div>
 
-<details open>
-<summary>What is Aroundo?</summary>
-<div style="
-  text-align:right;
-  margin-bottom:10px;
-">
-  <button 
-    onclick="changeLanguage('en')"
-    style="
-      border:none;
-      background:none;
-      cursor:pointer;
-      font-weight:700;
-      color:#2563eb;
-    ">
-    EN
-  </button>
-  |
-  <button 
-    onclick="changeLanguage('it')"
-    style="
-      border:none;
-      background:none;
-      cursor:pointer;
-      font-weight:700;
-      color:#666;
-    ">
-    IT
-  </button>
+
+<div class="lang">
+
+<button id="enBtn"
+class="active-lang"
+onclick="changeLanguage('en')">
+EN
+</button>
+
+&nbsp;|&nbsp;
+
+<button id="itBtn"
+class="inactive-lang"
+onclick="changeLanguage('it')">
+IT
+</button>
+
 </div>
-<p>
+
+
+<h1 id="pageTitle">
+Why Aroundo?
+</h1>
+
+
+<details open>
+
+<summary data-en="What is Aroundo?"
+         data-it="Cos'è Aroundo?">
+What is Aroundo?
+</summary>
+
+<p data-en="
 Aroundo is a network of people, places and experiences.
 It connects those who want to discover events with those who create them,
 organize them or make the places where they happen available.
+"
+data-it="
+Aroundo è una rete di persone, luoghi ed esperienze.
+Collega chi vuole scoprire eventi con chi li crea,
+li organizza o rende disponibili gli spazi dove possono accadere.
+">
 </p>
 
-<p>
+
+<p data-en="
 Aroundo grows through the contribution of its community:
 every person can add value, share knowledge and help create a more reliable
 and complete map of experiences.
+"
+data-it="
+Aroundo cresce grazie al contributo della sua comunità:
+ogni persona può aggiungere valore, condividere conoscenze
+e contribuire a creare una mappa di esperienze più completa e affidabile.
+">
 </p>
 
 </details>
 
 
 <details>
-<summary>How can I participate?</summary>
 
-<p>
+<summary data-en="How can I participate?"
+data-it="Come posso partecipare?">
+How can I participate?
+</summary>
+
+<p data-en="
 Aroundo does not define people by a single category.
 A person can have different roles over time and participate in different ways.
+"
+data-it="
+Aroundo non definisce le persone attraverso una sola categoria.
+Una persona può avere ruoli diversi nel tempo e partecipare in modi differenti.
+">
 </p>
 
-<p>
+<p data-en="
 You can start simply as a User and, whenever you want, add new roles
 according to what you do and what you want to contribute.
+"
+data-it="
+Puoi iniziare semplicemente come User e, quando vuoi,
+aggiungere nuovi ruoli in base a ciò che fai e a ciò che vuoi offrire.
+">
 </p>
 
 </details>
@@ -208,13 +229,13 @@ according to what you do and what you want to contribute.
 <details>
 <summary>User</summary>
 
-<p>
-A User is someone who wants to explore the territory and discover
-new experiences.
-</p>
-
-<p>
-Users can:
+<p data-en="
+A User is someone who wants to explore the territory and discover new experiences.
+"
+data-it="
+Uno User è una persona che vuole esplorare il territorio
+e scoprire nuove esperienze.
+">
 </p>
 
 <ul>
@@ -228,187 +249,175 @@ Users can:
 
 
 <details>
+
 <summary>Creator</summary>
 
-<p>
+<p data-en="
 Creators are the people who create experiences and content to share
 with the community.
+"
+data-it="
+I Creator sono le persone che creano esperienze e contenuti
+da condividere con la comunità.
+">
 </p>
 
-<p>
+<p data-en="
 Creators may include artists, professionals, cultural operators,
 performers or anyone who offers something meaningful to others.
-</p>
-
-<p>
-A Creator brings the experience to life.
+"
+data-it="
+Possono essere artisti, professionisti, operatori culturali,
+performer o chiunque offra qualcosa di significativo agli altri.
+">
 </p>
 
 </details>
 
 
 <details>
+
 <summary>Organizer</summary>
 
-<p>
+<p data-en="
 Organizers are responsible for creating and coordinating events.
-</p>
-
-<p>
-They connect places, creators and participants, providing the information
-needed to make an experience available on Aroundo.
+"
+data-it="
+Gli Organizer sono responsabili della creazione
+e del coordinamento degli eventi.
+">
 </p>
 
 </details>
 
 
 <details>
+
 <summary>Place Manager</summary>
 
-<p>
+<p data-en="
 A Place Manager is responsible for a place available on Aroundo.
-</p>
-
-<p>
 The role is not necessarily linked to ownership:
 it represents the person or organization responsible for maintaining
 the information and availability of that place.
-</p>
-
-<p>
-A place can be created by the community and, over time, its responsibility
-can be assigned to the appropriate manager.
+"
+data-it="
+Un Place Manager è responsabile di un luogo presente su Aroundo.
+Il ruolo non è necessariamente legato alla proprietà:
+rappresenta la persona o organizzazione che ne cura informazioni
+e disponibilità.
+">
 </p>
 
 </details>
 
 
 <details>
+
 <summary>Service Provider</summary>
 
-<p>
+<p data-en="
 Service Providers offer skills and support that help make events possible.
-</p>
-
-<p>
-Examples include technical services, equipment, production support
-and other professional contributions.
+"
+data-it="
+I Service Provider offrono competenze e servizi
+che aiutano a realizzare gli eventi.
+">
 </p>
 
 </details>
 
 
 <details>
+
 <summary>Trust & Community</summary>
 
-<p>
+<p data-en="
 Trust is the foundation of Aroundo.
-</p>
-
-<p>
 The platform provides the tools, but the quality of the experience
 depends on the people who use them.
-</p>
-
-<p>
-Accurate information, respect for places and events, and collaboration
-between users are what make the network grow.
-</p>
-
-</details> 
-  
-<!-- <h1>Perché Aroundo?</h1>
-<div class="subtitle">
-Una rete di persone, luoghi ed esperienze costruita sulla fiducia.
-</div>
-<div class="section">
-<h2>La nostra idea</h2>
-<p>
-Aroundo nasce per mettere in relazione chi cerca esperienze
-con chi le crea, chi mette a disposizione un luogo e chi
-contribuisce alla realizzazione di qualcosa di speciale.
-</p>
-<p>
-La piattaforma cresce grazie alle persone che ne fanno parte:
-ogni utente può contribuire alla qualità della rete.
-</p>
-</div>
-<div class="section">
-<h2>Come puoi partecipare</h2>
-<div class="roles">
-<div class="role">
-<strong>User</strong><br>
-Scopri eventi, luoghi ed esperienze vicino a te.
-</div>
-<div class="role">
-<strong>Creator</strong><br>
-Crea contenuti, attività ed esperienze da condividere.
-</div>
-<div class="role">
-<strong>Organizer</strong><br>
-Organizza eventi e iniziative.
-</div>
-<div class="role">
-<strong>Place Manager</strong><br>
-Gestisci un luogo e contribuisci alla sua presenza su Aroundo.
-</div>
-<div class="role">
-<strong>Service Provider</strong><br>
-Offri competenze e servizi utili agli eventi.
-</div>
-</div>
-</div>
-<div class="section">
-<h2>Una piattaforma collaborativa</h2>
-<p>
-Su Aroundo puoi iniziare come semplice utente e,
-nel tempo, aggiungere nuovi ruoli.
-Una persona può essere contemporaneamente visitatore,
-creator, organizzatore o responsabile di un luogo.
-</p>
-</div>
-<div class="trust">
-<strong>La fiducia è il cuore di Aroundo.</strong><br><br>
-La piattaforma fornisce gli strumenti,
-ma il valore nasce dalle persone che condividono
-informazioni corrette, rispettano luoghi ed eventi
-e collaborano per migliorare l'esperienza di tutti.
-</div>
--->  
-<div style="
-  margin-top:30px;
-  margin-bottom:20px;
-  text-align:center;
-  font-size:15px;
-  color:#555;
-  font-style:italic;
-  line-height:1.5;
+"
+data-it="
+La fiducia è il fondamento di Aroundo.
+La piattaforma fornisce gli strumenti, ma la qualità dell'esperienza
+dipende dalle persone che li utilizzano.
 ">
-  Aroundo starts with people.<br>
-  Choose how you want to be part of it.
+</p>
+
+</details>
+
+
+<div class="final-message">
+
+Aroundo starts with people.<br>
+Choose how you want to be part of it.
+
 </div>
+
+
 <a class="button" href="login.html">
 Join Aroundo
 </a>
+
+
 <div class="back">
-<a href="#" onclick="history.back();return false;">
+<a href="login.html">
 Back to login
 </a>
 </div>
+
+
 </div>
+
+
 <script>
+
 const details = document.querySelectorAll("details");
-details.forEach((targetDetail) => {
-  targetDetail.addEventListener("toggle", () => {
-    if (targetDetail.open) {
-      details.forEach((detail) => {
-        if (detail !== targetDetail) {
-          detail.removeAttribute("open");
-        }
-      });
-    }
-  });
+
+details.forEach((targetDetail)=>{
+
+targetDetail.addEventListener("toggle",()=>{
+
+if(targetDetail.open){
+
+details.forEach((detail)=>{
+
+if(detail !== targetDetail){
+detail.removeAttribute("open");
+}
+
 });
-</script>  
+
+}
+
+});
+
+});
+
+
+
+function changeLanguage(lang){
+
+document.querySelectorAll("[data-en]").forEach(el=>{
+
+el.textContent = el.getAttribute("data-"+lang);
+
+});
+
+
+document.getElementById("enBtn").className =
+lang==="en" ? "active-lang" : "inactive-lang";
+
+document.getElementById("itBtn").className =
+lang==="it" ? "active-lang" : "inactive-lang";
+
+
+document.documentElement.lang = lang;
+
+}
+
+</script>
+
+
 </body>
 </html>
