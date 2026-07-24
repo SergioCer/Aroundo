@@ -146,7 +146,34 @@ details p {
 
 <details open>
 <summary>What is Aroundo?</summary>
-
+<div style="
+  text-align:right;
+  margin-bottom:10px;
+">
+  <button 
+    onclick="changeLanguage('en')"
+    style="
+      border:none;
+      background:none;
+      cursor:pointer;
+      font-weight:700;
+      color:#2563eb;
+    ">
+    EN
+  </button>
+  |
+  <button 
+    onclick="changeLanguage('it')"
+    style="
+      border:none;
+      background:none;
+      cursor:pointer;
+      font-weight:700;
+      color:#666;
+    ">
+    IT
+  </button>
+</div>
 <p>
 Aroundo is a network of people, places and experiences.
 It connects those who want to discover events with those who create them,
@@ -361,21 +388,27 @@ e collaborano per migliorare l'esperienza di tutti.
   Choose how you want to be part of it.
 </div>
 <a class="button" href="login.html">
-  Join Aroundo
-</a>
-  
-<a class="button" href="login.html">
 Join Aroundo
 </a>
-
 <div class="back">
 <a href="#" onclick="history.back();return false;">
 Back to login
 </a>
 </div>
-
-
 </div>
-
+<script>
+const details = document.querySelectorAll("details");
+details.forEach((targetDetail) => {
+  targetDetail.addEventListener("toggle", () => {
+    if (targetDetail.open) {
+      details.forEach((detail) => {
+        if (detail !== targetDetail) {
+          detail.removeAttribute("open");
+        }
+      });
+    }
+  });
+});
+</script>  
 </body>
 </html>
