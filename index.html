@@ -1035,6 +1035,7 @@ OK
     const { data } = await supabase.auth.getSession();
     if (data.session) {
         loginBtn.textContent = "Logout";
+        loginBtn.style.color = "#ef4444"; // rosso
         loginBtn.onclick = async function() {
             await logout();
         };
