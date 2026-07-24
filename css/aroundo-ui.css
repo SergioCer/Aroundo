@@ -1,1 +1,47 @@
+/* ===========================
+   Aroundo UI
+   Navigation
+   =========================== */
 
+.au-btn-back{
+    width:42px;
+    height:42px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:none;
+    border-radius:50%;
+
+    background:#ffffff;
+
+    color:#2563eb;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.12);
+
+    cursor:pointer;
+
+    transition:
+        background .20s ease,
+        color .20s ease,
+        transform .15s ease,
+        box-shadow .20s ease;
+}
+
+.au-btn-back:hover{
+    background:#2563eb;
+    color:#ffffff;
+    transform:translateX(-2px);
+    box-shadow:0 4px 12px rgba(37,99,235,.25);
+}
+
+.au-btn-back:active{
+    transform:translateX(-1px) scale(.96);
+}
+
+.au-btn-back svg{
+    width:20px;
+    height:20px;
+    stroke:currentColor;
+}
