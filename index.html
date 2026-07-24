@@ -1171,6 +1171,10 @@ document.getElementById("shareQR").onclick = async () => {
       renderEvents();
     });
 
+    function showMessage(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";}
+
+    function closeMessage() {document.getElementById("messageDialog").style.display = "none";}
+  
     // Data unica: currentDate = giorno 'logico' 
     function getAppTime(mode = 'now') {
       const day = new Date(currentDate);
@@ -1998,10 +2002,6 @@ oms.addListener('click', function (marker) {
       return { x: point.x, y: point.y };
     }
 
-function showMessage(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";}
-
-function closeMessage() {document.getElementById("messageDialog").style.display = "none";}
-  
 // ====================================================
 // FIREWORKS SCENICI SUL CANVAS
 // ====================================================
