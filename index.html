@@ -908,6 +908,48 @@
   <div id="eventTicker">
   <div id="eventTickerContent"></div>
 </div>  
+
+<!-- MESSAGE DIALOG -->
+<div id="messageDialog" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+z-index:99999;
+align-items:center;
+justify-content:center;
+">
+<div style="
+background:white;
+padding:22px;
+border-radius:12px;
+width:300px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+">
+<div id="messageText" style="
+margin-bottom:18px;
+font-weight:600;
+">
+</div>
+
+<button onclick="closeMessage()" style="
+width:100%;
+background:#3b82f6;
+color:white;
+border:none;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+">
+OK
+</button>
+</div>
+</div>
   
 <script type="module">
   import { supabase } from './supabase.js';
@@ -1670,7 +1712,7 @@ oms.addListener('click', function (marker) {
               <a
                 href="#"
                 class="action-btn buy-btn"
-                onclick="alert('In Progress!');return false;">
+                onclick="showMessage('In Progress!'); return false;">
                 Buy
               </a>
             `
@@ -1681,7 +1723,7 @@ oms.addListener('click', function (marker) {
             <a
               href="#"
               class="action-btn book-btn"
-              onclick="alert('In Progress!');return false;">
+              onclick="showMessage('In Progress!'); return false;">
               Book
             </a>
           </div>
@@ -1955,6 +1997,10 @@ oms.addListener('click', function (marker) {
       const point = map.latLngToContainerPoint([lat, lng]);
       return { x: point.x, y: point.y };
     }
+
+function showMessage(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";}
+
+function closeMessage() {document.getElementById("messageDialog").style.display = "none";}
   
 // ====================================================
 // FIREWORKS SCENICI SUL CANVAS
