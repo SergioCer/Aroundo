@@ -183,9 +183,11 @@ Login
 
 <script type="module">
   import { requireAuth } from './auth-check.js';
-  await requireAuth(); 
-
-import { supabase } from '../supabase.js';
+  import { supabase } from '../supabase.js';
+  await requireAuth({
+    redirectIfLogged: true,
+    allowGuest: true
+  });
 
 document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
   document.getElementById('loginErrorDialog').style.display = 'none';
