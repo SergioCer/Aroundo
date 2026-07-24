@@ -57,12 +57,28 @@ button:hover {
   opacity:.9;
 }
 
+.btn-icon{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    background:#e5e7eb;
+    cursor:pointer;
+    font-size:18px;
+}
+  
 </style>
 </head>
 <body>
   
 <div class="login-box">
 <img src="../icon-512.png" alt="Aroundo">
+<div class="topbar" style="align-self: center; margin-top: 10px;">
+    <div style="display:flex;align-items:center;gap:20px;">
+        <button class="btn-icon" onclick="history.back()">←</button>
+        <div style="font-size:30px;">Home</div>
+    </div>
+</div>    
 <h2>Aroundo</h2>
 <div style="
     margin-top:-10px;
