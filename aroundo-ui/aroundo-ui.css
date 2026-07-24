@@ -1,0 +1,35 @@
+/* ==========================================================
+   AROUNDO UI
+   Component : button-back
+   ========================================================== */
+.button-back{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    background-color:#ffffff;
+    background-image:url("back.png");
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:18px 18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    cursor:pointer;
+    transition:
+        background-color .20s ease,
+        box-shadow .20s ease,
+        transform .15s ease;
+}
+
+.button-back:hover{
+    background-color:#f8fafc;
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+    transform:translateX(-2px);
+}
+
+.button-back:active{
+    transform:scale(.95);
+}
+
+.button-back:focus{
+    outline:none;
+}
