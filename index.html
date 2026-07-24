@@ -854,8 +854,7 @@
   <div class="title">
     <span>A</span><span>R</span><span>O</span><span>U</span><span>N</span><span>D</span><span>O</span>
   </div>
-  <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;">
-    Login</div>
+  <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;"></div>
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:4px;">
     📲 Install Aroundo
   </div>
@@ -953,6 +952,7 @@ OK
   
 <script type="module">
   import { supabase } from './supabase.js';
+  import { logout } from './pages/auth-check.js';
   import { trackEvent, trackGPSDecision } from './app-events.js'; // Vecchie statistiche
   import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin } from './analytics-events.js'; // Nuove statistiche
   
@@ -1032,18 +1032,19 @@ OK
 
     // Seleziona il div "Login"
     const loginBtn = document.getElementById('loginBtn');
-    // Click sinistro
-    loginBtn.addEventListener('click', async function() {
-    event.preventDefault(); // blocca il menu del browser
-    await analyticsLogin();      
-    window.location.href = 'pages/login.html';
-  });      
-    // Click destro
-    loginBtn.addEventListener('contextmenu', function(event) {
-    alert('Click errato!'); 
-    /* event.preventDefault(); // blocca il menu del browser
-    window.location.href = 'pages/login.html'; */
-  });
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+        loginBtn.textContent = "Logout";
+        loginBtn.onclick = async function() {
+            await logout();
+        };
+    } else {
+        loginBtn.textContent = "Login";
+        loginBtn.onclick = async function() {
+            await analyticsLogin();
+            window.location.href = 'pages/login.html';
+        };
+    }
     
   const canvas = document.getElementById('fx-canvas');
    const ctx = canvas.getContext('2d');
