@@ -16,3 +16,13 @@ export async function requireAuth(options = {}) {
   }
   return isLogged;
 }
+
+export async function logout() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("Logout error:", error);
+    return false;
+  }
+  window.location.href = "pages/login.html";
+  return true;
+}
