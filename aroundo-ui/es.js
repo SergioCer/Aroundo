@@ -3,6 +3,6 @@ export default {
     languageName: "Español",
 
     // PAGE TITLE
-    pageTitle: "¿Por qué Aroudo?",
+    pageTitle: "¿Por qué Aroudo?"
 
 };
