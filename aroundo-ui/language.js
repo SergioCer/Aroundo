@@ -65,6 +65,7 @@ async function translatePage(lang){
             element.textContent = dictionary[key];
         }
     });
+    document.documentElement.dir = dictionary.direction || "ltr";
     document.documentElement.lang = lang;
 }
 
