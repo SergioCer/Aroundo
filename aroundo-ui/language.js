@@ -71,13 +71,13 @@ async function translatePage(lang){
 
 function detectLanguage(){
     const saved = localStorage.getItem("aroundo-language");
-    if(saved && supportedLanguages.includes(saved)){
+    if(saved && supportedLanguages[saved]){
         return saved;
     }
     const browserLanguage =
         navigator.language
         .split("-")[0];
-    if(supportedLanguages.includes(browserLanguage)){
+    if(supportedLanguages[browserLanguage]){
         return browserLanguage;
     }
     return "en";
