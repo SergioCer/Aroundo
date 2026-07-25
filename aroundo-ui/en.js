@@ -2,6 +2,9 @@ export default {
 
     languageName: "English",
 
+    // PAGE TITLE
+    pageTitle: "Why Aroundo?",
+    
     // WHY AROUNDO
     whatTitle: "What is Aroundo?",
     whatText1: "Aroundo is a network of people, places and experiences. It connects those who want to discover events with those who create them, organize them or make the places where they happen available.",
