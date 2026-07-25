@@ -131,29 +131,19 @@ details li {
 <body>
 
 <div class="container">
-
+    <div class="page-header"> 
+      <button class="button-back" onclick="history.back()"; aria-label="Back"></button>
+    <div class="lang">
+      <button id="enBtn" class="active-lang" onclick="changeLanguage('en')">EN</button>
+      &nbsp;|&nbsp;
+      <button id="itBtn" class="inactive-lang" onclick="changeLanguage('it')">IT</button>
+    </div>
+  </div>
 
 <div class="logo">
 <img src="../icon-512.png" alt="Aroundo">
 </div>
-
-
-<div class="lang">
-
-<button id="enBtn"
-class="active-lang"
-onclick="changeLanguage('en')">
-EN
-</button>
-
-&nbsp;|&nbsp;
-
-<button id="itBtn"
-class="inactive-lang"
-onclick="changeLanguage('it')">
-IT
-</button>
-</div>
+  
 <h1 id="pageTitle"
 data-en="Why Aroundo?"
 data-it="Perché Aroundo?">
@@ -355,12 +345,6 @@ dipende dalle persone che li utilizzano.
    data-en="Join Aroundo"
    data-it="Entra in Aroundo">
 </a>
-<div class="button-back">
-<a href="login.html"
-   data-en="Back to login"
-   data-it="Torna al login">
-</a>
-</div>
 </div>
 
 <script>
