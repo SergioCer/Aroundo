@@ -1,37 +1,30 @@
 const supportedLanguages = {
     en: {
         file: "en.js",
-        name: "English",
         direction:"ltr"
     },
     it: {
         file: "it.js",
-        name: "Italiano",
         direction:"ltr"
     },
     fr: {
         file: "fr.js",
-        name: "Français",
         direction:"ltr"
     },
     de: {
         file: "de.js",
-        name: "Deutsch",
         direction:"ltr"
     },
     es: {
         file: "es.js",
-        name: "Español",
         direction:"ltr"
     },
     ar: {
         file: "ar.js",
-        name: "العربية",
         direction:"rtl"
     },
     zh: {
         file: "zh.js",
-        name: "中文",
         direction:"ltr"
     }
 };
@@ -65,7 +58,7 @@ async function translatePage(lang){
             element.textContent = dictionary[key];
         }
     });
-    document.documentElement.dir = dictionary.direction || "ltr";
+    document.documentElement.dir = supportedLanguages[lang].direction || "ltr";
     document.documentElement.lang = lang;
 }
 
