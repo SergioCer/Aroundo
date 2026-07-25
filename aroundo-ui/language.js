@@ -90,7 +90,7 @@ async function initLanguage(){
         document.getElementById("languageSelector");
     if(selector){
         selector.innerHTML = "";
-        for (const lang of supportedLanguages){
+        for (const lang of Object.keys(supportedLanguages)){
             try {
                 const module = await import(`./${lang}.js`);
                 const option =
