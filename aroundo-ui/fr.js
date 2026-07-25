@@ -3,6 +3,6 @@ export default {
     languageName: "Français",
 
     // PAGE TITLE
-    pageTitle: "Pourquoi Aroundo ?"
+    pageTitle: "Pourquoi Aroundo?"
 
 };
