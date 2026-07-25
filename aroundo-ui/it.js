@@ -2,6 +2,9 @@ export default {
 
     languageName: "Italiano",
 
+    // PAGE TITLE
+    pageTitle: "Perché Aroundo?",
+    
     // WHY AROUNDO
     whatTitle: "Cos'è Aroundo?",
     whatText1: "Aroundo è una rete di persone, luoghi ed esperienze. Connette chi vuole scoprire eventi con chi li crea, li organizza o rende disponibili i luoghi in cui si svolgono.",
