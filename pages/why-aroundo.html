@@ -124,22 +124,41 @@ details li {
 }
 
 </style>
-
 </head>
-
-
 <body>
 
 <div class="container">
-    <div class="page-header"> 
-      <button class="button-back" onclick="history.back()"; aria-label="Back"></button>
-    <div class="lang">
-      <button id="enBtn" class="active-lang" onclick="changeLanguage('en')">EN</button>
-      &nbsp;|&nbsp;
-      <button id="itBtn" class="inactive-lang" onclick="changeLanguage('it')">IT</button>
-    </div>
-  </div>
-
+  
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:24px;
+">
+<button
+    class="button-back"
+    onclick="history.back()"
+    aria-label="Back">
+</button>
+<select id="languageSelector"
+        style="
+        padding:6px 10px;
+        border:1px solid #d1d5db;
+        border-radius:8px;
+        background:white;
+        font-size:14px;
+        cursor:pointer;
+        ">
+<option value="en">English</option>
+<option value="it">Italiano</option>
+<option value="fr">Français</option>
+<option value="de">Deutsch</option>
+<option value="es">Español</option>
+<option value="ar">العربية</option>
+<option value="zh">中文</option>
+</select>
+</div>
+  
 <div class="logo">
 <img src="../icon-512.png" alt="Aroundo">
 </div>
