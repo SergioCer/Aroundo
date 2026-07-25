@@ -13,9 +13,20 @@ async function loadLanguage(lang){
     if(!supportedLanguages.includes(lang)){
         lang = "en";
     }
-    const module = await import(`./${lang}.js`);
-    currentLanguage = lang;
-    return module.default;
+    try {
+        const module = await import(`./${lang}.js`);
+        currentLanguage = lang;
+        return module.default;
+    } catch(error){
+        console.warn(
+            "Language not available:",
+            lang,
+            "Using English"
+        );
+        const module = await import("./en.js");
+        currentLanguage = "en";
+        return module.default;
+    }
 }
 
 async function translatePage(lang){
