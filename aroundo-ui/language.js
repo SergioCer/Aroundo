@@ -1,20 +1,48 @@
-const supportedLanguages = [
-    "en",
-    "it",
-    "fr",
-    "de",
-    "es",
-    "ar",
-    "zh"
-];
+const supportedLanguages = {
+    en: {
+        file: "en.js",
+        name: "English",
+        direction:"ltr"
+    },
+    it: {
+        file: "it.js",
+        name: "Italiano",
+        direction:"ltr"
+    },
+    fr: {
+        file: "fr.js",
+        name: "Français",
+        direction:"ltr"
+    },
+    de: {
+        file: "de.js",
+        name: "Deutsch",
+        direction:"ltr"
+    },
+    es: {
+        file: "es.js",
+        name: "Español",
+        direction:"ltr"
+    },
+    ar: {
+        file: "ar.js",
+        name: "العربية",
+        direction:"rtl"
+    },
+    zh: {
+        file: "zh.js",
+        name: "中文",
+        direction:"ltr"
+    }
+};
 
 let currentLanguage = "en";
 async function loadLanguage(lang){
-    if(!supportedLanguages.includes(lang)){
+    if(!supportedLanguages[lang]){
         lang = "en";
     }
     try {
-        const module = await import(`./${lang}.js`);
+        const module = await import(`./${supportedLanguages[lang].file}`);
         currentLanguage = lang;
         return module.default;
     } catch(error){
