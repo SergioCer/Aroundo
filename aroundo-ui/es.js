@@ -4,3 +4,5 @@ export default {
 
     // PAGE TITLE
     pageTitle: "¿Por qué Aroudo?",
+
+};
