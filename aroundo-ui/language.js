@@ -61,13 +61,22 @@ async function initLanguage(){
         document.getElementById("languageSelector");
     if(selector){
         selector.innerHTML = "";
-        supportedLanguages.forEach(lang=>{
-            const option =
-                document.createElement("option");
-            option.value = lang;
-            option.textContent = lang.toUpperCase();
-            selector.appendChild(option);
-        });
+        for (const lang of supportedLanguages){
+            try {
+                const module = await import(`./${lang}.js`);
+                const option =
+                    document.createElement("option");
+                option.value = lang;
+                option.textContent =
+                    module.default.languageName;
+                selector.appendChild(option);
+            } catch(error){
+                console.warn(
+                    "Missing language file:",
+                    lang
+                );
+            }
+        }
         selector.value = language;
         selector.addEventListener("change", async ()=>{
             const newLanguage = selector.value;
