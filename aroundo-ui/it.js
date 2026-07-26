@@ -66,7 +66,7 @@ export default {
     publishingList1: "prestazioni individuali",
     publishingList2: "consulenze professionali",
     publishingList3: "annunci di servizi",
-    publishingList4: "attività continuative prive di una reale opportunità di partecipazione pubblica"
+    publishingList4: "attività continuative prive di una reale opportunità di partecipazione pubblica",
     
     // FINAL MESSAGE
     finalMessage1: "Aroundo nasce dalle persone.",
