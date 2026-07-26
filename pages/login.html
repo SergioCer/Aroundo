@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="../aroundo-ui/aroundo-ui.css">  
 <title>Aroundo Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -32,6 +33,10 @@ body {
   margin-bottom:0px;
 }
 
+.login-box h2 {
+  margin:8px 0 8px;
+}
+  
 input {
   width:100%;
   box-sizing:border-box;
@@ -72,16 +77,13 @@ button:hover {
 </style>
 </head>
 <body>
-  
+<button class="button-back"
+        onclick="history.back()"
+        aria-label="Back">
+</button>  
 <div class="login-box">
 <img src="../icon-512.png" alt="Aroundo">
 <h2>Aroundo</h2>
-<div class="topbar" style="align-self: center;">
-    <div style="display:inline-flex;align-items:center;gap:20px;">
-        <button class="btn-icon" onclick="history.back()">←</button>
-        <div style="font-size:30px;">Home</div>
-    </div>
-</div>    
 <div style="
     margin-top:4px;
     margin-bottom:12px;
