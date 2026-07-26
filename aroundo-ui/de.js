@@ -52,6 +52,22 @@ export default {
     trustText2: "Die Plattform stellt die Werkzeuge bereit, aber die Qualität des Erlebnisses hängt von den Menschen ab, die sie nutzen.",
     trustText3: "Genaue Informationen, Respekt gegenüber Orten und Veranstaltungen sowie die Zusammenarbeit zwischen den Nutzern ermöglichen das Wachstum des Netzwerks.",
 
+    // PUBLISHING GUIDELINES
+    publishingTitle: "Richtlinien für Veröffentlichungen",
+    publishingText1: "Aroundo wurde entwickelt, um Menschen dabei zu helfen, zu entdecken, was sie tun, erleben und besuchen können.",
+    publishingText2: "Willkommen sind alle Veröffentlichungen, die Menschen eine konkrete Möglichkeit bieten, an einer Aktivität teilzunehmen, eine Erfahrung zu erleben oder einen öffentlich zugänglichen Ort zu besuchen.",
+    publishingText3: "Die Teilnahme kann kostenlos oder kostenpflichtig sein. Das Vorhandensein eines Preises bestimmt nicht die Art der Veröffentlichung.",
+    publishingText4: "Wenn Zweifel bestehen, fragt sich Aroundo nicht einfach: \"Ist das eine Veranstaltung?\" sondern vielmehr:",
+    publishingText5: "Bereichert ein auf Aroundo geteilter Beitrag das Netzwerk, indem er Menschen eine echte Möglichkeit bietet, an einer Aktivität teilzunehmen, eine Erfahrung zu erleben oder einen Ort zu besuchen?",
+    publishingText6: "Wenn die Antwort ja ist, kann die Veröffentlichung auf Aroundo Platz finden.",
+    publishingSubtitle: "Was nicht veröffentlicht werden kann",
+    publishingText7: "Nicht erlaubt sind Veröffentlichungen, die hauptsächlich das Angebot einer professionellen Dienstleistung oder einer individuellen Leistung darstellen, ohne eine echte Möglichkeit zur öffentlichen Teilnahme.",
+    publishingText8: "Insbesondere gehören folgende Inhalte nicht zum Zweck der Plattform:",
+    publishingList1: "individuelle Dienstleistungen",
+    publishingList2: "professionelle Beratungen",
+    publishingList3: "Dienstleistungsanzeigen",
+    publishingList4: "fortlaufende Aktivitäten ohne eine echte Möglichkeit zur öffentlichen Teilnahme",
+    
     // FINAL MESSAGE
     finalMessage1: "Aroundo entsteht durch Menschen.",
     finalMessage2: "Wähle, wie du Teil davon sein möchtest.",
