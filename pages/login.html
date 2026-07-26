@@ -34,7 +34,7 @@ body {
 }
 
 .login-box h2 {
-  margin:8px 0 8px;
+  margin:2px 0 4px;
 }
   
 input {
@@ -73,21 +73,55 @@ button:hover {
     color:black;
     padding:4px;
 }
+
+.action-button {
+  display:block;
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  text-decoration:none;
+  text-align:center;
+  font-weight:700;
+  margin-top:8px;
+}
+  
+.login-action {
+  background:#22c55e;
+  color:white;
+}
+
+.register-action {
+  background:#3b82f6;
+  color:white;
+}
+
+.why-action {
+  background:#f59e0b;
+  color:white;
+}
+
+.login-header {
+  display:flex;
+  justify-content:flex-start;
+  margin-bottom:0;
+}
   
 </style>
 </head>
 <body>
 <div class="login-box">
-<button class="button-back"
-        onclick="history.back()"
-        aria-label="Back">
-</button>  
+<div class="login-header">
+    <button class="button-back"
+            onclick="history.back()"
+            aria-label="Back">
+    </button>
+</div>
   
 <img src="../icon-512.png" alt="Aroundo">
 <h2>Aroundo</h2>
 <div style="
     margin-top:4px;
-    margin-bottom:12px;
+    margin-bottom:8px;
     font-size:14px;
     color:#666;
     letter-spacing:.5px;
@@ -102,16 +136,25 @@ button:hover {
  id="password"
  type="password"
  placeholder="Password">
-<button id="loginBtn">
+  
+<!--  <button id="loginBtn">
 Login
 </button>
 <div style="
   margin-top:12px;
   font-size:13px;
   color:#666;
-">
+"> 
+-->
+<button class="action-button login-action">
+Login
+</button>
+  
+  
   Don't have an account yet?
   <br><br>
+  
+ <!-- 
   <a href="#"
      id="registerLink"
      style="
@@ -122,6 +165,13 @@ Login
      Register
   </a>
 <br><br>
+-->
+
+<a href="#" id="registerLink" class="action-button register-action">
+Register
+</a>  
+  
+<!--  
   <a href="why-aroundo.html"
      style="
        color:#16a34a;
@@ -130,7 +180,13 @@ Login
      ">
      Why Aroundo?
   </a>
+-->
+<a href="why-aroundo.html" class="action-button why-action">
+Why Aroundo?
+</a>
+  
 </div>  
+  
 <div style="
     margin-top:25px;
     font-size:11px;
