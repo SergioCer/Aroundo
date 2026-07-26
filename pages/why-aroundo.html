@@ -108,22 +108,60 @@ details li {
 }
 
 .language-selector {
+  position:relative;
+}
+
+#languageButton {
   padding:6px 12px;
   border:1px solid #d1d5db;
   border-radius:12px;
   background:#ecf3fb;
   font-size:16px;
   cursor:pointer;
-  max-width:150px;
+  min-width:120px;
 }
 
-@media (max-width:600px){
-  .language-selector {
-    max-width:120px;
+#languageMenu {
+  display:none;
+  position:absolute;
+  right:0;
+  top:42px;
+  background:white;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,.15);
+  overflow:hidden;
+  z-index:100;
+  min-width:150px;
+}
+
+#languageMenu button {
+  width:100%;
+  border:0;
+  background:white;
+  padding:10px 14px;
+  text-align:left;
+  font-size:15px;
+  cursor:pointer;
+}
+
+#languageMenu button:hover {
+  background:#ecf3fb;
+}
+
+@media(max-width:600px){
+
+  #languageButton {
     font-size:14px;
+    min-width:100px;
     padding:6px 8px;
   }
-}  
+
+  #languageMenu {
+    min-width:130px;
+  }
+
+}
 
 </style>
 </head>
@@ -142,7 +180,13 @@ margin-bottom:4px;
     onclick="history.back()"
     aria-label="Back">
 </button>
-<select id="languageSelector" class="language-selector"></select>
+<!-- CANCELLARE selettore precedente  <select id="languageSelector" class="language-selector"></select> --> 
+  <div class="language-selector">
+      <button id="languageButton">
+      </button>
+      <div id="languageMenu">
+      </div>
+  </div>  
 </div>
   
 <div class="logo">
