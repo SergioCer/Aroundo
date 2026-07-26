@@ -52,6 +52,22 @@ export default {
     trustText2: "La plataforma proporciona las herramientas, pero la calidad de la experiencia depende de las personas que las utilizan.",
     trustText3: "La información precisa, el respeto por los lugares y eventos, y la colaboración entre los usuarios son lo que permite que la red crezca.",
 
+    // PUBLISHING GUIDELINES
+    publishingTitle: "Directrices para las publicaciones",
+    publishingText1: "Aroundo nace para ayudar a las personas a descubrir qué pueden hacer, vivir y visitar.",
+    publishingText2: "Son bienvenidas todas las publicaciones que ofrecen a las personas una oportunidad concreta de participar en una actividad, vivir una experiencia o visitar un lugar abierto al público.",
+    publishingText3: "La participación puede ser gratuita o de pago. La presencia de un coste no determina la naturaleza de la publicación.",
+    publishingText4: "Cuando existe una duda, Aroundo no se pregunta simplemente: \"¿Es un evento?\" sino más bien:",
+    publishingText5: "¿Un contenido compartido en Aroundo enriquece la red ofreciendo a las personas una oportunidad real de participar en una actividad, vivir una experiencia o visitar un lugar?",
+    publishingText6: "Si la respuesta es sí, la publicación puede encontrar su lugar en Aroundo.",
+    publishingSubtitle: "Qué no puede publicarse",
+    publishingText7: "No están permitidas las publicaciones que consisten principalmente en ofrecer un servicio profesional o una prestación individual, sin una oportunidad real de participación abierta al público.",
+    publishingText8: "En particular, no forman parte de la finalidad de la plataforma:",
+    publishingList1: "prestaciones individuales",
+    publishingList2: "consultas profesionales",
+    publishingList3: "anuncios de servicios",
+    publishingList4: "actividades continuas sin una oportunidad real de participación pública",
+    
     // FINAL MESSAGE
     finalMessage1: "Aroundo nace de las personas.",
     finalMessage2: "Elige cómo quieres formar parte de ella.",
