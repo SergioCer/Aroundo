@@ -54,7 +54,7 @@ export default {
 
     // PUBLISHING GUIDELINES
     publishingTitle: "Publishing Guidelines",
-    publishingText1: "Welcome are all publications that represent a concrete opportunity for people to participate in an activity, live an experience or visit a place open to the public.",
+    publishingText1: "All publications are welcome when they represent a concrete opportunity for people to participate in an activity, live an experience or visit a place open to the public.",
     publishingText2: "When there is doubt, Aroundo does not simply ask: \"Is this an event?\" but rather:",
     publishingText3: "\"Does a contribution shared on Aroundo enrich the network by offering people a real opportunity to participate in an activity, live an experience or visit a place?\"",
     publishingText4: "If the answer is yes, the publication can find a place on Aroundo.",
