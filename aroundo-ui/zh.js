@@ -54,19 +54,17 @@ export default {
 
     // PUBLISHING GUIDELINES
     publishingTitle: "发布指南",
-    publishingText1: "Aroundo 的诞生旨在帮助人们发现自己可以参与、体验和参观的内容。",
-    publishingText2: "欢迎所有能够为人们提供真实参与机会的发布内容，例如参与一项活动、体验一种经历或参观一个向公众开放的地点。",
-    publishingText3: "参与可以是免费的，也可以是付费的。是否收费并不决定发布内容的性质。",
-    publishingText4: "当存在疑问时，Aroundo 不只是问：“这是一个活动吗？”而是问：",
-    publishingText5: "在 Aroundo 上分享的内容，是否通过为人们提供真实的机会参与活动、体验经历或参观地点，从而丰富了整个网络？",
-    publishingText6: "如果答案是肯定的，该发布内容就可以在 Aroundo 上展示。",
-    publishingSubtitle: "什么内容不能发布",
-    publishingText7: "主要用于推广专业服务或个人服务，且没有真正面向公众参与机会的发布内容，不属于 Aroundo 的范围。",
-    publishingText8: "特别是，以下内容不属于平台的目标范围：",
+    publishingText1: "欢迎所有能够为人们提供具体参与机会的内容，例如参与一项活动、体验一种经历或参观一个向公众开放的地点。",
+    publishingText2: "当存在疑问时，Aroundo 不只是问：\"这是一个活动吗？\" 而是问：",
+    publishingText3: "\"在 Aroundo 上分享的内容，是否通过为人们提供参与活动、体验经历或参观地点的真实机会，丰富了整个网络？\"",
+    publishingText4: "如果答案是肯定的，该内容就可以在 Aroundo 上发布。",
+    publishingSubtitle: "不能发布的内容",
+    publishingText5: "主要目的是提供专业服务或个人服务，而不是提供面向公众参与机会的内容，不允许在平台上发布。",
+    publishingText6: "特别是，以下内容不属于平台的定位范围：",
     publishingList1: "个人服务",
     publishingList2: "专业咨询",
     publishingList3: "服务广告",
-    publishingList4: "缺乏真实公众参与机会的持续性活动",
+    publishingList4: "缺少公众参与机会的持续性活动",
     
     // FINAL MESSAGE
     finalMessage1: "Aroundo 源于人。",
