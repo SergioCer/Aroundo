@@ -52,6 +52,22 @@ export default {
     trustText2: "平台提供工具，但体验的质量取决于使用这些工具的人。",
     trustText3: "准确的信息、对地点和活动的尊重，以及用户之间的合作，是推动网络成长的关键。",
 
+    // PUBLISHING GUIDELINES
+    publishingTitle: "发布指南",
+    publishingText1: "Aroundo 的诞生旨在帮助人们发现自己可以参与、体验和参观的内容。",
+    publishingText2: "欢迎所有能够为人们提供真实参与机会的发布内容，例如参与一项活动、体验一种经历或参观一个向公众开放的地点。",
+    publishingText3: "参与可以是免费的，也可以是付费的。是否收费并不决定发布内容的性质。",
+    publishingText4: "当存在疑问时，Aroundo 不只是问：“这是一个活动吗？”而是问：",
+    publishingText5: "在 Aroundo 上分享的内容，是否通过为人们提供真实的机会参与活动、体验经历或参观地点，从而丰富了整个网络？",
+    publishingText6: "如果答案是肯定的，该发布内容就可以在 Aroundo 上展示。",
+    publishingSubtitle: "什么内容不能发布",
+    publishingText7: "主要用于推广专业服务或个人服务，且没有真正面向公众参与机会的发布内容，不属于 Aroundo 的范围。",
+    publishingText8: "特别是，以下内容不属于平台的目标范围：",
+    publishingList1: "个人服务",
+    publishingList2: "专业咨询",
+    publishingList3: "服务广告",
+    publishingList4: "缺乏真实公众参与机会的持续性活动",
+    
     // FINAL MESSAGE
     finalMessage1: "Aroundo 源于人。",
     finalMessage2: "选择你希望参与其中的方式。",
