@@ -79,8 +79,63 @@ function detectLanguage(){
 async function initLanguage(){
     const language = detectLanguage();
     await translatePage(language);
-    const selector =
-        document.getElementById("languageSelector");
+    // CANCELLARE vecchia vesione const selector =
+    //    document.getElementById("languageSelector");
+        const button =
+    document.getElementById("languageButton");
+const menu =
+    document.getElementById("languageMenu");
+if(button && menu){
+    button.textContent =
+        (await import(`./${language}.js`))
+        .default
+        .languageName
+        + " ▼";
+    menu.innerHTML = "";
+    for (const lang of Object.keys(supportedLanguages)){
+        try {
+            const module =
+                await import(`./${lang}.js`);
+            const option =
+                document.createElement("button");
+            option.textContent =
+                module.default.languageName;
+            option.addEventListener("click", async ()=>{
+                localStorage.setItem(
+                    "aroundo-language",
+                    lang
+                );
+                menu.style.display="none";
+                await translatePage(lang);
+                const updated =
+                    await import(`./${lang}.js`);
+                button.textContent =
+                    updated.default.languageName
+                    + " ▼";
+            });
+            menu.appendChild(option);
+        } catch(error){
+            console.warn(
+                "Missing language file:",
+                lang
+            );
+        }
+    }
+    button.addEventListener("click",()=>{
+        menu.style.display =
+            menu.style.display === "block"
+            ? "none"
+            : "block";
+    });
+    document.addEventListener("click",(event)=>{
+        if(!event.target.closest(".language-selector")){
+            menu.style.display="none";
+        }
+    });
+}
+
+    
+    
     if(selector){
         selector.innerHTML = "";
         for (const lang of Object.keys(supportedLanguages)){
