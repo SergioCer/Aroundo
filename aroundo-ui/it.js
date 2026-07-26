@@ -52,6 +52,22 @@ export default {
     trustText2: "La piattaforma fornisce gli strumenti, ma la qualità dell'esperienza dipende dalle persone che li utilizzano.",
     trustText3: "Informazioni accurate, rispetto per luoghi ed eventi e collaborazione tra gli utenti sono ciò che permette alla rete di crescere.",
 
+    // PUBLISHING GUIDELINES
+    publishingTitle: "Linee guida per le pubblicazioni",
+    publishingText1: "Aroundo nasce per aiutare le persone a scoprire cosa possono fare, vivere e visitare.",
+    publishingText2: "Sono benvenute tutte le pubblicazioni che offrono alle persone un'opportunità concreta di partecipare a un'attività, vivere un'esperienza o visitare un luogo aperto al pubblico.",
+    publishingText3: "La partecipazione può essere gratuita o a pagamento. La presenza di un costo non determina la natura della pubblicazione.",
+    publishingText4: "Quando esiste un dubbio, Aroundo non si chiede semplicemente: \"È un evento?\" ma piuttosto:",
+    publishingText5: "\"Un contributo condiviso su Aroundo arricchisce la rete offrendo alle persone una reale opportunità di partecipare a un'attività, vivere un'esperienza o visitare un luogo?\"",
+    publishingText6: "Se la risposta è sì, la pubblicazione può trovare spazio su Aroundo.",
+    publishingSubtitle: "Cosa non può essere pubblicato",
+    publishingText7: "Non sono ammesse pubblicazioni che consistono principalmente nell'offerta di un servizio professionale o di una prestazione individuale, senza una reale opportunità di partecipazione aperta al pubblico.",
+    publishingText8: "In particolare non rientrano nelle finalità della piattaforma:",
+    publishingList1: "prestazioni individuali",
+    publishingList2: "consulenze professionali",
+    publishingList3: "annunci di servizi",
+    publishingList4: "attività continuative prive di una reale opportunità di partecipazione pubblica"
+    
     // FINAL MESSAGE
     finalMessage1: "Aroundo nasce dalle persone.",
     finalMessage2: "Scegli come vuoi farne parte.",
