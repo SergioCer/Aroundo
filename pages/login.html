@@ -113,6 +113,20 @@ button.action-button {
 .password-toggle:hover {
   opacity:.7;
 }  
+
+.info-text {
+  text-align:center;
+  color:#666;
+  font-size:13px;
+  letter-spacing:.3px;
+}
+
+.info-text.small {
+  margin-top:25px;
+  font-size:11px;
+  color:#999;
+  letter-spacing:0;
+}  
   
 </style>
 </head>
@@ -127,15 +141,9 @@ button.action-button {
   
 <img src="../icon-512.png" alt="Aroundo">
 <h2>Aroundo</h2>
-<div style="
-    margin-top:4px;
-    margin-bottom:8px;
-    font-size:14px;
-    color:#666;
-    letter-spacing:.5px;
-">
-    Explore • Discover • Experience
-</div>
+
+<div class="info-text">Explore • Discover • Experience</div>
+
 <input 
  id="email"
  type="email"
@@ -159,15 +167,7 @@ button.action-button {
 Login
 </button>
 
-<div style="
-  margin-top:8px;
-  margin-bottom:8px;
-  text-align:center;
-  font-size:13px;
-  color:#666;
-">
-  Don't have an account yet?
-</div>
+<div class="info-text">Don't have an account yet?</div>
  
 <a href="#" id="registerLink" class="action-button register-action">
 Register
@@ -177,19 +177,9 @@ Register
 Why Aroundo?
 </a>
   
-<div style="
-    margin-top:25px;
-    font-size:11px;
-    color:#999;
-    text-align:center;
-">
-    Aroundo is continuously evolving.<br>
-    New features will become available over time.
-</div>  
+<div class="info-text small">Aroundo is continuously evolving.<br>New features will become available over time.</div>  
 </div>
 
-
-  
 <!-- LOGIN ERROR DIALOG -->
   <div id="loginErrorDialog" style="
     display:none;
