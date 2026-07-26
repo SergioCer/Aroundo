@@ -133,9 +133,8 @@ if(button && menu){
         }
     });
 }
-
     
-    
+   /* CANCELLARE vecchia gestione menu selettore lingue 
     if(selector){
         selector.innerHTML = "";
         for (const lang of Object.keys(supportedLanguages)){
@@ -163,8 +162,9 @@ if(button && menu){
             );
             await translatePage(newLanguage);
         });
-    }
+    }  fino a qui */
 }
+
 export {
     initLanguage
 };
