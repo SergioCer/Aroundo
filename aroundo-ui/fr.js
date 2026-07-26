@@ -54,19 +54,17 @@ export default {
 
     // PUBLISHING GUIDELINES
     publishingTitle: "Lignes directrices pour les publications",
-    publishingText1: "Aroundo est conçu pour aider les personnes à découvrir ce qu'elles peuvent faire, vivre et visiter.",
-    publishingText2: "Sont les bienvenues toutes les publications qui offrent aux personnes une opportunité concrète de participer à une activité, vivre une expérience ou visiter un lieu ouvert au public.",
-    publishingText3: "La participation peut être gratuite ou payante. La présence d'un coût ne détermine pas la nature de la publication.",
-    publishingText4: "En cas de doute, Aroundo ne se demande pas simplement : \"Est-ce un événement ?\" mais plutôt :",
-    publishingText5: "Un contenu partagé sur Aroundo enrichit-il le réseau en offrant aux personnes une réelle opportunité de participer à une activité, vivre une expérience ou visiter un lieu ?",
-    publishingText6: "Si la réponse est oui, la publication peut trouver sa place sur Aroundo.",
+    publishingText1: "Toutes les publications sont les bienvenues lorsqu'elles représentent une opportunité concrète de participer à une activité, de vivre une expérience ou de visiter un lieu ouvert au public.",
+    publishingText2: "En cas de doute, Aroundo ne se demande pas simplement : \"Est-ce un événement ?\" mais plutôt :",
+    publishingText3: "\"Une contribution partagée sur Aroundo enrichit-elle le réseau en offrant aux personnes une réelle opportunité de participer à une activité, de vivre une expérience ou de visiter un lieu ?\"",
+    publishingText4: "Si la réponse est oui, la publication peut trouver sa place sur Aroundo.",
     publishingSubtitle: "Ce qui ne peut pas être publié",
-    publishingText7: "Les publications qui consistent principalement à proposer un service professionnel ou une prestation individuelle, sans réelle possibilité de participation ouverte au public, ne sont pas autorisées.",
-    publishingText8: "En particulier, ne correspondent pas aux objectifs de la plateforme :",
+    publishingText5: "Les publications dont l'objectif principal est de proposer un service professionnel ou une prestation individuelle, sans réelle opportunité de participation ouverte au public, ne sont pas autorisées.",
+    publishingText6: "Ne correspondent notamment pas aux objectifs de la plateforme :",
     publishingList1: "prestations individuelles",
     publishingList2: "consultations professionnelles",
     publishingList3: "annonces de services",
-    publishingList4: "activités continues sans réelle possibilité de participation publique",
+    publishingList4: "activités continues sans réelle opportunité de participation publique",
     
     // FINAL MESSAGE
     finalMessage1: "Aroundo naît des personnes.",
