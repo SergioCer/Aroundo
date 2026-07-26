@@ -87,6 +87,28 @@ button.action-button {
   justify-content:flex-start;
   margin-bottom:0;
 }
+
+.password-wrapper {
+  position:relative;
+}
+
+.password-wrapper input {
+  padding-right:45px;
+}
+
+.password-toggle {
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  width:auto;
+  background:none;
+  border:none;
+  padding:4px;
+  cursor:pointer;
+  font-size:18px;
+  color:#666;
+}
   
 </style>
 </head>
@@ -114,10 +136,21 @@ button.action-button {
  id="email"
  type="email"
  placeholder="Email">
+
 <input
- id="password"
- type="password"
- placeholder="Password">
+  <div class="password-wrapper">
+    <input
+     id="password"
+     type="password"
+     placeholder="Password">
+    <button 
+      type="button"
+      id="togglePassword"
+      class="password-toggle"
+      aria-label="Show password">
+      👁
+    </button>
+  </div>
   
 <button id="loginBtn" class="action-button login-action">
 Login
@@ -203,6 +236,17 @@ Why Aroundo?
     allowGuest: true
   });
 
+document.getElementById('togglePassword')
+.addEventListener('click', () => {
+  const password =
+  document.getElementById('password');
+  if(password.type === "password"){
+      password.type = "text";
+  } else {
+      password.type = "password";
+  }
+});
+  
 document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
   document.getElementById('loginErrorDialog').style.display = 'none';
 });
