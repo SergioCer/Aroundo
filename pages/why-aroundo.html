@@ -152,6 +152,14 @@ details li {
   background:#ecf3fb;
 }
 
+.top-bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:4px;
+  direction:ltr;
+}  
+
 @media(max-width:600px){
 
   #languageButton {
@@ -171,29 +179,30 @@ details li {
 <body>
 
 <div class="container">
-  
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:4px;
-">
-<button
-    class="button-back"
-    onclick="history.back()"
-    aria-label="Back">
-</button>
-<!-- CANCELLARE selettore precedente  <select id="languageSelector" class="language-selector"></select> --> 
-  <div class="language-selector">
-      <button id="languageButton">
-      </button>
-      <div id="languageMenu">
-      </div>
-  </div>  
-</div>
+
+<div class="top-bar">  
+  <div style="
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:4px;
+  ">
+  <button
+      class="button-back"
+      onclick="history.back()"
+      aria-label="Back">
+  </button>
+      <div class="language-selector">
+        <button id="languageButton">
+        </button>
+        <div id="languageMenu">
+        </div>
+    </div>  
+  </div>
+</div>  
   
 <div class="logo">
-<img src="../icon-512.png" alt="Aroundo">
+  <img src="../icon-512.png" alt="Aroundo">
 </div>
   
 <h1 data-lang="pageTitle"></h1>
