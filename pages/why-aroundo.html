@@ -107,6 +107,24 @@ details li {
   font-size:13px;
 }
 
+.language-selector {
+  padding:6px 12px;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  background:#ecf3fb;
+  font-size:16px;
+  cursor:pointer;
+  max-width:150px;
+}
+
+@media (max-width:600px){
+  .language-selector {
+    max-width:120px;
+    font-size:14px;
+    padding:6px 8px;
+  }
+}  
+
 </style>
 </head>
 <body>
@@ -124,16 +142,7 @@ margin-bottom:4px;
     onclick="history.back()"
     aria-label="Back">
 </button>
-<select id="languageSelector"
-        style="
-        padding:6px 12px;
-        border:1px solid #d1d5db;
-        border-radius:12px;
-        background:#ecf3fb;
-        font-size:16px;
-        cursor:pointer;
-        ">
-</select>
+<select id="languageSelector" class="language-selector"></select>
 </div>
   
 <div class="logo">
