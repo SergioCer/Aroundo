@@ -662,17 +662,17 @@ const btn = document.getElementById("btnAddSeries");
   }
 }  
 
-ev_titolo.addEventListener("input", () => {
-  if (ev_titolo.value.trim()) {
-    ev_titolo.classList.remove("guide-active");
+const titoloField = document.getElementById("ev_titolo");
+titoloField.addEventListener("input", () => {
+  if (titoloField.value.trim()) {
+    titoloField.classList.remove("guide-active");
   }
 });
   
 /* LOAD */
 async function load() {
   if (isNew && !duplicateId) {
-      document.getElementById("ev_titolo") 
-    .classList.add("guide-active");
+    titoloField.classList.add("guide-active");
     original = JSON.stringify({});
     return;
   }
