@@ -695,6 +695,7 @@ const btn = document.getElementById("btnAddSeries");
 async function load() {
   if (isNew && !duplicateId) {
     original = JSON.stringify({});
+    setTimeout(updateGuide, 100);
     return;
   }
   const { data, error } = await supabase
@@ -814,7 +815,56 @@ window.markDirty = () => {
   dirty = current !== original;
   document.getElementById('backBtn')
     .classList.toggle('dirty', dirty);
+updateGuide();  
 };
+
+/* Visita Guidata su Aroundo */ 
+function updateGuide() {
+  // solo nuovi eventi
+  if (!isNew || duplicateId) return;
+  const fields = [
+    {
+      id: "ev_titolo",
+      valid: () => ev_titolo.value.trim() !== ""
+    },
+    {
+      id: "ev_descrizione",
+      valid: () => ev_descrizione.value.trim() !== ""
+    },
+    {
+      id: "id_categoria",
+      valid: () => id_categoria.value !== ""
+    },
+    {
+      id: "id_comune_evento",
+      valid: () => id_comune_evento_hidden.value !== ""
+    },
+    {
+      id: "id_luogo",
+      valid: () => id_luogo.value !== ""
+    },
+    {
+      id: "id_organizzatore",
+      valid: () => id_organizzatore_hidden.value !== ""
+    },
+    {
+      id: "ev_inizio",
+      valid: () => ev_inizio.value !== ""
+    }
+  ];
+  // pulisce tutti
+  fields.forEach(f => {
+    document.getElementById(f.id)
+      ?.classList.remove("guide-active");
+  });
+  // trova il primo campo mancante
+  const next = fields.find(f => !f.valid());
+  if (next) {
+    document.getElementById(next.id)
+      ?.classList.add("guide-active");
+  }
+}
+  
 
 window.duplicateEvent = () => {
   if (!id) return;
@@ -1437,10 +1487,6 @@ function updateStatusBox(){
     'active',
     ev_attivo.checked
   );
-}
-
-if (isNew && !duplicateId) {
-  document.getElementById("ev_titolo").classList.add("guide-active");
 }
   
 await loadComuni();  
