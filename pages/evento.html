@@ -245,24 +245,8 @@ input, select, textarea {
 }
 
 .guide-active {
-  background: linear-gradient(
-    90deg,
-    #ecfdf5,
-    #d1fae5,
-    #ecfdf5
-  );
-  background-size: 200% 100%;
-  animation: guideWave 3s ease infinite;
-  border-color: #22c55e;
-}
-
-@keyframes guideWave {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  background: #dcfce7 !important;
+  border: 2px solid #22c55e !important;
 }
   
 </style>
@@ -280,7 +264,7 @@ input, select, textarea {
 
 <!-- TITOLO -->
 <div class="hero">
-  <input id="ev_titolo" class="guide-active" placeholder="Event title..." oninput="markDirty()">
+  <input id="ev_titolo" placeholder="Event title..." oninput="markDirty()">
 </div>
 
 <div class="card">
@@ -662,17 +646,9 @@ const btn = document.getElementById("btnAddSeries");
   }
 }  
 
-const titoloField = document.getElementById("ev_titolo");
-titoloField.addEventListener("input", () => {
-  if (titoloField.value.trim()) {
-    titoloField.classList.remove("guide-active");
-  }
-});
-  
 /* LOAD */
 async function load() {
   if (isNew && !duplicateId) {
-    titoloField.classList.add("guide-active");
     original = JSON.stringify({});
     return;
   }
@@ -1415,6 +1391,10 @@ function updateStatusBox(){
     'active',
     ev_attivo.checked
   );
+}
+
+if (isNew && !duplicateId) {
+  document.getElementById("ev_titolo").classList.add("guide-active");
 }
   
 await loadComuni();  
