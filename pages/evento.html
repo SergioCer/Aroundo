@@ -640,10 +640,31 @@ async function loadSelects() {
   .from('categorie')
   .select('*')
   .order('mc_ordine', { ascending: true });
+    const { data: sub } = await supabase
+    .from('subcategorie')
+    .select('id_categoria, sc_descrizione')
+    .eq('sc_attiva', true)
+    .order('sc_ordine', { ascending: true });
+    // raggruppa sottocategorie per categoria
+    const subMap = {};
+    (sub || []).forEach(s => {
+      if (!subMap[s.id_categoria]) {
+        subMap[s.id_categoria] = [];
+      }
+      subMap[s.id_categoria].push(s.sc_descrizione);
+    });
   id_categoria.innerHTML = `<option value="">Category...</option>`;
-  (cat || []).forEach(c => {
-    id_categoria.innerHTML += `<option value="${c.id_categoria}">${c.mc_descrizione}</option>`;
-  });
+    (cat || []).forEach(c => {
+      let label = c.mc_descrizione;
+      if (subMap[c.id_categoria]) {
+        label += " · " + subMap[c.id_categoria].join(" · ");
+      }
+      id_categoria.innerHTML += `
+        <option value="${c.id_categoria}">
+          ${label}
+        </option>
+      `;
+    });
   id_luogo.innerHTML = `<option value="">Place...</option>`;
   const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">Organizzatore...</option>`;
