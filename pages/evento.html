@@ -634,7 +634,7 @@ async function loadSelects() {
   .from('categorie')
   .select('*')
   .order('mc_ordine', { ascending: true });
-  id_categoria.innerHTML = ``;
+  id_categoria.innerHTML = `<option value="">Category...</option>`;
   (cat || []).forEach(c => {
     id_categoria.innerHTML += `<option value="${c.id_categoria}">${c.mc_descrizione}</option>`;
   });
@@ -775,7 +775,8 @@ async function loadComuni() {
 
 window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
-  id_luogo.innerHTML = ``;
+  id_luogo.innerHTML = `<option value="">Place...</option>`;
+  id_luogo.value = "";
   if (!idComune) return;
   const { data } = await supabase
     .from('luoghi')
