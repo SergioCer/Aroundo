@@ -908,6 +908,9 @@ window.searchOrganizzatori = async (text) => {
   const box = document.getElementById('organizzatoriResults');
   if (text.length < 3) {
     box.innerHTML = '';
+    id_organizzatore_hidden.value = "";
+    document.getElementById("id_event_series").value = "";
+    markDirty();
     return;
   }
   const { data } = await supabase
