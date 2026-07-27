@@ -878,6 +878,7 @@ window.searchComuni = async (text) => {
     id_comune_evento_hidden.value = "";
     id_luogo.innerHTML = `<option value="">Place...</option>`;
     id_luogo.value = "";
+    markDirty();
     updateMapButton()
     return;
   }
