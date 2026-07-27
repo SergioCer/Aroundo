@@ -264,7 +264,7 @@ input, select, textarea {
 
 <!-- TITOLO -->
 <div class="hero">
-  <input id="ev_titolo" placeholder="Event title..." oninput="markDirty()">
+  <input id="ev_titolo" autocomplete="off" placeholder="Event title..." oninput="markDirty()">
 </div>
 
 <div class="card">
@@ -274,16 +274,16 @@ input, select, textarea {
   <select id="id_categoria" oninput="markDirty()"></select>
 
   <!-- DESCRIZIONE -->
-  <textarea id="ev_descrizione" placeholder="Event description..." rows="4" oninput="markDirty()"></textarea>
+  <textarea id="ev_descrizione" autocomplete="off" placeholder="Event description..." rows="4" oninput="markDirty()"></textarea>
   
   <!-- COMUNE -->
-  <input id="id_comune_evento" placeholder="City, min 3 chars to search..." oninput="searchComuni(this.value)">
+  <input id="id_comune_evento" autocomplete="off" placeholder="City, min 3 chars to search..." oninput="searchComuni(this.value)">
   <input type="hidden" id="id_comune_evento_hidden">
 <div id="comuniResults" class="search-results"></div>
 
   <!-- LUOGO -->
   <div style="display:flex; gap:10px; align-items:center;">
-  <select id="id_luogo" oninput="markDirty()" style="flex:1;"></select>
+  <select id="id_luogo" autocomplete="off" oninput="markDirty()" style="flex:1;"></select>
     
     <div style="position:relative; display:inline-block;">
     <button id="mapBtn" class="btn-icon btn-blue map-btn" onclick="openMapByComune()">📍</button>
@@ -294,7 +294,7 @@ input, select, textarea {
   
   <!-- ORGANIZZATORE -->
   <div style="display:flex; gap:10px; align-items:center;">
-  <input id="id_organizzatore" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
+  <input id="id_organizzatore" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
     
     <input type="hidden" id="id_organizzatore_hidden">
     
@@ -568,6 +568,31 @@ let seriesCache = [];
 let selectedCoverFile = null;
 let coverDeleted = false;
 let currentCover = null;
+
+// sequenza dei campi sia con tab che con enter  
+document.addEventListener("keydown", function(e) {
+  if (e.key !== "Enter") return;
+  const el = e.target;
+  // evita comportamenti strani nelle textarea
+  if (el.tagName === "TEXTAREA") return;
+  e.preventDefault();
+  const focusable = [
+    "ev_titolo",
+    "id_categoria",
+    "id_comune_evento",
+    "id_luogo",
+    "id_organizzatore",
+    "ev_inizio",
+    "ev_fine",
+    "ev_costo",
+    "ev_capienza",
+    "ev_link"
+  ];
+  const index = focusable.indexOf(el.id);
+  if (index >= 0 && index < focusable.length - 1) {
+    document.getElementById(focusable[index + 1]).focus();
+  }
+});
   
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
