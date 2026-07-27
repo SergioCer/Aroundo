@@ -54,17 +54,17 @@ export default {
 
     // PUBLISHING GUIDELINES
     publishingTitle: "Linee guida per le pubblicazioni",
-    publishingText1: "Sono benvenute tutte le pubblicazioni che rappresentano un'opportunità concreta di partecipare a un'attività, vivere un'esperienza o visitare un luogo aperto al pubblico.",
-    publishingText2: "Quando esiste un dubbio, Aroundo non si chiede semplicemente: \"È un evento?\" ma piuttosto:",
-    publishingText3: "\"Un contributo condiviso su Aroundo arricchisce la rete offrendo alle persone una reale opportunità di partecipare a un'attività, vivere un'esperienza o visitare un luogo?\"",
-    publishingText4: "Se la risposta è sì, la pubblicazione può trovare spazio su Aroundo.",
+    publishingText1: "Sono benvenute tutte le pubblicazioni che rappresentano un'opportunità di partecipare a un'attività, di vivere un'esperienza o di scoprire un luogo.",
+    publishingText2: "Quando esiste un dubbio, Aroundo non si chiede: \"È un evento?\" ma piuttosto:",
+    publishingText3: "\"Questa pubblicazione aiuta le persone a vivere il territorio?\"",
+    publishingText4: "Se la risposta è sì, può trovare spazio su Aroundo.",
     publishingSubtitle: "Cosa non può essere pubblicato",
-    publishingText5: "Non sono ammesse pubblicazioni che consistono principalmente nell'offerta di un servizio professionale o di una prestazione individuale, senza una reale opportunità di partecipazione aperta al pubblico.",
+    publishingText5: "Non sono ammesse pubblicazioni che non offrano un'opportunità di partecipazione aperta al pubblico.",
     publishingText6: "In particolare non rientrano nelle finalità della piattaforma:",
     publishingList1: "prestazioni individuali",
     publishingList2: "consulenze professionali",
     publishingList3: "annunci di servizi",
-    publishingList4: "attività continuative prive di una reale opportunità di partecipazione pubblica",
+    publishingList4: "attività continuative prive di specifiche occasioni di partecipazione",
     
     // FINAL MESSAGE
     finalMessage1: "Aroundo nasce dalle persone.",
