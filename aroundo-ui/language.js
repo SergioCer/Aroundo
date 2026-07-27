@@ -19,6 +19,10 @@ const supportedLanguages = {
         file: "es.js",
         direction:"ltr"
     },
+    pt: {
+        file: "pt.js",
+        direction:"ltr"
+    },
     ar: {
         file: "ar.js",
         direction:"rtl"
