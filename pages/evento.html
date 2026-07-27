@@ -243,6 +243,27 @@ input, select, textarea {
 .search-item:active{
   background:#dbeafe;
 }
+
+.guide-active {
+  background: linear-gradient(
+    90deg,
+    #ecfdf5,
+    #d1fae5,
+    #ecfdf5
+  );
+  background-size: 200% 100%;
+  animation: guideWave 3s ease infinite;
+  border-color: #22c55e;
+}
+
+@keyframes guideWave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
   
 </style>
 </head>
@@ -259,7 +280,7 @@ input, select, textarea {
 
 <!-- TITOLO -->
 <div class="hero">
-  <input id="ev_titolo" placeholder="Event title..." oninput="markDirty()">
+  <input id="ev_titolo" class="guide-field" placeholder="Event title..." oninput="markDirty()">
 </div>
 
 <div class="card">
@@ -641,9 +662,17 @@ const btn = document.getElementById("btnAddSeries");
   }
 }  
 
+ev_titolo.addEventListener("input", () => {
+  if (ev_titolo.value.trim()) {
+    ev_titolo.classList.remove("guide-active");
+  }
+});
+  
 /* LOAD */
 async function load() {
   if (isNew && !duplicateId) {
+      document.getElementById("ev_titolo") 
+    .classList.add("guide-active");
     original = JSON.stringify({});
     return;
   }
