@@ -828,12 +828,12 @@ function updateGuide() {
       valid: () => ev_titolo.value.trim() !== ""
     },
     {
-      id: "ev_descrizione",
-      valid: () => ev_descrizione.value.trim() !== ""
-    },
-    {
       id: "id_categoria",
       valid: () => id_categoria.value !== ""
+    },
+    {
+      id: "ev_descrizione",
+      valid: () => ev_descrizione.value.trim() !== ""
     },
     {
       id: "id_comune_evento",
@@ -875,6 +875,9 @@ window.searchComuni = async (text) => {
   const box = document.getElementById('comuniResults');
   if (text.length < 3) {
     box.innerHTML = '';
+    id_comune_evento_hidden.value = "";
+    id_luogo.innerHTML = `<option value="">Place...</option>`;
+    id_luogo.value = "";
     updateMapButton()
     return;
   }
