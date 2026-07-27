@@ -7,71 +7,72 @@ export default {
     
     // WHY AROUNDO
     whatTitle: "¿Qué es Aroundo?",
-    whatText1: "Aroundo es una red de personas, lugares y experiencias. Conecta a quienes quieren descubrir eventos con quienes los crean, los organizan o ponen a disposición los lugares donde se desarrollan.",
-    whatText2: "Aroundo crece gracias a la contribución de su comunidad: cada persona puede aportar valor, compartir conocimiento y contribuir a crear un mapa de experiencias más fiable y completo.",
+    whatText1: "Una red de personas, lugares y experiencias que conecta a quienes quieren descubrir el territorio con quienes crean, organizan o ponen a disposición lugares donde estas pueden vivirse.",
+    whatText2: "Crece gracias a la contribución de su comunidad: cada persona puede aportar valor, compartir conocimiento y contribuir a crear un mapa de experiencias más fiable y completo.",
 
     // PARTICIPATION
     participateTitle: "¿Cómo puedo participar?",
-    participateText1: "Aroundo no define a las personas mediante una sola categoría. Una persona puede tener diferentes roles a lo largo del tiempo y participar de distintas maneras.",
-    participateText2: "Puedes comenzar simplemente como User y, cuando quieras, añadir nuevos roles según lo que haces y lo que deseas compartir.",
+    participateText1: "Aroundo no define a las personas mediante una única categoría. Una persona puede tener diferentes roles a lo largo del tiempo y participar de distintas maneras.",
+    participateText2: "Puedes empezar simplemente como User no registrado y utilizar Aroundo para descubrir el territorio. Al registrarte podrás acceder a nuevas posibilidades y añadir nuevos roles según lo que haces y lo que deseas compartir.",
 
     // USER
     userTitle: "User",
-    userText1: "Un User es una persona que quiere explorar el territorio y descubrir nuevas experiencias.",
-    userText2: "Los Users pueden:",
-    userList1: "descubrir eventos y lugares",
+    userText1: "Personas que quieren explorar el territorio y descubrir nuevas experiencias.",
+    userText2: "Puede utilizar Aroundo incluso sin registrarse. Al registrarse, un User puede acceder a funcionalidades adicionales y participar más activamente en la comunidad.",
+    userText3: "Un User puede:",
+    userList1: "descubrir eventos, lugares y experiencias",
     userList2: "guardar experiencias interesantes",
     userList3: "participar en actividades",
-    userList4: "compartir comentarios con la comunidad",
-
-    // CREATOR
-    creatorTitle: "Creator",
-    creatorText1: "Los Creator son las personas que crean experiencias y contenidos para compartir con la comunidad.",
-    creatorText2: "Los Creator pueden ser artistas, profesionales, operadores culturales, performers o cualquier persona que ofrezca algo significativo a los demás.",
-    creatorText3: "Un Creator da vida a la experiencia.",
+    userList4: "compartir opiniones con la comunidad",
 
     // ORGANIZER
     organizerTitle: "Organizer",
-    organizerText1: "Los Organizer son responsables de la creación y coordinación de los eventos.",
-    organizerText2: "Conectan lugares, Creator y participantes, proporcionando la información necesaria para hacer disponible una experiencia en Aroundo.",
+    organizerText1: "Son responsables de la creación y coordinación de los eventos.",
+    organizerText2: "Conectan Place Manager, Creator, Service Provider y participantes, proporcionando la información necesaria para hacer disponible una experiencia en Aroundo.",
 
     // PLACE MANAGER
     placeManagerTitle: "Place Manager",
-    placeManagerText1: "Un Place Manager es responsable de un lugar disponible en Aroundo.",
-    placeManagerText2: "El rol no está necesariamente relacionado con la propiedad: representa a la persona o la organización responsable de la información y la disponibilidad de ese lugar.",
-    placeManagerText3: "Un lugar puede ser creado por la comunidad y, con el tiempo, su responsabilidad puede ser asignada al responsable adecuado.",
+    placeManagerText1: "Es la persona o organización responsable de un lugar disponible en Aroundo.",
+    placeManagerText2: "El rol no está necesariamente vinculado a la propiedad: representa a la persona u organización responsable de la información y disponibilidad de ese lugar.",
+    placeManagerText3: "Un lugar puede ser creado por la comunidad y, con el tiempo, su responsabilidad puede asignarse al responsable adecuado.",
+
+    // CREATOR
+    creatorTitle: "Creator",
+    creatorText1: "Son las personas que crean experiencias para compartir con la comunidad.",
+    creatorText2: "Pueden ser artistas, profesionales, operadores culturales, performers o cualquier persona que ofrezca algo significativo a los demás.",
+    creatorText3: "Un Creator da vida a la experiencia.",
 
     // SERVICE PROVIDER
     serviceProviderTitle: "Service Provider",
-    serviceProviderText1: "Los Service Provider ofrecen competencias y apoyo que contribuyen a la realización de los eventos.",
-    serviceProviderText2: "Algunos ejemplos incluyen servicios técnicos, equipamiento, apoyo a la producción y otras contribuciones profesionales.",
+    serviceProviderText1: "Ofrecen competencias y apoyo para la realización de experiencias.",
+    serviceProviderText2: "Algunos ejemplos son servicios técnicos, equipamiento, apoyo logístico y otras contribuciones profesionales para Organizer y Place Manager.",
 
     // TRUST
     trustTitle: "Confianza & Comunidad",
-    trustText1: "La confianza es la base de Aroundo.",
+    trustText1: "La confianza es el fundamento de Aroundo.",
     trustText2: "La plataforma proporciona las herramientas, pero la calidad de la experiencia depende de las personas que las utilizan.",
-    trustText3: "La información precisa, el respeto por los lugares y eventos, y la colaboración entre los usuarios son lo que permite que la red crezca.",
+    trustText3: "La información precisa, el respeto por los lugares y experiencias, y la colaboración entre usuarios permiten que la red crezca.",
 
     // PUBLISHING GUIDELINES
     publishingTitle: "Directrices para las publicaciones",
-    publishingText1: "Todas las publicaciones son bienvenidas cuando representan una oportunidad concreta para participar en una actividad, vivir una experiencia o visitar un lugar abierto al público.",
-    publishingText2: "Cuando existe una duda, Aroundo no se pregunta simplemente: \"¿Es un evento?\" sino más bien:",
-    publishingText3: "\"¿Una contribución compartida en Aroundo enriquece la red ofreciendo a las personas una oportunidad real de participar en una actividad, vivir una experiencia o visitar un lugar?\"",
-    publishingText4: "Si la respuesta es sí, la publicación puede tener cabida en Aroundo.",
+    publishingText1: "Son bienvenidas todas las publicaciones que representan una oportunidad para participar en una actividad, vivir una experiencia o descubrir un lugar.",
+    publishingText2: "Cuando existe una duda, Aroundo no se pregunta: \"¿Es un evento?\" sino:",
+    publishingText3: "\"¿Esta publicación ayuda a las personas a vivir el territorio?\"",
+    publishingText4: "Si la respuesta es sí, puede formar parte de Aroundo.",
     publishingSubtitle: "Qué no puede publicarse",
-    publishingText5: "No están permitidas las publicaciones cuyo objetivo principal sea ofrecer un servicio profesional o una prestación individual, sin una oportunidad real de participación abierta al público.",
-    publishingText6: "En particular, no forman parte de la finalidad de la plataforma:",
-    publishingList1: "prestaciones individuales",
+    publishingText5: "No forman parte de los objetivos de la plataforma las publicaciones que no ofrecen una oportunidad de participación abierta al público.",
+    publishingText6: "En particular:",
+    publishingList1: "servicios individuales",
     publishingList2: "consultas profesionales",
     publishingList3: "anuncios de servicios",
-    publishingList4: "actividades continuas sin una oportunidad real de participación pública",
-    
+    publishingList4: "actividades continuas sin ocasiones específicas de participación",
+
     // FINAL MESSAGE
     finalMessage1: "Aroundo nace de las personas.",
-    finalMessage2: "Elige cómo quieres formar parte de ella.",
+    finalMessage2: "Elige cómo quieres formar parte.",
 
     // BUTTONS
-    joinAroundo: "Únete a Aroundo",
-    backToLogin: "Volver al inicio de sesión"
+    joinAroundo: "Entrar en Aroundo",
+    backToLogin: "Volver al login"
 
 };
