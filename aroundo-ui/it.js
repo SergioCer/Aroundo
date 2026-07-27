@@ -59,7 +59,7 @@ export default {
     publishingText3: "\"Questa pubblicazione aiuta le persone a vivere il territorio?\"",
     publishingText4: "Se la risposta è sì, può trovare spazio su Aroundo.",
     publishingSubtitle: "Cosa non può essere pubblicato",
-    publishingText5: "Non sono ammesse pubblicazioni che non offrano un'opportunità di partecipazione aperta al pubblico.",
+    publishingText5: "Non possono essere pubblicate proposte prive di un'opportunità di partecipazione aperta al pubblico.",
     publishingText6: "In particolare non rientrano nelle finalità della piattaforma:",
     publishingList1: "prestazioni individuali",
     publishingList2: "consulenze professionali",
