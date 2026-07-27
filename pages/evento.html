@@ -825,72 +825,35 @@ window.markDirty = () => {
 updateGuide();  
 };
 
-/* Visita Guidata su Aroundo 
+  const guideSteps = [
+    {id: "ev_titolo", valid: () => ev_titolo.value.trim() !== ""},
+    {id: "id_categoria", valid: () => id_categoria.value !== ""},
+    {id: "ev_descrizione", valid: () => ev_descrizione.value.trim() !== ""},
+    {id: "id_comune_evento", valid: () => id_comune_evento_hidden.value !== ""},
+    {id: "id_luogo", valid: () => id_luogo.value !== ""},
+    {id: "id_organizzatore", valid: () => id_organizzatore_hidden.value !== ""},
+    {id: "ev_inizio", valid: () => ev_inizio.value !== ""}
+  ];  
+  
+/* Visita Guidata su Aroundo */
 function updateGuide() {
   // solo nuovi eventi
   if (!isNew || duplicateId) return;
-  const fields = [
-    {
-      id: "ev_titolo",
-      valid: () => ev_titolo.value.trim() !== ""
-    },
-    {
-      id: "id_categoria",
-      valid: () => id_categoria.value !== ""
-    },
-    {
-      id: "ev_descrizione",
-      valid: () => ev_descrizione.value.trim() !== ""
-    },
-    {
-      id: "id_comune_evento",
-      valid: () => id_comune_evento_hidden.value !== ""
-    },
-    {
-      id: "id_luogo",
-      valid: () => id_luogo.value !== ""
-    },
-    {
-      id: "id_organizzatore",
-      valid: () => id_organizzatore_hidden.value !== ""
-    },
-    {
-      id: "ev_inizio",
-      valid: () => ev_inizio.value !== ""
-    }
-  ];
-  // pulisce tutti
-  fields.forEach(f => {
-    document.getElementById(f.id)
-      ?.classList.remove("guide-active");
-  });
-  // trova il primo campo mancante
-  const next = fields.find(f => !f.valid());
-  if (next) {
-    document.getElementById(next.id)
-      ?.classList.add("guide-active");
-  }
-}
-*/
- function updateGuide() {
-  document.querySelectorAll(".guide-field").forEach(el => {
-    if (el.classList.contains("guide-active")) {
-      el.classList.remove("guide-active");
-      el.classList.add("guide-complete");
-    }
-  });
   guideSteps.forEach(step => {
-    const field = document.getElementById(step.id);
-    if (!step.valid()) {
+      const field = document.getElementById(step.id);
+      field.classList.remove("guide-active");
       field.classList.remove("guide-complete");
-    }
+      if (step.valid()) {
+          field.classList.add("guide-complete");
+      }
   });
   const next = guideSteps.find(step => !step.valid());
-  if (!next) return;
-  const field = document.getElementById(next.id);
-  field.classList.remove("guide-complete");
-  field.classList.add("guide-active");
-} 
+  if (next) {
+      document
+          .getElementById(next.id)
+          .classList.add("guide-active");
+  }
+}
 
 window.duplicateEvent = () => {
   if (!id) return;
