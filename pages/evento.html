@@ -245,13 +245,32 @@ input, select, textarea {
 }
 
 .guide-active {
-  background: #dcfce7 !important;
-  border: 2px solid #22c55e !important;
+  background: linear-gradient(
+    90deg,
+    #f0fdf4,
+    #dcfce7,
+    #f0fdf4
+  ) !important;
+  background-size: 200% 100%;
+  animation: guideWave 4s ease-in-out infinite;
+  border-color: #86efac !important;
+  transition: all .3s ease;
+}
+
+@keyframes guideWave {
+  0% {
+    background-position: 200% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
   
 </style>
 </head>
-
 <body>
 
 <div class="topbar" style="justify-content:center; padding:16px 20px;">
@@ -579,6 +598,7 @@ document.addEventListener("keydown", function(e) {
   const focusable = [
     "ev_titolo",
     "id_categoria",
+    "ev_descrizione",
     "id_comune_evento",
     "id_luogo",
     "id_organizzatore",
