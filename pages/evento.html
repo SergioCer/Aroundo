@@ -1488,8 +1488,9 @@ async function optimizeCover(file) {
   window.updateActiveStatus = function () {
     const btn = document.getElementById("activeBtn");
     const title = document.getElementById("activeTitle");
-    btn.classList.toggle("btn-icon btn-red", !ev_attivo.checked);
-    btn.classList.toggle("btn-icon btn-green", ev_attivo.checked);
+    btn.classList.add("btn-icon");
+    btn.classList.toggle("btn-red", !ev_attivo.checked);
+    btn.classList.toggle("btn-green", ev_attivo.checked);
     title.textContent = ev_attivo.checked
       ? "Active"
       : "Unactive";
