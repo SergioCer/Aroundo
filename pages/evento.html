@@ -28,11 +28,6 @@ body {
   font-weight: bold;
 }
 
-.btn-icon.dirty {
-  background: #fbbf24;
-  color: #111827;
-}
-
 .map-btn {
   opacity: 0;
   pointer-events: none;
@@ -172,6 +167,11 @@ input, select, textarea {
   transition:.20s;
 }
 
+.btn-icon.dirty {
+  background: #fbbf24;
+  color: #111827;
+}
+  
 .btn-blue{
   background:#3b82f6;
   color:white;
@@ -1300,7 +1300,6 @@ function updateDupButton() {
   } else {
     btn.disabled = false;
     btn.style.background = "#3b82f6";
-    btn.style.cursor = "pointer";
     btn.style.opacity = "1";
   }
 }
