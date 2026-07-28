@@ -28,20 +28,6 @@ body {
   font-weight: bold;
 }
 
-.map-btn {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8);
-  transition: all 0.25s ease;
-}
-
-.map-btn.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
-  animation: fadeIn 0.50s ease;
-}
-
 @keyframes fadeIn {
   from {opacity:0; transform:scale(0.85);}
   to {opacity:1; transform:scale(1);}
@@ -255,11 +241,8 @@ input, select, textarea {
   <div style="display:flex; gap:10px; align-items:center;">
   <select id="id_luogo" class="guide-field" autocomplete="off" oninput="markDirty()" style="flex:1;"></select>
     
-  <!-- CANCELLARE ?
-                  <div style="position:relative; display:inline-block;">
-  -->
   <div style="display:flex; gap:10px;">    
-  <button id="mapBtn" class="btn-icon btn-blue map-btn" onclick="openMapByComune()">📍</button>
+  <button id="mapBtn" class="btn-icon" onclick="openMapByComune()">📍</button>
   <button type="button" class="btn-icon btn-green" onclick="window.location.href='luogo.html?new=1'">+</button>
     </div>
   </div>
@@ -1238,13 +1221,11 @@ function dialogAction(type) {
 window.dialogAction = dialogAction;
 
 function updateMapButton() {
-  const idComune = id_comune_evento_hidden.value;
-  const btn = document.querySelector(".map-btn");
-  if (idComune) {
-    btn.classList.add("visible");
-  } else {
-    btn.classList.remove("visible");
-  }
+  const btn = document.getElementById("mapBtn");
+  const enabled = !!id_comune_evento_hidden.value;
+  btn.disabled = !enabled;
+  btn.classList.toggle("btn-blue", enabled);
+  btn.classList.toggle("btn-gray", !enabled);
 }
 
 function updateDupButton() {
