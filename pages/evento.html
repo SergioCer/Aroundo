@@ -56,7 +56,7 @@ body {
 .section-title {
   font-size: 11px;
   color: #777;
-  margin: 8px 0 3px;
+  margin: 2px 0 2px;
   text-align: left;
 }
 
@@ -249,23 +249,19 @@ input, select, textarea {
   
 <div class="inline">
   <div>
-    <div class="section-title" style="margin-top:0;">Start</div>
+    <div class="section-title">Start</div>
       <input id="ev_inizio" class="guide-field" type="datetime-local" oninput="aggiornaFineDaInizio(); markDirty()">
-  </div>
-  <div>
-    <div class="section-title" style="margin-top:0;">End</div>
+  </div>  <div>
+    <div class="section-title">End</div>
     <input id="ev_fine" type="datetime-local" oninput="markDirty(); calcolaDurata()">
-  </div>
-  <div>
-    <div class="section-title" style="margin-top:0;">Duration</div>
+  </div>  <div>
+    <div class="section-title">Duration</div>
     <input id="ev_durata" placeholder="Duration...automatic" readonly>
-</div>
-  <div>
-  <div class="section-title" style="margin-top:0;">Price</div>
+</div>  <div>
+  <div class="section-title">Price</div>
     <input id="ev_costo"  placeholder="Price — null = TBA · 0 = Free" oninput="markDirty()">
-  </div>
-  <div>
-    <div class="section-title" style="margin-top:0;">Capacity</div>
+  </div>  <div>
+    <div class="section-title">Capacity</div>
     <input id="ev_capienza" placeholder="Capacity..." oninput="markDirty()">
   </div>
 </div>
@@ -273,7 +269,8 @@ input, select, textarea {
 <div class="inline">
 
   <!-- SERIE -->
-    <div class="section-title" style="margin-top:0;">Event Series</div>
+  <div>
+    <div class="section-title">Event Series</div>
       <div style="display:flex; gap:10px; align-items:center;">
         <select id="id_event_series" oninput="markDirty()" disabled style="flex:1;">
         <option value="">Select organizer first</option>
@@ -283,7 +280,8 @@ input, select, textarea {
   </div>
 
   <!-- ATTIVO -->
-    <div id="activeTitle" class="section-title" style="margin-top:0; text-align: center;"></div>
+  <div>
+    <div id="activeTitle" class="section-title" style= text-align: center;"></div>
       <label style="display:flex; justify-content:center;">
         <input id="ev_attivo" type="checkbox" hidden onchange="markDirty(); updateActiveStatus()">
         <span id="activeBtn" class="btn-icon"></span>
@@ -291,7 +289,8 @@ input, select, textarea {
   </div>
 
   <!-- LINK -->
-    <div class="section-title" style="margin-top:0;">Link...</div>
+  <div>
+    <div class="section-title">Link...</div>
       <div style="display:flex; gap:10px; align-items:center;">
         <input id="ev_link" placeholder="Http(s)://..." autocomplete="off" oninput="markDirty(); updateLinkButton()">
         <button id="openLinkBtn" class="btn-icon btn-blue" type="button" onclick="openEventLink()">↗</button>
