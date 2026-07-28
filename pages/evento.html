@@ -1512,7 +1512,7 @@ async function optimizeCover(file) {
 }  
 
   /* Verifica lo stato del Checkbox Attivo */
-  function updateActiveStatus() {
+  window.updateActiveStatus = function () {
     const box = document.querySelector(".status-box");
     if (box) {
       box.classList.toggle("active", ev_attivo.checked);
