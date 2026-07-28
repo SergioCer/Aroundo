@@ -350,7 +350,7 @@ input, select, textarea {
     <div id="activeTitle" class="section-title" style="margin-top:0; text-align: center;">Unactive</div>
       <label class="status" style="justify-content:center;">
         <input id="ev_attivo" type="checkbox" hidden onchange="markDirty(); updateActiveStatus()">
-        <span id="activeBtn">✓</span>
+        <span id="activeBtn" class="btn-icon"></span>
       </label>
   </div>
 
@@ -1488,9 +1488,9 @@ async function optimizeCover(file) {
   window.updateActiveStatus = function () {
     const btn = document.getElementById("activeBtn");
     const title = document.getElementById("activeTitle");
-    btn.classList.add("btn-icon");
     btn.classList.toggle("btn-red", !ev_attivo.checked);
     btn.classList.toggle("btn-green", ev_attivo.checked);
+    btn.textContent = ev_attivo.checked ? "✓" : "";
     title.textContent = ev_attivo.checked
       ? "Active"
       : "Unactive";
