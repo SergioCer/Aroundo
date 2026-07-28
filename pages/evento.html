@@ -96,6 +96,26 @@ input, select, textarea {
   user-select:none;
 }
 
+/* INLINE */
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 8px;
+}
+
+.inline > div {
+  min-width: 180px;
+}
+
+/* FOOTER */
+.footer {
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+  margin-top: 6px;
+}
+
 .status-box {
   width:34px;
   height:34px;
@@ -125,27 +145,7 @@ input, select, textarea {
 .status input:checked + .status-box::after {
   transform:rotate(-45deg) scale(1);
 }  
-
-/* INLINE */
-.inline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 8px;
-}
-
-.inline > div {
-  min-width: 180px;
-}
-
-/* FOOTER */
-.footer {
-  text-align: right;
-  font-size: 11px;
-  color: #888;
-  margin-top: 6px;
-}
-
+  
 .btn-icon{
   width:34px;
   height:34px;
@@ -350,7 +350,7 @@ input, select, textarea {
     <div id="activeTitle" class="section-title" style="margin-top:0; text-align: center;">Unactive</div>
       <label class="status" style="justify-content:center;">
         <input id="ev_attivo" type="checkbox" hidden onchange="markDirty(); updateActiveStatus()">
-        <span class="status-box"></span>
+        <span id="activeBtn">✓</span>
       </label>
   </div>
 
@@ -1486,15 +1486,13 @@ async function optimizeCover(file) {
 
   /* Verifica lo stato del Checkbox Attivo */
   window.updateActiveStatus = function () {
-    const box = document.querySelector(".status-box");
-    if (box) {
-      box.classList.toggle("active", ev_attivo.checked);
-    }
+    const btn = document.getElementById("activeBtn");
     const title = document.getElementById("activeTitle");
-    if (title) {
-      title.textContent =
-        ev_attivo.checked ? "Active" : "Unactive";
-    }
+    btn.classList.toggle("btn-red", !ev_attivo.checked);
+    btn.classList.toggle("btn-green", ev_attivo.checked);
+    title.textContent = ev_attivo.checked
+      ? "Active"
+      : "Unactive";
   }
   
 await loadComuni();  
