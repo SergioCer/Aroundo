@@ -106,7 +106,7 @@ input, select, textarea {
   width:34px;
   height:34px;
   border-radius:50%;
-  background:white;
+  background:red;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -364,9 +364,9 @@ input, select, textarea {
 
   <!-- ATTIVO -->
   <div style="flex:1;">
-    <div class="section-title" style="margin-top:0; text-align: center;">Active</div>
+    <div id="activeTitle" class="section-title" style="margin-top:0; text-align: center;">Unactive</div>
       <label class="status" style="justify-content:center;">
-        <input id="ev_attivo" type="checkbox" hidden onchange="markDirty()">
+        <input id="ev_attivo" type="checkbox" hidden onchange="markDirty(); updateActiveStatus();">
         <span class="status-box"></span>
       </label>
   </div>
@@ -781,7 +781,13 @@ async function load() {
   updateLinkButton();
   currentCover = data.ev_copertina || null;
   ev_attivo.checked = !!data.ev_attivo;
-  updateStatusBox();
+  updateActiveStatus();
+    if (isNew && !duplicateId) {
+        original = JSON.stringify({});
+        updateActiveStatus();
+        setTimeout(updateGuide, 100);
+        return;
+      }
   ev_creato.textContent = data.ev_creato
     ? new Date(data.ev_creato).toLocaleString()
     : '';
@@ -863,7 +869,7 @@ updateGuide();
     {id: "id_organizzatore", valid: () => id_organizzatore_hidden.value !== ""},
     {id: "ev_inizio", valid: () => ev_inizio.value !== ""}
   ];  
-  
+
 /* Visita Guidata su Aroundo */
 function updateGuide() {
   // solo nuovi eventi
@@ -1505,14 +1511,18 @@ async function optimizeCover(file) {
   });
 }  
 
-function updateStatusBox(){
-  const box = document.querySelector('.status-box');
-  if (!box) return;
-  box.classList.toggle(
-    'active',
-    ev_attivo.checked
-  );
-}
+  /* Verifica lo stato del Checkbox Attivo */
+  function updateActiveStatus() {
+    const box = document.querySelector(".status-box");
+    if (box) {
+      box.classList.toggle("active", ev_attivo.checked);
+    }
+    const title = document.getElementById("activeTitle");
+    if (title) {
+      title.textContent =
+        ev_attivo.checked ? "Active" : "Unactive";
+    }
+  }
   
 await loadComuni();  
 await loadSelects();
