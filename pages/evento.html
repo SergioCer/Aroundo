@@ -248,17 +248,27 @@ input, select, textarea {
   <div id="organizzatoriResults" class="search-results"></div>
   
 <div class="inline">
+  <div>
     <div class="section-title" style="margin-top:0;">Start</div>
       <input id="ev_inizio" class="guide-field" type="datetime-local" oninput="aggiornaFineDaInizio(); markDirty()">
+  </div>
+  <div>
     <div class="section-title" style="margin-top:0;">End</div>
     <input id="ev_fine" type="datetime-local" oninput="markDirty(); calcolaDurata()">
-      <div class="section-title" style="margin-top:0;">Duration</div>
+  </div>
+  <div>
+    <div class="section-title" style="margin-top:0;">Duration</div>
     <input id="ev_durata" placeholder="Duration...automatic" readonly>
-      <div class="section-title" style="margin-top:0;">Price</div>
+</div>
+  <div>
+  <div class="section-title" style="margin-top:0;">Price</div>
     <input id="ev_costo"  placeholder="Price — null = TBA · 0 = Free" oninput="markDirty()">
-      <div class="section-title" style="margin-top:0;">Capacity</div>
+  </div>
+  <div>
+    <div class="section-title" style="margin-top:0;">Capacity</div>
     <input id="ev_capienza" placeholder="Capacity..." oninput="markDirty()">
   </div>
+</div>
 
 <div class="inline">
 
