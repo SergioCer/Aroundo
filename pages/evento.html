@@ -283,8 +283,10 @@ input, select, textarea {
   <div>
     <div id="activeTitle" class="section-title" style="text-align:center;"></div>
       <label style="display:flex; justify-content:center;">
-        <input id="ev_attivo" class="btn-icon" onchange="markDirty(); updateActiveStatus()" title="Active/Deactive Event">
-        <span id="activeBtn" class="btn-icon"></span>
+        <button id="ev_attivo" class="btn-icon" type="button" onchange="markDirty(); updateActiveStatus()" title="Active/Deactive Event">
+        <!-- CANCELLARE
+          <span id="activeBtn" class="btn-icon"></span>
+        -->
       </label>
   </div>
 
@@ -292,7 +294,7 @@ input, select, textarea {
   <div>
     <div class="section-title">Link...</div>
       <div style="display:flex; gap:10px; align-items:center;">
-        <button id="ev_link" placeholder="Http(s)://..." autocomplete="off" oninput="markDirty(); updateLinkButton()">
+        <input id="ev_link" placeholder="Http(s)://..." autocomplete="off" oninput="markDirty(); updateLinkButton()">
         <button id="openLinkBtn" class="btn-icon" type="button" onclick="openEventLink()" title="Open WWW page">↗</button>
       </div>
   </div>
