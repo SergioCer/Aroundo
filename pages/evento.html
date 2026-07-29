@@ -665,20 +665,17 @@ async function load() {
   ev_creato.textContent = data.ev_creato
     ? new Date(data.ev_creato).toLocaleString()
     : '';
-    if (data.id_organizzatore) {
-      await updateEventSeries();
       if (data.id_event_series) {
         document.getElementById("id_event_series").value =
           data.id_event_series;
       }
-    }
   updateCover();
   updateBackupCover();
   updateMapButton()  
   // CANCELLARE updateDupButton()
   updateLinkButton();
   updateActiveStatus();
-  verifySeries();
+  // CANCELLARE verifySeries();
   if (duplicateId) {
     dirty = true;
     document.getElementById('backBtn')
@@ -854,6 +851,7 @@ async function updateEventSeries(){
   const organizerId =
     document.getElementById('id_organizzatore_hidden').value;
   await loadSeriesByOrganizzatore(organizerId);
+verifySeries();
 }
 
 window.updateLinkButton = function() {
