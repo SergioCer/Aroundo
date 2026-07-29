@@ -129,7 +129,7 @@ input, select, textarea {
   color:#374151;
 }
 
-.:active{
+.btn-icon:active{
   transform:scale(.92);
 }  
 
@@ -339,45 +339,13 @@ input, select, textarea {
     right:10px;
     bottom:55px;
   ">
-  <button id="removeCoverBtn"
-    type="button"
-    style="
-      background:#ef4444;
-      color:white;
-      border:none;
-      padding:8px 8px;
-      border-radius:16px;
-      cursor:pointer;
-    " title="Remove Cover">
-    Remove cover
-  </button>
+  <button id="removeCoverBtn" type="button" class="btn-icon btn-red" title="Remove Cover">×</button>
 </div>
-<input id="coverFileInput"
-       type="file"
-       accept="image/*"
-       style="display:none">
+<input id="coverFileInput" type="file" accept="image/*" style="display:none">
   
 <!-- MAP POPUP -->
-<div id="mapModal" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.4);
-  z-index:9999;
-">
-  <div style="
-    position:absolute;
-    top:5%;
-    left:5%;
-    width:90%;
-    height:90%;
-    background:white;
-    border-radius:12px;
-    overflow:hidden;
-  ">
+<div id="mapModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999;">
+  <div style="position:absolute; top:5%; left:5%; width:90%; height:90%; background:white; border-radius:12px; overflow:hidden;">
     <div style="padding:10px; display:flex; justify-content:space-between;">
       <div style="font-weight:bold;">Seleziona luogo</div>
       <button onclick="closeMap()" class="btn-icon btn-red">✕</button>
