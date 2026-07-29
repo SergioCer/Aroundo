@@ -283,8 +283,8 @@ input, select, textarea {
   <div>
     <div id="activeTitle" class="section-title" style="text-align:center;"></div>
       <label style="display:flex; justify-content:center;">
-        <input id="ev_attivo" type="checkbox" hidden onchange="markDirty(); updateActiveStatus()" title="Active/Deactive Event">
-          <span id="activeBtn" class="btn-icon"></span>
+        <input id="ev_attivo" type="checkbox" hidden onchange="markDirty(); updateActiveStatus()">
+          <span id="activeBtn" class="btn-icon" title="Active/Deactive Event"></span>
       </label>
   </div>
 
@@ -623,6 +623,7 @@ async function load() {
     updateActiveStatus();
     updateMapButton();
     verifySeries();
+    ev_titolo.focus();
     return;
   }
   const { data, error } = await supabase
@@ -1200,6 +1201,12 @@ function updateMapButton() {
   addPlaceBtn.className = `btn-icon ${enabled ? "btn-green" : "btn-gray"}`;
   addPlaceBtn.disabled = !enabled;
   addPlaceBtn.style.cursor = enabled ? "" : "not-allowed";
+
+  const placeSelect = document.getElementById("id_luogo");
+    if (!enabled) {
+    placeSelect.innerHTML = `<option value="">Select City first</option>`;
+    placeSelect.disabled = true;
+  }
 }
 
 function updateDupButton() {
