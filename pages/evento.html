@@ -576,7 +576,6 @@ async function loadSelects() {
           </option>
         `;
       });
-  
   id_luogo.innerHTML = `<option value="">Place...</option>`;
   const { data: org } = await supabase.from('organizzatori').select('*');
   id_organizzatore.innerHTML = `<option value="">Organizzatore...</option>`;
@@ -708,11 +707,18 @@ window.filterLuoghi = async (selectedId = null) => {
     id_luogo.disabled = true;
     return;
   }
+  id_luogo.innerHTML = `<option value="">Place...</option>`;
+  id_luogo.disabled = false;
   const { data } = await supabase
     .from('luoghi')
     .select('id_luogo, lu_location, lu_descrizione')
     .eq('id_comune', idComune)
     .order('lu_location');
+    if (!data || data.length === 0) {
+    id_luogo.innerHTML = `<option value="">No places</option>`;
+    id_luogo.disabled = true;
+    return;
+  }
   (data || []).forEach(l => {
     id_luogo.innerHTML += `
       <option value="${l.id_luogo}">
@@ -720,8 +726,6 @@ window.filterLuoghi = async (selectedId = null) => {
       </option>
     `;
   });
-  id_luogo.innerHTML = `<option value="">Place...</option>`;
-  id_luogo.disabled = false;
   if (selectedId) {
     id_luogo.value = selectedId;
   }
@@ -790,8 +794,7 @@ window.searchComuni = async (text) => {
   if (text.length < 3) {
     box.innerHTML = '';
     id_comune_evento_hidden.value = "";
-    id_luogo.innerHTML = `<option value="">Place...</option>`;
-    id_luogo.value = "";
+    await filterLuoghi();
     markDirty();
     updateMapButton()
     return;
