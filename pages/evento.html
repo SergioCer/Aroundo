@@ -577,17 +577,6 @@ async function loadSelects() {
         `;
       });
   id_luogo.innerHTML = `<option value="">Place...</option>`;
-  const { data: org } = await supabase.from('organizzatori').select('*');
-  id_organizzatore.innerHTML = `<option value="">Organizzatore...</option>`;
-  (org || [])
-  .sort((a, b) =>
-    (a.or_nome || '').localeCompare(b.or_nome || '')
-  )
-  .forEach(o => {
-    id_organizzatore.innerHTML += `
-      <option value="${o.id_organizzatore}">${o.or_nome}</option>
-    `;
-  });
 }
 
 async function loadSeriesByOrganizzatore(idOrg) {
@@ -686,7 +675,7 @@ async function load() {
   updateCover();
   updateBackupCover();
   updateMapButton()  
-  updateDupButton()
+  // CANCELLARE updateDupButton()
   updateLinkButton();
   updateActiveStatus();
   verifySeries();
@@ -852,10 +841,9 @@ window.searchOrganizzatori = async (text) => {
     await updateEventSeries();
     markDirty();
     box.innerHTML = '';
-    // 🔥 reset serie quando cambia organizzatore
     const seriesSelect = document.getElementById("id_event_series");
     seriesSelect.value = "";
-    await loadSeriesByOrganizzatore(o.id_organizzatore);
+    // CANCELLARE await loadSeriesByOrganizzatore(o.id_organizzatore);
     verifySeries();
   };
     box.appendChild(div);
@@ -1242,14 +1230,6 @@ function verifySeries() {
   btn.disabled = false;
   btn.className = "btn-icon btn-green";
   btn.style.cursor = "";
-}  
-
-// Elimina la T tra data ed ora e rimuove i secondi
-function formatDateTime(dt) {
-  if (!dt) return '';
-  const [date, time] = dt.split('T');
-  const hhmm = time ? time.slice(0, 5) : '';
-  return `${date} ${hhmm}`;
 }  
 
 // Calcola durata dell'evento in minuti. 
