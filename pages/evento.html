@@ -193,6 +193,48 @@ input, select, textarea {
   50% {background-position: 0% 0;}
   100% {background-position: -200% 0;}
 }
+
+#removeCoverBtn {
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:2;
+}  
+
+.cover-preview {
+  width: min(400px, 100%);
+  height: 320px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius:8px;
+  margin:10px auto;
+  display:none;
+  background:#f3f4f6;
+}
+
+.cover-backup {
+    display:none;
+    position:absolute;
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:8px;
+    border:2px solid white;
+    box-shadow:0 2px 8px rgba(0,0,0,0.25);
+    right:10px;
+    bottom:55px;  
+ }
+
+.cover-box {
+  border:2px dashed #d1d5db;
+  border-radius:10px;
+  padding:8px;
+  text-align:center;
+  cursor:pointer;
+  background:#fafafa;
+  position:relative;
+  min-height:350px;
+}
   
 </style>
 </head>
@@ -297,16 +339,7 @@ input, select, textarea {
   
 <!-- COPERTINA -->
 <div class="section-title">Cover · Image will be optimized automatically...</div>
-<div id="coverBox" style="
-  border:2px dashed #d1d5db;
-  border-radius:10px;
-  padding:8px;
-  text-align:center;
-  cursor:pointer;
-  background:#fafafa;
-  position:relative;
-  min-height:350px;
-">
+<div id="coverBox" class="cover-box">
   <div id="coverHint" style="
     color:#666;
     font-size:14px;
@@ -317,28 +350,8 @@ input, select, textarea {
       JPG • PNG • WEBP • HEIC
     </small>
   </div>
-  <img id="coverPreview" style="
-    width: min(400px, 100%);
-    height: 320px;
-    max-width: 100%;
-    object-fit:contain;
-    border-radius:8px;
-    margin:10px auto;
-    display:none;
-    background:#f3f4f6;
-  ">
-  <img id="coverBackupPreview" style="
-    display:none;
-    position:absolute;
-    width:70px;
-    height:70px;
-    object-fit:cover;
-    border-radius:8px;
-    border:2px solid white;
-    box-shadow:0 2px 8px rgba(0,0,0,0.25);
-    right:10px;
-    bottom:55px;
-  ">
+  <img id="coverPreview" class="cover-preview">
+  <img id="coverBackupPreview" class="cover-backup">
   <button id="removeCoverBtn" type="button" class="btn-icon btn-red" title="Remove Cover">×</button>
 </div>
 <input id="coverFileInput" type="file" accept="image/*" style="display:none">
@@ -933,7 +946,14 @@ window.requestBack = async () => {
   }
 };
   
-  /* Mostra la Copertina se presente */
+window.newEventSerie = function(){
+  const idOrganizzatore =
+    document.getElementById('id_organizzatore_hidden').value;
+  window.location.href =
+    `event_serie.html?new=1&id_organizzatore=${idOrganizzatore}`;
+};
+
+/* Mostra la Copertina se presente */
 function updateCover() {
   const img = document.getElementById('coverPreview');
   const hint = document.getElementById('coverHint');
@@ -942,7 +962,7 @@ function updateCover() {
     img.src = '';
     img.style.display = 'none';
     hint.style.display = 'block';
-    removeBtn.style.display = 'none';
+    updateRemoveCoverButton();
     return;
   }
   const url =
@@ -951,15 +971,16 @@ function updateCover() {
   img.src = url + "?v=" + Date.now();
   img.style.display = 'block';
   hint.style.display = 'none';
-  removeBtn.style.display = 'inline-block';
-}
+  updateRemoveCoverButton();
+}  
 
-window.newEventSerie = function(){
-  const idOrganizzatore =
-    document.getElementById('id_organizzatore_hidden').value;
-  window.location.href =
-    `event_serie.html?new=1&id_organizzatore=${idOrganizzatore}`;
-};
+function updateRemoveCoverButton() {
+  const btn = document.getElementById("removeCoverBtn");
+  const enabled = !!currentCover && !coverDeleted;
+  btn.className = `btn-icon ${enabled ? "btn-red" : "btn-gray"}`;
+  btn.disabled = !enabled;
+  btn.style.cursor = enabled ? "" : "not-allowed";
+}  
 
 async function uploadCover(idEvento) {
   if (!selectedCoverFile) {
@@ -1052,7 +1073,6 @@ async function deleteCover(idEvento) {
     throw error;
   }
 }
-  
   
 function initMap() {
   if (map) return;
@@ -1394,6 +1414,7 @@ await loadComuni();
 await loadSelects();
 await load();
 updateDupButton();
+updateRemoveCoverButton();
   
 </script>
 </body>
