@@ -878,7 +878,8 @@ async function updateEventSeries(){
 window.updateLinkButton = function() {
   const btn = document.getElementById("openLinkBtn");
   const value = ev_link.value.trim();
-  btn.style.display = value ? "flex" : "none";
+  btn.className = `btn-icon ${value ? "btn-blue" : "btn-gray"}`;
+  btn.disabled = !value;
 };
 
 window.openEventLink = function() {
