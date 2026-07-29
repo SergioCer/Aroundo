@@ -243,7 +243,7 @@ input, select, textarea {
   <div style="display:flex; gap:10px; align-items:center;">
   <input id="id_organizzatore" class="guide-field" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
   <input type="hidden" id="id_organizzatore_hidden">
-  <button type="button" class="btn-icon" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
+  <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
   </div>
   <div id="organizzatoriResults" class="search-results"></div>
   
@@ -275,7 +275,7 @@ input, select, textarea {
         <select id="id_event_series" oninput="markDirty()" disabled style="flex:1;">
         <option value="">Select organizer first</option>
         </select>
-        <button id="btnAddSeries" type="button" class="btn-icon" onclick="newEventSerie()" title="Add new Serie">+</button>
+        <button id="addSeriesBtn" type="button" class="btn-icon" onclick="newEventSerie()" title="Add new Serie">+</button>
       </div>
   </div>
 
@@ -597,15 +597,6 @@ async function loadSelects() {
 
 async function loadSeriesByOrganizzatore(idOrg) {
   const select = document.getElementById("id_event_series");
-const btn = document.getElementById("btnAddSeries");
-  if (!idOrg) {
-    select.innerHTML = `<option value="">No series</option>`;
-    select.disabled = true;
-    if (btn) {
-      btn.style.display = "none";
-    }
-    return;
-  }
   const { data, error } = await supabase
     .from("event_series")
     .select("id_event_series, es_title")
@@ -623,15 +614,6 @@ const btn = document.getElementById("btnAddSeries");
     opt.textContent = s.es_title;
     select.appendChild(opt);
   });
-    if (!data || data.length === 0) {
-      // nessuna serie per questo organizzatore
-      select.disabled = true;
-    } else {
-      select.disabled = false;
-    }
-    if (btn) {
-    btn.style.display = "block";
-  }
 }  
 
 /* LOAD */
@@ -642,6 +624,7 @@ async function load() {
     updateLinkButton();
     updateActiveStatus();
     updateMapButton();
+    verifySeries();
     return;
   }
   const { data, error } = await supabase
@@ -706,6 +689,7 @@ async function load() {
   updateDupButton()
   updateLinkButton();
   updateActiveStatus();
+  verifySeries();
   if (duplicateId) {
     dirty = true;
     document.getElementById('backBtn')
@@ -838,6 +822,7 @@ window.searchOrganizzatori = async (text) => {
     box.innerHTML = '';
     id_organizzatore_hidden.value = "";
     document.getElementById("id_event_series").value = "";
+    verifySeries();
     markDirty();
     return;
   }
@@ -1208,15 +1193,13 @@ window.dialogAction = dialogAction;
 function updateMapButton() {
   const enabled = !!id_comune_evento_hidden.value;
   const mapBtn = document.getElementById("mapBtn");
+  mapBtn.className = `btn-icon ${enabled ? "btn-blue" : "btn-gray"}`;
   mapBtn.disabled = !enabled;
-  mapBtn.classList.toggle("btn-blue", enabled);
-  mapBtn.classList.toggle("btn-gray", !enabled);
   mapBtn.style.cursor = enabled ? "" : "not-allowed";
 
   const addPlaceBtn = document.getElementById("addPlaceBtn");
+  addPlaceBtn.className = `btn-icon ${enabled ? "btn-green" : "btn-gray"}`;
   addPlaceBtn.disabled = !enabled;
-  addPlaceBtn.classList.toggle("btn-green", enabled);
-  addPlaceBtn.classList.toggle("btn-gray", !enabled);
   addPlaceBtn.style.cursor = enabled ? "" : "not-allowed";
 }
 
@@ -1231,6 +1214,24 @@ function updateDupButton() {
     btn.className = "btn-icon btn-blue";
   }
 }
+
+function verifySeries() {
+  const select = document.getElementById("id_event_series");
+  const btn = document.getElementById("addSeriesBtn");
+  const hasOrganizer = !!id_organizzatore_hidden.value;
+  const hasSeries = seriesCache && seriesCache.length > 0;
+  if (!hasOrganizer) {
+    select.disabled = true;
+    btn.disabled = true;
+    btn.className = "btn-gray";
+    btn.style.cursor = "not-allowed";
+    return;
+  }
+  select.disabled = !hasSeries;
+  btn.disabled = false;
+  btn.className = "btn-green";
+  btn.style.cursor = "";
+}  
 
 // Elimina la T tra data ed ora e rimuove i secondi
 function formatDateTime(dt) {
