@@ -691,6 +691,7 @@ async function load() {
     if (isNew && !duplicateId) {
         original = JSON.stringify({});
         setTimeout(updateGuide, 100);
+        updateActiveStatus();
         return;
       }
   ev_creato.textContent = data.ev_creato
