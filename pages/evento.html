@@ -601,7 +601,12 @@ async function loadSeriesByOrganizzatore(idOrg) {
     console.error("STEP SERIES - errore:", error);
     return;
   }
-  select.innerHTML = `<option value="">No series</option>`;
+    if (data.length === 0) {
+        select.innerHTML = `<option value="">No series</option>`;
+        select.disabled = true;
+    } else {
+        select.innerHTML = `<option value="">Series...</option>`;
+        select.disabled = false;
   (data || []).forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.id_event_series;
