@@ -688,10 +688,8 @@ async function load() {
   updateLinkButton();
   currentCover = data.ev_copertina || null;
   ev_attivo.checked = !!data.ev_attivo;
-  updateActiveStatus();
     if (isNew && !duplicateId) {
         original = JSON.stringify({});
-        updateActiveStatus();
         setTimeout(updateGuide, 100);
         return;
       }
@@ -709,6 +707,7 @@ async function load() {
   updateBackupCover();
   updateMapButton()  
   updateDupButton()
+  updateActiveStatus();
   if (duplicateId) {
     dirty = true;
     document.getElementById('backBtn')
