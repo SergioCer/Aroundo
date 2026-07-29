@@ -238,15 +238,6 @@ input, select, textarea {
     </div>
   </div>
   
-  <!-- ORGANIZZATORE -->
-  <div class="section-title">Organizer</div>
-  <div style="display:flex; gap:10px; align-items:center;">
-  <input id="id_organizzatore" class="guide-field" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
-  <input type="hidden" id="id_organizzatore_hidden">
-  <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
-  </div>
-  <div id="organizzatoriResults" class="search-results"></div>
-  
 <div class="inline">
   <div>
     <div class="section-title">Start</div>
@@ -266,8 +257,16 @@ input, select, textarea {
   </div>
 </div>
 
+  <!-- ORGANIZZATORE -->
+  <div class="section-title">Organizer</div>
+  <div style="display:flex; gap:10px; align-items:center;">
+  <input id="id_organizzatore" class="guide-field" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
+  <input type="hidden" id="id_organizzatore_hidden">
+  <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
+  </div>
+  <div id="organizzatoriResults" class="search-results"></div>
+  
 <div class="inline">
-
   <!-- SERIE -->
   <div>
     <div class="section-title">Event Series</div>
@@ -278,7 +277,6 @@ input, select, textarea {
         <button id="addSeriesBtn" type="button" class="btn-icon" onclick="newEventSerie()" title="Add new Serie">+</button>
       </div>
   </div>
-
   <!-- ATTIVO -->
   <div>
     <div id="activeTitle" class="section-title" style="text-align:center;"></div>
@@ -287,7 +285,6 @@ input, select, textarea {
           <span id="activeBtn" class="btn-icon" title="Active/Deactive Event"></span>
       </label>
   </div>
-
   <!-- LINK -->
   <div>
     <div class="section-title">Link...</div>
