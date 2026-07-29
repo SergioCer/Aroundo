@@ -639,6 +639,8 @@ async function load() {
   if (isNew && !duplicateId) {
     original = JSON.stringify({});
     setTimeout(updateGuide, 100);
+    updateLinkButton();
+    updateActiveStatus();
     return;
   }
   const { data, error } = await supabase
@@ -685,15 +687,8 @@ async function load() {
   ev_costo.value = data.ev_costo === null ? 'TBA' : data.ev_costo;
   ev_capienza.value = data.ev_capienza || '';
   ev_link.value = data.ev_link || '';
-  updateLinkButton();
   currentCover = data.ev_copertina || null;
   ev_attivo.checked = !!data.ev_attivo;
-    if (isNew && !duplicateId) {
-        original = JSON.stringify({});
-        setTimeout(updateGuide, 100);
-        updateActiveStatus();
-        return;
-      }
   ev_creato.textContent = data.ev_creato
     ? new Date(data.ev_creato).toLocaleString()
     : '';
@@ -708,6 +703,7 @@ async function load() {
   updateBackupCover();
   updateMapButton()  
   updateDupButton()
+  updateLinkButton();
   updateActiveStatus();
   if (duplicateId) {
     dirty = true;
