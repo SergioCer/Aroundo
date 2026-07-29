@@ -704,7 +704,10 @@ window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
   id_luogo.innerHTML = `<option value="">Place...</option>`;
   id_luogo.value = "";
-  if (!idComune) return;
+    if (!idComune) {
+    id_luogo.disabled = true;
+    return;
+  }
   const { data } = await supabase
     .from('luoghi')
     .select('id_luogo, lu_location, lu_descrizione')
@@ -1203,8 +1206,8 @@ function updateMapButton() {
     if (!enabled) {
     placeSelect.innerHTML = `<option value="">Select City first</option>`;
     placeSelect.disabled = true;
+    }
   }
-}
 
 function updateDupButton() {
   const btn = document.getElementById('btnDuplicate');
