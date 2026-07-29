@@ -508,7 +508,6 @@ let comuniMap = {};
 let map;
 let markers = [];
 let dialogResolve;
-let seriesCache = [];  
 let selectedCoverFile = null;
 let coverDeleted = false;
 let currentCover = null;
@@ -606,7 +605,6 @@ async function loadSeriesByOrganizzatore(idOrg) {
     console.error("STEP SERIES - errore:", error);
     return;
   }
-  seriesCache = data || [];
   select.innerHTML = `<option value="">No series</option>`;
   (data || []).forEach(s => {
     const opt = document.createElement("option");
@@ -846,6 +844,7 @@ window.searchOrganizzatori = async (text) => {
     const seriesSelect = document.getElementById("id_event_series");
     seriesSelect.value = "";
     await loadSeriesByOrganizzatore(o.id_organizzatore);
+    verifySeries();
   };
     box.appendChild(div);
   });
@@ -1219,17 +1218,17 @@ function verifySeries() {
   const select = document.getElementById("id_event_series");
   const btn = document.getElementById("addSeriesBtn");
   const hasOrganizer = !!id_organizzatore_hidden.value;
-  const hasSeries = seriesCache && seriesCache.length > 0;
+  const hasSeries = select.options.length > 1;
   if (!hasOrganizer) {
     select.disabled = true;
     btn.disabled = true;
-    btn.className = "btn-gray";
+    btn.className = "btn-icon btn-gray";
     btn.style.cursor = "not-allowed";
     return;
   }
   select.disabled = !hasSeries;
   btn.disabled = false;
-  btn.className = "btn-green";
+  btn.className = "btn-icon btn-green";
   btn.style.cursor = "";
 }  
 
