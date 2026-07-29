@@ -203,7 +203,7 @@ input, select, textarea {
     <button id="backBtn" class="btn-icon btn-gray" onclick="requestBack()" title="Previous page">←</button>
     <div style="font-size:30px;">Event</div>
   </div>
-  <button id="btnDuplicate" class="btn-icon" style="margin-left:20px;" onclick="duplicateEvent()" title="Duplicate Event" >⧉</button>
+  <button id="btnDuplicate" class="btn-icon" style="margin-left:20px;" onclick="duplicateEvent()" title="Duplicate Event">⧉</button>
 </div>
 
 <!-- TITOLO -->
@@ -233,8 +233,8 @@ input, select, textarea {
   <select id="id_luogo" class="guide-field" autocomplete="off" oninput="markDirty()" style="flex:1;"></select>
     
   <div style="display:flex; gap:10px;">    
-  <button id="mapBtn" class="btn-icon" onclick="openMapByComune()">📍</button>
-  <button type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1'">+</button>
+  <button id="mapBtn" class="btn-icon" onclick="openMapByComune()" title="View Map">📍</button>
+  <button type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1'" title="Add Place">+</button>
     </div>
   </div>
   
@@ -243,7 +243,7 @@ input, select, textarea {
   <div style="display:flex; gap:10px; align-items:center;">
   <input id="id_organizzatore" class="guide-field" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
   <input type="hidden" id="id_organizzatore_hidden">
-  <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'">+</button>
+  <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
   </div>
   <div id="organizzatoriResults" class="search-results"></div>
   
@@ -275,7 +275,7 @@ input, select, textarea {
         <select id="id_event_series" oninput="markDirty()" disabled style="flex:1;">
         <option value="">Select organizer first</option>
         </select>
-        <button id="btnAddSeries" type="button" class="btn-icon" onclick="newEventSerie()">+</button>
+        <button id="btnAddSeries" type="button" class="btn-icon" onclick="newEventSerie()" title="Add new Serie">+</button>
       </div>
   </div>
 
@@ -283,7 +283,7 @@ input, select, textarea {
   <div>
     <div id="activeTitle" class="section-title" style="text-align:center;"></div>
       <label style="display:flex; justify-content:center;">
-        <input id="ev_attivo" class="btn-icon" type="checkbox" onchange="markDirty(); updateActiveStatus()">
+        <input id="ev_attivo" class="btn-icon" type="checkbox" onchange="markDirty(); updateActiveStatus()" title="Active/Deactive Event">
         <span id="activeBtn" class="btn-icon"></span>
       </label>
   </div>
@@ -293,7 +293,7 @@ input, select, textarea {
     <div class="section-title">Link...</div>
       <div style="display:flex; gap:10px; align-items:center;">
         <input id="ev_link" placeholder="Http(s)://..." autocomplete="off" oninput="markDirty(); updateLinkButton()">
-        <button id="openLinkBtn" class="btn-icon" type="button" onclick="openEventLink()">↗</button>
+        <button id="openLinkBtn" class="btn-icon" type="button" onclick="openEventLink()" title="Open WWW page">↗</button>
       </div>
   </div>
 </div>   
@@ -351,7 +351,7 @@ input, select, textarea {
       padding:8px 8px;
       border-radius:16px;
       cursor:pointer;
-    ">
+    " title="Remove Cover">
     Remove cover
   </button>
 </div>
