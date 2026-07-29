@@ -702,7 +702,7 @@ async function loadComuni() {
 
 window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
-  id_luogo.innerHTML = `<option value="">Place...</option>`;
+  id_luogo.innerHTML = `<option value="">Select City first...</option>`;
   id_luogo.value = "";
     if (!idComune) {
     id_luogo.disabled = true;
@@ -720,6 +720,7 @@ window.filterLuoghi = async (selectedId = null) => {
       </option>
     `;
   });
+  id_luogo.disabled = false;
   if (selectedId) {
     id_luogo.value = selectedId;
   }
@@ -1201,12 +1202,6 @@ function updateMapButton() {
   addPlaceBtn.className = `btn-icon ${enabled ? "btn-green" : "btn-gray"}`;
   addPlaceBtn.disabled = !enabled;
   addPlaceBtn.style.cursor = enabled ? "" : "not-allowed";
-
-  const placeSelect = document.getElementById("id_luogo");
-    if (!enabled) {
-    placeSelect.innerHTML = `<option value="">Select City first</option>`;
-    placeSelect.disabled = true;
-    }
   }
 
 function updateDupButton() {
