@@ -880,6 +880,7 @@ window.updateLinkButton = function() {
   const value = ev_link.value.trim();
   btn.className = `btn-icon ${value ? "btn-blue" : "btn-gray"}`;
   btn.disabled = !value;
+  btn.style.cursor = value ? "" : "not-allowed";
 };
 
 window.openEventLink = function() {
@@ -1219,8 +1220,8 @@ function updateDupButton() {
   const btn = document.getElementById('btnDuplicate');
   if (isNew) {
     btn.disabled = true;
-    btn.style.background = "#9ca3af";
     btn.style.cursor = "not-allowed";
+    btn.style.background = "#9ca3af";
     btn.style.opacity = "0.6";
   } else {
     btn.disabled = false;
