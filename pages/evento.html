@@ -1221,12 +1221,10 @@ function updateDupButton() {
   if (isNew) {
     btn.disabled = true;
     btn.style.cursor = "not-allowed";
-    btn.style.background = "#9ca3af";
-    btn.style.opacity = "0.6";
+    btn.className = "btn-icon btn-gray";
   } else {
     btn.disabled = false;
-    btn.style.background = "#3b82f6";
-    btn.style.opacity = "1";
+    btn.className = "btn-icon btn-blue";
   }
 }
 
