@@ -234,7 +234,7 @@ input, select, textarea {
     
   <div style="display:flex; gap:10px;">    
   <button id="mapBtn" class="btn-icon" onclick="openMapByComune()" title="View Map">📍</button>
-  <button type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1'" title="Add Place">+</button>
+  <button type="addPlaceBtn" class="btn-icon" onclick="window.location.href='luogo.html?new=1'" title="Add Place">+</button>
     </div>
   </div>
   
@@ -243,7 +243,7 @@ input, select, textarea {
   <div style="display:flex; gap:10px; align-items:center;">
   <input id="id_organizzatore" class="guide-field" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
   <input type="hidden" id="id_organizzatore_hidden">
-  <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
+  <button type="button" class="btn-icon" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
   </div>
   <div id="organizzatoriResults" class="search-results"></div>
   
@@ -1205,11 +1205,18 @@ function dialogAction(type) {
 window.dialogAction = dialogAction;
 
 function updateMapButton() {
-  const btn = document.getElementById("mapBtn");
   const enabled = !!id_comune_evento_hidden.value;
-  btn.disabled = !enabled;
-  btn.classList.toggle("btn-blue", enabled);
-  btn.classList.toggle("btn-gray", !enabled);
+  const mapBtn = document.getElementById("mapBtn");
+  mapBtn.disabled = !enabled;
+  mapBtn.classList.toggle("btn-blue", enabled);
+  mapBtn.classList.toggle("btn-gray", !enabled);
+  mapBtn.style.cursor = enabled ? "" : "not-allowed";
+
+  const addPlaceBtn = document.getElementById("addPlaceBtn");
+  addPlaceBtn.disabled = !enabled;
+  addPlaceBtn.classList.toggle("btn-green", enabled);
+  addPlaceBtn.classList.toggle("btn-gray", !enabled);
+  addPlaceBtn.style.cursor = enabled ? "" : "not-allowed";
 }
 
 function updateDupButton() {
