@@ -641,6 +641,7 @@ async function load() {
     setTimeout(updateGuide, 100);
     updateLinkButton();
     updateActiveStatus();
+    updateMapButton();
     return;
   }
   const { data, error } = await supabase
