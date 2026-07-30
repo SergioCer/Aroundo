@@ -286,7 +286,7 @@ input, select, textarea {
 }
 
 .ar-select-option {
-  padding:10px 12px;
+  padding:8px 8px;
   cursor:pointer;
 }
 
@@ -315,20 +315,12 @@ input, select, textarea {
 
   <!-- CATEGORIA -->
   <div class="section-title">Category</div>
-  
-  <!-- CANCELLARE VECCHIO 
-  <select id="id_categoria" class="guide-field" oninput="markDirty()"></select>
-  FINO A QUI -->
-
-  <!-- NUOVO -->
   <div id="categoriaBox" class="ar-select guide-field">
     <div id="categoriaValue" class="ar-select-value">
       Category...
     </div>
     <div id="categoriaOptions" class="ar-select-options"></div>
   </div>
-  <!-- FINO A QUI -->
-  
 <select id="id_categoria" hidden></select>
   
   <!-- DESCRIZIONE -->
@@ -344,8 +336,14 @@ input, select, textarea {
   <!-- LUOGO -->
   <div class="section-title">Place</div>
   <div style="display:flex; gap:10px; align-items:center;">
-  <select id="id_luogo" class="guide-field" autocomplete="off" oninput="markDirty()" style="flex:1;"></select>
-    
+<div id="luogoBox" class="ar-select guide-field" style="flex:1;">
+  <div id="luogoValue" class="ar-select-value">
+    Place...
+  </div>
+  <div id="luogoOptions" class="ar-select-options"></div>
+</div>
+
+<select id="id_luogo" hidden></select>    
   <div style="display:flex; gap:10px;">    
   <button id="mapBtn" class="btn-icon" onclick="openMapByComune()" title="View Map">📍</button>
   <button id="addPlaceBtn" type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1'" title="Add Place">+</button>
@@ -664,6 +662,30 @@ document
     .classList.toggle("open");
 });  
 
+function updateLuogoSelect() {
+  const box = document.getElementById("luogoOptions");
+  const value = document.getElementById("luogoValue");
+  box.innerHTML = "";
+  [...id_luogo.options].forEach(opt => {
+    if (!opt.value) return;
+    const div = document.createElement("div");
+    div.className = "ar-select-option";
+    div.textContent = opt.textContent;
+    div.onclick = () => {
+      id_luogo.value = opt.value;
+      value.textContent = opt.textContent;
+      document
+        .getElementById("luogoBox")
+        .classList.remove("open");
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+  value.textContent =
+    id_luogo.options[id_luogo.selectedIndex]?.text ||
+    "Place...";
+}
+  
 async function loadSeriesByOrganizzatore(idOrg) {
   const select = document.getElementById("id_event_series");
   const { data, error } = await supabase
@@ -804,7 +826,11 @@ window.filterLuoghi = async (selectedId = null) => {
   if (selectedId) {
     id_luogo.value = selectedId;
   }
+  updateLuogoSelect();
 };
+
+document.getElementById("luogoValue")
+.addEventListener("click", () => {document.getElementById("luogoBox").classList.toggle("open");});
   
 /* DIRTY */
 window.markDirty = () => {
