@@ -769,12 +769,15 @@ function updateGuide() {
 function updateActiveButtonState() {
   const btn = document.getElementById("activeBtn");
   if (isNew && !isComplete()) {
-    btn.classList.remove("btn-green");
+    btn.classList.remove("btn-green", "btn-red");
     btn.classList.add("btn-gray");
+    btn.textContent = "×";
+    btn.style.cursor = "not-allowed";
     ev_attivo.disabled = true;
     return;
   }
   ev_attivo.disabled = false;
+  btn.style.cursor = "";
   updateActiveStatus();
 }
 
