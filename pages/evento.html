@@ -901,15 +901,15 @@ updateActiveButtonState();
 
   const guideSteps = [
   {id: "ev_titolo", required: true, valid: () => ev_titolo.value.trim() !== ""},
-  {id: "id_categoria", required: true, valid: () => id_categoria.value !== ""},
+  {id: "categoriaBox", required: true, valid: () => id_categoria.value !== ""},
   {id: "ev_descrizione", required: false, valid: () => ev_descrizione.value.trim() !== ""},
   {id: "id_comune_evento", required: false, valid: () => id_comune_evento_hidden.value !== ""},
-  {id: "id_luogo", required: true, valid: () => id_luogo.value !== ""},
+  {id: "luogoBox", required: true, valid: () => id_luogo.value !== ""},
   {id: "ev_inizio", required: true, valid: () => ev_inizio.value !== ""},
   {id: "ev_fine", required: true, valid: () => ev_fine.value !== ""},
   {id: "ev_capienza", required: false, valid: () => ev_capienza.value !== ""},
   {id: "id_organizzatore", required: true, valid: () => id_organizzatore_hidden.value !== ""},
-  {id: "id_event_series", required: false, valid: () => id_event_series.value !== ""},
+  {id: "seriesBox", required: false, valid: () => id_event_series.value !== ""},
   {id: "ev_link", required: false, valid: () => ev_link.value !== ""}
 ];  
 
