@@ -342,7 +342,7 @@ input, select, textarea {
 
   <!-- CATEGORIA -->
   <div class="section-title">Category</div>
-  <div id="categoriaBox" class="ar-select guide-field">
+  <div id="categoriaBox" class="ar-select guide-field" tabindex="0">
     <div id="categoriaValue" class="ar-select-value">
       Category...
     </div>
@@ -363,7 +363,7 @@ input, select, textarea {
   <!-- LUOGO -->
   <div class="section-title">Place</div>
   <div style="display:flex; gap:10px; align-items:center;">
-<div id="luogoBox" class="ar-select guide-field" style="flex:1;">
+<div id="luogoBox" class="ar-select guide-field" style="flex:1;" tabindex="0">
   <div id="luogoValue" class="ar-select-value">
     Place...
   </div>
@@ -410,7 +410,7 @@ input, select, textarea {
   <div>
     <div class="section-title">Event Series</div>
       <div style="display:flex; gap:10px; align-items:center;">
-        <div id="seriesBox" class="ar-select guide-field" style="flex:1;">
+        <div id="seriesBox" class="ar-select guide-field" style="flex:1;" tabindex="0">
           <div id="seriesValue" class="ar-select-value">
             Select organizer first
           </div>
@@ -600,10 +600,10 @@ document.addEventListener("keydown", function(e) {
   e.preventDefault();
   const focusable = [
     "ev_titolo",
-    "id_categoria",
+    "categoriaValue",
     "ev_descrizione",
     "id_comune_evento",
-    "id_luogo",
+    "luogoValue",
     "id_organizzatore",
     "ev_inizio",
     "ev_fine",
