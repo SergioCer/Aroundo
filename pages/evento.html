@@ -877,7 +877,6 @@ window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
   id_luogo.innerHTML = `<option value="">Select City first</option>`;
   id_luogo.value = "";
-  document.getElementById("luogoValue").textContent = "Place...";
     if (!idComune) {
     id_luogo.disabled = true;
     updateLuogoSelect();
