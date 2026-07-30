@@ -743,10 +743,14 @@ function updateSeriesSelect() {
     };
     box.appendChild(div);
   });
-  value.textContent =
-      select.options[select.selectedIndex]?.text ||
-      value.classList.add("placeholder");
-      "Series...";
+  const selectedText =
+  select.options[select.selectedIndex]?.text || "Series...";
+  value.textContent = selectedText;
+    if (!select.value) {
+    value.classList.add("placeholder");
+  } else {
+    value.classList.remove("placeholder");
+  }
   wrapper.classList.toggle("disabled", select.disabled);
 }
   
