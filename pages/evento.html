@@ -1455,6 +1455,14 @@ removeCoverBtn.addEventListener('click', (event) => {
   markDirty();
 });
 
+document.addEventListener("click", e => {
+    if (!e.target.closest(".ar-select")) {
+        document
+            .querySelectorAll(".ar-select")
+            .forEach(s => s.classList.remove("open"));
+    }
+});
+
 async function loadCoverPreview(file) {
   if (!file || !file.type.startsWith('image/')) {
     return;
