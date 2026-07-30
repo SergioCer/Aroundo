@@ -303,6 +303,23 @@ input, select, textarea {
 .ar-select-option.placeholder{
     color:#9ca3af;
 }
+
+.ar-select.guide-active .ar-select-value {
+    background:linear-gradient(
+        90deg,
+        #eefcf5,
+        #d9fbe8,
+        #eefcf5
+    );
+    background-size:220% 100%;
+    animation:guideWave 2.8s linear infinite;
+    border:1px solid #4ade80;
+}
+
+.ar-select.guide-complete .ar-select-value {
+    background:white;
+    border:1px solid #86efac;
+}
   
 </style>
 </head>
