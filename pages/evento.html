@@ -713,10 +713,14 @@ function updateLuogoSelect() {
     };
     box.appendChild(div);
   });
-  value.textContent =
-    id_luogo.options[id_luogo.selectedIndex]?.text ||
-    value.classList.add("placeholder");
-    "Place...";
+  const selectedText =
+    id_luogo.options[id_luogo.selectedIndex]?.text || "Place...";
+    value.textContent = selectedText;
+    if (!id_luogo.value) {
+      value.classList.add("placeholder");
+    } else {
+      value.classList.remove("placeholder");
+  }
 }
 
 function updateSeriesSelect() {
@@ -872,6 +876,7 @@ window.filterLuoghi = async (selectedId = null) => {
   document.getElementById("luogoValue").textContent = "Place...";
     if (!idComune) {
     id_luogo.disabled = true;
+    updateLuogoSelect();
     return;
   }
   id_luogo.innerHTML = `<option value="">Place...</option>`;
@@ -993,6 +998,10 @@ window.searchComuni = async (text) => {
   if (text.length < 3) {
     box.innerHTML = '';
     id_comune_evento_hidden.value = "";
+      id_luogo.value = "";
+      const luogoValue = document.getElementById("luogoValue");
+      luogoValue.textContent = "Select City first";
+      luogoValue.classList.add("placeholder");
     await filterLuoghi();
     markDirty();
     updateMapButton()
@@ -1012,9 +1021,6 @@ window.searchComuni = async (text) => {
         id_comune_evento.value = c.co_descrizione;
         id_comune_evento_hidden.value = c.id_comune;
       await filterLuoghi();
-      const luogoValue = document.getElementById("luogoValue");
-      luogoValue.textContent = "Select City first";
-      luogoValue.classList.add("placeholder");
       markDirty();
       box.innerHTML = '';
       updateMapButton() 
