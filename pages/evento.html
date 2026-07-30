@@ -1370,6 +1370,7 @@ function renderMarkers(luoghiList, comune) {
     );
     marker.on("click", () => {
       id_luogo.value = l.id_luogo;
+      updateLuogoSelect();
       markDirty();
       closeMap();
     });
