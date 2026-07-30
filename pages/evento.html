@@ -239,6 +239,60 @@ input, select, textarea {
   position:relative;
   min-height:350px;
 }
+
+
+  
+.ar-select {
+  position: relative;
+  width:100%;
+}
+
+.ar-select-value {
+  width:100%;
+  border:1px solid #ddd;
+  padding:6px;
+  border-radius:6px;
+  font-size:16px;
+  background:white;
+  cursor:pointer;
+  min-height:38px;
+  display:flex;
+  align-items:center;
+}
+
+.ar-select-value:after {
+  content:"▼";
+  margin-left:auto;
+  font-size:12px;
+  color:#777;
+}
+
+.ar-select-options {
+  display:none;
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(100% + 4px);
+  background:white;
+  border:1px solid #ddd;
+  border-radius:8px;
+  overflow:hidden;
+  z-index:1000;
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+
+.ar-select.open .ar-select-options {
+  display:block;
+}
+
+.ar-select-option {
+  padding:10px 12px;
+  cursor:pointer;
+}
+
+.ar-select-option:hover {
+  background:#f3f4f6;
+}
   
 </style>
 </head>
@@ -261,8 +315,22 @@ input, select, textarea {
 
   <!-- CATEGORIA -->
   <div class="section-title">Category</div>
+  
+  <!-- CANCELLARE VECCHIO 
   <select id="id_categoria" class="guide-field" oninput="markDirty()"></select>
+  FINO A QUI -->
 
+  <!-- NUOVO -->
+  <div id="categoriaBox" class="ar-select guide-field">
+    <div id="categoriaValue" class="ar-select-value">
+      Category...
+    </div>
+    <div id="categoriaOptions" class="ar-select-options"></div>
+  </div>
+  <!-- FINO A QUI -->
+  
+<select id="id_categoria" hidden></select>
+  
   <!-- DESCRIZIONE -->
   <div class="section-title">Description</div>
   <textarea id="ev_descrizione" autocomplete="off" placeholder="Event description..." rows="4" oninput="markDirty()"></textarea>
@@ -562,7 +630,39 @@ async function loadSelects() {
         `;
       });
   id_luogo.innerHTML = `<option value="">Place...</option>`;
+  updateCategoriaSelect();
 }
+
+function updateCategoriaSelect() {
+  const box = document.getElementById("categoriaOptions");
+  const value = document.getElementById("categoriaValue");
+  box.innerHTML = "";
+  [...id_categoria.options].forEach(opt => {
+    if (!opt.value) return;
+    const div = document.createElement("div");
+    div.className = "ar-select-option";
+    div.textContent = opt.textContent;
+    div.onclick = () => {
+      id_categoria.value = opt.value;
+      value.textContent = opt.textContent;
+      document
+        .getElementById("categoriaBox")
+        .classList.remove("open");
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+  value.textContent =
+    id_categoria.options[id_categoria.selectedIndex]?.text ||
+    "Category...";
+}
+document
+.getElementById("categoriaValue")
+.addEventListener("click", () => {
+  document
+    .getElementById("categoriaBox")
+    .classList.toggle("open");
+});  
 
 async function loadSeriesByOrganizzatore(idOrg) {
   const select = document.getElementById("id_event_series");
