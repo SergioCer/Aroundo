@@ -293,6 +293,12 @@ input, select, textarea {
 .ar-select-option:hover {
   background:#f3f4f6;
 }
+
+.ar-select.disabled .ar-select-value{
+    background:#f3f4f6;
+    color:#9ca3af;
+    cursor:not-allowed;
+}  
   
 </style>
 </head>
@@ -377,15 +383,19 @@ input, select, textarea {
   <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
   </div>
   <div id="organizzatoriResults" class="search-results"></div>
-  
+
 <div class="inline">
   <!-- SERIE -->
   <div>
     <div class="section-title">Event Series</div>
       <div style="display:flex; gap:10px; align-items:center;">
-        <select id="id_event_series" oninput="markDirty()" disabled style="flex:1;">
-        <option value="">Select organizer first</option>
-        </select>
+        <div id="seriesBox" class="ar-select" style="flex:1;">
+          <div id="seriesValue" class="ar-select-value">
+            Select organizer first
+          </div>
+          <div id="seriesOptions" class="ar-select-options"></div>
+        </div>
+    <select id="id_event_series" hidden></select>
         <button id="addSeriesBtn" type="button" class="btn-icon" onclick="newEventSerie()" title="Add new Serie">+</button>
       </div>
   </div>
@@ -654,12 +664,8 @@ function updateCategoriaSelect() {
     id_categoria.options[id_categoria.selectedIndex]?.text ||
     "Category...";
 }
-document
-.getElementById("categoriaValue")
-.addEventListener("click", () => {
-  document
-    .getElementById("categoriaBox")
-    .classList.toggle("open");
+
+document.getElementById("categoriaValue").addEventListener("click", () => {document.getElementById("categoriaBox").classList.toggle("open");
 });  
 
 function updateLuogoSelect() {
@@ -685,6 +691,37 @@ function updateLuogoSelect() {
     id_luogo.options[id_luogo.selectedIndex]?.text ||
     "Place...";
 }
+
+function updateSeriesSelect() {
+  const box = document.getElementById("seriesOptions");
+  const value = document.getElementById("seriesValue");
+  const select = document.getElementById("id_event_series");
+  const wrapper = document.getElementById("seriesBox");
+  box.innerHTML = "";
+  [...select.options].forEach(opt => {
+    if (!opt.value) return;
+    const div = document.createElement("div");
+    div.className = "ar-select-option";
+    div.textContent = opt.textContent;
+    div.onclick = () => {
+      select.value = opt.value;
+      value.textContent = opt.textContent;
+      wrapper.classList.remove("open");
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+  value.textContent =
+      select.options[select.selectedIndex]?.text ||
+      "Series...";
+  wrapper.classList.toggle("disabled", select.disabled);
+}
+  
+document.getElementById("seriesValue").addEventListener("click", () => {const wrapper =document.getElementById("seriesBox");
+    if (document.getElementById("id_event_series").disabled)
+        return;
+    wrapper.classList.toggle("open");
+});
   
 async function loadSeriesByOrganizzatore(idOrg) {
   const select = document.getElementById("id_event_series");
@@ -710,6 +747,7 @@ async function loadSeriesByOrganizzatore(idOrg) {
       select.appendChild(opt);
     });
   }
+  updateSeriesSelect();
 }  
 
 /* LOAD */
@@ -776,6 +814,7 @@ async function load() {
       if (data.id_event_series) {
         document.getElementById("id_event_series").value =
           data.id_event_series;
+        updateSeriesSelect();
       }
   updateCover();
   updateBackupCover();
