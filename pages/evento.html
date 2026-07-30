@@ -304,6 +304,10 @@ input, select, textarea {
     color:#9ca3af;
 }
 
+.ar-select-value.placeholder {
+    color:#9ca3af;
+}
+  
 .ar-select.guide-active .ar-select-value {
     background:linear-gradient(
         90deg,
@@ -364,8 +368,8 @@ input, select, textarea {
   <div class="section-title">Place</div>
   <div style="display:flex; gap:10px; align-items:center;">
 <div id="luogoBox" class="ar-select guide-field" style="flex:1;" tabindex="0">
-  <div id="luogoValue" class="ar-select-value">
-    Place...
+  <div id="luogoValue" class="ar-select-value placeholder">
+    Select City first
   </div>
   <div id="luogoOptions" class="ar-select-options"></div>
 </div>
@@ -411,7 +415,7 @@ input, select, textarea {
     <div class="section-title">Event Series</div>
       <div style="display:flex; gap:10px; align-items:center;">
         <div id="seriesBox" class="ar-select guide-field" style="flex:1;" tabindex="0">
-          <div id="seriesValue" class="ar-select-value">
+          <div id="seriesValue" class="ar-select-value placeholder">
             Select organizer first
           </div>
           <div id="seriesOptions" class="ar-select-options"></div>
@@ -700,6 +704,7 @@ function updateLuogoSelect() {
     div.textContent = opt.textContent;
     div.onclick = () => {
       id_luogo.value = opt.value;
+      value.classList.remove("placeholder");
       value.textContent = opt.textContent;
       document
         .getElementById("luogoBox")
@@ -710,6 +715,7 @@ function updateLuogoSelect() {
   });
   value.textContent =
     id_luogo.options[id_luogo.selectedIndex]?.text ||
+    value.classList.add("placeholder");
     "Place...";
 }
 
@@ -726,6 +732,7 @@ function updateSeriesSelect() {
     div.textContent = opt.textContent;
     div.onclick = () => {
       select.value = opt.value;
+      value.classList.remove("placeholder");
       value.textContent = opt.textContent;
       wrapper.classList.remove("open");
       markDirty();
@@ -734,6 +741,7 @@ function updateSeriesSelect() {
   });
   value.textContent =
       select.options[select.selectedIndex]?.text ||
+      value.classList.add("placeholder");
       "Series...";
   wrapper.classList.toggle("disabled", select.disabled);
 }
