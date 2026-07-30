@@ -1012,6 +1012,9 @@ window.searchComuni = async (text) => {
         id_comune_evento.value = c.co_descrizione;
         id_comune_evento_hidden.value = c.id_comune;
       await filterLuoghi();
+      const luogoValue = document.getElementById("luogoValue");
+      luogoValue.textContent = "Select City first";
+      luogoValue.classList.add("placeholder");
       markDirty();
       box.innerHTML = '';
       updateMapButton() 
@@ -1026,6 +1029,9 @@ window.searchOrganizzatori = async (text) => {
     box.innerHTML = '';
     id_organizzatore_hidden.value = "";
     document.getElementById("id_event_series").value = "";
+    const seriesValue = document.getElementById("seriesValue");
+    seriesValue.textContent = "Select organizer first";
+    seriesValue.classList.add("placeholder");
     verifySeries();
     markDirty();
     return;
@@ -1048,6 +1054,9 @@ window.searchOrganizzatori = async (text) => {
     box.innerHTML = '';
     const seriesSelect = document.getElementById("id_event_series");
     seriesSelect.value = "";
+    const seriesValue = document.getElementById("seriesValue");
+    seriesValue.textContent = "Select organizer first";
+    seriesValue.classList.add("placeholder");
     verifySeries();
   };
     box.appendChild(div);
