@@ -299,6 +299,10 @@ input, select, textarea {
     color:#9ca3af;
     cursor:not-allowed;
 }  
+
+.ar-select-option.placeholder{
+    color:#9ca3af;
+}
   
 </style>
 </head>
@@ -648,6 +652,7 @@ function updateCategoriaSelect() {
   [...id_categoria.options].forEach(opt => {
     const div = document.createElement("div");
     div.className = "ar-select-option";
+      if (!opt.value) {div.classList.add("placeholder");}
     div.textContent = opt.textContent;
     div.onclick = () => {
       id_categoria.value = opt.value;
@@ -674,6 +679,7 @@ function updateLuogoSelect() {
   [...id_luogo.options].forEach(opt => {
     const div = document.createElement("div");
     div.className = "ar-select-option";
+      if (!opt.value) {div.classList.add("placeholder");}
     div.textContent = opt.textContent;
     div.onclick = () => {
       id_luogo.value = opt.value;
@@ -699,6 +705,7 @@ function updateSeriesSelect() {
   [...select.options].forEach(opt => {
     const div = document.createElement("div");
     div.className = "ar-select-option";
+      if (!opt.value) {div.classList.add("placeholder");}
     div.textContent = opt.textContent;
     div.onclick = () => {
       select.value = opt.value;
