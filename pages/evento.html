@@ -658,10 +658,8 @@ async function load() {
   updateCover();
   updateBackupCover();
   updateMapButton()  
-  // CANCELLARE updateDupButton()
   updateLinkButton();
   updateActiveStatus();
-  // CANCELLARE verifySeries();
   if (duplicateId) {
     dirty = true;
     document.getElementById('backBtn')
@@ -1247,6 +1245,9 @@ function updateDupButton() {
   }
 }
 
+document.getElementById("backBtn")
+  .classList.add("btn-gray");
+  
 function verifySeries() {
   const select = document.getElementById("id_event_series");
   const btn = document.getElementById("addSeriesBtn");
