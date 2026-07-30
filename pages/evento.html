@@ -240,24 +240,24 @@ input, select, textarea {
   min-height:350px;
 }
 
-
-  
-.ar-select {
-  position: relative;
-  width:100%;
+.ar-select{
+    position:relative;
+    width:100%;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:6px;
 }
 
-.ar-select-value {
-  width:100%;
-  border:1px solid #ddd;
-  padding:6px;
-  border-radius:6px;
-  font-size:16px;
-  background:white;
-  cursor:pointer;
-  min-height:38px;
-  display:flex;
-  align-items:center;
+.ar-select-value{
+    width:100%;
+    padding:6px;
+    font-size:16px;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    min-height:38px;
+    display:flex;
+    align-items:center;
 }
 
 .ar-select-value:after {
@@ -907,7 +907,6 @@ updateActiveButtonState();
   {id: "luogoBox", required: true, valid: () => id_luogo.value !== ""},
   {id: "ev_inizio", required: true, valid: () => ev_inizio.value !== ""},
   {id: "ev_fine", required: true, valid: () => ev_fine.value !== ""},
-  {id: "ev_capienza", required: false, valid: () => ev_capienza.value !== ""},
   {id: "id_organizzatore", required: true, valid: () => id_organizzatore_hidden.value !== ""},
   {id: "seriesBox", required: false, valid: () => id_event_series.value !== ""},
   {id: "ev_link", required: false, valid: () => ev_link.value !== ""}
@@ -1025,7 +1024,6 @@ window.searchOrganizzatori = async (text) => {
     box.innerHTML = '';
     const seriesSelect = document.getElementById("id_event_series");
     seriesSelect.value = "";
-    // CANCELLARE await loadSeriesByOrganizzatore(o.id_organizzatore);
     verifySeries();
   };
     box.appendChild(div);
@@ -1362,7 +1360,7 @@ function renderMarkers(luoghiList, comune) {
     markers.push(marker);
     bounds.push([l.lu_lat, l.lu_lng]);
   });
-  map.fitBounds(bounds, { padding: [30, 30] }); // ***** VIVE *****
+  map.fitBounds(bounds, { padding: [30, 30] }); 
 }
 
 window.closeMap = () => {
