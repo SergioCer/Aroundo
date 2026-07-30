@@ -596,7 +596,7 @@ async function load() {
     original = JSON.stringify({});
     setTimeout(updateGuide, 100);
     updateLinkButton();
-    updateActiveStatus();
+    updateActiveButtonState();
     updateMapButton();
     verifySeries();
     ev_titolo.focus();
@@ -727,19 +727,24 @@ window.markDirty = () => {
   dirty = current !== original;
   document.getElementById('backBtn')
     .classList.toggle('dirty', dirty);
-updateGuide();  
+updateGuide();
+updateActiveButtonState();
 };
 
   const guideSteps = [
-    {id: "ev_titolo", valid: () => ev_titolo.value.trim() !== ""},
-    {id: "id_categoria", valid: () => id_categoria.value !== ""},
-    {id: "ev_descrizione", valid: () => ev_descrizione.value.trim() !== ""},
-    {id: "id_comune_evento", valid: () => id_comune_evento_hidden.value !== ""},
-    {id: "id_luogo", valid: () => id_luogo.value !== ""},
-    {id: "ev_inizio", valid: () => ev_inizio.value !== ""},
-    {id: "ev_fine", valid: () => ev_fine.value !== ""},    
-    {id: "id_organizzatore", valid: () => id_organizzatore_hidden.value !== ""}
-  ];  
+  {id: "ev_titolo", required: true, valid: () => ev_titolo.value.trim() !== ""},
+  {id: "id_categoria", required: true, valid: () => id_categoria.value !== ""},
+  {id: "ev_descrizione", required: false, valid: () => ev_descrizione.value.trim() !== ""},
+  {id: "id_comune_evento", required: false, valid: () => id_comune_evento_hidden.value !== ""},
+  {id: "id_luogo", required: true, valid: () => id_luogo.value !== ""},
+  {id: "ev_inizio", required: true, valid: () => ev_inizio.value !== ""},
+  {id: "ev_fine", required: true, valid: () => ev_fine.value !== ""},
+  {id: "ev_costo", required: false, valid: () => ev_costo.value !== ""},
+  {id: "ev_capienza", required: false, valid: () => ev_capienza.value !== ""},
+  {id: "id_organizzatore", required: true, valid: () => id_organizzatore_hidden.value !== ""},
+  {id: "id_event_series", required: false, valid: () => id_event_series.value !== ""},
+  {id: "ev_link", required: false, valid: () => ev_link.value !== ""}
+];  
 
 /* Visita Guidata su Aroundo */
 function updateGuide() {
@@ -761,6 +766,30 @@ function updateGuide() {
   }
 }
 
+function updateActiveButtonState() {
+  const btn = document.getElementById("activeBtn");
+  if (isNew && !isComplete()) {
+    btn.classList.remove("btn-green");
+    btn.classList.add("btn-gray");
+    ev_attivo.disabled = true;
+    return;
+  }
+  ev_attivo.disabled = false;
+  updateActiveStatus();
+}
+
+  /* Verifica lo stato del Checkbox Attivo */
+  window.updateActiveStatus = function () {
+    const btn = document.getElementById("activeBtn");
+    const title = document.getElementById("activeTitle");
+    btn.classList.toggle("btn-red", !ev_attivo.checked);
+    btn.classList.toggle("btn-green", ev_attivo.checked);
+    btn.textContent = ev_attivo.checked ? "✓" : "×";
+    title.textContent = ev_attivo.checked
+      ? "Active"
+      : "Unactive";
+  }
+  
 window.duplicateEvent = () => {
   if (!id) return;
   location.href = `evento.html?new=1&duplicate=${id}`;
@@ -854,6 +883,17 @@ window.openEventLink = function() {
     window.open(url, "_blank");
   }
 };
+
+function isComplete(){
+  return (
+    ev_titolo.value.trim() !== "" &&
+    id_categoria.value !== "" &&
+    ev_inizio.value !== "" &&
+    ev_fine.value !== "" &&
+    id_luogo.value !== "" &&
+    id_organizzatore_hidden.value !== ""
+  );
+}
   
 /* SAVE */
 async function save() {
@@ -1402,18 +1442,6 @@ async function optimizeCover(file) {
   });
 }  
 
-  /* Verifica lo stato del Checkbox Attivo */
-  window.updateActiveStatus = function () {
-    const btn = document.getElementById("activeBtn");
-    const title = document.getElementById("activeTitle");
-    btn.classList.toggle("btn-red", !ev_attivo.checked);
-    btn.classList.toggle("btn-green", ev_attivo.checked);
-    btn.textContent = ev_attivo.checked ? "✓" : "×";
-    title.textContent = ev_attivo.checked
-      ? "Active"
-      : "Unactive";
-  }
-  
 await loadComuni();  
 await loadSelects();
 await load();
