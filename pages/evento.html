@@ -672,7 +672,6 @@ function updateLuogoSelect() {
   const value = document.getElementById("luogoValue");
   box.innerHTML = "";
   [...id_luogo.options].forEach(opt => {
-    if (!opt.value) return;
     const div = document.createElement("div");
     div.className = "ar-select-option";
     div.textContent = opt.textContent;
@@ -698,7 +697,6 @@ function updateSeriesSelect() {
   const wrapper = document.getElementById("seriesBox");
   box.innerHTML = "";
   [...select.options].forEach(opt => {
-    if (!opt.value) return;
     const div = document.createElement("div");
     div.className = "ar-select-option";
     div.textContent = opt.textContent;
