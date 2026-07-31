@@ -1554,7 +1554,6 @@ window.closeWarning = function() {
 // Gestione Copertina 
   const coverBox = document.getElementById('coverBox');
   const coverFileInput = document.getElementById('coverFileInput');
-  const pasteCoverBtn = document.getElementById('pasteCoverBtn');
   const removeCoverBtn = document.getElementById('removeCoverBtn');
   const coverHint = document.getElementById('coverHint');
   const coverPreview = document.getElementById('coverPreview');
@@ -1565,25 +1564,6 @@ coverFileInput.addEventListener('change', () => {
   const file = coverFileInput.files[0];
   loadCoverPreview(file);
 });
-if (pasteCoverBtn) {
-  pasteCoverBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    const items = await navigator.clipboard.read();
-    for (const item of items) {
-      const type = item.types.find(t =>
-        t.startsWith("image/")
-      );
-      if (!type) continue;
-      const blob = await item.getType(type);
-      const file = new File(
-        [blob],
-        "clipboard-image.png",
-        { type }
-      );
-      loadCoverPreview(file);
-      return;
-    }
-  });
 coverBox.addEventListener('dragover', e => {
   e.preventDefault();
   coverBox.style.background = '#eef2ff';
@@ -1609,6 +1589,31 @@ document.addEventListener('paste', e => {
     }
   }
 });
+
+// CANCELLARE document.addEventListener('paste', handleCoverPaste);  
+
+const pasteCoverBtn = document.getElementById('pasteCoverBtn');
+if (pasteCoverBtn) {
+  pasteCoverBtn.addEventListener('click', async () => {
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        const type = item.types.find(t => t.startsWith("image/"));
+        if (!type) continue;
+        const blob = await item.getType(type);
+        const file = new File(
+          [blob],
+          "clipboard-image.png",
+          { type }
+        );
+        loadCoverPreview(file);
+        break;
+      }
+    } catch (err) {
+      console.error("Paste clipboard error:", err);
+    }
+  });
+} 
 
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
