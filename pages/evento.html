@@ -198,6 +198,13 @@ input, select, textarea {
   100% {background-position: -200% 0;}
 }
 
+#pasteCoverBtn {
+  position:absolute;
+  top:10px;
+  left:50px;
+  z-index:2;
+}
+  
 #removeCoverBtn {
   position:absolute;
   top:10px;
@@ -458,6 +465,7 @@ input, select, textarea {
   </div>
   <img id="coverPreview" class="cover-preview">
   <img id="coverBackupPreview" class="cover-backup">
+  <button id="pasteCoverBtn" type="button" class="btn-icon" title="Paste image">📋</button>
   <button id="removeCoverBtn" type="button" class="btn-icon" title="Remove Cover">×</button>
 </div>
 <input id="coverFileInput" type="file" accept="image/*" style="display:none">
@@ -1546,18 +1554,37 @@ window.closeWarning = function() {
 // Gestione Copertina 
   const coverBox = document.getElementById('coverBox');
   const coverFileInput = document.getElementById('coverFileInput');
+  const pasteCoverBtn = document.getElementById('pasteCoverBtn');
   const removeCoverBtn = document.getElementById('removeCoverBtn');
   const coverHint = document.getElementById('coverHint');
   const coverPreview = document.getElementById('coverPreview');
-
 coverBox.addEventListener('click', () => {
   coverFileInput.click();
 });
-
 coverFileInput.addEventListener('change', () => {
   const file = coverFileInput.files[0];
   loadCoverPreview(file);
 });
+if (pasteCoverBtn) {
+  pasteCoverBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const items = await navigator.clipboard.read();
+    for (const item of items) {
+      const type = item.types.find(t =>
+        t.startsWith("image/")
+      );
+      if (!type) continue;
+      const blob = await item.getType(type);
+      const file = new File(
+        [blob],
+        "clipboard-image.png",
+        { type }
+      );
+      loadCoverPreview(file);
+      return;
+    }
+  });
+}
 coverBox.addEventListener('dragover', e => {
   e.preventDefault();
   coverBox.style.background = '#eef2ff';
@@ -1583,7 +1610,7 @@ document.addEventListener('paste', e => {
     }
   }
 });
-  
+
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   selectedCoverFile = null;
