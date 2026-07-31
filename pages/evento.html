@@ -696,6 +696,7 @@ document.getElementById("categoriaValue").addEventListener("click", () => {docum
 function updateLuogoSelect() {
   const box = document.getElementById("luogoOptions");
   const value = document.getElementById("luogoValue");
+  const wrapper = document.getElementById("luogoBox");
   box.innerHTML = "";
   if (id_luogo.disabled) {
       value.classList.add("placeholder");
@@ -703,7 +704,8 @@ function updateLuogoSelect() {
           id_comune_evento_hidden.value
               ? "No places"
               : "Select City first";
-      document.getElementById("luogoBox").classList.remove("open");
+        wrapper.classList.add("disabled");
+        wrapper.classList.remove("open");
       return;
   }
   [...id_luogo.options].forEach(opt => {
@@ -729,8 +731,17 @@ function updateLuogoSelect() {
     } else {
       value.classList.remove("placeholder");
   }
+  wrapper.classList.remove("disabled");
 }
 
+document.getElementById("luogoValue")
+.addEventListener("click", () => {
+    const wrapper = document.getElementById("luogoBox");
+    if (id_luogo.disabled)
+        return;
+    wrapper.classList.toggle("open");
+});
+  
 function updateSeriesSelect() {
   const box = document.getElementById("seriesOptions");
   const value = document.getElementById("seriesValue");
@@ -925,9 +936,6 @@ window.filterLuoghi = async (selectedId = null) => {
   }
   updateLuogoSelect();
 };
-
-document.getElementById("luogoValue")
-.addEventListener("click", () => {document.getElementById("luogoBox").classList.toggle("open");});
   
 /* DIRTY */
 window.markDirty = () => {
