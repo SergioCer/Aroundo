@@ -1458,7 +1458,7 @@ function dialogAction(type) {
 window.dialogAction = dialogAction;
 
 function updateMapButton() {
-  const enabled = !!id_comune_evento_hidden.value;
+  const enabled = !!id_comune_evento_hidden.value && id_luogo.options.length > 1;
   const mapBtn = document.getElementById("mapBtn");
   mapBtn.className = `btn-icon ${enabled ? "btn-blue" : "btn-gray"}`;
   mapBtn.disabled = !enabled;
