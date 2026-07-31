@@ -697,6 +697,15 @@ function updateLuogoSelect() {
   const box = document.getElementById("luogoOptions");
   const value = document.getElementById("luogoValue");
   box.innerHTML = "";
+  if (id_luogo.disabled) {
+      value.classList.add("placeholder");
+      value.textContent =
+          id_comune_evento_hidden.value
+              ? "No places"
+              : "Select City first";
+      document.getElementById("luogoBox").classList.remove("open");
+      return;
+  }
   [...id_luogo.options].forEach(opt => {
     const div = document.createElement("div");
     div.className = "ar-select-option";
@@ -704,11 +713,10 @@ function updateLuogoSelect() {
     div.textContent = opt.textContent;
     div.onclick = () => {
       id_luogo.value = opt.value;
-      value.classList.remove("placeholder");
-      value.textContent = opt.textContent;
       document
         .getElementById("luogoBox")
         .classList.remove("open");
+      updateLuogoSelect();
       markDirty();
     };
     box.appendChild(div);
@@ -875,7 +883,7 @@ async function loadComuni() {
 
 window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
-  id_luogo.innerHTML = `<option value="">Select City first</option>`;
+  id_luogo.innerHTML = "";
   id_luogo.value = "";
     if (!idComune) {
     id_luogo.disabled = true;
@@ -890,8 +898,9 @@ window.filterLuoghi = async (selectedId = null) => {
     .eq('id_comune', idComune)
     .order('lu_location');
     if (!data || data.length === 0) {
-    id_luogo.innerHTML = `<option value="">No places</option>`;
+    id_luogo.innerHTML = "";
     id_luogo.disabled = true;
+    updateLuogoSelect();
     return;
   }
   (data || []).forEach(l => {
