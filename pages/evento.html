@@ -1653,7 +1653,7 @@ async function updateBackupCover() {
   }
   img.src =
     "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/backup/"
-    + fileName;
+    + fileName + "?v=" + Date.now();
   img.style.display = 'block';
 }
 
