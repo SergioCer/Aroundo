@@ -511,7 +511,8 @@ const isNew = params.has('new') || !id;
 const lat = params.get("lat");
 const lng = params.get("lng");
 const comune = params.get("comune");
-
+const idComuneParam = params.get("id_comune");
+  
 let original = "{}";
 let dirty = false;
 let map;
@@ -580,11 +581,22 @@ const mapStyles = [
   
 /* LOAD */
 async function load() {
-  if (isNew) {
-    original = JSON.stringify({}); // base vuoto
-    document.getElementById("mapTitle").textContent = "Aggiungi Luogo";
-    updatePageState();
-    return;
+if (isNew) {
+  original = JSON.stringify({});
+  document.getElementById("mapTitle").textContent = "Aggiungi Luogo";
+  if (idComuneParam) {
+    id_comune_hidden.value = idComuneParam;
+    const { data: com } = await supabase
+      .from("comuni")
+      .select("co_descrizione")
+      .eq("id_comune", idComuneParam)
+      .single();
+    if (com) {
+      id_comune.value = com.co_descrizione;
+    }
+  }
+  updatePageState();
+  return;
   } else {
     document.getElementById("mapTitle").textContent =  "Luogo Attuale";
   }
