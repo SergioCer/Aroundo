@@ -1594,7 +1594,8 @@ document.addEventListener('paste', e => {
 
 const pasteCoverBtn = document.getElementById('pasteCoverBtn');
 if (pasteCoverBtn) {
-  pasteCoverBtn.addEventListener('click', async () => {
+  pasteCoverBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
     try {
       const items = await navigator.clipboard.read();
       for (const item of items) {
