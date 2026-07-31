@@ -449,11 +449,10 @@ input, select, textarea {
     color:#666;
     font-size:14px;
   ">
-    IMAGE<br>
     Click • Drop • Paste<br>
-    allowed<br>
+    Image allowed<br>
     <small>
-      (JPG • PNG • WEBP • HEIC)
+    (JPG • PNG • WEBP • HEIC)
     </small>
   </div>
   <img id="coverPreview" class="cover-preview">
@@ -1234,127 +1233,6 @@ window.newEventSerie = function(){
     `event_serie.html?new=1&id_organizzatore=${idOrganizzatore}`;
 };
 
-/* Mostra la Copertina se presente */
-function updateCover() {
-  const img = document.getElementById('coverPreview');
-  const hint = document.getElementById('coverHint');
-  const removeBtn = document.getElementById('removeCoverBtn');
-  if (coverDeleted || !currentCover) {
-    img.src = '';
-    img.style.display = 'none';
-    hint.style.display = 'block';
-    updateRemoveCoverButton();
-    return;
-  }
-  const url =
-    "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/"
-    + currentCover;
-  img.src = url + "?v=" + Date.now();
-  img.style.display = 'block';
-  hint.style.display = 'none';
-  updateRemoveCoverButton();
-}  
-
-function updateRemoveCoverButton() {
-  const btn = document.getElementById("removeCoverBtn");
-  const enabled = !!currentCover && !coverDeleted;
-  btn.className = `btn-icon ${enabled ? "btn-red" : "btn-gray"}`;
-  btn.disabled = !enabled;
-  btn.style.cursor = enabled ? "" : "not-allowed";
-}  
-
-async function uploadCover(idEvento) {
-  if (!selectedCoverFile) {
-    return null;
-  }
-  const fileName = `${idEvento}.jpg`;
-  const path = `copertine/${fileName}`;
-  // Verifica se il file esiste già
-  const { data: files, error: listError } = await supabase.storage
-    .from('eventi')
-    .list('copertine');
-  if (listError) {
-    console.error("Errore lettura copertine:", listError);
-    throw listError;
-  }
-  const exists = files.some(f => f.name === fileName);
-  let error;
-  if (exists) {
-    // Salva la vecchia copertina prima della sostituzione
-    await backupCover(fileName);
-    // Sostituisce il file esistente
-    ({ error } = await supabase.storage
-      .from('eventi')
-      .update(path, selectedCoverFile, {
-        contentType: 'image/jpeg'
-      }));
-  } else {
-    // Carica un nuovo file
-    ({ error } = await supabase.storage
-      .from('eventi')
-      .upload(path, selectedCoverFile, {
-        contentType: 'image/jpeg'
-      }));
-  }
-  if (error) {
-    console.error("Errore upload copertina:", error);
-    throw error;
-  }
-  return fileName;
-}
-
-// Esegue una copia di Backup della copertina se presente
-async function backupCover(fileName) {
-  const source = `copertine/${fileName}`;
-  const destination = `copertine/backup/${fileName}`;
-  // Recupera il file originale
-  const { data: file, error: downloadError } = await supabase.storage
-    .from('eventi')
-    .download(source);
-  if (downloadError) {
-    console.error("Errore download backup:", downloadError);
-    throw downloadError;
-  }
-  // Verifica se il backup esiste già
-  const { data: files, error: listError } = await supabase.storage
-    .from('eventi')
-    .list('copertine/backup');
-  if (listError) {
-    console.error("Errore lettura backup:", listError);
-    throw listError;
-  }
-  const exists = files.some(f => f.name === fileName);
-  let error;
-  if (exists) {
-    ({ error } = await supabase.storage
-      .from('eventi')
-      .update(destination, file, {
-        contentType: 'image/jpeg'
-      }));
-  } else {
-    ({ error } = await supabase.storage
-      .from('eventi')
-      .upload(destination, file, {
-        contentType: 'image/jpeg'
-      }));
-  }
-    if (error) {
-    console.error("Errore creazione backup:", error);
-    throw error;
-  }
-}
-
-async function deleteCover(idEvento) {
-  const fileName = `${idEvento}.jpg`;
-  const { error } = await supabase.storage
-    .from('eventi')
-    .remove([`copertine/${fileName}`]);
-  if (error) {
-    console.error("Errore eliminazione copertina:", error);
-    throw error;
-  }
-}
-  
 function initMap() {
   if (map) return;
   map = L.map('map');
@@ -1543,7 +1421,70 @@ window.closeWarning = function() {
   document.getElementById("warningDialog").style.display = "none";
 };  
 
-// Gestione Copertina 
+/// Gestione Copertina ///
+// Carica copertina 
+async function uploadCover(idEvento) {
+  if (!selectedCoverFile) {
+    return null;
+  }
+  const fileName = `${idEvento}.jpg`;
+  const path = `copertine/${fileName}`;
+  // Verifica se il file esiste già
+  const { data: files, error: listError } = await supabase.storage
+    .from('eventi')
+    .list('copertine');
+  if (listError) {
+    console.error("Errore lettura copertine:", listError);
+    throw listError;
+  }
+  const exists = files.some(f => f.name === fileName);
+  let error;
+  if (exists) {
+    // Salva la vecchia copertina prima della sostituzione
+    await backupCover(fileName);
+    // Sostituisce il file esistente
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .update(path, selectedCoverFile, {
+        contentType: 'image/jpeg'
+      }));
+  } else {
+    // Carica un nuovo file
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .upload(path, selectedCoverFile, {
+        contentType: 'image/jpeg'
+      }));
+  }
+  if (error) {
+    console.error("Errore upload copertina:", error);
+    throw error;
+  }
+  return fileName;
+}
+
+// Aggiorna Copertina
+function updateCover() {
+  const img = document.getElementById('coverPreview');
+  const hint = document.getElementById('coverHint');
+  const removeBtn = document.getElementById('removeCoverBtn');
+  if (coverDeleted || !currentCover) {
+    img.src = '';
+    img.style.display = 'none';
+    hint.style.display = 'block';
+    updateRemoveCoverButton();
+    return;
+  }
+  const url =
+    "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/"
+    + currentCover;
+  img.src = url + "?v=" + Date.now();
+  img.style.display = 'block';
+  hint.style.display = 'none';
+  updateRemoveCoverButton();
+}  
+  
+// Gestione del copia incolla inserisci 
   const coverBox = document.getElementById('coverBox');
   const coverFileInput = document.getElementById('coverFileInput');
   const removeCoverBtn = document.getElementById('removeCoverBtn');
@@ -1570,6 +1511,7 @@ coverBox.addEventListener('drop', e => {
   loadCoverPreview(file);
 });
 
+  // Incolla CTRL+V - Maiusc+Ins
 document.addEventListener('paste', e => {
   const items = e.clipboardData?.items;
   if (!items) return;
@@ -1582,12 +1524,85 @@ document.addEventListener('paste', e => {
   }
 });
 
+// Pulsante Rimozione Copertina
+function updateRemoveCoverButton() {
+  const btn = document.getElementById("removeCoverBtn");
+  const enabled =
+    (!!currentCover || !!selectedCoverFile) &&
+    !coverDeleted;
+  btn.className = `btn-icon ${enabled ? "btn-red" : "btn-gray"}`;
+  btn.disabled = !enabled;
+  btn.style.cursor = enabled ? "" : "not-allowed";
+}
+  
+// Esegue una copia di Backup della copertina se presente
+async function backupCover(fileName) {
+  const source = `copertine/${fileName}`;
+  const destination = `copertine/backup/${fileName}`;
+  // Recupera il file originale
+  const { data: file, error: downloadError } = await supabase.storage
+    .from('eventi')
+    .download(source);
+  if (downloadError) {
+    console.error("Errore download backup:", downloadError);
+    throw downloadError;
+  }
+  // Verifica se il backup esiste già
+  const { data: files, error: listError } = await supabase.storage
+    .from('eventi')
+    .list('copertine/backup');
+  if (listError) {
+    console.error("Errore lettura backup:", listError);
+    throw listError;
+  }
+  const exists = files.some(f => f.name === fileName);
+  let error;
+  if (exists) {
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .update(destination, file, {
+        contentType: 'image/jpeg'
+      }));
+  } else {
+    ({ error } = await supabase.storage
+      .from('eventi')
+      .upload(destination, file, {
+        contentType: 'image/jpeg'
+      }));
+  }
+    if (error) {
+    console.error("Errore creazione backup:", error);
+    throw error;
+  }
+}
+
+// Cancella Copertina  
+async function deleteCover(idEvento) {
+  const fileName = `${idEvento}.jpg`;
+  const { error } = await supabase.storage
+    .from('eventi')
+    .remove([`copertine/${fileName}`]);
+  if (error) {
+    console.error("Errore eliminazione copertina:", error);
+    throw error;
+  }
+}
+    
+// Click su rimuovi copertina
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
-  selectedCoverFile = null;
-  coverDeleted = true;
+  if (selectedCoverFile && !currentCover) {
+    // nuova immagine mai salvata
+    selectedCoverFile = null;
+    coverDeleted = false;
+  } else {
+    // copertina già presente sul server
+    selectedCoverFile = null;
+    coverDeleted = true;
+  }
   coverFileInput.value = '';
   updateCover();
+  updateRemoveCoverButton();
   markDirty();
 });
 
@@ -1599,6 +1614,7 @@ document.addEventListener("click", e => {
     }
 });
 
+// Preview Copertina  
 async function loadCoverPreview(file) {
   if (!file || !file.type.startsWith('image/')) {
     return;
@@ -1612,11 +1628,13 @@ async function loadCoverPreview(file) {
     coverPreview.style.display = 'block';
     coverHint.style.display = 'none';
     removeCoverBtn.style.display = 'inline-block';
+    updateRemoveCoverButton();
     markDirty();
   };
   reader.readAsDataURL(file);
 }
-  
+
+// Backup Copertina  
 async function updateBackupCover() {
   const img = document.getElementById('coverBackupPreview');
   if (!id) {
@@ -1639,6 +1657,7 @@ async function updateBackupCover() {
   img.style.display = 'block';
 }
 
+// Preview del Backup Copertina  
 const coverBackupPreview = document.getElementById('coverBackupPreview');
 coverBackupPreview.addEventListener('click', (event) => {
   event.stopPropagation();
