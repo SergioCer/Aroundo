@@ -449,10 +449,11 @@ input, select, textarea {
     color:#666;
     font-size:14px;
   ">
-    Drop an image here<br>
-    or click to browse<br>
+    IMAGE<br>
+    Click • Drop • Paste<br>
+    allowed<br>
     <small>
-      JPG • PNG • WEBP • HEIC
+      (JPG • PNG • WEBP • HEIC)
     </small>
   </div>
   <img id="coverPreview" class="cover-preview">
@@ -1463,11 +1464,11 @@ function updateMapButton() {
   mapBtn.className = `btn-icon ${enabled ? "btn-blue" : "btn-gray"}`;
   mapBtn.disabled = !enabled;
   mapBtn.style.cursor = enabled ? "" : "not-allowed";
-
+  const addPlaceEnabled = !!id_comune_evento_hidden.value;
   const addPlaceBtn = document.getElementById("addPlaceBtn");
-  addPlaceBtn.className = `btn-icon ${enabled ? "btn-green" : "btn-gray"}`;
-  addPlaceBtn.disabled = !enabled;
-  addPlaceBtn.style.cursor = enabled ? "" : "not-allowed";
+  addPlaceBtn.className = `btn-icon ${addPlaceEnabled ? "btn-green" : "btn-gray"}`;
+  addPlaceBtn.disabled = !addPlaceEnabled;
+  addPlaceBtn.style.cursor = addPlaceEnabled ? "" : "not-allowed";
   }
 
 function updateDupButton() {
