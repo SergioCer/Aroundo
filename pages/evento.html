@@ -198,13 +198,6 @@ input, select, textarea {
   100% {background-position: -200% 0;}
 }
 
-#pasteCoverBtn {
-  position:absolute;
-  top:10px;
-  left:50px;
-  z-index:2;
-}
-  
 #removeCoverBtn {
   position:absolute;
   top:10px;
@@ -465,7 +458,6 @@ input, select, textarea {
   </div>
   <img id="coverPreview" class="cover-preview">
   <img id="coverBackupPreview" class="cover-backup">
-  <button id="pasteCoverBtn" type="button" class="btn-icon" title="Paste image">📋</button>
   <button id="removeCoverBtn" type="button" class="btn-icon" title="Remove Cover">×</button>
 </div>
 <input id="coverFileInput" type="file" accept="image/*" style="display:none">
@@ -1589,32 +1581,6 @@ document.addEventListener('paste', e => {
     }
   }
 });
-
-// CANCELLARE document.addEventListener('paste', handleCoverPaste);  
-
-const pasteCoverBtn = document.getElementById('pasteCoverBtn');
-if (pasteCoverBtn) {
-  pasteCoverBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    try {
-      const items = await navigator.clipboard.read();
-      for (const item of items) {
-        const type = item.types.find(t => t.startsWith("image/"));
-        if (!type) continue;
-        const blob = await item.getType(type);
-        const file = new File(
-          [blob],
-          "clipboard-image.png",
-          { type }
-        );
-        loadCoverPreview(file);
-        break;
-      }
-    } catch (err) {
-      console.error("Paste clipboard error:", err);
-    }
-  });
-} 
 
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
