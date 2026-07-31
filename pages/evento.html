@@ -737,6 +737,16 @@ function updateSeriesSelect() {
   const select = document.getElementById("id_event_series");
   const wrapper = document.getElementById("seriesBox");
   box.innerHTML = "";
+    if (select.disabled) {
+      value.classList.add("placeholder");
+      value.textContent =
+          id_organizzatore_hidden.value
+              ? "No series"
+              : "Select organizer first";
+      wrapper.classList.remove("open");
+      wrapper.classList.add("disabled");
+      return;
+  }
   [...select.options].forEach(opt => {
     const div = document.createElement("div");
     div.className = "ar-select-option";
@@ -744,9 +754,8 @@ function updateSeriesSelect() {
     div.textContent = opt.textContent;
     div.onclick = () => {
       select.value = opt.value;
-      value.classList.remove("placeholder");
-      value.textContent = opt.textContent;
       wrapper.classList.remove("open");
+      updateSeriesSelect();
       markDirty();
     };
     box.appendChild(div);
@@ -759,7 +768,7 @@ function updateSeriesSelect() {
   } else {
     value.classList.remove("placeholder");
   }
-  wrapper.classList.toggle("disabled", select.disabled);
+  wrapper.classList.remove("disabled");
 }
   
 document.getElementById("seriesValue").addEventListener("click", () => {const wrapper =document.getElementById("seriesBox");
@@ -780,8 +789,9 @@ async function loadSeriesByOrganizzatore(idOrg) {
     return;
   }
     if (data.length === 0) {
-        select.innerHTML = `<option value="">No series</option>`;
+        select.innerHTML = "";
         select.disabled = true;
+        updateSeriesSelect();
     } else {
         select.innerHTML = `<option value="">Series...</option>`;
         select.disabled = false;
@@ -1046,10 +1056,11 @@ window.searchOrganizzatori = async (text) => {
   if (text.length < 3) {
     box.innerHTML = '';
     id_organizzatore_hidden.value = "";
-    document.getElementById("id_event_series").value = "";
-    const seriesValue = document.getElementById("seriesValue");
-    seriesValue.textContent = "Select organizer first";
-    seriesValue.classList.add("placeholder");
+    const seriesSelect = document.getElementById("id_event_series");
+      seriesSelect.innerHTML = "";
+      seriesSelect.value = "";
+      seriesSelect.disabled = true;
+    updateSeriesSelect();
     verifySeries();
     markDirty();
     return;
@@ -1065,18 +1076,16 @@ window.searchOrganizzatori = async (text) => {
     div.className = "search-item";
     div.innerText = o.or_nome;
     div.onclick = async () => {
-    id_organizzatore.value = o.or_nome;
-    id_organizzatore_hidden.value = o.id_organizzatore;
-    await updateEventSeries();
-    markDirty();
-    box.innerHTML = '';
-    const seriesSelect = document.getElementById("id_event_series");
-    seriesSelect.value = "";
-    const seriesValue = document.getElementById("seriesValue");
-    seriesValue.textContent = "Select organizer first";
-    seriesValue.classList.add("placeholder");
-    verifySeries();
-  };
+      id_organizzatore.value = o.or_nome;
+      id_organizzatore_hidden.value = o.id_organizzatore;
+      await updateEventSeries();
+      const seriesSelect = document.getElementById("id_event_series");
+      seriesSelect.value = "";
+      updateSeriesSelect();
+      markDirty();
+      box.innerHTML = '';
+      verifySeries();
+    };
     box.appendChild(div);
   });
 };
