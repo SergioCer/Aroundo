@@ -1160,20 +1160,6 @@ if (error) {
   alert("Errore salvataggio");
   return false;
 }
-if (coverDeleted) {
-  if (currentCover) {
-    await backupCover(currentCover);
-  }
-  await deleteCover(data.id_evento);
-  await supabase
-    .from('eventi')
-    .update({
-      ev_copertina: null
-    })
-    .eq('id_evento', data.id_evento);
-  currentCover = null;
-  coverDeleted = false;
-}
 if (selectedCoverFile) {
   const fileName = await uploadCover(data.id_evento);
   await supabase
@@ -1184,6 +1170,20 @@ if (selectedCoverFile) {
     .eq('id_evento', data.id_evento);
   currentCover = fileName;
   selectedCoverFile = null;
+  coverDeleted = false;
+} else if (coverDeleted) {
+  if (currentCover) {
+    await backupCover(currentCover);
+    await deleteCover(data.id_evento);
+  }
+  await supabase
+    .from('eventi')
+    .update({
+      ev_copertina: null
+    })
+    .eq('id_evento', data.id_evento);
+  currentCover = null;
+  coverDeleted = false;
 }
 dirty = false;
 if (isNew) {
