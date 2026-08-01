@@ -434,7 +434,7 @@ input, select, textarea {
   <div>
     <div id="activeTitle" class="section-title" style="text-align:center;"></div>
       <label style="display:flex; justify-content:center;">
-        <input id="ev_attivo" type="checkbox" hidden onchange="markDirty(); updateActiveStatus()">
+        <input id="ev_attivo" type="checkbox" hidden onchange="changeActiveStatus()">
           <span id="activeBtn" class="btn-icon" title="Active/Deactive Event"></span>
       </label>
   </div>
@@ -853,8 +853,21 @@ function updateActiveButtonState() {
   updateActiveStatus();
 }
 
-  /* Verifica lo stato del Checkbox Attivo */
-  window.updateActiveStatus = function () {
+/* Verifica se l'Evento è Attivabile */
+window.changeActiveStatus = function(){
+  if (ev_attivo.checked) {
+    if (!validateDateTime()) {
+      ev_attivo.checked = false;
+      updateActiveStatus();
+      return;
+    }
+  }
+  markDirty();
+  updateActiveStatus();
+};
+  
+/* Attiva/Disattiva il Checkbox */
+window.updateActiveStatus = function () {
     const btn = document.getElementById("activeBtn");
     const title = document.getElementById("activeTitle");
     btn.className = `btn-icon ${ev_attivo.checked ? "btn-green" : "btn-red"}`;    
@@ -1193,21 +1206,9 @@ function isComplete(){
   
 /* Controllo su BTN BACK */
 window.requestBack = async () => {
-    const durata = parseInt(ev_durata.value);
-      if (!isNaN(durata)) {
-        if (durata < 0) {
-          showWarning("La data di fine evento non può precedere la data di inizio");
-          return;
-        }
-        if (durata < 3) {
-          showWarning("Incoerenza di durata dell'evento");
-          return;
-        }
-        if (durata > 2160) {
-          showWarning("Un singolo evento non dovrebbe durare più di 36 ore");
-          return;
-        }
-      }
+  if (!validateDateTime()) {
+    return;
+  }
   if (!dirty) {
     location.href = 'eventi.html';
     return;
@@ -1370,10 +1371,43 @@ window.closeWarning = function() {
   document.getElementById("warningDialog").style.display = "none";
 };  
 
+/* Messaggio del Warning */
 function showWarning(message) {
   document.getElementById("warningMessage").textContent = message;
   document.getElementById("warningDialog").style.display = "flex";
 }
+
+/* Validazione durata dell'Evento */ 
+function validateDateTime() {
+  const inizio = document.getElementById('ev_inizio').value;
+  const fine = document.getElementById('ev_fine').value;
+  // Se manca una delle due date lascia lavorare gli altri controlli
+  if (!inizio || !fine) {
+    return true;
+  }
+  const start = new Date(inizio);
+  const end = new Date(fine);
+  const minuti = Math.round((end - start) / 60000);
+  if (minuti < 0) {
+    showWarning(
+      "La data di fine evento non può precedere la data di inizio"
+    );
+    return false;
+  }
+  if (minuti < 3) {
+    showWarning(
+      "La durata dell'evento è inferiore a 3 minuti. Verifica i dati inseriti."
+    );
+    return true;
+  }
+  if (minuti > 2160) {
+    showWarning(
+      "Un singolo evento non dovrebbe durare più di 36 ore."
+    );
+    return false;
+  }
+  return true;
+}  
 
 /* Abilita Disabilita BTN Link */  
 window.updateLinkButton = function() {
