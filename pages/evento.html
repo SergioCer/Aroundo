@@ -427,7 +427,7 @@ input, select, textarea {
         <!--  CANCELLARE
         <button id="addSeriesBtn" type="button" class="btn-icon" onclick="newEventSerie()" title="Add new Serie">+</button>
         -->
-        <button id="addSeriesBtn" type="button" class="btn-icon"  onclick="openLinkedPage('event-series.html?new=1','event_serie')" title="Add new Serie">+</button>
+        <button id="addSeriesBtn" type="button" class="btn-icon"  onclick="openLinkedPage('event_serie.html?new=1','event_serie')" title="Add new Serie">+</button>
       </div>
   </div>
   <!-- ATTIVO -->
@@ -1259,7 +1259,7 @@ window.requestBack = async () => {
   }
 };
 
-/* BTN Aggiungi Organizzatore */
+/* BTN Aggiungi nuova Serie ad Organizzatore */
 window.newEventSerie = function(){
   const idOrganizzatore =
     document.getElementById('id_organizzatore_hidden').value;
