@@ -1219,6 +1219,13 @@ function isComplete(){
   
 /* Controllo su BTN BACK */
 window.requestBack = async () => {
+  if (!isComplete()) {
+    updateGuide();
+    showWarning(
+        "The event is incomplete.\n\nComplete the highlighted required fields before saving."
+    );
+    return false;
+}
   if (!validateDateTime()) {
     return;
   }
