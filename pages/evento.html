@@ -380,7 +380,7 @@ input, select, textarea {
   <!--  CANCELLARE
   <button id="addPlaceBtn" type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1&id_comune='+ id_comune_evento_hidden.value" title="Add Place">+</button>
   -->
-  <button id="addPlaceBtn" type="button" class="btn-icon"  onclick="openLinkedPage('luogo.html?new=1&id_comune=' + id_comune_evento_hidden.value,'luogo')" title="Add Place">+</button>    
+  <button id="addPlaceBtn" type="button" class="btn-icon" onclick="openLinkedPage('luogo.html?new=1&id_comune=' + id_comune_evento_hidden.value,'luogo')" title="Add Place">+</button>    
     </div>
   </div>
   
@@ -865,11 +865,8 @@ function updateActiveButtonState() {
   }
 
 /* Gestione ritorno pagina da altre pagine html richiamate */  
-function openLinkedPage(url, refreshType) {
-  sessionStorage.setItem(
-    "eventoRefresh",
-    refreshType
-  );
+window.openLinkedPage = function (url, refreshType) {
+  sessionStorage.setItem("eventoRefresh", refreshType);
   window.location.href = url;
 }
 
