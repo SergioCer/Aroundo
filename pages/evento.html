@@ -811,6 +811,10 @@ window.markDirty = () => {
     ev_attivo: ev_attivo.checked
   });
   dirty = current !== original;
+    if (ev_attivo.checked && !isComplete()) {
+    ev_attivo.checked = false;
+    updateActiveStatus();
+  }
   document.getElementById('backBtn')
     .classList.toggle('dirty', dirty);
 updateGuide();
