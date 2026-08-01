@@ -377,7 +377,10 @@ input, select, textarea {
 <select id="id_luogo" hidden></select>    
   <div style="display:flex; gap:10px;">    
   <button id="mapBtn" class="btn-icon" onclick="openMapByComune()" title="View Map">📍</button>
+  <!-- CANCELLARE
   <button id="addPlaceBtn" type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1&id_comune='+ id_comune_evento_hidden.value" title="Add Place">+</button>
+  -->
+  <button id="addPlaceBtn" type="button" class="btn-icon" onclick="newPlace()" title="Add Place">+</button>    
     </div>
   </div>
   
@@ -405,7 +408,10 @@ input, select, textarea {
   <div style="display:flex; gap:10px; align-items:center;">
   <input id="id_organizzatore" class="guide-field" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
   <input type="hidden" id="id_organizzatore_hidden">
+  <!-- CANCELLARE    
   <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
+  -->
+  <button type="button" class="btn-icon btn-green" onclick="newOrganizer()" title="Add Organizer">+</button>    
   </div>
   <div id="organizzatoriResults" class="search-results"></div>
 
@@ -1087,20 +1093,7 @@ window.filterLuoghi = async (selectedId = null) => {
   }
   updateLuogoSelect();
 };
-  
-/* Controllo in caso di Duplica evento */  
-window.duplicateEvent = () => {
-  if (!id) return;
-  location.href = `evento.html?new=1&duplicate=${id}`;
-};
 
-window.openEventLink = function() {
-  const url = ev_link.value.trim();
-  if (url) {
-    window.open(url, "_blank");
-  }
-};
-  
 /* Ricerca dei Comuni */  
 window.searchComuni = async (text) => {
   const box = document.getElementById('comuniResults');
@@ -1232,30 +1225,13 @@ window.requestBack = async () => {
   }
 };
 
-/* BTN Aggiungi nuova Serie ad Organizzatore */
-window.newEventSerie = function(){
-  const idOrganizzatore =
-    document.getElementById('id_organizzatore_hidden').value;
-  window.location.href =
-    `event_serie.html?new=1&id_organizzatore=${idOrganizzatore}`;
+/* BTN Duplica Evento */
+window.duplicateEvent = () => {
+  if (!id) return;
+  location.href = `evento.html?new=1&duplicate=${id}`;
 };
 
-/* Aggiungi un nuovo luogo sulla Mappa */  
-function initMap() {
-  if (map) return;
-  map = L.map('map');
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: ''
-  }).addTo(map);
-  map.on("click", (e) => {
-  const { lat, lng } = e.latlng;
-  const ok = confirm("Vuoi aggiungere un nuovo luogo qui?");
-  if (!ok) return;
-  openNewLuogoFromMap(lat, lng);
-});
-}
-
-/* Apre la Mappa in base al comune selezionato */  
+/* BTN Apre la Mappa in base al comune selezionato */  
 window.openMapByComune = async () => {
   const idComune = id_comune_evento_hidden.value;
     if (!idComune) {
@@ -1270,6 +1246,46 @@ window.openMapByComune = async () => {
   }, 200);
 };
 
+/* BTN Nuovo Luogo */    
+window.newPlace = function () {
+    const idComune = id_comune_evento_hidden.value;
+    location.href =`luogo.html?new=1&id_comune=${idComune}`;
+}; 
+
+/* BTN Nuovo Organizzatore */    
+window.newOrganizer = function () {
+    location.href ='organizzatore.html?new=1';
+}; 
+  
+/* BTN Aggiungi nuova Serie ad Organizzatore */
+window.newEventSerie = function(){
+  const idOrganizzatore = document.getElementById('id_organizzatore_hidden').value;
+  window.location.href =`event_serie.html?new=1&id_organizzatore=${idOrganizzatore}`;
+};
+
+/* BTN Link WWW dell'Evento */  
+window.openEventLink = function() {
+  const url = ev_link.value.trim();
+  if (url) {
+    window.open(url, "_blank");
+  }
+};
+  
+/* Aggiungi un nuovo luogo sulla Mappa */  
+function initMap() {
+  if (map) return;
+  map = L.map('map');
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: ''
+  }).addTo(map);
+  map.on("click", (e) => {
+  const { lat, lng } = e.latlng;
+  const ok = confirm("Vuoi aggiungere un nuovo luogo qui?");
+  if (!ok) return;
+  openNewLuogoFromMap(lat, lng);
+});
+}
+  
 /* Apre la Mappa con i Markers del Comune selezionato */  
 async function loadMapLuoghi(idComune) {
   initMap();
@@ -1322,7 +1338,7 @@ function renderMarkers(luoghiList, comune) {
   map.fitBounds(bounds, { padding: [30, 30] }); 
 }
 
-/* Disabilita visualizzazione Mappa */  
+/* BTN Disabilita visualizzazione Mappa */  
 window.closeMap = () => {
   document.getElementById("mapModal").style.display = "none";
 };
@@ -1334,21 +1350,30 @@ function openNewLuogoFromMap(lat, lng) {
   window.location.href = url;
 }
 
-/* Richiama SI-NO-ANNULLA */  
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
-
   return new Promise(resolve => {
     dialogResolve = resolve;
   });
 }
 
+/* Richiama SI-NO-ANNULLA */  
 function dialogAction(type) {
   document.getElementById("saveDialog").style.display = "none";
   dialogResolve(type);
 }
 
 window.dialogAction = dialogAction;
+
+/* BTN Richiama Annulla */  
+window.closeWarning = function() {
+  document.getElementById("warningDialog").style.display = "none";
+};  
+
+function showWarning(message) {
+  document.getElementById("warningMessage").textContent = message;
+  document.getElementById("warningDialog").style.display = "flex";
+}
 
 /* Abilita Disabilita BTN Link */  
 window.updateLinkButton = function() {
@@ -1437,15 +1462,6 @@ window.aggiornaFineDaInizio = function() {
     `${anno}-${mese}-${giorno}T${ore}:${minuti}`;
 calcolaDurata()
 };
-
-function showWarning(message) {
-  document.getElementById("warningMessage").textContent = message;
-  document.getElementById("warningDialog").style.display = "flex";
-}
-
-window.closeWarning = function() {
-  document.getElementById("warningDialog").style.display = "none";
-};  
 
 /// Gestione Copertina ///
 // Carica copertina 
