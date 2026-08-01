@@ -635,187 +635,6 @@ const selectedIcon = L.icon({
   iconAnchor: [12, 41]
 });  
   
-/* LOAD SELECTS */
-async function loadSelects() {
-    const { data: cat } = await supabase
-    .from('categorie')
-    .select('*')
-    .order('mc_ordine', { ascending: true });
-      const { data: sub } = await supabase
-        .from('subcategorie')
-        .select('id_categoria, sc_descrizione')
-        .eq('sc_attiva', true)
-        .order('sc_ordine', { ascending: true });
-      id_categoria.innerHTML = `<option value="">Category...</option>`;
-      (cat || []).forEach(c => {
-        const subList = (sub || [])
-          .filter(s => s.id_categoria === c.id_categoria)
-          .map(s => s.sc_descrizione)
-          .join(" • ");
-        let text = c.mc_descrizione;
-        if (subList) {
-          text += " • " + subList;
-        }
-        id_categoria.innerHTML += `
-          <option value="${c.id_categoria}">
-            ${text}
-          </option>
-        `;
-      });
-  id_luogo.innerHTML = `<option value="">Place...</option>`;
-  updateCategoriaSelect();
-}
-
-function updateCategoriaSelect() {
-  const box = document.getElementById("categoriaOptions");
-  const value = document.getElementById("categoriaValue");
-  box.innerHTML = "";
-  [...id_categoria.options].forEach(opt => {
-    const div = document.createElement("div");
-    div.className = "ar-select-option";
-      if (!opt.value) {div.classList.add("placeholder");}
-    div.textContent = opt.textContent;
-    div.onclick = () => {
-      id_categoria.value = opt.value;
-      value.textContent = opt.textContent;
-      document
-        .getElementById("categoriaBox")
-        .classList.remove("open");
-      markDirty();
-    };
-    box.appendChild(div);
-  });
-  value.textContent =
-    id_categoria.options[id_categoria.selectedIndex]?.text ||
-    "Category...";
-}
-
-document.getElementById("categoriaValue").addEventListener("click", () => {document.getElementById("categoriaBox").classList.toggle("open");
-});  
-
-function updateLuogoSelect() {
-  const box = document.getElementById("luogoOptions");
-  const value = document.getElementById("luogoValue");
-  const wrapper = document.getElementById("luogoBox");
-  box.innerHTML = "";
-  if (id_luogo.disabled) {
-      value.classList.add("placeholder");
-      value.textContent =
-          id_comune_evento_hidden.value
-              ? "No places"
-              : "Select City first";
-        wrapper.classList.add("disabled");
-        wrapper.classList.remove("open");
-      return;
-  }
-  [...id_luogo.options].forEach(opt => {
-    const div = document.createElement("div");
-    div.className = "ar-select-option";
-      if (!opt.value) {div.classList.add("placeholder");}
-    div.textContent = opt.textContent;
-    div.onclick = () => {
-      id_luogo.value = opt.value;
-      document
-        .getElementById("luogoBox")
-        .classList.remove("open");
-      updateLuogoSelect();
-      markDirty();
-    };
-    box.appendChild(div);
-  });
-  const selectedText =
-    id_luogo.options[id_luogo.selectedIndex]?.text || "Place...";
-    value.textContent = selectedText;
-    if (!id_luogo.value) {
-      value.classList.add("placeholder");
-    } else {
-      value.classList.remove("placeholder");
-  }
-  wrapper.classList.remove("disabled");
-}
-
-document.getElementById("luogoValue")
-.addEventListener("click", () => {
-    const wrapper = document.getElementById("luogoBox");
-    if (id_luogo.disabled)
-        return;
-    wrapper.classList.toggle("open");
-});
-  
-function updateSeriesSelect() {
-  const box = document.getElementById("seriesOptions");
-  const value = document.getElementById("seriesValue");
-  const select = document.getElementById("id_event_series");
-  const wrapper = document.getElementById("seriesBox");
-  box.innerHTML = "";
-    if (select.disabled) {
-      value.classList.add("placeholder");
-      value.textContent =
-          id_organizzatore_hidden.value
-              ? "No series"
-              : "Select organizer first";
-      wrapper.classList.remove("open");
-      wrapper.classList.add("disabled");
-      return;
-  }
-  [...select.options].forEach(opt => {
-    const div = document.createElement("div");
-    div.className = "ar-select-option";
-      if (!opt.value) {div.classList.add("placeholder");}
-    div.textContent = opt.textContent;
-    div.onclick = () => {
-      select.value = opt.value;
-      wrapper.classList.remove("open");
-      updateSeriesSelect();
-      markDirty();
-    };
-    box.appendChild(div);
-  });
-  const selectedText =
-  select.options[select.selectedIndex]?.text || "Series...";
-  value.textContent = selectedText;
-    if (!select.value) {
-    value.classList.add("placeholder");
-  } else {
-    value.classList.remove("placeholder");
-  }
-  wrapper.classList.remove("disabled");
-}
-  
-document.getElementById("seriesValue").addEventListener("click", () => {const wrapper =document.getElementById("seriesBox");
-    if (document.getElementById("id_event_series").disabled)
-        return;
-    wrapper.classList.toggle("open");
-});
-  
-async function loadSeriesByOrganizzatore(idOrg) {
-  const select = document.getElementById("id_event_series");
-  const { data, error } = await supabase
-    .from("event_series")
-    .select("id_event_series, es_title")
-    .eq("id_organizzatore", idOrg)
-    .order("es_title");
-  if (error) {
-    console.error("STEP SERIES - errore:", error);
-    return;
-  }
-    if (data.length === 0) {
-        select.innerHTML = "";
-        select.disabled = true;
-        updateSeriesSelect();
-    } else {
-        select.innerHTML = `<option value="">Series...</option>`;
-        select.disabled = false;
-    (data || []).forEach(s => {
-      const opt = document.createElement("option");
-      opt.value = s.id_event_series;
-      opt.textContent = s.es_title;
-      select.appendChild(opt);
-    });
-  }
-  updateSeriesSelect();
-}  
-
 /* LOAD */
 async function load() {
   if (isNew && !duplicateId) {
@@ -895,242 +714,6 @@ async function load() {
   }
 }
 
-async function loadComuni() {
-  const { data } = await supabase.from('comuni').select('*');
-  (data || []).forEach(c => {
-    comuniMap[c.id_comune] = c.co_descrizione;
-  });
-}
-
-window.filterLuoghi = async (selectedId = null) => {
-  const idComune = id_comune_evento_hidden.value;
-  id_luogo.innerHTML = "";
-  id_luogo.value = "";
-    if (!idComune) {
-    id_luogo.disabled = true;
-    updateLuogoSelect();
-    return;
-  }
-  id_luogo.innerHTML = `<option value="">Place...</option>`;
-  id_luogo.disabled = false;
-  const { data } = await supabase
-    .from('luoghi')
-    .select('id_luogo, lu_location, lu_descrizione')
-    .eq('id_comune', idComune)
-    .order('lu_location');
-    if (!data || data.length === 0) {
-    id_luogo.innerHTML = "";
-    id_luogo.disabled = true;
-    updateLuogoSelect();
-    return;
-  }
-  (data || []).forEach(l => {
-    id_luogo.innerHTML += `
-      <option value="${l.id_luogo}">
-        ${l.lu_location}${l.lu_descrizione ? ' • ' + l.lu_descrizione : ''}
-      </option>
-    `;
-  });
-  if (selectedId) {
-    id_luogo.value = selectedId;
-  }
-  updateLuogoSelect();
-};
-  
-/* DIRTY */
-window.markDirty = () => {
-  const current = JSON.stringify({
-    ev_titolo: ev_titolo.value,
-    ev_descrizione: ev_descrizione.value,
-    id_categoria: id_categoria.value,
-    id_luogo: id_luogo.value,
-    id_organizzatore: id_organizzatore.value,
-    ev_inizio: ev_inizio.value,
-    ev_fine: ev_fine.value,
-    ev_costo: ev_costo.value,
-    ev_capienza: ev_capienza.value,
-    ev_link: ev_link.value,
-    ev_copertina: selectedCoverFile ? 'new_cover' : currentCover,
-    ev_attivo: ev_attivo.checked
-  });
-  dirty = current !== original;
-  document.getElementById('backBtn')
-    .classList.toggle('dirty', dirty);
-updateGuide();
-updateActiveButtonState();
-};
-
-  const guideSteps = [
-  {id: "ev_titolo", required: true, valid: () => ev_titolo.value.trim() !== ""},
-  {id: "categoriaBox", required: true, valid: () => id_categoria.value !== ""},
-  {id: "ev_descrizione", required: false, valid: () => ev_descrizione.value.trim() !== ""},
-  {id: "id_comune_evento", required: false, valid: () => id_comune_evento_hidden.value !== ""},
-  {id: "luogoBox", required: true, valid: () => id_luogo.value !== ""},
-  {id: "ev_inizio", required: true, valid: () => ev_inizio.value !== ""},
-  {id: "ev_fine", required: true, valid: () => ev_fine.value !== ""},
-  {id: "id_organizzatore", required: true, valid: () => id_organizzatore_hidden.value !== ""},
-  {id: "seriesBox", required: false, valid: () => id_event_series.value !== ""},
-  {id: "ev_link", required: false, valid: () => ev_link.value !== ""}
-];  
-
-/* Visita Guidata su Aroundo */
-function updateGuide() {
-  // solo nuovi eventi
-  if (!isNew || duplicateId) return;
-  guideSteps.forEach(step => {
-      const field = document.getElementById(step.id);
-      field.classList.remove("guide-active");
-      field.classList.remove("guide-complete");
-      if (step.valid()) {
-          field.classList.add("guide-complete");
-      }
-  });
-  const next = guideSteps.find(step => !step.valid());
-  if (next) {
-      document
-          .getElementById(next.id)
-          .classList.add("guide-active");
-  }
-}
-
-function updateActiveButtonState() {
-  const btn = document.getElementById("activeBtn");
-  if (isNew && !isComplete()) {
-    btn.className = "btn-icon btn-gray";
-    btn.textContent = "×";
-    btn.style.cursor = "not-allowed";
-    ev_attivo.disabled = true;
-    return;
-  }
-  ev_attivo.disabled = false;
-  btn.style.cursor = "";
-  updateActiveStatus();
-}
-
-  /* Verifica lo stato del Checkbox Attivo */
-  window.updateActiveStatus = function () {
-    const btn = document.getElementById("activeBtn");
-    const title = document.getElementById("activeTitle");
-    btn.className = `btn-icon ${ev_attivo.checked ? "btn-green" : "btn-red"}`;    
-    btn.textContent = ev_attivo.checked ? "✓" : "×";
-    title.textContent = ev_attivo.checked
-      ? "Active"
-      : "Unactive";
-  }
-  
-window.duplicateEvent = () => {
-  if (!id) return;
-  location.href = `evento.html?new=1&duplicate=${id}`;
-};
-
-window.searchComuni = async (text) => {
-  const box = document.getElementById('comuniResults');
-  if (text.length < 3) {
-    box.innerHTML = '';
-    id_comune_evento_hidden.value = "";
-      id_luogo.value = "";
-      const luogoValue = document.getElementById("luogoValue");
-      luogoValue.textContent = "Select City first";
-      luogoValue.classList.add("placeholder");
-    await filterLuoghi();
-    markDirty();
-    updateMapButton()
-    return;
-  }
-  const { data } = await supabase
-    .from('comuni')
-    .select('id_comune, co_descrizione')
-    .ilike('co_descrizione', text + '%')
-    .limit(10);
-  box.innerHTML = '';
-  (data || []).forEach(c => {
-    const div = document.createElement('div');
-    div.className = "search-item";
-    div.innerText = c.co_descrizione;
-    div.onclick = async () => {
-        id_comune_evento.value = c.co_descrizione;
-        id_comune_evento_hidden.value = c.id_comune;
-      await filterLuoghi();
-      markDirty();
-      box.innerHTML = '';
-      updateMapButton() 
-    };
-    box.appendChild(div);
-  });
-};
-
-window.searchOrganizzatori = async (text) => {
-  const box = document.getElementById('organizzatoriResults');
-  if (text.length < 3) {
-    box.innerHTML = '';
-    id_organizzatore_hidden.value = "";
-    const seriesSelect = document.getElementById("id_event_series");
-      seriesSelect.innerHTML = "";
-      seriesSelect.value = "";
-      seriesSelect.disabled = true;
-    updateSeriesSelect();
-    verifySeries();
-    markDirty();
-    return;
-  }
-  const { data } = await supabase
-    .from('organizzatori')
-    .select('id_organizzatore, or_nome')
-    .ilike('or_nome', `%${text}%`)   // 🔥 CONTIENE (non inizia con)
-    .limit(10);
-  box.innerHTML = '';
-  (data || []).forEach(o => {
-    const div = document.createElement('div');
-    div.className = "search-item";
-    div.innerText = o.or_nome;
-    div.onclick = async () => {
-      id_organizzatore.value = o.or_nome;
-      id_organizzatore_hidden.value = o.id_organizzatore;
-      await updateEventSeries();
-      const seriesSelect = document.getElementById("id_event_series");
-      seriesSelect.value = "";
-      updateSeriesSelect();
-      markDirty();
-      box.innerHTML = '';
-      verifySeries();
-    };
-    box.appendChild(div);
-  });
-};
-
-async function updateEventSeries(){
-  const organizerId =
-    document.getElementById('id_organizzatore_hidden').value;
-  await loadSeriesByOrganizzatore(organizerId);
-verifySeries();
-}
-
-window.updateLinkButton = function() {
-  const btn = document.getElementById("openLinkBtn");
-  const value = ev_link.value.trim();
-  btn.className = `btn-icon ${value ? "btn-blue" : "btn-gray"}`;
-  btn.disabled = !value;
-  btn.style.cursor = value ? "" : "not-allowed";
-};
-
-window.openEventLink = function() {
-  const url = ev_link.value.trim();
-  if (url) {
-    window.open(url, "_blank");
-  }
-};
-
-function isComplete(){
-  return (
-    ev_titolo.value.trim() !== "" &&
-    id_categoria.value !== "" &&
-    ev_inizio.value !== "" &&
-    ev_fine.value !== "" &&
-    id_luogo.value !== "" &&
-    id_organizzatore_hidden.value !== ""
-  );
-}
-  
 /* SAVE */
 async function save() {
   const payload = {
@@ -1192,7 +775,430 @@ if (isNew) {
 return true;
 }
 
-/* BACK */
+/* Marca i campi DIRTY */
+window.markDirty = () => {
+  const current = JSON.stringify({
+    ev_titolo: ev_titolo.value,
+    ev_descrizione: ev_descrizione.value,
+    id_categoria: id_categoria.value,
+    id_luogo: id_luogo.value,
+    id_organizzatore: id_organizzatore.value,
+    ev_inizio: ev_inizio.value,
+    ev_fine: ev_fine.value,
+    ev_costo: ev_costo.value,
+    ev_capienza: ev_capienza.value,
+    ev_link: ev_link.value,
+    ev_copertina: selectedCoverFile ? 'new_cover' : currentCover,
+    ev_attivo: ev_attivo.checked
+  });
+  dirty = current !== original;
+  document.getElementById('backBtn')
+    .classList.toggle('dirty', dirty);
+updateGuide();
+updateActiveButtonState();
+};
+
+/* Definisce i passaggi della guida */
+const guideSteps = [
+  {id: "ev_titolo", required: true, valid: () => ev_titolo.value.trim() !== ""},
+  {id: "categoriaBox", required: true, valid: () => id_categoria.value !== ""},
+  {id: "ev_descrizione", required: false, valid: () => ev_descrizione.value.trim() !== ""},
+  {id: "id_comune_evento", required: false, valid: () => id_comune_evento_hidden.value !== ""},
+  {id: "luogoBox", required: true, valid: () => id_luogo.value !== ""},
+  {id: "ev_inizio", required: true, valid: () => ev_inizio.value !== ""},
+  {id: "ev_fine", required: true, valid: () => ev_fine.value !== ""},
+  {id: "id_organizzatore", required: true, valid: () => id_organizzatore_hidden.value !== ""},
+  {id: "seriesBox", required: false, valid: () => id_event_series.value !== ""},
+  {id: "ev_link", required: false, valid: () => ev_link.value !== ""}
+];  
+
+/* Visita Guidata su Aroundo */
+function updateGuide() {
+  // solo nuovi eventi
+  if (!isNew || duplicateId) return;
+  guideSteps.forEach(step => {
+      const field = document.getElementById(step.id);
+      field.classList.remove("guide-active");
+      field.classList.remove("guide-complete");
+      if (step.valid()) {
+          field.classList.add("guide-complete");
+      }
+  });
+  const next = guideSteps.find(step => !step.valid());
+  if (next) {
+      document
+          .getElementById(next.id)
+          .classList.add("guide-active");
+  }
+}
+
+/* Aggiorna lo stato Active/Deactive Button */  
+function updateActiveButtonState() {
+  const btn = document.getElementById("activeBtn");
+  if (isNew && !isComplete()) {
+    btn.className = "btn-icon btn-gray";
+    btn.textContent = "×";
+    btn.style.cursor = "not-allowed";
+    ev_attivo.disabled = true;
+    return;
+  }
+  ev_attivo.disabled = false;
+  btn.style.cursor = "";
+  updateActiveStatus();
+}
+
+  /* Verifica lo stato del Checkbox Attivo */
+  window.updateActiveStatus = function () {
+    const btn = document.getElementById("activeBtn");
+    const title = document.getElementById("activeTitle");
+    btn.className = `btn-icon ${ev_attivo.checked ? "btn-green" : "btn-red"}`;    
+    btn.textContent = ev_attivo.checked ? "✓" : "×";
+    title.textContent = ev_attivo.checked
+      ? "Active"
+      : "Unactive";
+  }
+  
+/* LOAD Categorie */
+async function loadSelects() {
+    const { data: cat } = await supabase
+    .from('categorie')
+    .select('*')
+    .order('mc_ordine', { ascending: true });
+      const { data: sub } = await supabase
+        .from('subcategorie')
+        .select('id_categoria, sc_descrizione')
+        .eq('sc_attiva', true)
+        .order('sc_ordine', { ascending: true });
+      id_categoria.innerHTML = `<option value="">Category...</option>`;
+      (cat || []).forEach(c => {
+        const subList = (sub || [])
+          .filter(s => s.id_categoria === c.id_categoria)
+          .map(s => s.sc_descrizione)
+          .join(" • ");
+        let text = c.mc_descrizione;
+        if (subList) {
+          text += " • " + subList;
+        }
+        id_categoria.innerHTML += `
+          <option value="${c.id_categoria}">
+            ${text}
+          </option>
+        `;
+      });
+  id_luogo.innerHTML = `<option value="">Place...</option>`;
+  updateCategoriaSelect();
+}
+
+/* Aggiorna le Categorie */  
+function updateCategoriaSelect() {
+  const box = document.getElementById("categoriaOptions");
+  const value = document.getElementById("categoriaValue");
+  box.innerHTML = "";
+  [...id_categoria.options].forEach(opt => {
+    const div = document.createElement("div");
+    div.className = "ar-select-option";
+      if (!opt.value) {div.classList.add("placeholder");}
+    div.textContent = opt.textContent;
+    div.onclick = () => {
+      id_categoria.value = opt.value;
+      value.textContent = opt.textContent;
+      document
+        .getElementById("categoriaBox")
+        .classList.remove("open");
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+  value.textContent =
+    id_categoria.options[id_categoria.selectedIndex]?.text ||
+    "Category...";
+}
+
+document.getElementById("categoriaValue").addEventListener("click", () => {document.getElementById("categoriaBox").classList.toggle("open");
+});  
+
+/* Aggiorna il Luogo */  
+function updateLuogoSelect() {
+  const box = document.getElementById("luogoOptions");
+  const value = document.getElementById("luogoValue");
+  const wrapper = document.getElementById("luogoBox");
+  box.innerHTML = "";
+  if (id_luogo.disabled) {
+      value.classList.add("placeholder");
+      value.textContent =
+          id_comune_evento_hidden.value
+              ? "No places"
+              : "Select City first";
+        wrapper.classList.add("disabled");
+        wrapper.classList.remove("open");
+      return;
+  }
+  [...id_luogo.options].forEach(opt => {
+    const div = document.createElement("div");
+    div.className = "ar-select-option";
+      if (!opt.value) {div.classList.add("placeholder");}
+    div.textContent = opt.textContent;
+    div.onclick = () => {
+      id_luogo.value = opt.value;
+      document
+        .getElementById("luogoBox")
+        .classList.remove("open");
+      updateLuogoSelect();
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+  const selectedText =
+    id_luogo.options[id_luogo.selectedIndex]?.text || "Place...";
+    value.textContent = selectedText;
+    if (!id_luogo.value) {
+      value.classList.add("placeholder");
+    } else {
+      value.classList.remove("placeholder");
+  }
+  wrapper.classList.remove("disabled");
+}
+
+document.getElementById("luogoValue")
+.addEventListener("click", () => {
+    const wrapper = document.getElementById("luogoBox");
+    if (id_luogo.disabled)
+        return;
+    wrapper.classList.toggle("open");
+});
+
+
+/* Aggiorna le Serie */  
+function updateSeriesSelect() {
+  const box = document.getElementById("seriesOptions");
+  const value = document.getElementById("seriesValue");
+  const select = document.getElementById("id_event_series");
+  const wrapper = document.getElementById("seriesBox");
+  box.innerHTML = "";
+    if (select.disabled) {
+      value.classList.add("placeholder");
+      value.textContent =
+          id_organizzatore_hidden.value
+              ? "No series"
+              : "Select organizer first";
+      wrapper.classList.remove("open");
+      wrapper.classList.add("disabled");
+      return;
+  }
+  [...select.options].forEach(opt => {
+    const div = document.createElement("div");
+    div.className = "ar-select-option";
+      if (!opt.value) {div.classList.add("placeholder");}
+    div.textContent = opt.textContent;
+    div.onclick = () => {
+      select.value = opt.value;
+      wrapper.classList.remove("open");
+      updateSeriesSelect();
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+  const selectedText =
+  select.options[select.selectedIndex]?.text || "Series...";
+  value.textContent = selectedText;
+    if (!select.value) {
+    value.classList.add("placeholder");
+  } else {
+    value.classList.remove("placeholder");
+  }
+  wrapper.classList.remove("disabled");
+}
+  
+document.getElementById("seriesValue").addEventListener("click", () => {const wrapper =document.getElementById("seriesBox");
+    if (document.getElementById("id_event_series").disabled)
+        return;
+    wrapper.classList.toggle("open");
+});
+
+/* Carica le Serie in base all'Organizzatore */
+async function loadSeriesByOrganizzatore(idOrg) {
+  const select = document.getElementById("id_event_series");
+  const { data, error } = await supabase
+    .from("event_series")
+    .select("id_event_series, es_title")
+    .eq("id_organizzatore", idOrg)
+    .order("es_title");
+  if (error) {
+    console.error("STEP SERIES - errore:", error);
+    return;
+  }
+    if (data.length === 0) {
+        select.innerHTML = "";
+        select.disabled = true;
+        updateSeriesSelect();
+    } else {
+        select.innerHTML = `<option value="">Series...</option>`;
+        select.disabled = false;
+    (data || []).forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.id_event_series;
+      opt.textContent = s.es_title;
+      select.appendChild(opt);
+    });
+  }
+  updateSeriesSelect();
+}  
+
+/* Carica i Comuni */  
+async function loadComuni() {
+  const { data } = await supabase.from('comuni').select('*');
+  (data || []).forEach(c => {
+    comuniMap[c.id_comune] = c.co_descrizione;
+  });
+}
+
+*/ Carica Luoghi dei Comuni */  
+window.filterLuoghi = async (selectedId = null) => {
+  const idComune = id_comune_evento_hidden.value;
+  id_luogo.innerHTML = "";
+  id_luogo.value = "";
+    if (!idComune) {
+    id_luogo.disabled = true;
+    updateLuogoSelect();
+    return;
+  }
+  id_luogo.innerHTML = `<option value="">Place...</option>`;
+  id_luogo.disabled = false;
+  const { data } = await supabase
+    .from('luoghi')
+    .select('id_luogo, lu_location, lu_descrizione')
+    .eq('id_comune', idComune)
+    .order('lu_location');
+    if (!data || data.length === 0) {
+    id_luogo.innerHTML = "";
+    id_luogo.disabled = true;
+    updateLuogoSelect();
+    return;
+  }
+  (data || []).forEach(l => {
+    id_luogo.innerHTML += `
+      <option value="${l.id_luogo}">
+        ${l.lu_location}${l.lu_descrizione ? ' • ' + l.lu_descrizione : ''}
+      </option>
+    `;
+  });
+  if (selectedId) {
+    id_luogo.value = selectedId;
+  }
+  updateLuogoSelect();
+};
+  
+/* Controllo in caso di Duplica evento */  
+window.duplicateEvent = () => {
+  if (!id) return;
+  location.href = `evento.html?new=1&duplicate=${id}`;
+};
+
+window.openEventLink = function() {
+  const url = ev_link.value.trim();
+  if (url) {
+    window.open(url, "_blank");
+  }
+};
+  
+/* Ricerca dei Comuni */  
+window.searchComuni = async (text) => {
+  const box = document.getElementById('comuniResults');
+  if (text.length < 3) {
+    box.innerHTML = '';
+    id_comune_evento_hidden.value = "";
+      id_luogo.value = "";
+      const luogoValue = document.getElementById("luogoValue");
+      luogoValue.textContent = "Select City first";
+      luogoValue.classList.add("placeholder");
+    await filterLuoghi();
+    markDirty();
+    updateMapButton()
+    return;
+  }
+  const { data } = await supabase
+    .from('comuni')
+    .select('id_comune, co_descrizione')
+    .ilike('co_descrizione', text + '%')
+    .limit(10);
+  box.innerHTML = '';
+  (data || []).forEach(c => {
+    const div = document.createElement('div');
+    div.className = "search-item";
+    div.innerText = c.co_descrizione;
+    div.onclick = async () => {
+        id_comune_evento.value = c.co_descrizione;
+        id_comune_evento_hidden.value = c.id_comune;
+      await filterLuoghi();
+      markDirty();
+      box.innerHTML = '';
+      updateMapButton() 
+    };
+    box.appendChild(div);
+  });
+};
+
+/* Ricerca Organizzatori */  
+window.searchOrganizzatori = async (text) => {
+  const box = document.getElementById('organizzatoriResults');
+  if (text.length < 3) {
+    box.innerHTML = '';
+    id_organizzatore_hidden.value = "";
+    const seriesSelect = document.getElementById("id_event_series");
+      seriesSelect.innerHTML = "";
+      seriesSelect.value = "";
+      seriesSelect.disabled = true;
+    updateSeriesSelect();
+    verifySeries();
+    markDirty();
+    return;
+  }
+  const { data } = await supabase
+    .from('organizzatori')
+    .select('id_organizzatore, or_nome')
+    .ilike('or_nome', `%${text}%`)   // 🔥 CONTIENE (non inizia con)
+    .limit(10);
+  box.innerHTML = '';
+  (data || []).forEach(o => {
+    const div = document.createElement('div');
+    div.className = "search-item";
+    div.innerText = o.or_nome;
+    div.onclick = async () => {
+      id_organizzatore.value = o.or_nome;
+      id_organizzatore_hidden.value = o.id_organizzatore;
+      await updateEventSeries();
+      const seriesSelect = document.getElementById("id_event_series");
+      seriesSelect.value = "";
+      updateSeriesSelect();
+      markDirty();
+      box.innerHTML = '';
+      verifySeries();
+    };
+    box.appendChild(div);
+  });
+};
+
+/* Aggiorna le Serie di Eventi in base all'Organizzatore */  
+async function updateEventSeries(){
+  const organizerId =
+    document.getElementById('id_organizzatore_hidden').value;
+  await loadSeriesByOrganizzatore(organizerId);
+verifySeries();
+}
+
+/* Controlla se l'evento è Completo */  
+function isComplete(){
+  return (
+    ev_titolo.value.trim() !== "" &&
+    id_categoria.value !== "" &&
+    ev_inizio.value !== "" &&
+    ev_fine.value !== "" &&
+    id_luogo.value !== "" &&
+    id_organizzatore_hidden.value !== ""
+  );
+}
+  
+/* Controllo su BTN BACK */
 window.requestBack = async () => {
     const durata = parseInt(ev_durata.value);
       if (!isNaN(durata)) {
@@ -1225,7 +1231,8 @@ window.requestBack = async () => {
     location.href = 'eventi.html';
   }
 };
-  
+
+/* BTN Aggiungi Organizzatore */
 window.newEventSerie = function(){
   const idOrganizzatore =
     document.getElementById('id_organizzatore_hidden').value;
@@ -1233,6 +1240,7 @@ window.newEventSerie = function(){
     `event_serie.html?new=1&id_organizzatore=${idOrganizzatore}`;
 };
 
+/* Aggiungi un nuovo luogo sulla Mappa */  
 function initMap() {
   if (map) return;
   map = L.map('map');
@@ -1247,6 +1255,7 @@ function initMap() {
 });
 }
 
+/* Apre la Mappa in base al comune selezionato */  
 window.openMapByComune = async () => {
   const idComune = id_comune_evento_hidden.value;
     if (!idComune) {
@@ -1261,6 +1270,7 @@ window.openMapByComune = async () => {
   }, 200);
 };
 
+/* Apre la Mappa con i Markers del Comune selezionato */  
 async function loadMapLuoghi(idComune) {
   initMap();
 const { data: luoghiData } = await supabase
@@ -1276,6 +1286,7 @@ const { data: comuneData } = await supabase
 renderMarkers(luoghiList, comuneData);
 }
 
+/* Posiziona i Markers del comune selezionato sulla Mappa */  
 function renderMarkers(luoghiList, comune) {
   markers.forEach(m => map.removeLayer(m));
   markers = [];
@@ -1311,16 +1322,19 @@ function renderMarkers(luoghiList, comune) {
   map.fitBounds(bounds, { padding: [30, 30] }); 
 }
 
+/* Disabilita visualizzazione Mappa */  
 window.closeMap = () => {
   document.getElementById("mapModal").style.display = "none";
 };
 
+/* BTN Inserimento nuovo Luogo sulla Mapa */  
 function openNewLuogoFromMap(lat, lng) {
   const comune = id_comune_evento.value;
   const url = `luogo.html?new=1&lat=${lat}&lng=${lng}&comune=${comune}`;
   window.location.href = url;
 }
 
+/* Richiama SI-NO-ANNULLA */  
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
 
@@ -1336,6 +1350,16 @@ function dialogAction(type) {
 
 window.dialogAction = dialogAction;
 
+/* Abilita Disabilita BTN Link */  
+window.updateLinkButton = function() {
+  const btn = document.getElementById("openLinkBtn");
+  const value = ev_link.value.trim();
+  btn.className = `btn-icon ${value ? "btn-blue" : "btn-gray"}`;
+  btn.disabled = !value;
+  btn.style.cursor = value ? "" : "not-allowed";
+};
+
+/* Attiva/Disattiva BTN Mappa */
 function updateMapButton() {
   const enabled = !!id_comune_evento_hidden.value && id_luogo.options.length > 1;
   const mapBtn = document.getElementById("mapBtn");
@@ -1349,6 +1373,7 @@ function updateMapButton() {
   addPlaceBtn.style.cursor = addPlaceEnabled ? "" : "not-allowed";
   }
 
+/* Attiva/Disattiva BTN Duplicate */  
 function updateDupButton() {
   const btn = document.getElementById('btnDuplicate');
   if (isNew) {
@@ -1363,7 +1388,8 @@ function updateDupButton() {
 
 document.getElementById("backBtn")
   .classList.add("btn-gray");
-  
+
+/* Attiva/Disattiva BTN Serie */  
 function verifySeries() {
   const select = document.getElementById("id_event_series");
   const btn = document.getElementById("addSeriesBtn");
@@ -1511,7 +1537,7 @@ coverBox.addEventListener('drop', e => {
   loadCoverPreview(file);
 });
 
-  // Incolla CTRL+V - Maiusc+Ins
+// Incolla CTRL+V - Maiusc+Ins
 document.addEventListener('paste', e => {
   const items = e.clipboardData?.items;
   if (!items) return;
@@ -1588,7 +1614,7 @@ async function deleteCover(idEvento) {
   }
 }
     
-// Click su rimuovi copertina
+// BTN rimuovi copertina
 removeCoverBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   if (selectedCoverFile && !currentCover) {
