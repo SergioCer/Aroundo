@@ -869,6 +869,15 @@ function updateActiveButtonState() {
 /* Verifica se l'Evento è Attivabile */
 window.changeActiveStatus = function(){
   if (ev_attivo.checked) {
+    if (!isComplete()) {
+      ev_attivo.checked = false;
+      updateGuide();
+      showWarning(
+       "The event is incomplete.\n\nComplete the highlighted required fields before activating."
+      );
+      updateActiveStatus();
+      return;
+    }
     if (!validateDateTime()) {
       ev_attivo.checked = false;
       updateActiveStatus();
