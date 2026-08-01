@@ -834,7 +834,7 @@ const guideSteps = [
 /* Visita Guidata su Aroundo */
 function updateGuide() {
   // solo nuovi eventi
-  if (!isNew || duplicateId) return;
+  // if (!isNew || duplicateId) return;
   guideSteps.forEach(step => {
       const field = document.getElementById(step.id);
       field.classList.remove("guide-active");
