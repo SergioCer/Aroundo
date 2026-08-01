@@ -1212,7 +1212,7 @@ window.requestBack = async () => {
         }
         if (durata > 2160) {
           showWarning("Un singolo evento non dovrebbe durare più di 36 ore");
-          return false;
+          return;
         }
       }
   if (!dirty) {
