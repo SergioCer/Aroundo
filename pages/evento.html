@@ -377,7 +377,10 @@ input, select, textarea {
 <select id="id_luogo" hidden></select>    
   <div style="display:flex; gap:10px;">    
   <button id="mapBtn" class="btn-icon" onclick="openMapByComune()" title="View Map">📍</button>
+  <!--  CANCELLARE
   <button id="addPlaceBtn" type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1&id_comune='+ id_comune_evento_hidden.value" title="Add Place">+</button>
+  -->
+  <button id="addPlaceBtn" type="button" class="btn-icon"  onclick="openLinkedPage('luogo.html?new=1&id_comune=' + id_comune_evento_hidden.value,'luogo')" title="Add Place">+</button>    
     </div>
   </div>
   
@@ -421,7 +424,10 @@ input, select, textarea {
           <div id="seriesOptions" class="ar-select-options"></div>
         </div>
     <select id="id_event_series" hidden></select>
+        <!--  CANCELLARE
         <button id="addSeriesBtn" type="button" class="btn-icon" onclick="newEventSerie()" title="Add new Serie">+</button>
+        -->
+        <button id="addSeriesBtn" type="button" class="btn-icon"  onclick="openLinkedPage('event-series.html?new=1','event_serie')" title="Add new Serie">+</button>
       </div>
   </div>
   <!-- ATTIVO -->
@@ -857,6 +863,30 @@ function updateActiveButtonState() {
       ? "Active"
       : "Unactive";
   }
+
+/* Gestione ritorno pagina da altre pagine html richiamate */  
+function openLinkedPage(url, refreshType) {
+  sessionStorage.setItem(
+    "eventoRefresh",
+    refreshType
+  );
+  window.location.href = url;
+}
+
+/* Stabilisce quali elementi aggiornare quando ritorna sulla pagina evento.html */  
+window.addEventListener("pageshow", async () => {
+  const refresh = sessionStorage.getItem("eventoRefresh");
+  if (!refresh) return;
+  sessionStorage.removeItem("eventoRefresh");
+  switch (refresh) {
+    case "luogo":
+      await filterLuoghi();
+      break;
+    case "event_serie":
+      await loadSerie();
+      break;
+  }
+});
   
 /* LOAD Categorie */
 async function loadSelects() {
