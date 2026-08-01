@@ -577,6 +577,19 @@ input, select, textarea {
     ">
       Annulla
     </button>
+    <button onclick="exitWithoutSave()" style="
+      width:100%;
+      background:#ef4444;
+      color:white;
+      border:none;
+      padding:10px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      margin-top:10px;
+    ">
+      Esci senza salvare
+    </button>
   </div>
 </div>  
 
@@ -1366,10 +1379,16 @@ function dialogAction(type) {
 
 window.dialogAction = dialogAction;
 
-/* BTN Richiama Annulla */  
+/* BTN Richiama Annulla */
 window.closeWarning = function() {
   document.getElementById("warningDialog").style.display = "none";
 };  
+
+/* BTN Richiama Esci senza salvare */  
+ window.exitWithoutSave = function () {
+  document.getElementById("warningDialog").style.display = "none";
+  location.href = "eventi.html";
+}; 
 
 /* Messaggio del Warning */
 function showWarning(message) {
