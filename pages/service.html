@@ -340,7 +340,7 @@ async function load(){
   sv_icona.value=data.sv_icona||'';
   sv_livello.value=data.livello||'1';
   id_genere.value=data.id_genere||'';
-  setStatus(data.sv_attivo);
+  setActiveStatus(data.sv_attivo);
   updateIcon();
 }
 
@@ -366,27 +366,19 @@ function updateGuide(){
   }
 }
 
-/* ACTIVE STATUS */
+/* CHANGE ACTIVE STATUS */
 window.changeActiveStatus=function(){
-  const btn=document.getElementById("activeBtn");
-  const active=btn.classList.contains("btn-green");
-  if(active){
-    btn.className="btn-icon btn-red";
-    btn.textContent="×";
-  }else{
-    btn.className="btn-icon btn-green";
-    btn.textContent="✓";
-  }
+  const active=activeBtn.classList.contains("btn-green");
+  activeBtn.className=`btn-icon ${active?"btn-red":"btn-green"}`;
+  activeBtn.textContent=active?"×":"✓";
   markDirty();
 };
 
-function setStatus(value){
-  const btn=document.getElementById("activeBtn");
-  if(value){btn.className="btn-icon btn-green"; btn.textContent="✓";
-  }else{btn.className="btn-icon btn-red"; btn.textContent="×";
-  }
+function setActiveStatus(value){
+  activeBtn.className=`btn-icon ${value?"btn-green":"btn-red"}`;
+  activeBtn.textContent=value?"✓":"×";
 }
-
+  
 /* ICON */
 function updateIcon(){
   iconPreview.innerHTML=
@@ -406,7 +398,7 @@ window.markDirty=function(){
     sv_servizio:sv_servizio.value,
     sv_descrizione:sv_descrizione.value,
     sv_icona:sv_icona.value,
-    sv_attivo:statusBox.classList.contains("active"),
+    sv_attivo: activeBtn.classList.contains("btn-green"),
     livello:sv_livello.value,
     id_genere:id_genere.value
   });
@@ -421,7 +413,7 @@ async function save(){
     sv_servizio:sv_servizio.value,
     sv_descrizione:sv_descrizione.value,
     sv_icona:sv_icona.value,
-    sv_attivo:statusBox.classList.contains("active"),
+    sv_attivo: activeBtn.classList.contains("btn-green"),
     livello:parseInt(sv_livello.value),
     id_genere:id_genere.value
   };
@@ -510,8 +502,9 @@ function isComplete(){
 
 /* ACTIVE BUTTON STATE */
 function updateActiveStatus(){
-  const active=statusBox.classList.contains("active");
-  statusBox.textContent=active?"✓":"";
+  const active=activeBtn.classList.contains("btn-green");
+  activeBtn.textContent=active?"✓":"×";
+  activeBtn.className=`btn-icon ${active?"btn-green":"btn-red"}`;
 }
 
 /* INITIALIZE */
