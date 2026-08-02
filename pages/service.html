@@ -271,9 +271,10 @@ Icon
 </div>
 <div class="inline-box">
 <span class="small-label">Status</span>
-<div class="status" onclick="changeActiveStatus()">
-<div id="statusBox" class="status-box">✓</div>
-<span>Active</span>
+<!-- CANCELLARE 
+  <div class="status" onclick="changeActiveStatus()">
+-->
+<button id="activeBtn" class="btn-icon btn-red" onclick="changeActiveStatus()">×</button>
 </div>
 </div>
 <div class="inline-box">
@@ -370,18 +371,22 @@ function updateGuide(){
 
 /* ACTIVE STATUS */
 window.changeActiveStatus=function(){
-  const active=document.getElementById("statusBox")
-    .classList.contains("active");
-  setStatus(!active);
+  const btn=document.getElementById("activeBtn");
+  const active=btn.classList.contains("btn-green");
+  if(active){
+    btn.className="btn-icon btn-red";
+    btn.textContent="×";
+  }else{
+    btn.className="btn-icon btn-green";
+    btn.textContent="✓";
+  }
   markDirty();
 };
 
 function setStatus(value){
-  const box=document.getElementById("statusBox");
-  if(value){
-    box.classList.add("active");
-  }else{
-    box.classList.remove("active");
+  const btn=document.getElementById("activeBtn");
+  if(value){btn.className="btn-icon btn-green"; btn.textContent="✓";
+  }else{btn.className="btn-icon btn-red"; btn.textContent="×";
   }
 }
 
