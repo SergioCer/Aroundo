@@ -408,9 +408,10 @@ function render() {
         `;      
     header.onclick = () => {
       if (expanded.has(g.id_genere)) {
-        expanded.delete(g.id_genere);
+        expanded.clear();
       } else {
         expanded.add(g.id_genere);
+        expanded.clear();          
       }
       render();
     };
