@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Category</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<style>
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f2f4f7;
+}
+
+/* TOPBAR */
+.topbar{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:16px;
+  font-weight:bold;
+}
+
+.title{
+  display:flex;
+  gap:20px;
+  align-items:center;
+  font-size:24px;
+  font-weight:bold;
+}
+
+.back-btn{
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:17px;
+  background:#e5e7eb;
+  color:#374151;
+  cursor:pointer;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.back-btn.dirty{
+  background:#fbbf24;
+  color:#111827;
+}
+
+.back-btn:hover{
+  background:#d1d5db;
+}
+
+/* CARD */
+.card{
+  background:white;
+  margin:15px;
+  padding:15px;
+  border-radius:20px;
+}
+
+/* LABEL */
+.section-title{
+  font-size:11px;
+  color:#777;
+  margin:10px 0 4px;
+}
+
+/* INPUT */
+input,textarea,select{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:8px;
+  font-size:16px;
+  font-family:inherit;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+/* INLINE */
+.inline-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  margin-top:12px;
+}
+
+.inline-box{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+.small-label{
+  font-size:11px;
+  color:#777;
+}
+
+/* BUTTON */
+.btn-icon{
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:20px;
+  color:white;
+}
+
+.btn-green{
+  background:#22c55e;
+}
+
+.btn-red{
+  background:#ef4444;
+}
+
+.btn-blue{
+  background:#3b82f6;
+}
+
+/* ICON */
+.icon-preview{
+  height:40px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.material-symbols-outlined{
+  font-size:40px!important;
+}
+
+/* COLOR */
+.color-preview{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid #ddd;
+}
+
+/* DIALOG */
+.dialog-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.40);
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
+}
+
+.dialog{
+  width:340px;
+  background:white;
+  border-radius:12px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.dialog-title{
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:18px;
+}
+
+.dialog-buttons{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.dialog-buttons button{
+  flex:1;
+  border:none;
+  border-radius:8px;
+  padding:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<div class="title">
+<button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
+Category
+</div>
+</div>
+<div class="card">
+<div class="section-title">Description</div>
+<input id="sc_descrizione" oninput="markDirty()">
+<div class="section-title">Notes</div>
+<textarea id="sc_note" oninput="markDirty()"></textarea>
+<div class="section-title">Icon</div>
+<input id="sc_icona" oninput="updateIcon();markDirty()">
+<div class="section-title">Color</div>
+<input id="sc_colore" type="color" onchange="updateColor();markDirty()">
+<div class="inline-row">
+<div class="inline-box">
+<span class="small-label">Category</span>
+<select id="id_categoria" onchange="markDirty()"></select>
+</div>
+<div class="inline-box">
+<span class="small-label">Status</span>
+<button id="activeBtn" class="btn-icon btn-red" onclick="changeActiveStatus()">×</button>
+</div>
+<div class="inline-box">
+<span class="small-label">Preview</span>
+<div id="iconPreview" class="icon-preview"></div>
+</div>
+<div class="inline-box">
+<span class="small-label">Color</span>
+<div id="colorPreview" class="color-preview"></div>
+</div>
+</div>
+</div>
+<div id="saveDialog" class="dialog-overlay">
+<div class="dialog">
+<div class="dialog-title">Save changes?</div>
+<div class="dialog-buttons">
+<button class="btn-green" onclick="dialogAction('yes')">Yes</button>
+<button class="btn-red" onclick="dialogAction('no')">No</button>
+<button onclick="dialogAction('cancel')">Cancel</button>
+</div>
+</div>
+</div>
+<script type="module">
+
+import { requireAuth } from './auth-check.js';
+await requireAuth();
+
+import { supabase } from '../supabase.js';
+
+const params=new URLSearchParams(location.search);
+const id=params.get('id');
+const isNew=!id;
+
+let original="{}";
+let dirty=false;
+
+/* LOAD */
+async function load(){
+  if(isNew){
+    const idCategoria=params.get("id_categoria");
+    if(idCategoria) id_categoria.value=idCategoria;
+    setActiveStatus(true);
+    updateIcon();
+    updateColor();
+    return;
+  }
+  const {data}=await supabase
+    .from("subcategorie")
+    .select("*")
+    .eq("id_subcategoria",id)
+    .single();
+  if(!data)return;
+  original=JSON.stringify(data);
+  sc_descrizione.value=data.sc_descrizione||"";
+  sc_note.value=data.sc_note||"";
+  sc_icona.value=data.sc_icona||"";
+  sc_colore.value=data.sc_colore||"#ffffff";
+  id_categoria.value=data.id_categoria||"";
+  setActiveStatus(data.sc_attiva);
+  updateIcon();
+  updateColor();
+}
+
+/* ACTIVE STATUS */
+window.changeActiveStatus=function(){
+  const active=activeBtn.classList.contains("btn-green");
+  setActiveStatus(!active);
+  markDirty();
+};
+
+function setActiveStatus(value){
+  activeBtn.className=`btn-icon ${value?"btn-green":"btn-red"}`;
+  activeBtn.textContent=value?"✓":"×";
+}
+
+/* ICON */
+window.updateIcon=function(){
+  iconPreview.innerHTML=sc_icona.value?
+  `<span class="material-symbols-outlined">${sc_icona.value}</span>`:"";
+};
+
+/* COLOR */
+window.updateColor=function(){
+  colorPreview.style.background=sc_colore.value||"#ffffff";
+};
+
+/* DIRTY */
+window.markDirty=function(){
+  const current=JSON.stringify({
+    sc_descrizione:sc_descrizione.value,
+    sc_note:sc_note.value,
+    sc_icona:sc_icona.value,
+    sc_colore:sc_colore.value,
+    sc_attiva:activeBtn.classList.contains("btn-green"),
+    id_categoria:id_categoria.value
+  });
+  dirty=current!==original;
+  backBtn.classList.toggle("dirty",dirty);
+};
+
+/* SAVE */
+async function save(){
+  const payload={
+    sc_descrizione:sc_descrizione.value.trim(),
+    sc_note:sc_note.value.trim(),
+    sc_icona:sc_icona.value.trim(),
+    sc_colore:sc_colore.value,
+    sc_attiva:activeBtn.classList.contains("btn-green"),
+    id_categoria:parseInt(id_categoria.value)
+  };
+
+  if(isNew){
+    const {data}=await supabase
+      .from("subcategorie")
+      .insert(payload)
+      .select()
+      .single();
+    location.href=`category.html?id=${data.id_subcategoria}`;
+  }else{
+    await supabase
+      .from("subcategorie")
+      .update(payload)
+      .eq("id_subcategoria",id);
+  }
+  dirty=false;
+}
+
+/* BACK */
+window.requestBack=async function(){
+  if(!dirty){
+    history.back();
+    return;
+  }
+  document.getElementById("saveDialog").style.display="flex";
+};
+
+window.dialogAction=function(type){
+  document.getElementById("saveDialog").style.display="none";
+  if(type==="yes"){
+    save().then(()=>history.back());
+  }
+  if(type==="no"){
+    dirty=false;
+    history.back();
+  }
+};
+
+/* LOAD CATEGORY */
+async function loadCategories(){
+  const {data}=await supabase
+    .from("categorie")
+    .select("id_categoria,mc_descrizione")
+    .order("mc_ordine",{ascending:true});
+  id_categoria.innerHTML="";
+  (data||[]).forEach(c=>{
+    const opt=document.createElement("option");
+    opt.value=c.id_categoria;
+    opt.textContent=c.mc_descrizione;
+    id_categoria.appendChild(opt);
+  });
+}
+
+/* INIT */
+await loadCategories();
+await load();
+
+</script>
+</body>
+</html>
+  
