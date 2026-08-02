@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Categories</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f2f4f7;
+}
+
+/* TOP BAR */
+.topbar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    padding:16px;
+    font-weight:bold;
+}
+
+.page-title{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.back-btn{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:17px;
+    background:#e5e7eb;
+    color:#374151;
+    cursor:pointer;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.back-btn:hover{
+    background:#d1d5db;
+}
+
+
+/* CATEGORIE */
+.category-box{
+    margin:0 14px 6px;
+    background:white;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.category-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    cursor:pointer;
+    user-select:none;
+    background:#f8fafc;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.category-header:hover{
+    background:#e6fafc;
+}
+
+.category-title{
+    flex:1;
+    font-size:16px;
+    font-weight:700;
+}
+
+.category-panel{
+    padding:14px;
+}
+
+.category-count{
+    width:28px;
+    text-align:center;
+    color:#6b7280;
+    font-size:11px;
+    font-weight:500;
+}
+
+
+/* ICONE */
+.material-symbols-outlined{
+    font-size:20px;
+    vertical-align:middle;
+}
+
+.arrow{
+    width:6px;
+    text-align:center;
+    font-weight:bold;
+}
+
+
+/* PULSANTI */
+.icon-btn{
+    width:32px;
+    height:32px;
+    border:none;
+    border-radius:50%;
+    cursor:pointer;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:26px;
+}
+
+.icon-btn:hover{
+    opacity:.9;
+}
+
+.edit-btn{
+    background:#3b82f6;
+    color:white;
+}
+
+.add-btn{
+    background:#22c55e;
+    color:white;
+}
+
+
+/* SOTTOCATEGORIE */
+.subcategory-row{
+    display:flex;
+    align-items:center;
+    margin-left:50px;
+    gap:10px;
+    padding:6px 4px;
+    border-radius:18px;
+    cursor:pointer;
+}
+
+.subcategory-row:hover{
+    background:#e6fafc;
+}
+
+.subcategory-icons{
+    width:60px;
+    display:flex;
+    gap:4px;
+    justify-content:flex-start;
+}
+
+.subcategory-icons .material-symbols-outlined{
+    font-size:20px;
+}
+
+.subcategory-name{
+    flex:1;
+    font-weight:700;
+    font-size:15px;
+}
+
+
+/* NOTA SOTTOCATEGORIA */
+.subcategory-note{
+    margin:0 0 10px 50px;
+    background:#e6fafc;
+    padding:14px;
+    border-radius:22px;
+}
+
+
+/* STATO */
+.subcategory-state{
+    width:14px;
+    text-align:center;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.subcategory-state.on{
+    color:#22c55e;
+}
+
+.subcategory-state.off{
+    color:#ef4444;
+}
+
+
+/* DIALOG */
+.dialog-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.40);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
+}
+
+.dialog{
+    width:340px;
+    background:white;
+    border-radius:12px;
+    padding:22px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.dialog-title{
+    text-align:center;
+    font-weight:bold;
+    margin-bottom:18px;
+}
+
+.dialog-body input{
+    width:100%;
+    box-sizing:border-box;
+    padding:9px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    font-size:15px;
+}
+
+.dialog-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.dialog-buttons button{
+    flex:1;
+    border:none;
+    border-radius:8px;
+    padding:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-green{
+    background:#22c55e;
+    color:white;
+}
+
+.btn-red{
+    background:#ef4444;
+    color:white;
+}
+
+
+/* DRAG */
+.drag-handle{
+    cursor:grab;
+    color:#6b7280;
+    user-select:none;
+    flex:0 0 20px;
+}
+
+.drag-handle:active{
+    cursor:grabbing;
+}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <div class="page-title">
+        Categories
+    </div>
+</div>
+
+<div id="categorieContainer"></div>
+
+<!-- DIALOG MODIFICA CATEGORIA -->
+<div id="categoryDialog" class="dialog-overlay">
+    <div class="dialog">
+        <div class="dialog-title">
+            Modifica categoria
+        </div>
+        <div class="dialog-body">
+            <label>
+                Descrizione
+            </label>
+            <input
+                id="categoryDescrizione"
+                type="text"
+                maxlength="80">
+        </div>
+
+        <div class="dialog-buttons">
+            <button
+                class="btn-green"
+                onclick="saveCategory()">
+                Salva
+            </button>
+            <button
+                class="btn-red"
+                onclick="closeCategory()">
+                Annulla
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();
+
+import { supabase } from "../supabase.js";
+
+let categorie=[];
+let sottocategorie=[];
+let expanded=new Set();
+let currentCategoria=null;
+
+/* LOAD DATI */
+async function load(){
+    const c=await supabase.from("categorie").select("*").order("mc_ordine",{ascending:true});
+    const s=await supabase.from("sottocategorie").select("*").order("sc_ordine",{ascending:true});
+    categorie=c.data||[];
+    sottocategorie=s.data||[];
+    render();
+}
+
+/* HELP */
+function getSubcategorie(id_categoria){
+    return sottocategorie.filter(s=>s.id_categoria==id_categoria);
+}
+
+function render(){
+    const container=document.getElementById("categorieContainer");
+    container.innerHTML="";
+
+    categorie.forEach(c=>{
+        const list=getSubcategorie(c.id_categoria);
+        const open=expanded.has(c.id_categoria);
+
+        const box=document.createElement("div");
+        box.className="category-box";
+        box.dataset.id=c.id_categoria;
+
+        const header=document.createElement("div");
+        header.className="category-header";
+
+        header.innerHTML=`
+        <span class="drag-handle material-symbols-outlined">drag_indicator</span>
+        <span class="arrow">${open?"▼":"▶"}</span>
+        <span class="category-count">${String(list.length).padStart(2,"0")}</span>
+        <span class="material-symbols-outlined">${c.mc_icona||""}</span>
+        <span class="category-title">${c.mc_descrizione}</span>
+        <button class="icon-btn add-btn" onclick="event.stopPropagation();openAdd(${c.id_categoria})">+</button>
+        <button class="icon-btn edit-btn" onclick="event.stopPropagation();openEdit(${c.id_categoria})">✎</button>`;
+
+        header.onclick=()=>{
+            if(expanded.has(c.id_categoria)){
+                expanded.clear();
+            }else{
+                expanded.clear();
+                expanded.add(c.id_categoria);
+            }
+            render();
+        };
+
+        box.appendChild(header);
+
+        if(open){
+            const panel=document.createElement("div");
+            panel.className="category-panel";
+
+            list.forEach(s=>{
+                const row=document.createElement("div");
+                row.className="subcategory-row";
+                row.dataset.id=s.id_subcategoria;
+
+                row.innerHTML=`
+                <span class="drag-handle material-symbols-outlined">drag_indicator</span>
+                <span class="subcategory-icons">
+                    <span class="material-symbols-outlined">${s.sc_icona||""}</span>
+                </span>
+                <span class="subcategory-name">${s.sc_descrizione}</span>
+                <span class="subcategory-state ${s.sc_attiva?"on":"off"}">${s.sc_attiva?"●":"✕"}</span>`;
+
+                row.onclick=()=>{
+                    window.location.href=`category.html?id=${s.id_subcategoria}`;
+                };
+
+                if(s.sc_note){
+                    const note=document.createElement("div");
+                    note.className="subcategory-note";
+                    note.textContent=s.sc_note;
+                    panel.appendChild(note);
+                }
+
+                panel.appendChild(row);
+            });
+
+            box.appendChild(panel);
+        }
+
+        container.appendChild(box);
+    });
+
+    initSortable();
+}
+
+function initSortable(){
+    const container=document.getElementById("categorieContainer");
+    new Sortable(container,{animation:150,handle:".drag-handle",onEnd:async()=>{const items=[...container.querySelectorAll(".category-box")];for(let i=0;i<items.length;i++){await supabase.from("categorie").update({mc_ordine:i+1}).eq("id_categoria",items[i].dataset.id);}load();}});
+    document.querySelectorAll(".category-panel").forEach(panel=>{new Sortable(panel,{animation:150,handle:".drag-handle",draggable:".subcategory-row",onEnd:async()=>{const rows=[...panel.querySelectorAll(".subcategory-row")];for(let i=0;i<rows.length;i++){await supabase.from("sottocategorie").update({sc_ordine:i+1}).eq("id_subcategoria",rows[i].dataset.id);}load();}});});
+}
+
+window.openAdd=(id_categoria)=>{
+    window.location.href=`category.html?new=1&id_categoria=${id_categoria}`;
+};
+
+window.openEdit=(id_categoria)=>{
+    const c=categorie.find(x=>x.id_categoria==id_categoria);
+    currentCategoria=id_categoria;
+    document.getElementById("categoryDescrizione").value=c.mc_descrizione||"";
+    document.getElementById("categoryDialog").style.display="flex";
+};
+
+window.closeCategory=()=>{
+    document.getElementById("categoryDialog").style.display="none";
+    currentCategoria=null;
+};
+
+window.saveCategory=async()=>{
+    const descrizione=document.getElementById("categoryDescrizione").value.trim();
+    if(!descrizione){alert("La descrizione è obbligatoria.");return;}
+    await supabase.from("categorie").update({mc_descrizione:descrizione}).eq("id_categoria",currentCategoria);
+    closeCategory();
+    load();
+};
+
+load();
+
+</script>
+</body>
+</html>
