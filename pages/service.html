@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Service</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<style>
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f2f4f7;
+}
+
+/* TOPBAR */
+.topbar{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:16px;
+  font-weight:bold;
+}
+
+.title{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  font-size:24px;
+  font-weight:bold;
+}
+
+.back-btn{
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:50%;
+  background:#e5e7eb;
+  color:#374151;
+  cursor:pointer;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.back-btn.dirty{
+  background:#fbbf24;
+  color:#111827;
+}
+
+.back-btn:hover{
+  background:#d1d5db;
+}
+
+/* CARD */
+.card{
+  background:white;
+  margin:15px;
+  padding:15px;
+  border-radius:20px;
+}
+
+/* LABEL */
+.section-title{
+  font-size:11px;
+  color:#777;
+  margin:10px 0 4px;
+}
+
+/* INPUT */
+input,
+textarea,
+select{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:8px;
+  font-size:16px;
+  font-family:inherit;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+/* INLINE */
+.inline-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  margin-top:12px;
+}
+
+.inline-box{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+/* SMALL LABEL */
+.small-label{
+  font-size:11px;
+  color:#777;
+}
+
+/* STATUS */
+.status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.status-box{
+  width:18px;
+  height:18px;
+  border-radius:4px;
+  border:2px solid #999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.status-box.active{
+  background:#22c55e;
+  border-color:#16a34a;
+  color:white;
+}
+
+/* LEVEL */
+.level-select{
+  width:60px;
+}
+
+/* ICON */
+.icon-preview{
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.material-symbols-outlined{
+  font-size:40px !important;
+  line-height:1;
+}
+
+/* BUTTON */
+.btn-icon{
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  color:white;
+}
+
+.btn-green{
+  background:#22c55e;
+}
+
+.btn-red{
+  background:#ef4444;
+}
+
+.btn-blue{
+  background:#3b82f6;
+}
+
+.btn-gray{
+  background:#9ca3af;
+}
+
+/* DIALOG */
+.dialog-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.40);
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
+}
+
+.dialog{
+  width:340px;
+  background:white;
+  border-radius:12px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.dialog-title{
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:18px;
+}
+
+.dialog-buttons{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.dialog-buttons button{
+  flex:1;
+  border:none;
+  border-radius:8px;
+  padding:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* GUIDE */
+.guide-active{
+  outline:2px solid #22c55e;
+}
+
+.guide-complete{
+  border-color:#22c55e;
+}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<div class="title">
+<button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
+Service
+</div>
+</div>
+<div class="card">
+<div class="section-title">
+Service
+</div>
+<input id="sv_servizio" oninput="markDirty()">
+<div class="section-title">
+Description
+</div>
+<textarea id="sv_descrizione" oninput="markDirty()"></textarea>
+<div class="section-title">
+Icon
+</div>
+<input id="sv_icona" oninput="markDirty()">
+<div class="inline-row">
+<div class="inline-box">
+<span class="small-label">Genre</span>
+<select id="id_genere" onchange="markDirty()"></select>
+</div>
+<div class="inline-box">
+<span class="small-label">Level</span>
+<select id="sv_livello" class="level-select" onchange="markDirty()">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+</select>
+</div>
+<div class="inline-box">
+<span class="small-label">Status</span>
+<div class="status" onclick="changeActiveStatus()">
+<div id="statusBox" class="status-box">✓</div>
+<span>Active</span>
+</div>
+</div>
+<div class="inline-box">
+<span class="small-label">Preview</span>
+<div id="iconPreview" class="icon-preview"></div>
+</div>
+</div>
+</div>
+<div id="saveDialog" class="dialog-overlay">
+<div class="dialog">
+<div class="dialog-title">
+Save changes?
+</div>
+<div class="dialog-buttons">
+<button class="btn-green" onclick="dialogAction('yes')">
+Yes
+</button>
+<button class="btn-red" onclick="dialogAction('no')">
+No
+</button>
+<button onclick="dialogAction('cancel')">
+Cancel
+</button>
+</div>
+</div>
+</div>
+
+<script type="module">
+import { requireAuth } from './auth-check.js';
+await requireAuth();
+
+import { supabase } from '../supabase.js';
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const isNew = params.has('new') || !id;
+const newGenre = params.get('id_genere');
+
+let original = "{}";
+let dirty = false;
+let dialogResolve;
+
+/* LOAD */
+async function load(){
+  if(isNew){
+    original = JSON.stringify({});
+    if(newGenre){
+      id_genere.value = newGenre;
+    }
+    setTimeout(updateGuide,100);
+    sv_servizio.focus();
+    return;
+  }
+  const {data,error}=await supabase
+    .from('servizi')
+    .select('*')
+    .eq('id_servizio',id)
+    .single();
+  if(error){
+    console.error(error);
+    return;
+  }
+  original=JSON.stringify(data);
+  sv_servizio.value=data.sv_servizio||'';
+  sv_descrizione.value=data.sv_descrizione||'';
+  sv_icona.value=data.sv_icona||'';
+  sv_livello.value=data.livello||'1';
+  id_genere.value=data.id_genere||'';
+  setStatus(data.sv_attivo);
+  updateIcon();
+}
+
+/* GUIDE */
+const guideSteps=[
+  {id:"sv_servizio",valid:()=>sv_servizio.value.trim()!==""},
+  {id:"sv_descrizione",valid:()=>sv_descrizione.value.trim()!==""},
+  {id:"id_genere",valid:()=>id_genere.value!==""},
+  {id:"sv_icona",valid:()=>sv_icona.value.trim()!==""}
+];
+
+function updateGuide(){
+  guideSteps.forEach(s=>{
+    const el=document.getElementById(s.id);
+    el.classList.remove("guide-active","guide-complete");
+    if(s.valid()){
+      el.classList.add("guide-complete");
+    }
+  });
+  const next=guideSteps.find(s=>!s.valid());
+  if(next){
+    document.getElementById(next.id).classList.add("guide-active");
+  }
+}
+
+/* ACTIVE STATUS */
+window.changeActiveStatus=function(){
+  const active=document.getElementById("statusBox")
+    .classList.contains("active");
+  setStatus(!active);
+  markDirty();
+};
+
+function setStatus(value){
+  const box=document.getElementById("statusBox");
+  if(value){
+    box.classList.add("active");
+  }else{
+    box.classList.remove("active");
+  }
+}
+
+/* ICON */
+function updateIcon(){
+  iconPreview.innerHTML=
+    sv_icona.value
+    ? `<span class="material-symbols-outlined">${sv_icona.value}</span>`
+    : "";
+}
+
+sv_icona.addEventListener("input",()=>{
+  updateIcon();
+  markDirty();
+});
+
+/* DIRTY */
+window.markDirty=function(){
+  const current=JSON.stringify({
+    sv_servizio:sv_servizio.value,
+    sv_descrizione:sv_descrizione.value,
+    sv_icona:sv_icona.value,
+    sv_attivo:statusBox.classList.contains("active"),
+    livello:sv_livello.value,
+    id_genere:id_genere.value
+  });
+  dirty=current!==original;
+  backBtn.classList.toggle("dirty",dirty);
+  updateGuide();
+};
+
+/* SAVE */
+async function save(){
+  const payload={
+    sv_servizio:sv_servizio.value,
+    sv_descrizione:sv_descrizione.value,
+    sv_icona:sv_icona.value,
+    sv_attivo:statusBox.classList.contains("active"),
+    livello:parseInt(sv_livello.value),
+    id_genere:id_genere.value
+  };
+  let result;
+  if(isNew){
+    result=await supabase
+      .from("servizi")
+      .insert(payload)
+      .select()
+      .single();
+  }else{
+    result=await supabase
+      .from("servizi")
+      .update(payload)
+      .eq("id_servizio",id)
+      .select()
+      .single();
+  }
+  if(result.error){
+    console.error(result.error);
+    alert("Save error");
+    return false;
+  }
+  dirty=false;
+  if(isNew){
+    location.href=`service.html?id=${result.data.id_servizio}`;
+  }
+  return true;
+}
+
+/* BACK */
+window.requestBack=async function(){
+  if(!dirty){
+    history.back();
+    return;
+  }
+  const choice=await askSaveDialog();
+  if(choice==="cancel") return;
+  if(choice==="yes"){
+    const ok=await save();
+    if(!ok)return;
+  }
+  history.back();
+};
+
+/* SAVE DIALOG */
+function askSaveDialog(){
+  document.getElementById("saveDialog")
+    .style.display="flex";
+  return new Promise(resolve=>{
+    dialogResolve=resolve;
+  });
+}
+
+window.dialogAction=function(type){
+  document.getElementById("saveDialog")
+    .style.display="none";
+  dialogResolve(type);
+};  
+
+async function loadGenres(){
+  const {data,error}=await supabase
+    .from("servizi_genere")
+    .select("id_genere,gen_descrizione")
+    .order("gen_order",{ascending:true});
+  if(error){
+    console.error(error);
+    return;
+  }
+  id_genere.innerHTML=`<option value="">Genre...</option>`;
+  (data||[]).forEach(g=>{
+    id_genere.innerHTML+=`
+    <option value="${g.id_genere}">
+      ${g.gen_descrizione}
+    </option>`;
+  });
+}
+
+/* VALIDATION */
+function isComplete(){
+  return(
+    sv_servizio.value.trim()!=="" &&
+    id_genere.value!==""
+  );
+}
+
+/* ACTIVE BUTTON STATE */
+function updateActiveStatus(){
+  const active=statusBox.classList.contains("active");
+  statusBox.textContent=active?"✓":"";
+}
+
+/* INITIALIZE */
+sv_servizio.addEventListener("input",markDirty);
+sv_descrizione.addEventListener("input",markDirty);
+id_genere.addEventListener("change",markDirty);
+sv_livello.addEventListener("change",markDirty);
+
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Enter")return;
+  if(e.target.tagName==="TEXTAREA")return;
+  e.preventDefault();
+  const fields=[
+    "sv_servizio",
+    "sv_descrizione",
+    "sv_icona",
+    "id_genere",
+    "sv_livello"
+  ];
+  const index=fields.indexOf(e.target.id);
+  if(index>=0 && index<fields.length-1){
+    document.getElementById(fields[index+1]).focus();
+  }
+});
+
+await loadGenres();
+await load();
+updateIcon();
+updateActiveStatus();
+updateGuide();
+
+</script>
+</body>
+</html>  
+  
