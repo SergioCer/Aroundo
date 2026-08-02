@@ -133,7 +133,7 @@ body{
 }
 
 
-/* SOTTOCATEGORIE */
+/* subcategorie */
 .subcategory-row{
     display:flex;
     align-items:center;
@@ -315,22 +315,22 @@ await requireAuth();
 import { supabase } from "../supabase.js";
 
 let categorie=[];
-let sottocategorie=[];
+let subcategorie=[];
 let expanded=new Set();
 let currentCategoria=null;
 
 /* LOAD DATI */
 async function load(){
     const c=await supabase.from("categorie").select("*").order("mc_ordine",{ascending:true});
-    const s=await supabase.from("sottocategorie").select("*").order("sc_ordine",{ascending:true});
+    const s=await supabase.from("subcategorie").select("*").order("sc_ordine",{ascending:true});
     categorie=c.data||[];
-    sottocategorie=s.data||[];
+    subcategorie=s.data||[];
     render();
 }
 
 /* HELP */
 function getSubcategorie(id_categoria){
-    return sottocategorie.filter(s=>s.id_categoria==id_categoria);
+    return subcategorie.filter(s=>s.id_categoria==id_categoria);
 }
 
 function render(){
@@ -412,7 +412,7 @@ function render(){
 function initSortable(){
     const container=document.getElementById("categorieContainer");
     new Sortable(container,{animation:150,handle:".drag-handle",onEnd:async()=>{const items=[...container.querySelectorAll(".category-box")];for(let i=0;i<items.length;i++){await supabase.from("categorie").update({mc_ordine:i+1}).eq("id_categoria",items[i].dataset.id);}load();}});
-    document.querySelectorAll(".category-panel").forEach(panel=>{new Sortable(panel,{animation:150,handle:".drag-handle",draggable:".subcategory-row",onEnd:async()=>{const rows=[...panel.querySelectorAll(".subcategory-row")];for(let i=0;i<rows.length;i++){await supabase.from("sottocategorie").update({sc_ordine:i+1}).eq("id_subcategoria",rows[i].dataset.id);}load();}});});
+    document.querySelectorAll(".category-panel").forEach(panel=>{new Sortable(panel,{animation:150,handle:".drag-handle",draggable:".subcategory-row",onEnd:async()=>{const rows=[...panel.querySelectorAll(".subcategory-row")];for(let i=0;i<rows.length;i++){await supabase.from("subcategorie").update({sc_ordine:i+1}).eq("id_subcategoria",rows[i].dataset.id);}load();}});});
 }
 
 window.openAdd=(id_categoria)=>{
