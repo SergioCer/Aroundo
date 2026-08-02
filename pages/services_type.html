@@ -84,6 +84,13 @@ body{
     font-weight:500;
 }
 
+.genre-description{
+    margin:0 0 10px 50px;
+    background:#e6fafc;
+    padding:14px;
+    border-radius:22px;
+}    
+
 /* ICONE */
 .material-symbols-outlined{
     font-size:20px;
@@ -127,6 +134,14 @@ body{
 .genre-panel{
     padding:14px;
 }
+
+.genre-count{
+    width:28px;
+    text-align:center;
+    color:#6b7280;
+    font-size:11px;
+    font-weight:500;
+}    
 
 /* SERVIZI */
 .service-row{
@@ -176,6 +191,11 @@ body{
     box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
+.dialog-label{
+    display:block;
+    margin-top:14px;
+}    
+
 .dialog-title{
     text-align:center;
     font-weight:bold;
@@ -206,6 +226,18 @@ body{
     font-weight:bold;
 }
 
+.dialog-textarea{
+    width:100%;
+    box-sizing:border-box;
+    margin-top:6px;
+    padding:10px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    resize:vertical;
+    font-family:inherit;
+    font-size:14px;
+}
+    
 .btn-green{
     background:#22c55e;
     color:white;
@@ -284,24 +316,11 @@ body{
                 id="renameDescrizione"
                 type="text"
                 maxlength="80">
-            <label style="display:block;margin-top:14px;">
+            <label class="dialog-label">
                 Descrizione estesa
             </label>
-            <textarea
-                id="renameEstesa"
-                rows="4"
-                maxlength="500"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    margin-top:6px;
-                    padding:10px;
-                    border:1px solid #d1d5db;
-                    border-radius:8px;
-                    resize:vertical;
-                    font-family:inherit;
-                    font-size:14px;
-                "></textarea>
+            <textarea id="renameEstesa" rows="4" maxlength="500" class="dialog-textarea">
+            </textarea>
         </div>            
     </div>
         <div class="dialog-buttons">
@@ -328,7 +347,6 @@ import { supabase } from "../supabase.js";
 let generi = [];
 let servizi = [];
 let expanded = new Set();
-let editingGenere = null;
 let currentGenere = null;
     
 /* LOAD DATI                                             */
@@ -375,7 +393,7 @@ function render() {
             ${open ? "▼" : "▶"}
           </span>
           <!-- NUMERO SERVIZI (blocco fisso 2 cifre) -->
-          <span class="genre-count" style="width:28px; text-align:center;">
+          <span class="genre-count">
             ${String(list.length).padStart(2, "0")}
           </span>
           <!-- ICONA MATERIAL -->
@@ -410,11 +428,7 @@ function render() {
       panel.className = "genre-panel";
       /* DESCRIZIONE ESTESA */
       const ext = document.createElement("div");
-        ext.style.marginBottom = "10px";
-        ext.style.marginLeft = "50px";
-        ext.style.background = "#e6fafc";
-        ext.style.padding = "14px";
-        ext.style.borderRadius = "22px";
+        ext.className = "genre-description";
         ext.textContent = g.gen_descrizione_estesa || "";
       panel.appendChild(ext);
 
