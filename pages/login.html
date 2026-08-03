@@ -134,10 +134,10 @@ button.action-button {
 <body>
 <div class="login-box">
 <div class="login-header">
-    <button class="button-back"
-            onclick="history.back()"
-            aria-label="Back">
-    </button>
+  <button id="backBtn"
+        class="button-back"
+        aria-label="Back">
+  </button>
 </div>
   
 <img src="../icon-512.png" alt="Aroundo">
@@ -252,6 +252,10 @@ document.getElementById('togglePassword')
 document.getElementById('loginErrorOkBtn').addEventListener('click', () => {
   document.getElementById('loginErrorDialog').style.display = 'none';
 });
+
+document.getElementById("backBtn").onclick=function(){
+  window.location.href="../index.html";
+};
   
 document.getElementById('registerLink').addEventListener('click', (e) => {
   e.preventDefault();
