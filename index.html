@@ -680,7 +680,8 @@
     }
 
     .geo-status {
-      margin-top: 4px;
+      margin-top: 2px;
+      margin-bottom: 4px;
       text-align: center;
       font-size: 12px;
       font-weight: 500;
@@ -771,7 +772,7 @@
       flex-direction: column;  /* impila elementi verticalmente */
       align-items: center;
       gap: 2px;
-      width: 200px;     /* Larghezza */
+      width: 190px;     /* Larghezza */
       height: 66px;     /* Altezza */
       padding: 2px 20px;
       font-size: 12px;
@@ -787,7 +788,7 @@
     }    
 
     .date-day {
-      font-size: 14px;
+      font-size: 12px;
       text-align: center;
       top: 12px;
     }
@@ -807,7 +808,7 @@
     }
       
     .time-slider {
-      width: 80%;
+      width: 75%;
     }
 
     .toggle-pill {
@@ -874,15 +875,14 @@
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:4px;">
     📲 Install Aroundo
   </div>
-    <div id="geoStatus" class="geo-status">
-    <span id="geoDot"></span>
-    <span id="geoText"></span>
-  </div>
-
     <div class="qr-container">
       <button id="shareBtn" class="qr-side-btn share-btn"><span class="material-symbols-outlined">share</span></button>
       <img id="QR" src="qr.png">
       <button id="infoBtn" class="qr-side-btn info-btn"><span class="material-symbols-outlined">info</span></button>
+    </div>
+    <div id="geoStatus" class="geo-status">
+      <span id="geoDot"></span>
+      <span id="geoText"></span>
     </div>
   
   </div>
@@ -1822,11 +1822,11 @@ oms.addListener('click', function (marker) {
     function updateGeoStatus(active) {
       if (active) {
         geoDot.style.background = "#22c55e";
-        geoText.textContent = "Geo active";
+        geoText.textContent = "Location enabled";
         geoText.style.color = "#22c55e";
       } else {
         geoDot.style.background = "#ef4444";
-        geoText.textContent = "Geo inactive";
+        geoText.textContent = "Location denied";
         geoText.style.color = "#ef4444";
       }
     }
