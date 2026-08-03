@@ -76,6 +76,10 @@ body {
   }
 }
 
+#logoutBtn{
+  cursor:pointer;
+}
+  
 </style>
 </head>
 <body>
@@ -98,8 +102,8 @@ body {
         <a href="analytics.html">Analytics</a>
         <a href="why-aroundo.html">Why Aroundo</a>
         <a href="account.html" class="in-progress">Account</a>
+        <a id="logoutBtn">Logout</a>
         <a href="../index.html">Aroundo</a>
-        <a href="javascript:void(0)" id="logoutBtn">Logout</a>
       </nav>
     </aside>
     <main class="content">
@@ -149,6 +153,59 @@ OK
 </button>
 </div>
 </div>
+
+<div id="logoutDialog" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+z-index:99999;
+align-items:center;
+justify-content:center;
+">
+<div style="
+background:white;
+padding:22px;
+border-radius:12px;
+width:300px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+">
+<div style="margin-bottom:18px;font-weight:600;">
+Confirm exit?
+</div>
+
+<button onclick="confirmLogout(true)" style="
+width:45%;
+background:#22c55e;
+color:white;
+border:none;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+">
+Yes
+</button>
+
+<button onclick="confirmLogout(false)" style="
+width:45%;
+background:#ef4444;
+color:white;
+border:none;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+">
+No
+</button>
+
+</div>
+</div>  
   
 </body>
 </html>
@@ -161,14 +218,14 @@ import { supabase } from '../supabase.js';
 
 import { logout } from './auth-check.js';
 
-  const { data, error } = await supabase.auth.getSession();
-    if (error || !data.session) {
-      window.location.href = "login.html";
-    }
+// CANCELLARE DUPLICATO   const { data, error } = await supabase.auth.getSession();
+//    if (error || !data.session) {
+//      window.location.href = "login.html";
+//    }
 
 window.showMessage=function(text){
 document.getElementById("messageText").textContent=text;
-document.getElementById("messageDialog").style.display="flex";
+document.getElementById("").style.display="flex";
 }
 
 window.closeMessage=function(){
@@ -184,10 +241,15 @@ document.querySelectorAll('.in-progress').forEach(link => {
 
 document.getElementById("logoutBtn").onclick=async function(e){
   e.preventDefault();
-  await logout();
-  window.location.href="../index.html";
+  document.getElementById("logoutDialog").style.display="flex";
 };  
   
+window.confirmLogout=async function(value){
+  document.getElementById("logoutDialog").style.display="none";
+  if(value){
+    await logout();
+    window.location.href="../index.html";
+  }
+};
   
 </script>
-
