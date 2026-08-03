@@ -1965,12 +1965,12 @@ oms.addListener('click', function (marker) {
     }
 
     window.enableLocation=function(){
-      closeGeoDialog();
+      window.closeGeoDialog();
       acquireLocation();
     }
 
     window.continueWithoutLocation=function(){
-      closeGeoDialog();
+      window.closeGeoDialog();
       analyticsGPS(false);
       updateGeoStatus(false);
       map.setView([defaultLat,defaultLng],defaultZoom);
