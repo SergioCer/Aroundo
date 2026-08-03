@@ -1186,7 +1186,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
   // 4. Verifica se Geolocalizzazione Attiva o Disattiva
-  const geoState=await checkGeoPermission();
+  // const geoState=await checkGeoPermission();    VERIFICA ERRORE
+  const state="denied";
     switch(geoState){
     case "granted":
       acquireLocation();
