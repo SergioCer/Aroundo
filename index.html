@@ -1070,6 +1070,10 @@ OK
   const defaultLat = 37.87; /* 37.55 */
   const defaultLng = 12.69; /* 14.1 */
   const defaultZoom = 10; /* 9 */
+  const geoStatus = document.getElementById("geoStatus");
+  const geoDot = document.getElementById("geoDot");
+  const geoText = document.getElementById("geoText");
+  const geoDialog = document.getElementById("geoDialog");
   const dayText = document.getElementById("day-text");
   const dateText = document.getElementById("date-text");
   const slider = document.getElementById('time-range');
@@ -1926,12 +1930,7 @@ oms.addListener('click', function (marker) {
     }
   }
 
-    // Verifica se Geolocalizzazione è Attiva o Disattiva
-    const geoStatus = document.getElementById("geoStatus");
-    const geoDot = document.getElementById("geoDot");
-    const geoText = document.getElementById("geoText");
-    const geoDialog = document.getElementById("geoDialog");
-  
+  // Verifica se Geolocalizzazione è Attiva o Disattiva
   function updateGeoStatus(active) {
       if (active) {
         geoDot.style.background = "#22c55e";
