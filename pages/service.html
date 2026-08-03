@@ -360,6 +360,7 @@ function updateGuide(){
       el.classList.add("guide-complete");
     }
   });
+  
   const next=guideSteps.find(s=>!s.valid());
   if(next){
     document.getElementById(next.id).classList.add("guide-active");
