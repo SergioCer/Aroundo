@@ -871,8 +871,8 @@
     <span>A</span><span>R</span><span>O</span><span>U</span><span>N</span><span>D</span><span>O</span>
   </div>
   <div class="subtitle">Discover what's Around•you</div>
-  <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;"></div>
-  <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:4px;">
+  <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;margin-bottom:4px;"></div>
+  <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:2px;margin-bottom:4px;">
     📲 Install Aroundo
   </div>
     <div class="qr-container">
@@ -1828,6 +1828,7 @@ oms.addListener('click', function (marker) {
         geoDot.style.background = "#ef4444";
         geoText.textContent = "Location denied";
         geoText.style.color = "#ef4444";
+        geoText.text-decoration ="underline";
       }
     }
 
