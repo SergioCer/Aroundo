@@ -834,7 +834,7 @@
     gap:10px;
   }
 
-  #shareQR{
+  #QR{
     width:80px;
     height:80px;
   }
@@ -870,7 +870,7 @@
   <div class="title">
     <span>A</span><span>R</span><span>O</span><span>U</span><span>N</span><span>D</span><span>O</span>
   </div>
-  <div class="subtitle">Discover what's Around.you</div>
+  <div class="subtitle">Discover what's Around•you</div>
   <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;"></div>
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:4px;">
     📲 Install Aroundo
@@ -882,7 +882,7 @@
 
     <div class="qr-container">
       <button id="shareBtn" class="qr-side-btn share-btn"><span class="material-symbols-outlined">share</span></button>
-      <img id="shareQR" src="qr.png">
+      <img id="QR" src="qr.png">
       <button id="infoBtn" class="qr-side-btn info-btn"><span class="material-symbols-outlined">info</span></button>
     </div>
   
@@ -1165,7 +1165,7 @@ document.getElementById("shareBtn").onclick = async () => {
     if(navigator.share){
       await navigator.share({
         title:"Aroundo",
-        text:"Discover what's Around.you",
+        text:"Discover what's Around•you",
         url:SHARE_URL
       });
     }else{
