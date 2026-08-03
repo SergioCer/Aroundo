@@ -272,6 +272,8 @@ async function load(){
     setActiveStatus(true);
     updateIcon();
     updateColor();
+    setTimeout(updateGuide,100);
+    sc_descrizione.focus();
     return;
   }
   const {data}=await supabase
@@ -290,6 +292,29 @@ async function load(){
   updateIcon();
   updateColor();
 }
+
+/* GUIDE */
+const guideSteps=[
+  {id:"sc_descrizione",valid:()=>sc_descrizione.value.trim()!==""},
+  {id:"sc_note",valid:()=>sc_note.value.trim()!==""},
+  {id:"sc_icona",valid:()=>sc_icona.value.trim()!==""},
+  {id:"id_categoria",valid:()=>id_categoria.value!==""}
+];
+
+function updateGuide(){
+  guideSteps.forEach(s=>{
+    const el=document.getElementById(s.id);
+    el.classList.remove("guide-active","guide-complete");
+    if(s.valid()){
+      el.classList.add("guide-complete");
+    }
+  });
+  
+  const next=guideSteps.find(s=>!s.valid());
+  if(next){
+    document.getElementById(next.id).classList.add("guide-active");
+  }
+}  
 
 /* ACTIVE STATUS */
 window.changeActiveStatus=function(){
@@ -326,6 +351,7 @@ window.markDirty=function(){
   });
   dirty=current!==original;
   backBtn.classList.toggle("dirty",dirty);
+  updateGuide();
 };
 
 /* SAVE */
@@ -393,7 +419,8 @@ async function loadCategories(){
 /* INIT */
 await loadCategories();
 await load();
-
+updateGuide();
+  
 </script>
 </body>
 </html>
