@@ -679,11 +679,13 @@
       margin-left: 2px;
     }
 
-    .geo-status {
-      margin-top: 4px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 500;
+    .geo-status{
+      margin-top:4px;
+      text-align:center;
+      font-size:12px;
+      font-weight:500;
+      cursor:pointer;
+      user-select:none;
     }
 
     #geoDot {
@@ -694,6 +696,63 @@
       margin-right: 5px;
       background: #ef4444;
     }
+
+  .dialog-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.40);
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
+}
+
+.dialog{
+  width:340px;
+  background:white;
+  border-radius:12px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.dialog-title{
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:18px;
+}
+
+.dialog-text{
+  text-align:center;
+  color:#555;
+  font-size:14px;
+  line-height:1.4;
+  margin-bottom:20px;
+}
+
+.dialog-buttons{
+  display:flex;
+  gap:10px;
+}
+
+.dialog-buttons button{
+  flex:1;
+  border:none;
+  border-radius:8px;
+  padding:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.btn-green{
+  background:#22c55e;
+  color:white;
+}
+
+.btn-red{
+  background:#ef4444;
+  color:white;
+}
+    
     
     @keyframes tickerScroll{
       from{
@@ -968,10 +1027,32 @@ OK
 </button>
 </div>
 </div>
+
+
+<div id="geoDialog" class="dialog-overlay">
+  <div class="dialog">
+    <div class="dialog-title">
+      Enable location
+    </div>
+    <div class="dialog-text">
+      Aroundo works perfectly without your location.<br><br>
+      Enabling it simply helps discover nearby events and improves your experience.
+    </div>
+    <div class="dialog-buttons">
+      <button class="btn-green" onclick="enableLocation()">
+        Enable location
+      </button>
+      <button class="btn-red" onclick="continueWithoutLocation()">
+        Continue without
+      </button>
+    </div>
+  </div>
+</div>
+
   
 <script type="module">
   import { supabase } from './supabase.js';
-  import { trackEvent, trackGPSDecision } from './app-events.js'; // Vecchie statistiche
+  // CANCELLARE import { trackEvent, trackGPSDecision } from './app-events.js'; // Vecchie statistiche
   import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin } from './analytics-events.js'; // Nuove statistiche
   
   let categories = [];
@@ -1093,49 +1174,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   icons[cat.id_categoria] = createIcon(cat.mc_colore);
   });
   events = await fetchEvents();
-  // 2. Prova a ottenere la posizione dell'utente
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-      (pos) => {
-      trackGPSDecision("GPS_GRANTED"); // vecchie statistiche
-      analyticsGPS(true);  // nuove statistiche
-      const userLat = pos.coords.latitude;
-      const userLng = pos.coords.longitude;
-      // Calcolo approssimativo dello zoom in base agli eventi vicini
-      const nearbyEvents = events.filter(e => {
-      const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
-      return distance <= 25000; // 25 km
-      });
-      let zoomLevel = 10; // Provincia
-      if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
-      else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
-      else zoomLevel = 9; // Regione
-      console.warn("Posizione ottenuta, Eventi presenti in zona <25Km:", nearbyEvents.length);
-      map.setView([userLat, userLng], zoomLevel);
-      },
-      (err) => {
-      trackGPSDecision("GPS_PERMISSION_DENIED"); // vecchie statistiche
-      analyticsGPS(false); // nuove statistiche
-      console.warn("Aroundo works best with location access enabled. If not available, default coordinates will be used.");
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
-      );
-    } else {
-      console.warn("Browser non supporta geolocalizzazione");
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
-  // 3. Crea il menu Categorie
+  // 2. Crea il menu Categorie
   buildCategoryMenu();
-  // 4. inizializza checkbox con tutti selezionati
+  // 3. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
-  // 5. Verifica se Geolocalizzazione Attiva o Disattiva
-  checkGeoStatus()
+  // 4. Verifica se Geolocalizzazione Attiva o Disattiva
+  const geoState=await checkGeoPermission();
+    switch(geoState){
+    case "granted":
+      acquireLocation();
+      break;
+    case "denied":
+      map.setView([defaultLat,defaultLng],defaultZoom);
+      break;
+    case "prompt":
+      openGeoDialog();
+      break;
+  }
   setupTimeline();
   renderEvents();
   updateDateUI();
   updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news.
-  trackEvent("APP_OPEN"); // vecchie statistiche
-  analyticsOpen(); // Nuove statistiche
+  analyticsOpen();
 });
       
     noUiSlider.create(slider, {
@@ -1157,6 +1217,57 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
 
+  //  Posizione dell'utente
+  async function acquireLocation(){
+    if(!navigator.geolocation){
+      map.setView([defaultLat,defaultLng],defaultZoom);
+      return;
+    }
+      navigator.geolocation.getCurrentPosition(
+      (pos) => {
+      analyticsGPS(true);
+      const userLat = pos.coords.latitude;
+      const userLng = pos.coords.longitude;
+      // Calcolo approssimativo dello zoom in base agli eventi vicini
+      const nearbyEvents = events.filter(e => {
+      const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
+      return distance <= 25000; // 25 km
+      });
+      let zoomLevel = 10; // Provincia
+      if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
+      else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
+      else zoomLevel = 9; // Regione
+      map.setView([userLat, userLng], zoomLevel);
+      },
+      ()=>{
+        analyticsGPS(false);
+        map.setView([defaultLat,defaultLng],defaultZoom);
+        updateGeoStatus(false);
+      }
+    );
+  }
+
+  const state=await checkGeoPermission();
+    switch(state){
+    case "granted":
+        acquireLocation();
+        break;
+    case "denied":
+        map.setView([defaultLat,defaultLng],defaultZoom);
+        break;
+    case "prompt":
+        openGeoDialog();
+        break;
+    }  
+    map.setView([defaultLat,defaultLng],defaultZoom);
+    updateGeoStatus(false);
+    closeGeoDialog();
+    geoStatus.onclick=function(){
+        if(geoText.textContent==="Location denied"){
+            openGeoDialog();
+        }
+    };
+  
 document.getElementById("shareBtn").onclick = async () => {
   await trackEvent("SHARE_CLICK");
   await analyticsShare();
@@ -1819,32 +1930,74 @@ oms.addListener('click', function (marker) {
     const geoStatus = document.getElementById("geoStatus");
     const geoDot = document.getElementById("geoDot");
     const geoText = document.getElementById("geoText");
-    function updateGeoStatus(active) {
+    
+  function updateGeoStatus(active) {
       if (active) {
         geoDot.style.background = "#22c55e";
-        geoText.textContent = "Geo active";
+        geoText.textContent = "Location enabled";
         geoText.style.color = "#22c55e";
       } else {
         geoDot.style.background = "#ef4444";
-        geoText.textContent = "Geo inactive";
+        geoText.textContent = "Location denied";
         geoText.style.color = "#ef4444";
       }
     }
 
+    geoStatus.onclick=function(){
+      if(geoText.textContent==="Location denied"){
+        openGeoDialog();
+      }
+    };
+
     // aggiornamento quando ritorni nell'app
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        checkGeoStatus();
+        await checkGeoPermission();
       }
     });
 
-    function checkGeoStatus() {
-        navigator.geolocation.getCurrentPosition(
-            () => {updateGeoStatus(true);},
-            () => {updateGeoStatus(false);},
-            {timeout:5000});
+//   CANCELLARE vecchia gestione  
+//   function checkGeoStatus() {
+//        navigator.geolocation.getCurrentPosition(
+//            () => {updateGeoStatus(true);},
+//            () => {updateGeoStatus(false);},
+//            {timeout:5000});
+//    }
+
+    window.openGeoDialog=function(){
+      geoDialog.style.display="flex";
     }
-    
+
+    window.closeGeoDialog=function(){
+      geoDialog.style.display="none";
+    }
+
+    window.enableLocation=function(){
+      closeGeoDialog();
+      acquireLocation();
+    }
+
+    window.continueWithoutLocation=function(){
+      closeGeoDialog();
+      analyticsGPS(false);
+      updateGeoStatus(false);
+      map.setView([defaultLat,defaultLng],defaultZoom);
+    }
+
+  async function checkGeoPermission(){
+    if(!navigator.permissions){
+      updateGeoStatus(false);
+      return "prompt";
+    }
+    const permission=await navigator.permissions.query({name:"geolocation"});
+    if(permission.state==="granted"){
+      updateGeoStatus(true);
+    }else{
+      updateGeoStatus(false);
+    }
+    return permission.state;
+  }
+  
     // Calcola il range della Timeline
     function getTimelineRange () {
       let start, end;
