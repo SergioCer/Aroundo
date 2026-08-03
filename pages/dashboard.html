@@ -159,7 +159,7 @@ import { requireAuth } from './auth-check.js';
   
 import { supabase } from '../supabase.js';
 
-import { logout } from './pages/auth-check.js';
+import { logout } from './auth-check.js';
 
   const { data, error } = await supabase.auth.getSession();
     if (error || !data.session) {
