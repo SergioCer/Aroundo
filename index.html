@@ -826,25 +826,39 @@
       }
     }
 
-    #shareArea{
-        margin-top: 2px;
-        text-align:center;
-    }
+  .qr-container{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
 
-    #shareQR{
-        width:80px;
-        height:80px;
-        border-radius:0px;
-        cursor:pointer;
-    }
+  #shareQR{
+    width:80px;
+    height:80px;
+  }
 
-    #shareText{
-        margin-top:-2px;
-        font-size:11px;
-        color:#999;
-        letter-spacing:0.6px;
-        font-weight: bold;    
-    }    
+  .qr-side-btn{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    color:white;
+    cursor:pointer;
+    font-size:20px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .share-btn{
+    background:#3b82f6;
+  }
+
+  .info-btn{
+    background:#f59e0b;
+  }    
 
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
@@ -855,6 +869,7 @@
   <div class="title">
     <span>A</span><span>R</span><span>O</span><span>U</span><span>N</span><span>D</span><span>O</span>
   </div>
+  <div class="subtitle">Discover what's Around.you</div>
   <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;"></div>
   <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#22c55e;text-decoration:underline;margin-top:4px;">
     📲 Install Aroundo
@@ -863,12 +878,16 @@
     <span id="geoDot"></span>
     <span id="geoText"></span>
   </div>
-    <div class="subtitle">Discover what's around you</div>
-      <div id="shareArea">
-        <img src="qr.png" id="shareQR" alt="Share Aroundo">
+
+    <div class="qr-container">
+      <button id="shareBtn" class="qr-side-btn share-btn"><span class="material-symbols-outlined">share</span></button>
+      <img id="shareQR" src="qr.png">
+      <button id="infoBtn" class="qr-side-btn info-btn"><span class="material-symbols-outlined">info</span></button>
     </div>
+  
   </div>
 <div id="overlayToggle">🔓</div>
+  
 <div class="map-overlay2" id="category-menu">
 <div class="menu-header filter-all-container">
   <label class="toggle-pill" title="Select all categories">
@@ -1138,18 +1157,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
 
-document.getElementById("shareQR").onclick = async () => {
-  await trackEvent("SHARE_CLICK"); // vecchie statistiche
-  await analyticsShare(); // nuove statistiche
-    if (navigator.share) {
-        await navigator.share({
-            title: "Aroundo",
-            text: "Discover what's around you",
-            url: SHARE_URL
-        });
-    } else {
-        await navigator.clipboard.writeText(SHARE_URL);
+document.getElementById("shareBtn").onclick = async () => {
+  await trackEvent("SHARE_CLICK");
+  await analyticsShare();
+  try{
+    if(navigator.share){
+      await navigator.share({
+        title:"Aroundo",
+        text:"Discover what's Around.you",
+        url:SHARE_URL
+      });
+    }else{
+      await navigator.clipboard.writeText(SHARE_URL);
     }
+  }catch(e){
+    console.log("Share cancelled");
+  }
+};
+
+  /* Richiama la pagina Info */
+  document.getElementById("infoBtn").onclick=function(){
+   window.location.href="pages/why-aroundo.html";
 };
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
