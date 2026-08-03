@@ -1263,9 +1263,6 @@ const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
         openGeoDialog();
         break;
     }  
-    map.setView([defaultLat,defaultLng],defaultZoom);
-    updateGeoStatus(false);
-    closeGeoDialog();
     geoStatus.onclick=function(){
         if(geoText.textContent==="Location denied"){
             openGeoDialog();
