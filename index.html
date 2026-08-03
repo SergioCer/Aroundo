@@ -866,7 +866,6 @@
     <div class="subtitle">Discover what's around you</div>
       <div id="shareArea">
         <img src="qr.png" id="shareQR" alt="Share Aroundo">
-        <div id="shareText">Scan · Share</div>
     </div>
   </div>
 <div id="overlayToggle">🔓</div>
@@ -953,7 +952,6 @@ OK
   
 <script type="module">
   import { supabase } from './supabase.js';
-  import { logout } from './pages/auth-check.js';
   import { trackEvent, trackGPSDecision } from './app-events.js'; // Vecchie statistiche
   import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin } from './analytics-events.js'; // Nuove statistiche
   
@@ -1034,14 +1032,15 @@ OK
     // Seleziona il div "Login"
     const loginBtn = document.getElementById('loginBtn');
     const { data } = await supabase.auth.getSession();
-    if (data.session) {
-        loginBtn.textContent = "Logout";
-        loginBtn.style.color = "#ef4444"; // rosso
-        loginBtn.onclick = async function() {
-            await logout();
+      if(data.session){
+        loginBtn.textContent="Dashboard";
+        loginBtn.style.color="#3b82f6";
+        loginBtn.onclick=()=>{
+            window.location.href="pages/dashboard.html";
         };
     } else {
         loginBtn.textContent = "Login";
+        loginBtn.style.color="";
         loginBtn.onclick = async function() {
             await analyticsLogin();
             window.location.href = 'pages/login.html';
