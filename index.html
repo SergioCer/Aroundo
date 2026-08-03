@@ -1950,19 +1950,11 @@ oms.addListener('click', function (marker) {
     };
 
     // aggiornamento quando ritorni nell'app
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
+    document.addEventListener("visibilitychange", async () => {
+      if(document.visibilityState==="visible"){
         await checkGeoPermission();
       }
     });
-
-//   CANCELLARE vecchia gestione  
-//   function checkGeoStatus() {
-//        navigator.geolocation.getCurrentPosition(
-//            () => {updateGeoStatus(true);},
-//            () => {updateGeoStatus(false);},
-//            {timeout:5000});
-//    }
 
     window.openGeoDialog=function(){
       geoDialog.style.display="flex";
