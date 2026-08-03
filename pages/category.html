@@ -387,6 +387,10 @@ window.requestBack=async function(){
     history.back();
     return;
   }
+  if(!sc_descrizione.value.trim()){
+    sc_descrizione.focus();
+    return;
+  }  
   document.getElementById("saveDialog").style.display="flex";
 };
 
