@@ -356,6 +356,10 @@ window.markDirty=function(){
 
 /* SAVE */
 async function save(){
+    if(!sc_descrizione.value.trim()){
+    sc_descrizione.focus();
+    return;
+  }
   const payload={
     sc_descrizione:sc_descrizione.value.trim(),
     sc_note:sc_note.value.trim(),
@@ -387,17 +391,18 @@ window.requestBack=async function(){
     history.back();
     return;
   }
-  if(!sc_descrizione.value.trim()){
-    sc_descrizione.focus();
-    return;
-  }  
   document.getElementById("saveDialog").style.display="flex";
 };
 
 window.dialogAction=function(type){
   document.getElementById("saveDialog").style.display="none";
   if(type==="yes"){
-    save().then(()=>history.back());
+    if(!sc_descrizione.value.trim()){
+      updateGuide();
+      sc_descrizione.focus();
+      return;
+    }
+  save().then(()=>history.back());
   }
   if(type==="no"){
     dirty=false;
