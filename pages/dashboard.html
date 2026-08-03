@@ -97,8 +97,9 @@ body {
         <a href="coverage.html">Coverage</a>
         <a href="analytics.html">Analytics</a>
         <a href="why-aroundo.html">Why Aroundo</a>
-        <a href="login.html">Login</a>
+        <a href="account.html" class="in-progress">Account</a>
         <a href="../index.html">Aroundo</a>
+        <a href="#" id="logoutBtn">Logout</a>
       </nav>
     </aside>
     <main class="content">
@@ -161,10 +162,15 @@ OK
     if (error || !data.session) {
       window.location.href = "login.html";
     }
-    if (!data.session) {
-      window.location.href="login.html";
-    }  
 
+import { logout } from './pages/auth-check.js';
+
+document.getElementById("logoutBtn").onclick=async function(e){
+  e.preventDefault();
+  await logout();
+  window.location.href="../index.html";
+};  
+  
 window.showMessage=function(text){
 document.getElementById("messageText").textContent=text;
 document.getElementById("messageDialog").style.display="flex";
