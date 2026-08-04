@@ -1090,33 +1090,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   icons[cat.id_categoria] = createIcon(cat.mc_colore);
   });
   events = await fetchEvents();
-  // 2. Prova a ottenere la posizione dell'utente
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-      (pos) => {
-      analyticsGPS(true); 
-      const userLat = pos.coords.latitude;
-      const userLng = pos.coords.longitude;
-      // Calcolo approssimativo dello zoom in base agli eventi vicini
-      const nearbyEvents = events.filter(e => {
-      const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
-      return distance <= 25000; // 25 km
-      });
-      let zoomLevel = 10; // Provincia
-      if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
-      else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
-      else zoomLevel = 9; // Regione
-      // console.warn("Posizione ottenuta, Eventi presenti in zona <25Km:", nearbyEvents.length);
-      map.setView([userLat, userLng], zoomLevel);
-      },
-      (err) => {
-      analyticsGPS(false);
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
-      );
-    } else {
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
   // 3. Crea il menu Categorie
   buildCategoryMenu();
   // 4. inizializza checkbox con tutti selezionati
@@ -1147,6 +1120,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateMarkerVisibility(start, end);
     });
 
+// Autorizzazione per la posizione GPS dell'utente
+function requestUserLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+      (pos) => {
+      analyticsGPS(true); 
+      const userLat = pos.coords.latitude;
+      const userLng = pos.coords.longitude;
+      // Calcolo approssimativo dello zoom in base agli eventi vicini
+      const nearbyEvents = events.filter(e => {
+      const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
+      return distance <= 25000; // 25 km
+      });
+      let zoomLevel = 10; // Provincia
+      if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
+      else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
+      else zoomLevel = 9; // Regione
+      // console.warn("Posizione ottenuta, Eventi presenti in zona <25Km:", nearbyEvents.length);
+      map.setView([userLat, userLng], zoomLevel);
+      },
+      (err) => {
+      analyticsGPS(false);
+      map.setView([defaultLat, defaultLng], defaultZoom);
+      }
+      );
+    } else {
+      map.setView([defaultLat, defaultLng], defaultZoom);
+      }
+  }
+    
 const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
 
 document.getElementById("shareBtn").onclick = async () => {
@@ -1837,12 +1840,22 @@ oms.addListener('click', function (marker) {
         geoDot.style.background = "#22c55e";
         geoText.textContent = "Location enabled";
         geoText.style.color = "#22c55e";
+        geoText.style.textDecoration = "none";
+        geoText.style.cursor = "default";
       } else {
         geoDot.style.background = "#f59e0b";
-        geoText.textContent = "Location disable";
+        geoText.textContent = "Enable location...";
         geoText.style.color = "#f59e0b";
+        geoText.style.textDecoration = "underline";
+        geoText.style.cursor = "pointer";
       }
     }
+
+    geoStatus.addEventListener("click", () => {
+    if (geoText.textContent === "Enable location...") {
+      requestUserLocation();
+    }
+  });
 
     // aggiornamento quando ritorni nell'app
     document.addEventListener("visibilitychange", () => {
