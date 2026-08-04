@@ -138,7 +138,7 @@ details li {
   direction:ltr;
 }
 
-#languageMenu  {
+#languageMenu button {
   width:100%;
   border:0;
   background:white;
@@ -148,7 +148,7 @@ details li {
   cursor:pointer;
 }
 
-#languageMenu :hover {
+#languageMenu button:hover {
   background:#ecf3fb;
 }
 
@@ -159,7 +159,7 @@ details li {
 
 @media(max-width:600px){
 
-  #language {
+  #languageButton {
     font-size:14px;
     min-width:100px;
     padding:6px 8px;
@@ -183,11 +183,16 @@ details li {
   justify-content:space-between;
   align-items:center;
   ">
-  < class="button-back" onclick="history.back()" aria-label="Back"></button>
-        <div class="language-selector">
-  <button id="languageButton"></button>
+  <button
+      class="button-back"
+      onclick="history.back()"
+      aria-label="Back">
+  </button>
+      <div class="language-selector">
+        <button id="languageButton">
+        </button>
         <div id="languageMenu">
-      </div>
+        </div>
     </div>  
   </div>
 </div>  
@@ -294,7 +299,7 @@ href="login.html"
 class="button"
 data-lang="backToLogin">
 </a>
-  
+
 <script>
 const details = document.querySelectorAll("details");
 
