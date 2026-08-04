@@ -88,7 +88,15 @@
     .title span:nth-child(5) { transform: translateY(1px) rotate(6deg); }
     .title span:nth-child(6) { transform: translateY(4px) rotate(12deg); }
     .title span:nth-child(7) { transform: translateY(8px) rotate(18deg); }
-      
+
+    .title,
+    .title span,
+    .subtitle {
+        user-select: none;
+        -webkit-user-select: none;
+        pointer-events: none;
+    }
+    
     /* Sotto titolo */
     .subtitle {
       display: flex;
