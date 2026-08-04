@@ -1153,10 +1153,12 @@ function requestUserLocation() {
       },
       (err) => {
       analyticsGPS(false);
+      updateGeoError();        
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
     } else {
+      updateGeoError();
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
   }
@@ -1861,11 +1863,22 @@ oms.addListener('click', function (marker) {
       }
     }
 
-    geoStatus.addEventListener("click", () => {
-    if (geoText.textContent === "Enable location...") {
-      requestUserLocation();
+    function updateGeoError() {
+      geoDot.style.background = "#f59e0b";
+      geoText.textContent = "Verify GPS";
+      geoText.style.color = "#f59e0b";
+      geoText.style.textDecoration = "underline";
+      geoText.style.cursor = "pointer";
     }
-  });
+  
+    geoStatus.addEventListener("click", () => {
+      if (
+        geoText.textContent === "Enable location..." ||
+        geoText.textContent === "Verify GPS"
+      ) {
+        requestUserLocation();
+      }
+    });
 
     // aggiornamento quando ritorni nell'app
     document.addEventListener("visibilitychange", () => {
