@@ -1153,7 +1153,6 @@ function requestUserLocation() {
 const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
 
 document.getElementById("shareBtn").onclick = async () => {
-  await trackEvent("SHARE_CLICK");
   await analyticsShare();
   try{
     if(navigator.share){
