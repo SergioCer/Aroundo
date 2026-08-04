@@ -692,7 +692,7 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      margin-right: 5px;
+      margin-right: 3px;
       background: #ef4444;
     }
     
@@ -969,8 +969,7 @@ OK
   
 <script type="module">
   import { supabase } from './supabase.js';
-  import { trackEvent, trackGPSDecision } from './app-events.js'; // Vecchie statistiche
-  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin } from './analytics-events.js'; // Nuove statistiche
+  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin } from './analytics-events.js';
   
   let categories = [];
   let icons = {};
@@ -1095,8 +1094,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
       (pos) => {
-      trackGPSDecision("GPS_GRANTED"); // vecchie statistiche
-      analyticsGPS(true);  // nuove statistiche
+      analyticsGPS(true); 
       const userLat = pos.coords.latitude;
       const userLng = pos.coords.longitude;
       // Calcolo approssimativo dello zoom in base agli eventi vicini
@@ -1112,8 +1110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
-      trackGPSDecision("GPS_PERMISSION_DENIED"); // vecchie statistiche
-      analyticsGPS(false); // nuove statistiche
+      analyticsGPS(false);
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
@@ -1130,8 +1127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEvents();
   updateDateUI();
   updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news.
-  trackEvent("APP_OPEN"); // vecchie statistiche
-  analyticsOpen(); // Nuove statistiche
+  analyticsOpen();
 });
       
     noUiSlider.create(slider, {
@@ -1810,8 +1806,7 @@ oms.addListener('click', function (marker) {
 
   // Quando viene installata
   window.addEventListener('appinstalled', () => {
-    trackEvent("PWA_INSTALL"); // vecchie statistiche
-    analyticsInstall(); // nuove statistiche
+    analyticsInstall();
     document.getElementById("installBtn").style.display = "none";
   });
  
@@ -1844,7 +1839,7 @@ oms.addListener('click', function (marker) {
         geoText.style.color = "#22c55e";
       } else {
         geoDot.style.background = "#f59e0b";
-        geoText.textContent = "Location denied";
+        geoText.textContent = "Location disable";
         geoText.style.color = "#f59e0b";
       }
     }
