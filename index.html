@@ -117,8 +117,8 @@
 
     /* stato “mini” in alto a destra */
     .map-overlay.minimized {
-      top: 20px;
-      right: 10px;
+      top: 18px;
+      right: 2px;
       left: auto;
       transform: none;
       width: 32px;
@@ -131,8 +131,8 @@
     /* icona toggle */
     #overlayToggle {
       position: fixed;
-      top: 20px;
-      right: 10px;
+      top: 18px;
+      right: 2px;
       z-index: 1000;
       width: 32px;
       height: 32px;
@@ -148,8 +148,8 @@
     /* -- Rettangolo filtro categorie */
     .map-overlay2 {
       position: absolute;
-      top: 6px;
-      left: 10px;
+      top: 2px;
+      left: 6px;
       z-index: 999;
       background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
       padding: 2px 2px;     /* Contenitore */
@@ -166,18 +166,18 @@
     /* -- Rettangolo barra temporale */
     .top-timebar {
       position: absolute;
-      top: 6px;                      /* distanza dal bordo superiore */
-      left: 50%;                     /* centro orizzontale */
+      top: 2px;
+      left: 50%;
       transform: translateX(-50%);   /* centraggio reale */
       z-index: 998;
       display: flex;
       flex-direction: row;           /* elementi in riga su desktop */
       align-items: center;
       justify-content: center;       /* centrare internamente */
-      gap: 10px;                     /* distanza tra elementi interni */
-      width: 310px;                  /* dimensione reale del contenitore */
-      height: 90px;                  /* altezza fissa per contenuto */
-      padding: 2px 2px;              /* spazio interno */
+      gap: 10px;
+      width: 310px;
+      height: 90px;
+      padding: 2px 2px;
       border-radius: 16px;
       background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
       backdrop-filter: blur(8px);
@@ -597,7 +597,7 @@
     #day-text,
     #day-next-text {
       position: absolute;
-      top: 10px;       /* sopra lo slider */
+      top: 12px;       /* sopra lo slider */
     }
 
     #date-text {
@@ -664,7 +664,7 @@
       text-align: center;
       font-size: 9px;
       color: rgba(0,0,255,1);
-      bottom: 32px;
+      bottom: 26px;
       left: 0;
       right: 0;
       white-space: nowrap;
@@ -739,10 +739,10 @@
     }
 
     .map-overlay.minimized {
-      top: 20px;
-      right: 10px;
-      width: 36px;
-      height: 36px;
+      top: 18px;
+      right: 2px;
+      width: 32px;
+      height: 32px;
     }
 
     #overlayToggle {
@@ -752,7 +752,7 @@
     }
   
     .map-overlay2 {
-      top: 76px;
+      top: 74px;
       left: 0px;
       padding: 0px 0px;
       min-width: 120px;
@@ -766,9 +766,7 @@
     }
 
     .top-timebar {
-      top: 2px;                /* centro verticale circa + spostamento */
-      /* width: 60%;           /* si adatta allo schermo */
-      /* height: auto;         /* altezza flessibile */
+      top: 0px;
       flex-direction: column;  /* impila elementi verticalmente */
       align-items: center;
       gap: 2px;
@@ -1110,18 +1108,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
       else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
       else zoomLevel = 9; // Regione
-      console.warn("Posizione ottenuta, Eventi presenti in zona <25Km:", nearbyEvents.length);
+      // console.warn("Posizione ottenuta, Eventi presenti in zona <25Km:", nearbyEvents.length);
       map.setView([userLat, userLng], zoomLevel);
       },
       (err) => {
       trackGPSDecision("GPS_PERMISSION_DENIED"); // vecchie statistiche
       analyticsGPS(false); // nuove statistiche
-      console.warn("Aroundo works best with location access enabled. If not available, default coordinates will be used.");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
       );
     } else {
-      console.warn("Browser non supporta geolocalizzazione");
       map.setView([defaultLat, defaultLng], defaultZoom);
       }
   // 3. Crea il menu Categorie
