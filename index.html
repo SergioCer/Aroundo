@@ -1520,8 +1520,30 @@ oms.addListener('click', function (marker) {
         selectAllToggle.parentElement.classList.toggle('partial', partialChecked);  
         }
         menuItemsDiv.addEventListener('change', updateSelectAllToggle);
+      // Chiude l'elenco delle categorie facendo un click fuori. 
+      document.addEventListener('click', (event) => {
+      if (
+        menuItemsDiv.classList.contains('open') &&
+        !menuItemsDiv.contains(event.target) &&
+        !toggleBtn.contains(event.target)
+      ) {
+        menuItemsDiv.classList.remove('open');
+        menuItemsDiv.style.display = 'none';
+        arrow.textContent = '▼';
+        // Mantiene la tua logica di chiusura
+        const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        if (checkedCount === 0) {
+          checkboxes.forEach(cb => cb.checked = true);
+          selectAllToggle.checked = true;
+          updateSelectAllToggle();
+          updateMarkerVisibility();
+        }
       }
-
+    });
+ }
+  
+                                                       
     /* Compone il giorno ed il mese corrente nel rettangolo */  
     function updateDateUI() {
       // console.log("Aggiorno Data e mese", new Date().toLocaleTimeString());
