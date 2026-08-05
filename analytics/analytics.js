@@ -419,39 +419,26 @@ render();
 }
 
 // COLLAPSE SECTIONS
-
 document
 .querySelectorAll(
 ".collapse-btn"
 )
 .forEach(btn=>{
-
 btn.onclick=function(){
-
 document
-.querySelectorAll(
-".period-section"
-)
+.querySelectorAll(".period-section")
 .forEach(x=>{
-x.classList.remove(
-"open"
-);
+    x.classList.remove("open");
 });
-
-const target=
-document
-.getElementById(
-"section-"+this.dataset.target
+const target=document.getElementById(
+    "section-"+this.dataset.target
 );
-
-target.classList.add(
-"open"
-);
-};
+if(target)
+    target.classList.add("open");
+  };
 });
 
 // NAVIGAZIONE GIORNO
-
 document
 .getElementById("dayPrev")
 .onclick=
