@@ -66,10 +66,36 @@ info.ai_last_update
 render();
 }
 
-function filter(data,start,end){
+function filter(data,type,date){
 return data.filter(x=>{
 const d=new Date(x.an_date);
+if(type==="day"){
+return (
+d.getFullYear()===date.getFullYear() &&
+d.getMonth()===date.getMonth() &&
+d.getDate()===date.getDate()
+);
+}
+if(type==="week"){
+const start=new Date(date);
+const day=start.getDay() || 7;
+start.setDate(start.getDate()-day+1);
+const end=new Date(start);
+end.setDate(start.getDate()+6);
 return d>=start && d<=end;
+}
+if(type==="month"){
+return (
+d.getFullYear()===date.getFullYear() &&
+d.getMonth()===date.getMonth()
+);
+}
+if(type==="year"){
+return (
+d.getFullYear()===date.getFullYear()
+);
+}
+return false;
 });
 }
 
