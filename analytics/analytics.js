@@ -1,10 +1,8 @@
 import { supabase } from "../supabase.js";
 
-
 let rows=[];
 let currentPeriod="day";
 let currentDate=new Date();
-
 
 async function loadAnalytics(){
 
@@ -64,38 +62,22 @@ info.ai_last_update
 .toLocaleString("it-IT")
 :
 "-";
-
 render();
-
 }
-
-
 
 function filter(data,start,end){
-
 return data.filter(x=>{
-
 const d=new Date(x.an_date);
-
 return d>=start && d<=end;
-
 });
-
 }
-
-
 
 function getRange(type,date){
-
 let start=new Date(date);
 let end=new Date(date);
-
 if(type==="day"){
-
 }
-
 if(type==="week"){
-
 const day=start.getDay()||7;
 start.setDate(
 start.getDate()-day+1
@@ -104,44 +86,31 @@ end=new Date(start);
 end.setDate(
 start.getDate()+6
 );
-
 }
-
 if(type==="month"){
-
 start.setDate(1);
 end=new Date(
 start.getFullYear(),
 start.getMonth()+1,
 0
 );
-
 }
-
 if(type==="year"){
-
 start=new Date(
 start.getFullYear(),
 0,
 1
 );
-
 end=new Date(
 start.getFullYear(),
 11,
 31
 );
-
 }
-
 return {start,end};
-
 }
-
-
 
 function periodLabel(type,date){
-
 if(type==="day")
 return date.toLocaleDateString(
 "it-IT",
@@ -150,14 +119,11 @@ day:"numeric",
 month:"long"
 }
 );
-
 if(type==="week"){
-
 let r=getRange(
 type,
 date
 );
-
 return `${r.start.getDate()}-${r.end.getDate()} ${
 r.start.toLocaleDateString(
 "it-IT",
@@ -165,9 +131,7 @@ r.start.toLocaleDateString(
 month:"long"
 }
 )}`;
-
 }
-
 if(type==="month")
 return date.toLocaleDateString(
 "it-IT",
@@ -175,17 +139,11 @@ return date.toLocaleDateString(
 month:"long"
 }
 );
-
 return date.getFullYear();
-
 }
 
-
-
 function stats(data){
-
 let devices=new Set();
-
 let s={
 open:0,
 login:0,
@@ -199,86 +157,60 @@ gps:0,
 nogps:0
 };
 
-
 data.forEach(x=>{
 
 if(x.an_device)
 devices.add(x.an_device);
-
 s.open+=x.an_open||0;
 s.share+=x.an_share||0;
 s.more+=x.an_more||0;
 s.info+=x.an_info||0;
-
 if(x.an_login)
 s.login++;
-
 if(x.an_install)
 s.install++;
-
 if(x.an_app)
 s.app++;
 else
 s.web++;
-
 if(x.an_gps===true)
 s.gps++;
-
 if(x.an_gps===false)
 s.nogps++;
-
 });
-
-
 s.devices=devices.size;
-
 return s;
-
 }
 
 
 
 function metric(icon,label,value,text){
-
 return`
-
 <div class="metric" title="${text}">
-
 <div class="metric-icon">
 ${icon}
 </div>
-
 <div class="metric-label">
 ${label}
 </div>
-
 <div class="metric-value">
 ${value}
 </div>
-
 </div>
-
 `;
-
 }
 
-
-
 function renderSection(type){
-
 const r=getRange(
 type,
 currentDate
 );
-
 const data=filter(
 rows,
 r.start,
 r.end
 );
-
 const s=stats(data);
-
 
 document
 .getElementById(type+"Title")
@@ -287,7 +219,6 @@ periodLabel(
 type,
 currentDate
 );
-
 
 document
 .getElementById(type+"Metrics")
@@ -308,13 +239,9 @@ ${metric("📍","GPS",s.gps,"GPS autorizzati")}
 ${metric("🚫","No GPS",s.nogps,"GPS negati")}
 
 `;
-
 }
 
-
-
 function render(){
-
 [
 "day",
 "week",
@@ -324,46 +251,33 @@ function render(){
 .forEach(
 renderSection
 );
-
 }
 
-
-
 function move(type,value){
-
 if(type==="day")
 currentDate.setDate(
 currentDate.getDate()+value
 );
-
 if(type==="week")
 currentDate.setDate(
 currentDate.getDate()+value*7
 );
-
 if(type==="month")
 currentDate.setMonth(
 currentDate.getMonth()+value
 );
-
 if(type==="year")
 currentDate.setFullYear(
 currentDate.getFullYear()+value
 );
-
 render();
-
 }
-
-
 
 document.querySelectorAll(
 ".collapse-btn"
 )
 .forEach(btn=>{
-
 btn.onclick=function(){
-
 document
 .querySelectorAll(
 ".period-section"
@@ -376,16 +290,11 @@ const target=
 document.getElementById(
 "section-"+this.dataset.target
 );
-
 target.classList.toggle(
 "open"
 );
-
 };
-
 });
-
-
 
 document.getElementById("dayPrev")
 .onclick=()=>move("day",-1);
@@ -393,13 +302,11 @@ document.getElementById("dayPrev")
 document.getElementById("dayNext")
 .onclick=()=>move("day",1);
 
-
 document.getElementById("weekPrev")
 .onclick=()=>move("week",-1);
 
 document.getElementById("weekNext")
 .onclick=()=>move("week",1);
-
 
 document.getElementById("monthPrev")
 .onclick=()=>move("month",-1);
@@ -407,13 +314,10 @@ document.getElementById("monthPrev")
 document.getElementById("monthNext")
 .onclick=()=>move("month",1);
 
-
 document.getElementById("yearPrev")
 .onclick=()=>move("year",-1);
 
 document.getElementById("yearNext")
 .onclick=()=>move("year",1);
-
-
 
 loadAnalytics();
