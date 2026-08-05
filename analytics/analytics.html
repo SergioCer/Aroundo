@@ -34,26 +34,33 @@ rel="stylesheet">
     <section
         class="period-section open"
         id="section-day">
-        <div class="period-header">
-            <button
-                id="dayPrev"
-                class="nav-btn">
-                <span class="material-symbols-outlined">
-                    chevron_left
-                </span>
-            </button>
-            <div
-                class="period-title"
+            <div class="period-header">
+                <button
+                    class="collapse-btn"
+                    data-target="day">
+                    <span class="material-symbols-outlined">
+                        expand_more
+                    </span>
+                </button>
+                <button
+                    id="dayPrev"
+                    class="nav-btn">
+                    <span class="material-symbols-outlined">
+                        chevron_left
+                    </span>
+                </button>
+                <div
+                    class="period-title"
                 id="dayTitle">
+                </div>
+                <button
+                    id="dayNext"
+                    class="nav-btn">
+                    <span class="material-symbols-outlined">
+                        chevron_right
+                    </span>
+                </button>
             </div>
-            <button
-                id="dayNext"
-                class="nav-btn">
-                <span class="material-symbols-outlined">
-                    chevron_right
-                </span>
-            </button>
-        </div>
         <div
             class="metrics-grid"
             id="dayMetrics">
