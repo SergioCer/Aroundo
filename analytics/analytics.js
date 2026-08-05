@@ -4,10 +4,7 @@ let rows=[];
 let currentPeriod="day";
 let currentDate=new Date();
 
-
-// ===============================
 // LOAD ANALYTICS
-// ===============================
 
 async function loadAnalytics(){
 
@@ -16,7 +13,6 @@ const from=new Date();
 from.setFullYear(
 from.getFullYear()-1
 );
-
 
 const {data,error}=await supabase
 .from("analytics")
@@ -45,10 +41,8 @@ ascending:false
 }
 );
 
-
 if(error)
 console.error(error);
-
 
 rows=data||[];
 
@@ -57,17 +51,14 @@ console.log(
 rows
 );
 
-
 const {data:info}=await supabase
 .from("analytics_info")
 .select("ai_last_update")
 .single();
 
-
 document
 .getElementById("dbStatus")
 .textContent="Online";
-
 
 document
 .getElementById("lastUpdate")
@@ -80,17 +71,11 @@ info.ai_last_update
 .toLocaleString("it-IT")
 :
 "-";
-
-
 render();
-
 }
 
 
-
-// ===============================
 // DATE HELPERS
-// ===============================
 
 function cleanDate(d){
 
@@ -99,146 +84,90 @@ d.getFullYear(),
 d.getMonth(),
 d.getDate()
 );
-
 }
 
 
-
-// ===============================
 // RANGE CALENDARIO
-// ===============================
 
 function getRange(type,date){
 
 let start;
 let end;
 
-
 date=cleanDate(date);
 
-
-
 if(type==="day"){
-
 start=new Date(date);
 end=new Date(date);
-
 }
 
-
-
 if(type==="week"){
-
 start=new Date(date);
-
 const day=
 start.getDay() || 7;
-
-
 start.setDate(
 start.getDate()-day+1
 );
-
-
 end=new Date(start);
-
 end.setDate(
 end.getDate()+6
 );
-
 }
-
-
-
 if(type==="month"){
-
 start=new Date(
 date.getFullYear(),
 date.getMonth(),
 1
 );
-
-
 end=new Date(
 date.getFullYear(),
 date.getMonth()+1,
 0
 );
-
 }
-
-
-
 if(type==="year"){
-
 start=new Date(
 date.getFullYear(),
 0,
 1
 );
-
-
 end=new Date(
 date.getFullYear(),
 11,
 31
 );
-
 }
-
-
 return {
 start,
 end
 };
-
 }
 
 
-
-// ===============================
 // FILTER
-// ===============================
 
 function filter(data,type,date){
-
 const range=
 getRange(
 type,
 date
 );
-
-
 return data.filter(x=>{
-
-
 const d=
 cleanDate(
 new Date(x.an_date)
 );
-
-
 return (
 d>=range.start &&
 d<=range.end
 );
-
-
 });
-
 }
 
-
-
-// ===============================
 // LABEL PERIODO
-// ===============================
 
 function periodLabel(type,date){
-
-
 if(type==="day")
-
 return date.toLocaleDateString(
 "it-IT",
 {
@@ -246,18 +175,12 @@ day:"numeric",
 month:"long"
 }
 );
-
-
-
 if(type==="week"){
-
 const r=
 getRange(
 type,
 date
 );
-
-
 return `
 ${r.start.getDate()}
 -
@@ -270,178 +193,101 @@ month:"long"
 }
 )
 }`;
-
 }
-
-
-
 if(type==="month")
-
 return date.toLocaleDateString(
 "it-IT",
 {
 month:"long"
 }
 );
-
-
-
 if(type==="year")
-
 return date.getFullYear();
-
-
 }
 
 
-// ===============================
 // STATS
-// ===============================
 
 function stats(data){
 
 let devices=new Set();
-
 let s={
-
 open:0,
 login:0,
 install:0,
 share:0,
-
 more:0,
 info:0,
-
 app:0,
 web:0,
-
 gps:0,
 nogps:0
-
 };
 
-
 data.forEach(x=>{
-
-
 if(x.an_device)
 devices.add(
 x.an_device
 );
-
-
 s.open +=
 x.an_open || 0;
-
-
 s.share +=
 x.an_share || 0;
-
-
 s.more +=
 x.an_more || 0;
-
-
 s.info +=
 x.an_info || 0;
-
-
-
 if(x.an_login)
 s.login++;
-
-
-
 if(x.an_install)
 s.install++;
-
-
-
 if(x.an_app)
 s.app++;
 else
 s.web++;
-
-
-
 if(x.an_gps===true)
 s.gps++;
-
-
 if(x.an_gps===false)
 s.nogps++;
-
-
 });
-
-
 s.devices=
 devices.size;
-
-
 return s;
-
 }
 
-
-
-
-// ===============================
 // METRIC
-// ===============================
-
 function metric(
 icon,
 label,
 value,
 text
 ){
-
 return `
-
 <div class="metric" title="${text}">
-
 <div class="metric-icon">
 ${icon}
 </div>
-
 <div class="metric-label">
 ${label}
 </div>
-
 <div class="metric-value">
 ${value}
 </div>
-
 </div>
-
 `;
-
 }
 
-
-
-
-// ===============================
 // RENDER SECTION
-// ===============================
 
 function renderSection(type){
-
-
 const data=
 filter(
 rows,
 type,
 currentDate
 );
-
-
 const s=
 stats(data);
-
-
-
 document
 .getElementById(
 type+"Title"
@@ -451,212 +297,133 @@ periodLabel(
 type,
 currentDate
 );
-
-
-
 document
 .getElementById(
 type+"Metrics"
 )
 .innerHTML=
-
-
-
 /* UTILIZZO */
 `
-
 ${metric(
 "👁",
 "Open",
 s.open,
 "Numero aperture piattaforma"
 )}
-
-
 ${metric(
 "📱",
 "Devices",
 s.devices,
 "Dispositivi unici rilevati"
 )}
-
-
 ${metric(
 "🔑",
 "Login",
 s.login,
 "Accessi autenticati"
 )}
-
-
 ${metric(
 "⬇️",
 "Install",
 s.install,
 "Installazioni PWA"
 )}
-
-
-
 ${metric(
 "📤",
 "Share",
 s.share,
 "Condivisioni generate"
 )}
-
-
-
 ${metric(
 "➕",
 "More",
 s.more,
 "Aperture dettagli evento"
 )}
-
-
 ${metric(
 "ℹ️",
 "Info",
 s.info,
 "Aperture pagina informazioni Aroundo"
 )}
-
-
-
 ${metric(
 "📲",
 "App",
 s.app,
 "Utilizzo PWA"
 )}
-
-
 ${metric(
 "🌐",
 "Web",
 s.web,
 "Utilizzo Web"
 )}
-
-
-
 ${metric(
 "📍",
 "GPS",
 s.gps,
 "Autorizzazioni GPS"
 )}
-
-
 ${metric(
 "🚫",
 "No GPS",
 s.nogps,
 "GPS negati"
 )}
-
 `;
-
 }
 
-
-
-// ===============================
 // RENDER GENERALE
-// ===============================
-
 function render(){
-
-
 [
 "day",
 "week",
 "month",
 "year"
-
 ]
 .forEach(
 renderSection
 );
-
-
 }
 
-
-// ===============================
 // CAMBIO PERIODO
-// ===============================
-
 function move(type,value){
-
-
 if(type==="day"){
-
 currentDate.setDate(
 currentDate.getDate()+value
 );
-
 }
-
-
 if(type==="week"){
-
 currentDate.setDate(
 currentDate.getDate()+(value*7)
 );
-
 }
-
-
 if(type==="month"){
-
 currentDate.setMonth(
 currentDate.getMonth()+value
 );
-
 }
-
-
 if(type==="year"){
-
 currentDate.setFullYear(
 currentDate.getFullYear()+value
 );
-
 }
 
-
-
 // blocco futuro
-
 const today=
 cleanDate(
 new Date()
 );
-
-
 if(
 cleanDate(currentDate)>today
 ){
-
 currentDate=
 today;
-
 }
-
-
-
 render();
-
 }
 
-
-
-
-// ===============================
 // COLLAPSE SECTIONS
-// ===============================
 
 document
 .querySelectorAll(
@@ -664,23 +431,17 @@ document
 )
 .forEach(btn=>{
 
-
 btn.onclick=function(){
-
 
 document
 .querySelectorAll(
 ".period-section"
 )
 .forEach(x=>{
-
 x.classList.remove(
 "open"
 );
-
 });
-
-
 
 const target=
 document
@@ -688,25 +449,13 @@ document
 "section-"+this.dataset.target
 );
 
-
-
 target.classList.add(
 "open"
 );
-
-
 };
-
-
 });
 
-
-
-
-
-// ===============================
 // NAVIGAZIONE GIORNO
-// ===============================
 
 document
 .getElementById("dayPrev")
@@ -716,8 +465,6 @@ document
 -1
 );
 
-
-
 document
 .getElementById("dayNext")
 .onclick=
@@ -726,12 +473,7 @@ document
 1
 );
 
-
-
-
-// ===============================
 // NAVIGAZIONE SETTIMANA
-// ===============================
 
 document
 .getElementById("weekPrev")
@@ -741,8 +483,6 @@ document
 -1
 );
 
-
-
 document
 .getElementById("weekNext")
 .onclick=
@@ -751,12 +491,7 @@ document
 1
 );
 
-
-
-
-// ===============================
 // NAVIGAZIONE MESE
-// ===============================
 
 document
 .getElementById("monthPrev")
@@ -766,8 +501,6 @@ document
 -1
 );
 
-
-
 document
 .getElementById("monthNext")
 .onclick=
@@ -776,12 +509,7 @@ document
 1
 );
 
-
-
-
-// ===============================
 // NAVIGAZIONE ANNO
-// ===============================
 
 document
 .getElementById("yearPrev")
@@ -791,8 +519,6 @@ document
 -1
 );
 
-
-
 document
 .getElementById("yearNext")
 .onclick=
@@ -801,12 +527,6 @@ document
 1
 );
 
-
-
-
-// ===============================
 // START
-// ===============================
 
 loadAnalytics();
-
