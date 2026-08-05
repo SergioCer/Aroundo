@@ -1139,6 +1139,7 @@ function requestUserLocation() {
       updateGeoStatus(true);
       const userLat = pos.coords.latitude;
       const userLng = pos.coords.longitude;
+      analyticsLocation(userLat, userLng); // Statistiche, salva le ultime coordinate rilevate a 2 decimali         
       // Calcolo approssimativo dello zoom in base agli eventi vicini
       const nearbyEvents = events.filter(e => {
       const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
