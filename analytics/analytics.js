@@ -67,7 +67,7 @@ render();
 
 function filter(data,start,end){
 return data.filter(x=>{
-const d=new Date(x.an_date);
+const d=new Date(x.an_date+"T00:00:00");
 return d>=start && d<=end;
 });
 }
