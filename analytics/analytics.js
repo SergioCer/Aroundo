@@ -278,6 +278,36 @@ s.devices
 return s;
 }
 
+function platformStats(data){
+let platforms={};
+data.forEach(x=>{
+if(!x.an_platform)
+return;
+platforms[x.an_platform]=
+(platforms[x.an_platform]||0)+1;
+});
+const total=
+Object.values(platforms)
+.reduce(
+(a,b)=>a+b,
+0
+);
+return Object.entries(platforms)
+.map(([platform,count])=>({
+platform,
+count,
+percent:
+total
+?
+Math.round(
+(count/total)*100
+)
+:
+0
+}));
+}
+
+
 // METRIC
 function metric(
 icon,
@@ -309,6 +339,7 @@ type,
 currentDate
 );
 const s=stats(data,rows);
+const platforms=platformStats(data);    
 document
 .getElementById(
 type+"Title"
@@ -322,6 +353,7 @@ document
 .getElementById(
 type+"Metrics"
 )
+    console.log(type,s,platforms); /* CANCELLARE */
 .innerHTML=
 /* UTILIZZO */
 `
