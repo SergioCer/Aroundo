@@ -700,11 +700,10 @@
 
     #geoDot {
       display: inline-block;
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      margin-right: 3px;
-      background: #ef4444;
+      margin-right: 0px;
     }
     
     @keyframes tickerScroll{
@@ -1136,7 +1135,8 @@ function requestUserLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
       (pos) => {
-      analyticsGPS(true); 
+      analyticsGPS(true);
+      updateGeoStatus(true);
       const userLat = pos.coords.latitude;
       const userLng = pos.coords.longitude;
       // Calcolo approssimativo dello zoom in base agli eventi vicini
@@ -1854,27 +1854,30 @@ oms.addListener('click', function (marker) {
         geoText.style.color = "#22c55e";
         geoText.style.textDecoration = "none";
         geoText.style.cursor = "default";
+        geoText.style.fontSize = "12px";
       } else {
         geoDot.style.background = "#f59e0b";
         geoText.textContent = "Enable location...";
         geoText.style.color = "#f59e0b";
         geoText.style.textDecoration = "underline";
         geoText.style.cursor = "pointer";
+        geoText.style.fontSize = "12px";
       }
     }
 
     function updateGeoError() {
-      geoDot.style.background = "#f59e0b";
-      geoText.textContent = "Verify GPS";
-      geoText.style.color = "#f59e0b";
+      geoDot.style.background = "#dc2626";
+      geoText.textContent = "Check Location Settings";
+      geoText.style.color = "#dc2626";
       geoText.style.textDecoration = "underline";
       geoText.style.cursor = "pointer";
+      geoText.style.fontSize = "10px";
     }
   
     geoStatus.addEventListener("click", () => {
       if (
         geoText.textContent === "Enable location..." ||
-        geoText.textContent === "Verify GPS"
+        geoText.textContent === "Check Location Settings"
       ) {
         requestUserLocation();
       }
