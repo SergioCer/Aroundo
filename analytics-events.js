@@ -125,6 +125,13 @@ async function updateAnalytics(values){
             values.gps;
         }
         if(
+            values.lat !== undefined &&
+            values.lng !== undefined
+        ){
+            update.an_lat = values.lat;
+            update.an_lng = values.lng;
+        }
+        if(
             values.app !== undefined
         ){
             update.an_app =
@@ -166,6 +173,10 @@ async function updateAnalytics(values){
         values.login === true,
         an_gps:
         values.gps ?? null,
+        an_lat:
+        values.lat ?? null,
+        an_lng:
+        values.lng ?? null,
         an_open:
         values.open ? 1 : 0,
         an_share:
@@ -209,5 +220,12 @@ export function analyticsInstall(){
 export function analyticsGPS(value){
     return updateAnalytics({
         gps:value
+    });
+}
+
+export function analyticsLocation(lat, lng){
+    return updateAnalytics({
+        lat: Number(lat.toFixed(2)),
+        lng: Number(lng.toFixed(2))
     });
 }
