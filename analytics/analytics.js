@@ -41,6 +41,7 @@ if(error)
 console.error(error);
 
 rows=data||[];
+console.log("analytics rows",rows);  
 
 const {data:info}=await supabase
 .from("analytics_info")
@@ -67,7 +68,7 @@ render();
 
 function filter(data,start,end){
 return data.filter(x=>{
-const d=new Date(x.an_date+"T00:00:00");
+const d=new Date(x.an_date);
 return d>=start && d<=end;
 });
 }
