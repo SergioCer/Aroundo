@@ -202,9 +202,7 @@ return date.getFullYear();
 
 
 // STATS
-
-function stats(data){
-
+function stats(data,allData){
 let devices=new Set();
 let s={
 open:0,
@@ -213,25 +211,23 @@ install:0,
 share:0,
 more:0,
 info:0,
+gps:0,
+nogps:0,
+nonegps:0,
 app:0,
 web:0,
-gps:0,
-nogps:0
+newUsers:0,
+returnUsers:0,
+retention:0,
+avgOpen:0
 };
-
 data.forEach(x=>{
 if(x.an_device)
-devices.add(
-x.an_device
-);
-s.open +=
-x.an_open || 0;
-s.share +=
-x.an_share || 0;
-s.more +=
-x.an_more || 0;
-s.info +=
-x.an_info || 0;
+devices.add(x.an_device);
+s.open+=x.an_open||0;
+s.share+=x.an_share||0;
+s.more+=x.an_more||0;
+s.info+=x.an_info||0;
 if(x.an_login)
 s.login++;
 if(x.an_install)
@@ -242,11 +238,43 @@ else
 s.web++;
 if(x.an_gps===true)
 s.gps++;
-if(x.an_gps===false)
+else if(x.an_gps===false)
 s.nogps++;
+else
+s.nonegps++;
 });
-s.devices=
-devices.size;
+s.devices=devices.size;
+/* NEW / RETURN */
+let previous=new Set(
+allData
+.filter(x=>!data.includes(x))
+.map(x=>x.an_device)
+);
+let current=new Set(
+data.map(x=>x.an_device)
+);
+current.forEach(id=>{
+if(previous.has(id))
+s.returnUsers++;
+else
+s.newUsers++;
+});
+/* RETENTION */
+s.retention=
+s.devices
+?
+Math.round(
+(s.returnUsers/s.devices)*100
+)
+:
+0;
+/* AVG OPEN */
+s.avgOpen=
+s.devices
+?
+(s.open/s.devices).toFixed(2)
+:
+0;
 return s;
 }
 
@@ -273,7 +301,6 @@ ${value}
 }
 
 // RENDER SECTION
-
 function renderSection(type){
 const data=
 filter(
@@ -281,8 +308,7 @@ rows,
 type,
 currentDate
 );
-const s=
-stats(data);
+const s=stats(data,rows);
 document
 .getElementById(
 type+"Title"
