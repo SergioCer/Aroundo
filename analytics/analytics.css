@@ -43,6 +43,18 @@ overflow:hidden;
 box-shadow:0 1px 4px #0001;
 }
 
+.period-section:not(.open) .metrics-grid{
+    display:none;
+}
+
+.period-section.open .metrics-grid{
+    display:grid;
+}
+
+.period-section.open .collapse-btn span{
+    transform:rotate(90deg);
+}
+
 .period-header,
 .collapse-bar{
 height:42px;
