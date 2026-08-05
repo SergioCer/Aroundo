@@ -349,11 +349,11 @@ periodLabel(
 type,
 currentDate
 );
+console.log(type,s,platforms); /* CANCELLARE */
 document
 .getElementById(
 type+"Metrics"
 )
-    console.log(type,s,platforms); /* CANCELLARE */
 .innerHTML=
 /* UTILIZZO */
 `
