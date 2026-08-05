@@ -105,6 +105,14 @@ async function updateAnalytics(values){
             update.an_share =
             current.an_share + 1;
         }
+        if(values.more){
+            update.an_more =
+            current.an_more + 1;
+        }
+        if(values.info){
+            update.an_info =
+            current.an_info + 1;
+        }
         if(
             values.login === true
         ){
@@ -180,7 +188,11 @@ async function updateAnalytics(values){
         an_open:
         values.open ? 1 : 0,
         an_share:
-        values.share ? 1 : 0
+        values.share ? 1 : 0,
+        an_more:
+        values.more ? 1 : 0,
+        an_info:
+        values.info ? 1 : 0
     };
     await supabase
     .from("analytics")
@@ -202,6 +214,18 @@ export function analyticsOpen(){
 export function analyticsShare(){
     return updateAnalytics({
         share:true
+    });
+}
+
+export function analyticsMore(){
+    return updateAnalytics({
+        more:true
+    });
+}
+
+export function analyticsInfo(){
+    return updateAnalytics({
+        info:true
     });
 }
 
@@ -229,3 +253,5 @@ export function analyticsLocation(lat, lng){
         lng: Number(lng.toFixed(2))
     });
 }
+
+
