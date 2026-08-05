@@ -4,12 +4,19 @@ let rows=[];
 let currentPeriod="day";
 let currentDate=new Date();
 
+
+// ===============================
+// LOAD ANALYTICS
+// ===============================
+
 async function loadAnalytics(){
 
 const from=new Date();
+
 from.setFullYear(
 from.getFullYear()-1
 );
+
 
 const {data,error}=await supabase
 .from("analytics")
@@ -28,7 +35,8 @@ an_info
 `)
 .gte(
 "an_date",
-from.toISOString().split("T")[0]
+from.toISOString()
+.split("T")[0]
 )
 .order(
 "an_date",
@@ -37,20 +45,29 @@ ascending:false
 }
 );
 
+
 if(error)
 console.error(error);
 
+
 rows=data||[];
-console.log("analytics rows",rows);  
+
+console.log(
+"analytics rows",
+rows
+);
+
 
 const {data:info}=await supabase
 .from("analytics_info")
 .select("ai_last_update")
 .single();
 
+
 document
 .getElementById("dbStatus")
 .textContent="Online";
+
 
 document
 .getElementById("lastUpdate")
@@ -63,82 +80,165 @@ info.ai_last_update
 .toLocaleString("it-IT")
 :
 "-";
+
+
 render();
+
 }
 
-function filter(data,type,date){
-return data.filter(x=>{
-const d=new Date(x.an_date);
-if(type==="day"){
-return (
-d.getFullYear()===date.getFullYear() &&
-d.getMonth()===date.getMonth() &&
-d.getDate()===date.getDate()
+
+
+// ===============================
+// DATE HELPERS
+// ===============================
+
+function cleanDate(d){
+
+return new Date(
+d.getFullYear(),
+d.getMonth(),
+d.getDate()
 );
+
 }
-if(type==="week"){
-const start=new Date(date);
-const day=start.getDay() || 7;
-start.setDate(start.getDate()-day+1);
-const end=new Date(start);
-end.setDate(start.getDate()+6);
-return d>=start && d<=end;
-}
-if(type==="month"){
-return (
-d.getFullYear()===date.getFullYear() &&
-d.getMonth()===date.getMonth()
-);
-}
-if(type==="year"){
-return (
-d.getFullYear()===date.getFullYear()
-);
-}
-return false;
-});
-}
+
+
+
+// ===============================
+// RANGE CALENDARIO
+// ===============================
 
 function getRange(type,date){
-let start=new Date(date);
-let end=new Date(date);
+
+let start;
+let end;
+
+
+date=cleanDate(date);
+
+
+
 if(type==="day"){
+
+start=new Date(date);
+end=new Date(date);
+
 }
+
+
+
 if(type==="week"){
-const day=start.getDay()||7;
+
+start=new Date(date);
+
+const day=
+start.getDay() || 7;
+
+
 start.setDate(
 start.getDate()-day+1
 );
+
+
 end=new Date(start);
+
 end.setDate(
-start.getDate()+6
+end.getDate()+6
 );
+
 }
+
+
+
 if(type==="month"){
-start.setDate(1);
+
+start=new Date(
+date.getFullYear(),
+date.getMonth(),
+1
+);
+
+
 end=new Date(
-start.getFullYear(),
-start.getMonth()+1,
+date.getFullYear(),
+date.getMonth()+1,
 0
 );
+
 }
+
+
+
 if(type==="year"){
+
 start=new Date(
-start.getFullYear(),
+date.getFullYear(),
 0,
 1
 );
+
+
 end=new Date(
-start.getFullYear(),
+date.getFullYear(),
 11,
 31
 );
-}
-return {start,end};
+
 }
 
+
+return {
+start,
+end
+};
+
+}
+
+
+
+// ===============================
+// FILTER
+// ===============================
+
+function filter(data,type,date){
+
+const range=
+getRange(
+type,
+date
+);
+
+
+return data.filter(x=>{
+
+
+const d=
+cleanDate(
+new Date(x.an_date)
+);
+
+
+return (
+d>=range.start &&
+d<=range.end
+);
+
+
+});
+
+}
+
+
+
+// ===============================
+// LABEL PERIODO
+// ===============================
+
 function periodLabel(type,date){
+
+
 if(type==="day")
+
 return date.toLocaleDateString(
 "it-IT",
 {
@@ -146,205 +246,567 @@ day:"numeric",
 month:"long"
 }
 );
+
+
+
 if(type==="week"){
-let r=getRange(
+
+const r=
+getRange(
 type,
 date
 );
-return `${r.start.getDate()}-${r.end.getDate()} ${
-r.start.toLocaleDateString(
+
+
+return `
+${r.start.getDate()}
+-
+${r.end.getDate()}
+${
+r.end.toLocaleDateString(
 "it-IT",
 {
 month:"long"
 }
-)}`;
+)
+}`;
+
 }
+
+
+
 if(type==="month")
+
 return date.toLocaleDateString(
 "it-IT",
 {
 month:"long"
 }
 );
+
+
+
+if(type==="year")
+
 return date.getFullYear();
+
+
 }
 
+
+// ===============================
+// STATS
+// ===============================
+
 function stats(data){
+
 let devices=new Set();
+
 let s={
+
 open:0,
 login:0,
 install:0,
 share:0,
+
 more:0,
 info:0,
+
 app:0,
 web:0,
+
 gps:0,
 nogps:0
+
 };
+
 
 data.forEach(x=>{
 
+
 if(x.an_device)
-devices.add(x.an_device);
-s.open+=x.an_open||0;
-s.share+=x.an_share||0;
-s.more+=x.an_more||0;
-s.info+=x.an_info||0;
+devices.add(
+x.an_device
+);
+
+
+s.open +=
+x.an_open || 0;
+
+
+s.share +=
+x.an_share || 0;
+
+
+s.more +=
+x.an_more || 0;
+
+
+s.info +=
+x.an_info || 0;
+
+
+
 if(x.an_login)
 s.login++;
+
+
+
 if(x.an_install)
 s.install++;
+
+
+
 if(x.an_app)
 s.app++;
 else
 s.web++;
+
+
+
 if(x.an_gps===true)
 s.gps++;
+
+
 if(x.an_gps===false)
 s.nogps++;
+
+
 });
-s.devices=devices.size;
+
+
+s.devices=
+devices.size;
+
+
 return s;
+
 }
 
 
 
-function metric(icon,label,value,text){
-return`
+
+// ===============================
+// METRIC
+// ===============================
+
+function metric(
+icon,
+label,
+value,
+text
+){
+
+return `
+
 <div class="metric" title="${text}">
+
 <div class="metric-icon">
 ${icon}
 </div>
+
 <div class="metric-label">
 ${label}
 </div>
+
 <div class="metric-value">
 ${value}
 </div>
+
 </div>
+
 `;
+
 }
 
+
+
+
+// ===============================
+// RENDER SECTION
+// ===============================
+
 function renderSection(type){
-const r=getRange(
+
+
+const data=
+filter(
+rows,
 type,
 currentDate
 );
-const data=filter(
-rows,
-r.start,
-r.end
-);
-const s=stats(data);
+
+
+const s=
+stats(data);
+
+
 
 document
-.getElementById(type+"Title")
+.getElementById(
+type+"Title"
+)
 .textContent=
 periodLabel(
 type,
 currentDate
 );
 
+
+
 document
-.getElementById(type+"Metrics")
-.innerHTML=`
+.getElementById(
+type+"Metrics"
+)
+.innerHTML=
 
-${metric("👁","Open",s.open,"Numero aperture")}
-${metric("📱","Devices",s.devices,"Dispositivi unici")}
-${metric("🔑","Login",s.login,"Accessi effettuati")}
-${metric("⬇️","Install",s.install,"Installazioni")}
 
-${metric("🌐","Web",s.web,"Accessi Web")}
-${metric("📲","App",s.app,"Utilizzo PWA")}
-${metric("📤","Share",s.share,"Condivisioni")}
-${metric("➕","More",s.more,"Aperture dettagli evento")}
 
-${metric("ℹ️","Info",s.info,"Aperture informazioni Aroundo")}
-${metric("📍","GPS",s.gps,"GPS autorizzati")}
-${metric("🚫","No GPS",s.nogps,"GPS negati")}
+/* UTILIZZO */
+`
+
+${metric(
+"👁",
+"Open",
+s.open,
+"Numero aperture piattaforma"
+)}
+
+
+${metric(
+"📱",
+"Devices",
+s.devices,
+"Dispositivi unici rilevati"
+)}
+
+
+${metric(
+"🔑",
+"Login",
+s.login,
+"Accessi autenticati"
+)}
+
+
+${metric(
+"⬇️",
+"Install",
+s.install,
+"Installazioni PWA"
+)}
+
+
+
+${metric(
+"📤",
+"Share",
+s.share,
+"Condivisioni generate"
+)}
+
+
+
+${metric(
+"➕",
+"More",
+s.more,
+"Aperture dettagli evento"
+)}
+
+
+${metric(
+"ℹ️",
+"Info",
+s.info,
+"Aperture pagina informazioni Aroundo"
+)}
+
+
+
+${metric(
+"📲",
+"App",
+s.app,
+"Utilizzo PWA"
+)}
+
+
+${metric(
+"🌐",
+"Web",
+s.web,
+"Utilizzo Web"
+)}
+
+
+
+${metric(
+"📍",
+"GPS",
+s.gps,
+"Autorizzazioni GPS"
+)}
+
+
+${metric(
+"🚫",
+"No GPS",
+s.nogps,
+"GPS negati"
+)}
 
 `;
+
 }
 
+
+
+// ===============================
+// RENDER GENERALE
+// ===============================
+
 function render(){
+
+
 [
 "day",
 "week",
 "month",
 "year"
+
 ]
 .forEach(
 renderSection
 );
+
+
 }
 
+
+// ===============================
+// CAMBIO PERIODO
+// ===============================
+
 function move(type,value){
-if(type==="day")
+
+
+if(type==="day"){
+
 currentDate.setDate(
 currentDate.getDate()+value
 );
-if(type==="week")
+
+}
+
+
+if(type==="week"){
+
 currentDate.setDate(
-currentDate.getDate()+value*7
+currentDate.getDate()+(value*7)
 );
-if(type==="month")
+
+}
+
+
+if(type==="month"){
+
 currentDate.setMonth(
 currentDate.getMonth()+value
 );
-if(type==="year")
+
+}
+
+
+if(type==="year"){
+
 currentDate.setFullYear(
 currentDate.getFullYear()+value
 );
-render();
+
 }
 
-document.querySelectorAll(
+
+
+// blocco futuro
+
+const today=
+cleanDate(
+new Date()
+);
+
+
+if(
+cleanDate(currentDate)>today
+){
+
+currentDate=
+today;
+
+}
+
+
+
+render();
+
+}
+
+
+
+
+// ===============================
+// COLLAPSE SECTIONS
+// ===============================
+
+document
+.querySelectorAll(
 ".collapse-btn"
 )
 .forEach(btn=>{
+
+
 btn.onclick=function(){
+
+
 document
 .querySelectorAll(
 ".period-section"
 )
-.forEach(x=>
-x.classList.remove("open")
-);
+.forEach(x=>{
 
-const target=
-document.getElementById(
-"section-"+this.dataset.target
-);
-target.classList.toggle(
+x.classList.remove(
 "open"
 );
-};
+
 });
 
-document.getElementById("dayPrev")
-.onclick=()=>move("day",-1);
 
-document.getElementById("dayNext")
-.onclick=()=>move("day",1);
 
-document.getElementById("weekPrev")
-.onclick=()=>move("week",-1);
+const target=
+document
+.getElementById(
+"section-"+this.dataset.target
+);
 
-document.getElementById("weekNext")
-.onclick=()=>move("week",1);
 
-document.getElementById("monthPrev")
-.onclick=()=>move("month",-1);
 
-document.getElementById("monthNext")
-.onclick=()=>move("month",1);
+target.classList.add(
+"open"
+);
 
-document.getElementById("yearPrev")
-.onclick=()=>move("year",-1);
 
-document.getElementById("yearNext")
-.onclick=()=>move("year",1);
+};
+
+
+});
+
+
+
+
+
+// ===============================
+// NAVIGAZIONE GIORNO
+// ===============================
+
+document
+.getElementById("dayPrev")
+.onclick=
+()=>move(
+"day",
+-1
+);
+
+
+
+document
+.getElementById("dayNext")
+.onclick=
+()=>move(
+"day",
+1
+);
+
+
+
+
+// ===============================
+// NAVIGAZIONE SETTIMANA
+// ===============================
+
+document
+.getElementById("weekPrev")
+.onclick=
+()=>move(
+"week",
+-1
+);
+
+
+
+document
+.getElementById("weekNext")
+.onclick=
+()=>move(
+"week",
+1
+);
+
+
+
+
+// ===============================
+// NAVIGAZIONE MESE
+// ===============================
+
+document
+.getElementById("monthPrev")
+.onclick=
+()=>move(
+"month",
+-1
+);
+
+
+
+document
+.getElementById("monthNext")
+.onclick=
+()=>move(
+"month",
+1
+);
+
+
+
+
+// ===============================
+// NAVIGAZIONE ANNO
+// ===============================
+
+document
+.getElementById("yearPrev")
+.onclick=
+()=>move(
+"year",
+-1
+);
+
+
+
+document
+.getElementById("yearNext")
+.onclick=
+()=>move(
+"year",
+1
+);
+
+
+
+
+// ===============================
+// START
+// ===============================
 
 loadAnalytics();
+
