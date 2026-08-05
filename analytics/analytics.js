@@ -46,11 +46,6 @@ console.error(error);
 
 rows=data||[];
 
-console.log(
-"analytics rows",
-rows
-);
-
 const {data:info}=await supabase
 .from("analytics_info")
 .select("ai_last_update")
