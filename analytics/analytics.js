@@ -349,80 +349,57 @@ periodLabel(
 type,
 currentDate
 );
-console.log(type,s,platforms); /* CANCELLARE */
 document
 .getElementById(
 type+"Metrics"
 )
 .innerHTML=
-/* UTILIZZO */
 `
-${metric(
-"👁",
-"Open",
-s.open,
-"Numero aperture piattaforma"
-)}
-${metric(
-"📱",
-"Devices",
-s.devices,
-"Dispositivi unici rilevati"
-)}
-${metric(
-"🔑",
-"Login",
-s.login,
-"Accessi autenticati"
-)}
-${metric(
-"⬇️",
-"Install",
-s.install,
-"Installazioni PWA"
-)}
-${metric(
-"📤",
-"Share",
-s.share,
-"Condivisioni generate"
-)}
-${metric(
-"➕",
-"More",
-s.more,
-"Aperture dettagli evento"
-)}
-${metric(
-"ℹ️",
-"Info",
-s.info,
-"Aperture pagina informazioni Aroundo"
-)}
-${metric(
-"📲",
-"App",
-s.app,
-"Utilizzo PWA"
-)}
-${metric(
-"🌐",
-"Web",
-s.web,
-"Utilizzo Web"
-)}
-${metric(
-"📍",
-"GPS",
-s.gps,
-"Autorizzazioni GPS"
-)}
-${metric(
-"🚫",
-"No GPS",
-s.nogps,
-"GPS negati"
-)}
+<div class="metric-group">
+<div class="group-title">
+Utilizzo
+</div>
+${metric("👁","Open",s.open,"Numero aperture")}
+${metric("📱","Devices",s.devices,"Dispositivi unici")}
+${metric("🔑","Login",s.login,"Accessi effettuati")}
+${metric("⬇️","Install",s.install,"Installazioni")}
+</div>
+<div class="metric-group">
+<div class="group-title">
+Interazioni
+</div>
+${metric("📤","Share",s.share,"Condivisioni")}
+${metric("➕","More",s.more,"Aperture dettagli evento")}
+${metric("ℹ️","Info",s.info,"Aperture informazioni Aroundo")}
+</div>
+<div class="metric-group">
+<div class="group-title">
+Comportamento
+</div>
+${metric("🆕","New",s.newUsers,"Nuovi dispositivi nel periodo")}
+${metric("↩️","Return",s.returnUsers,"Utenti già presenti")}
+${metric("%","Retention",s.retention+"%","Percentuale utenti ritornati")}
+${metric("Ø","Avg Open",s.avgOpen,"Media aperture per dispositivo")}
+</div>
+<div class="metric-group">
+<div class="group-title">
+Tecnologia
+</div>
+${metric("🌐","Web",s.web,"Accessi Web")}
+${metric("📲","App",s.app,"Utilizzo PWA")}
+${
+platforms
+.map(p=>
+metric(
+"💻",
+p.platform,
+p.count+" ("+p.percent+"%)",
+"Dispositivi per piattaforma"
+)
+)
+.join("")
+}
+</div>
 `;
 }
 
