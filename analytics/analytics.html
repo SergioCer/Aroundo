@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Aroundo Analytics</title>
+
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/analytics.css">
+<link
+href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+rel="stylesheet">
+
+</head>
+<body>
+
+<div class="analytics-page">
+    <!-- HEADER -->
+    <header class="analytics-header">
+        <div class="header-title">
+            <span class="material-symbols-outlined">
+                analytics
+            </span>
+            <span>
+                Analytics
+            </span>
+        </div>
+    </header>
+
+    <!-- GIORNO -->
+
+    <section
+        class="period-section open"
+        id="section-day">
+        <div class="period-header">
+            <button
+                id="dayPrev"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_left
+                </span>
+            </button>
+            <div
+                class="period-title"
+                id="dayTitle">
+            </div>
+            <button
+                id="dayNext"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_right
+                </span>
+            </button>
+        </div>
+        <div
+            class="metrics-grid"
+            id="dayMetrics">
+        </div>
+    </section>
+
+    <!-- SETTIMANA -->
+
+    <section
+        class="period-section collapsed"
+        id="section-week">
+        <div class="collapse-bar">
+            <button
+                class="collapse-btn"
+                data-target="week">
+                <span class="material-symbols-outlined">
+                    chevron_right
+                </span>
+            </button>
+            <button
+                id="weekPrev"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_left
+                </span>
+            </button>
+            <div
+                class="period-title"
+                id="weekTitle">
+            </div>
+            <button
+                id="weekNext"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_right
+                </span>
+            </button>
+        </div>
+        <div
+            class="metrics-grid"
+            id="weekMetrics">
+        </div>
+    </section>
+
+    <!-- MESE -->
+
+    <section
+        class="period-section collapsed"
+        id="section-month">
+        <div class="collapse-bar">
+            <button
+                class="collapse-btn"
+                data-target="month">
+                <span class="material-symbols-outlined">
+                    chevron_right
+                </span>
+            </button>
+            <button
+                id="monthPrev"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_left
+                </span>
+            </button>
+            <div
+                class="period-title"
+                id="monthTitle">
+            </div>
+            <button
+                id="monthNext"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_right
+                </span>
+            </button>
+        </div>
+        <div
+            class="metrics-grid"
+            id="monthMetrics">
+        </div>
+    </section>
+
+    <!-- ANNO -->
+
+    <section
+        class="period-section collapsed"
+        id="section-year">
+        <div class="collapse-bar">
+            <button
+                class="collapse-btn"
+                data-target="year">
+                <span class="material-symbols-outlined">
+                    chevron_right
+                </span>
+            </button>
+            <button
+                id="yearPrev"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_left
+                </span>
+            </button>
+            <div
+                class="period-title"
+                id="yearTitle">
+            </div>
+            <button
+                id="yearNext"
+                class="nav-btn">
+                <span class="material-symbols-outlined">
+                    chevron_right
+                </span>
+            </button>
+        </div>
+        <div
+            class="metrics-grid"
+            id="yearMetrics">
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer class="analytics-footer">
+        <button
+            id="mapButton">
+            <span class="material-symbols-outlined">
+                map
+            </span>
+            Map
+        </button>
+        <div class="footer-status">
+            <div>
+                DB
+                <span id="dbStatus">
+                    --
+                </span>
+            </div>
+            <div>
+                Last Update
+                <span id="lastUpdate">
+                    --
+                </span>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script type="module"
+src="analytics.js">
+</script>
+</body>
+</html>
