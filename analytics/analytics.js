@@ -388,8 +388,9 @@ s.share,
 ${metric(
 "👁",
 "Open",
-s.open + " (" + s.avgOpen + ")",
-"Number of openings"
+s.open,
+"Number of openings",
+s.avgOpen    
 )}
 </div>
 <div class="metric-group">
@@ -442,8 +443,9 @@ s.newUsers,
 ${metric(
 "🔁",
 "Return",
-s.returnUsers + " (" + s.retention + "%)",
-"Returning devices"
+s.returnUsers,
+"Returning devices",
+s.retention    
 )}
 ${metric(
 "⬇️",
@@ -465,8 +467,9 @@ platforms.map(p=>
 metric(
 "💻",
 p.platform,
-p.count + " (" + p.percent + "%)",
-"Platform usage"
+p.count,
+"Platform usage",
+p.percent    
 )
 ).join("")
 }
