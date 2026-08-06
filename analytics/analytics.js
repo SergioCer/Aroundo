@@ -316,13 +316,8 @@ Math.round(
 
 
 // METRIC
-function metric(
-icon,
-label,
-value,
-text
-){
-return `
+function metric(icon,label,value,text,secondary=""){
+return`
 <div class="metric" title="${text}">
 <div class="metric-icon">
 ${icon}
@@ -332,6 +327,13 @@ ${label}
 </div>
 <div class="metric-value">
 ${value}
+${
+secondary
+?
+`<span class="metric-secondary"> (${secondary})</span>`
+:
+""
+}
 </div>
 </div>
 `;
@@ -364,35 +366,90 @@ type+"Metrics"
 `
 <div class="metric-group">
 <div class="group-title">
-USE
+Use
 </div>
-${metric("📱","Devices",s.devices,"Unique devices")}
-${metric("🌐","Web",s.web,"Devices currently using Web")}
-${metric("📲","App",s.app,"Devices currently using App")}
-${metric("👁","Open",s.open,"Total app openings")}
-${metric("Ø","Avg Open",s.avgOpen,"Average openings per device")}
+${metric(
+"📱",
+"Devices",
+s.devices,
+"Unique devices"
+)}
+${metric(
+"🌐",
+"Web",
+s.web,
+"Devices currently using Web"
+)}
+${metric(
+"📲",
+"App",
+s.app,
+"Devices currently using App"
+)}
+${metric(
+"👁",
+"Open",
+s.open,
+"Total app openings",
+s.avgOpen
+)}
 </div>
 <div class="metric-group">
 <div class="group-title">
-INTERACTION
+Interaction
 </div>
-${metric("⬇️","Install",s.install,"PWA installations")}
-${metric("🔑","Login",s.login,"User login actions")}
-${metric("📤","Share",s.share,"Content sharing actions")}
-${metric("➕","More",s.more,"Event detail openings")}
-${metric("ℹ️","Info",s.info,"Information page openings")}
+${metric(
+"📤",
+"Share",
+s.share,
+"Content sharing actions"
+)}
+${metric(
+"➕",
+"More",
+s.more,
+"Event detail openings"
+)}
+${metric(
+"ℹ️",
+"Info",
+s.info,
+"Information page openings"
+)}
 </div>
 <div class="metric-group">
 <div class="group-title">
-BEHAVIOR
+Behavior
 </div>
-${metric("🆕","New",s.newUsers,"New devices in the selected period")}
-${metric("↩️","Return",s.returnUsers,"Returning devices already seen before")}
-${metric("%","Retention",s.retention+"%","Percentage of returning devices")}
+${metric(
+"🆕",
+"New",
+s.newUsers,
+"New devices in the selected period"
+)}
+${metric(
+"↩️",
+"Return",
+s.returnUsers,
+"Returning devices already seen before",
+s.retention+"%"
+)}
+${metric(
+"⬇️",
+"Install",
+s.install,
+"PWA installations"
+)}
+${metric(
+"🔑",
+"Login",
+s.login,
+"User login actions"
+)}
 </div>
 <div class="metric-group">
 <div class="group-title">
-TECHNOLOGY
+Technology
 </div>
 ${
 platforms
@@ -400,8 +457,9 @@ platforms
 metric(
 "💻",
 p.platform,
-`${p.count} (${p.percent}%)`,
-"Device distribution by platform"
+p.count,
+"Device distribution by platform",
+p.percent+"%"
 )
 )
 .join("")
