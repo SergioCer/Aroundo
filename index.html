@@ -979,8 +979,10 @@ OK
   
 <script type="module">
   import { supabase } from './supabase.js';
-  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin, analyticsMore, analyticsInfo} from './analytics-events.js';
-  
+  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin, analyticsMore, analyticsInfo, analyticsMarker, analyticsMap, analyticsBuy, analyticsBook} from './analytics-events.js';
+  window.analyticsMap = analyticsMap;
+  window.analyticsBuy = analyticsBuy;
+  window.analyticsBook = analyticsBook;
   let categories = [];
   let icons = {};
   let events = [];
@@ -1164,30 +1166,30 @@ function requestUserLocation() {
       }
   }
     
-const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
+    const SHARE_URL = "https://sergiocer.github.io/Aroundo/";
 
-document.getElementById("shareBtn").onclick = async () => {
-  await analyticsShare();
-  try{
-    if(navigator.share){
-      await navigator.share({
-        title:"Aroundo",
-        text:"Discover what's Around•you",
-        url:SHARE_URL
-      });
-    }else{
-      await navigator.clipboard.writeText(SHARE_URL);
-    }
-  }catch(e){
-    console.log("Share cancelled");
-  }
-};
+    document.getElementById("shareBtn").onclick = async () => {
+      await analyticsShare();
+      try{
+        if(navigator.share){
+          await navigator.share({
+            title:"Aroundo",
+            text:"Discover what's Around•you",
+            url:SHARE_URL
+          });
+        }else{
+          await navigator.clipboard.writeText(SHARE_URL);
+        }
+      }catch(e){
+        console.log("Share cancelled");
+      }
+    };
 
-  /* Richiama la pagina Info */
-  document.getElementById("infoBtn").onclick=function(){
-  analyticsInfo();
-  window.location.href="pages/why-aroundo.html";
-};
+      /* Richiama la pagina Info */
+      document.getElementById("infoBtn").onclick=function(){
+      analyticsInfo();
+      window.location.href="pages/why-aroundo.html";
+    };
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
       updateDateUI();
@@ -1356,6 +1358,7 @@ document.getElementById("shareBtn").onclick = async () => {
             }
         /* Richiama il POPUP */
         marker.on('click', function () {
+        analyticsMarker();
         window.openBasePopup(e, this.getLatLng());
         });
         //-- 📦 STORAGE DATI (NO LOGICA)
@@ -1732,7 +1735,7 @@ oms.addListener('click', function (marker) {
             <a
               href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
               target="_blank"
-              class="action-btn map-btn">
+              class="action-btn map-btn" onclick="analyticsMap()">
               Map
             </a>
           </div>
@@ -1778,7 +1781,7 @@ oms.addListener('click', function (marker) {
               <a
                 href="#"
                 class="action-btn buy-btn"
-                onclick="showMessage('In Progress!'); return false;">
+                onclick="analyticsBuy(); showMessage('In Progress!'); return false;">
                 Buy
               </a>
             `
@@ -1789,7 +1792,7 @@ oms.addListener('click', function (marker) {
             <a
               href="#"
               class="action-btn book-btn"
-              onclick="showMessage('In Progress!'); return false;">
+              onclick="analyticsBook(); showMessage('In Progress!'); return false;">
               Book
             </a>
           </div>
