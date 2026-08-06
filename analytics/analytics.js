@@ -367,105 +367,142 @@ type+"Metrics"
 .innerHTML=
 `
 <div class="metric-group">
-<div class="group-title">
-Use
-</div>
+<h3>Use</h3>
+
 ${metric(
 "📱",
 "Devices",
 s.devices,
 "Unique devices"
 )}
+
 ${metric(
 "🌐",
 "Web",
 s.web,
-"Devices currently using Web"
+"Web usage"
 )}
+
 ${metric(
 "📲",
 "App",
 s.app,
-"Devices currently using App"
+"App usage"
 )}
-${metric(
-"👁",
-"Open",
-s.open,
-"Total app openings",
-s.avgOpen
-)}
-</div>
-<div class="metric-group">
-<div class="group-title">
-Interaction
-</div>
+
 ${metric(
 "📤",
 "Share",
 s.share,
-"Content sharing actions"
+"Sharing"
 )}
+
 ${metric(
-"➕",
-"More",
-s.more,
-"Event detail openings"
+"👁",
+"Open",
+s.open + " (" + s.avgOpen + ")",
+"Number of openings"
 )}
+
+</div>
+
+
+<div class="metric-group">
+<h3>Interaction</h3>
+
 ${metric(
 "ℹ️",
 "Info",
 s.info,
-"Information page openings"
+"Aroundo information"
 )}
+
+${metric(
+"➕",
+"More",
+s.more,
+"Event details"
+)}
+
+${metric(
+"📍",
+"Marker",
+s.marker,
+"Event marker clicks"
+)}
+
+${metric(
+"🗺️",
+"Map",
+s.map,
+"Map openings"
+)}
+
+${metric(
+"📅",
+"Book",
+s.book,
+"Booking intent"
+)}
+
+${metric(
+"💳",
+"Buy",
+s.buy,
+"Purchase intent"
+)}
+
 </div>
+
+
 <div class="metric-group">
-<div class="group-title">
-Behavior
-</div>
+<h3>Behavior</h3>
+
 ${metric(
 "🆕",
 "New",
 s.newUsers,
-"New devices in the selected period"
+"New devices"
 )}
+
 ${metric(
-"↩️",
+"🔁",
 "Return",
-s.returnUsers,
-"Returning devices already seen before",
-s.retention+"%"
+s.returnUsers + " (" + s.retention + "%)",
+"Returning devices"
 )}
+
 ${metric(
 "⬇️",
 "Install",
 s.install,
-"PWA installations"
+"Installations"
 )}
+
 ${metric(
 "🔑",
 "Login",
 s.login,
-"User login actions"
+"Logins"
 )}
+
 </div>
+
+
 <div class="metric-group">
-<div class="group-title">
-Technology
-</div>
+<h3>Technology</h3>
+
 ${
-platforms
-.map(p=>
+platforms.map(p=>
 metric(
 "💻",
 p.platform,
-p.count,
-"Device distribution by platform",
-p.percent+"%"
+p.count + " (" + p.percent + "%)",
+"Platform usage"
 )
-)
-.join("")
+).join("")
 }
+
 </div>
 `;
 }
