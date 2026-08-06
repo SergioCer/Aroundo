@@ -7,13 +7,10 @@ let currentDate=new Date();
 // LOAD ANALYTICS
 
 async function loadAnalytics(){
-
 const from=new Date();
-
 from.setFullYear(
 from.getFullYear()-1
 );
-
 const {data,error}=await supabase
 .from("analytics")
 .select(`
@@ -27,7 +24,11 @@ an_gps,
 an_open,
 an_share,
 an_more,
-an_info
+an_info,
+an_marker,
+an_map,
+an_buy,
+an_book
 `)
 .gte(
 "an_date",
@@ -209,6 +210,10 @@ open:0,
 login:0,
 install:0,
 share:0,
+marker:0,
+map:0,
+buy:0,
+book:0,    
 more:0,
 info:0,
 gps:0,
@@ -233,6 +238,10 @@ platform:x.an_platform
 }
 s.open+=x.an_open||0;
 s.share+=x.an_share||0;
+s.marker+=x.an_marker||0;
+s.map+=x.an_map||0;
+s.buy+=x.an_buy||0;
+s.book+=x.an_book||0;    
 s.more+=x.an_more||0;
 s.info+=x.an_info||0;
 if(x.an_login)
@@ -349,6 +358,13 @@ currentDate
 );
 const s=stats(data,rows);
 const platforms=platformStats(s.deviceState);
+console.log(
+"engagement",
+s.marker,
+s.map,
+s.buy,
+s.book
+);    
 document
 .getElementById(
 type+"Title"
