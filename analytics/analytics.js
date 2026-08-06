@@ -221,14 +221,14 @@ returnUsers:0,
 retention:0,
 avgOpen:0
 };
-let lastAccess={};    
+let deviceState={};    
 data.forEach(x=>{
 if(x.an_device)
 devices.add(x.an_device);
-if(!lastAccess[x.an_device]){    
-lastAccess[x.an_device]={
-date:x.an_date,
-app:x.an_app
+if(!deviceState[x.an_device]){
+deviceState[x.an_device]={
+app:x.an_app,
+platform:x.an_platform
 };
 }
 s.open+=x.an_open||0;
@@ -246,13 +246,13 @@ s.nogps++;
 else
 s.nonegps++;
 });
-Object.values(lastAccess)
-.forEach(x=>{
-if(x.app)
+Object.values(deviceState)
+.forEach(d=>{
+if(d.app)
 s.app++;
 else
 s.web++;
-});    
+}); 
 s.devices=devices.size;
 /* NEW / RETURN */
 let previous=new Set(
@@ -285,23 +285,20 @@ s.devices
 (s.open/s.devices).toFixed(2)
 :
 0;
+s.deviceState=deviceState;    
 return s;
 }
 
-function platformStats(data){
+function platformStats(deviceState){
 let platforms={};
-data.forEach(x=>{
-if(!x.an_platform)
-return;
-platforms[x.an_platform]=
-(platforms[x.an_platform]||0)+1;
+Object.values(deviceState)
+.forEach(d=>{
+platforms[d.platform]=
+(platforms[d.platform]||0)+1;
 });
 const total=
-Object.values(platforms)
-.reduce(
-(a,b)=>a+b,
-0
-);
+Object.keys(deviceState)
+.length;
 return Object.entries(platforms)
 .map(([platform,count])=>({
 platform,
@@ -349,7 +346,7 @@ type,
 currentDate
 );
 const s=stats(data,rows);
-const platforms=platformStats(data);    
+const platforms=platformStats(s.deviceState);
 document
 .getElementById(
 type+"Title"
