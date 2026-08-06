@@ -282,9 +282,9 @@ Math.round(
 s.avgOpen=
 s.devices
 ?
-(s.open/s.devices).toFixed(2)
+(s.open/s.devices).toFixed(1)+"%"
 :
-0;
+"0%"
 s.deviceState=deviceState;    
 return s;
 }
