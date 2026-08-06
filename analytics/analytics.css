@@ -17,7 +17,6 @@ padding:10px;
 }
 
 /* HEADER */
-
 .analytics-header{
 display:flex;
 justify-content:center;
@@ -34,7 +33,6 @@ font-weight:700;
 }
 
 /* PERIODI */
-
 .period-section{
 background:white;
 border-radius:12px;
@@ -97,7 +95,6 @@ transform:rotate(90deg);
 }
 
 /* METRICHE */
-
 .metrics-grid{
 display:grid;
 grid-template-columns:repeat(4,1fr);
@@ -156,7 +153,6 @@ margin-left:3px;
 }
 
 /* FOOTER */
-
 .analytics-footer{
 margin-top:8px;
 padding:8px;
@@ -187,7 +183,6 @@ color:#777;
 }
 
 @media(max-width:420px){
-
 .metrics-grid{
 grid-template-columns:repeat(4,1fr);
 gap:4px;
