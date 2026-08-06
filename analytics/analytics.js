@@ -364,44 +364,44 @@ type+"Metrics"
 `
 <div class="metric-group">
 <div class="group-title">
-Utilizzo
+USE
 </div>
-${metric("👁","Open",s.open,"Numero aperture")}
-${metric("📱","Devices",s.devices,"Dispositivi unici")}
-${metric("🔑","Login",s.login,"Accessi effettuati")}
-${metric("⬇️","Install",s.install,"Installazioni")}
-</div>
-<div class="metric-group">
-<div class="group-title">
-Interazioni
-</div>
-${metric("📤","Share",s.share,"Condivisioni")}
-${metric("➕","More",s.more,"Aperture dettagli evento")}
-${metric("ℹ️","Info",s.info,"Aperture informazioni Aroundo")}
+${metric("📱","Devices",s.devices,"Unique devices")}
+${metric("🌐","Web",s.web,"Devices currently using Web")}
+${metric("📲","App",s.app,"Devices currently using App")}
+${metric("👁","Open",s.open,"Total app openings")}
+${metric("Ø","Avg Open",s.avgOpen,"Average openings per device")}
 </div>
 <div class="metric-group">
 <div class="group-title">
-Comportamento
+INTERACTION
 </div>
-${metric("🆕","New",s.newUsers,"Nuovi dispositivi nel periodo")}
-${metric("↩️","Return",s.returnUsers,"Utenti già presenti")}
-${metric("%","Retention",s.retention+"%","Percentuale utenti ritornati")}
-${metric("Ø","Avg Open",s.avgOpen,"Media aperture per dispositivo")}
+${metric("⬇️","Install",s.install,"PWA installations")}
+${metric("🔑","Login",s.login,"User login actions")}
+${metric("📤","Share",s.share,"Content sharing actions")}
+${metric("➕","More",s.more,"Event detail openings")}
+${metric("ℹ️","Info",s.info,"Information page openings")}
 </div>
 <div class="metric-group">
 <div class="group-title">
-Tecnologia
+BEHAVIOR
 </div>
-${metric("🌐","Web",s.web,"Accessi Web")}
-${metric("📲","App",s.app,"Utilizzo PWA")}
+${metric("🆕","New",s.newUsers,"New devices in the selected period")}
+${metric("↩️","Return",s.returnUsers,"Returning devices already seen before")}
+${metric("%","Retention",s.retention+"%","Percentage of returning devices")}
+</div>
+<div class="metric-group">
+<div class="group-title">
+TECHNOLOGY
+</div>
 ${
 platforms
 .map(p=>
 metric(
 "💻",
 p.platform,
-p.count+" ("+p.percent+"%)",
-"Dispositivi per piattaforma"
+`${p.count} (${p.percent}%)`,
+"Device distribution by platform"
 )
 )
 .join("")
