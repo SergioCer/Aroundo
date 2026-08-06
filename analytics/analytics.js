@@ -344,13 +344,6 @@ currentDate
 );
 const s=stats(data,rows);
 const platforms=platformStats(s.deviceState);
-console.log(
-"engagement",
-s.marker,
-s.map,
-s.buy,
-s.book
-);    
 document
 .getElementById(
 type+"Title"
@@ -368,130 +361,105 @@ type+"Metrics"
 `
 <div class="metric-group">
 <h3>Use</h3>
-
 ${metric(
 "📱",
 "Devices",
 s.devices,
 "Unique devices"
 )}
-
 ${metric(
 "🌐",
 "Web",
 s.web,
 "Web usage"
 )}
-
 ${metric(
 "📲",
 "App",
 s.app,
 "App usage"
 )}
-
 ${metric(
 "📤",
 "Share",
 s.share,
 "Sharing"
 )}
-
 ${metric(
 "👁",
 "Open",
 s.open + " (" + s.avgOpen + ")",
 "Number of openings"
 )}
-
 </div>
-
-
 <div class="metric-group">
 <h3>Interaction</h3>
-
 ${metric(
 "ℹ️",
 "Info",
 s.info,
 "Aroundo information"
 )}
-
 ${metric(
 "➕",
 "More",
 s.more,
 "Event details"
 )}
-
 ${metric(
 "📍",
 "Marker",
 s.marker,
 "Event marker clicks"
 )}
-
 ${metric(
 "🗺️",
 "Map",
 s.map,
 "Map openings"
 )}
-
 ${metric(
 "📅",
 "Book",
 s.book,
 "Booking intent"
 )}
-
 ${metric(
 "💳",
 "Buy",
 s.buy,
 "Purchase intent"
 )}
-
 </div>
-
-
 <div class="metric-group">
 <h3>Behavior</h3>
-
 ${metric(
 "🆕",
 "New",
 s.newUsers,
 "New devices"
 )}
-
 ${metric(
 "🔁",
 "Return",
 s.returnUsers + " (" + s.retention + "%)",
 "Returning devices"
 )}
-
 ${metric(
 "⬇️",
 "Install",
 s.install,
 "Installations"
 )}
-
 ${metric(
 "🔑",
 "Login",
 s.login,
 "Logins"
 )}
-
 </div>
-
-
 <div class="metric-group">
 <h3>Technology</h3>
-
 ${
 platforms.map(p=>
 metric(
@@ -502,7 +470,6 @@ p.count + " (" + p.percent + "%)",
 )
 ).join("")
 }
-
 </div>
 `;
 }
