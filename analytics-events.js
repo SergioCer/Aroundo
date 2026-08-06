@@ -105,6 +105,22 @@ async function updateAnalytics(values){
             update.an_share =
             current.an_share + 1;
         }
+        if(values.marker){
+            update.an_marker =
+            current.an_marker + 1;
+        }
+        if(values.map){
+            update.an_map =
+            current.an_map + 1;
+        }
+        if(values.buy){
+            update.an_buy =
+            current.an_buy + 1;
+        }
+        if(values.book){
+            update.an_book =
+            current.an_book + 1;
+        }
         if(values.more){
             update.an_more =
             current.an_more + 1;
@@ -189,6 +205,14 @@ async function updateAnalytics(values){
         values.open ? 1 : 0,
         an_share:
         values.share ? 1 : 0,
+        an_marker:
+        values.marker ? 1 : 0,
+        an_map:
+        values.map ? 1 : 0,
+        an_buy:
+        values.buy ? 1 : 0,
+        an_book:
+        values.book ? 1 : 0,
         an_more:
         values.more ? 1 : 0,
         an_info:
@@ -214,6 +238,30 @@ export function analyticsOpen(){
 export function analyticsShare(){
     return updateAnalytics({
         share:true
+    });
+}
+
+export function analyticsMarker(){
+    return updateAnalytics({
+        marker:true
+    });
+}
+
+export function analyticsMap(){
+    return updateAnalytics({
+        map:true
+    });
+}
+
+export function analyticsBuy(){
+    return updateAnalytics({
+        buy:true
+    });
+}
+
+export function analyticsBook(){
+    return updateAnalytics({
+        book:true
     });
 }
 
