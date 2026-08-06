@@ -5,7 +5,6 @@ let currentPeriod="day";
 let currentDate=new Date();
 
 // LOAD ANALYTICS
-
 async function loadAnalytics(){
 const from=new Date();
 from.setFullYear(
@@ -41,12 +40,9 @@ from.toISOString()
 ascending:false
 }
 );
-
 if(error)
 console.error(error);
-
 rows=data||[];
-
 const {data:info}=await supabase
 .from("analytics_info")
 .select("ai_last_update")
@@ -72,9 +68,7 @@ render();
 
 
 // DATE HELPERS
-
 function cleanDate(d){
-
 return new Date(
 d.getFullYear(),
 d.getMonth(),
@@ -84,19 +78,14 @@ d.getDate()
 
 
 // RANGE CALENDARIO
-
 function getRange(type,date){
-
 let start;
 let end;
-
 date=cleanDate(date);
-
 if(type==="day"){
 start=new Date(date);
 end=new Date(date);
 }
-
 if(type==="week"){
 start=new Date(date);
 const day=
@@ -139,9 +128,7 @@ end
 };
 }
 
-
 // FILTER
-
 function filter(data,type,date){
 const range=
 getRange(
@@ -161,7 +148,6 @@ d<=range.end
 }
 
 // LABEL PERIODO
-
 function periodLabel(type,date){
 if(type==="day")
 return date.toLocaleDateString(
@@ -520,7 +506,7 @@ currentDate.getFullYear()+value
 );
 }
 
-// blocco futuro
+// blocco su data futura
 const today=
 cleanDate(
 new Date()
@@ -562,7 +548,6 @@ document
 "day",
 -1
 );
-
 document
 .getElementById("dayNext")
 .onclick=
@@ -572,7 +557,6 @@ document
 );
 
 // NAVIGAZIONE SETTIMANA
-
 document
 .getElementById("weekPrev")
 .onclick=
@@ -580,7 +564,6 @@ document
 "week",
 -1
 );
-
 document
 .getElementById("weekNext")
 .onclick=
@@ -590,7 +573,6 @@ document
 );
 
 // NAVIGAZIONE MESE
-
 document
 .getElementById("monthPrev")
 .onclick=
@@ -598,7 +580,6 @@ document
 "month",
 -1
 );
-
 document
 .getElementById("monthNext")
 .onclick=
@@ -608,7 +589,6 @@ document
 );
 
 // NAVIGAZIONE ANNO
-
 document
 .getElementById("yearPrev")
 .onclick=
@@ -616,7 +596,6 @@ document
 "year",
 -1
 );
-
 document
 .getElementById("yearNext")
 .onclick=
@@ -626,5 +605,4 @@ document
 );
 
 // START
-
 loadAnalytics();
