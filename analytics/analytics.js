@@ -221,9 +221,16 @@ returnUsers:0,
 retention:0,
 avgOpen:0
 };
+let lastAccess={};    
 data.forEach(x=>{
 if(x.an_device)
 devices.add(x.an_device);
+if(!lastAccess[x.an_device]){    
+lastAccess[x.an_device]={
+date:x.an_date,
+app:x.an_app
+};
+}
 s.open+=x.an_open||0;
 s.share+=x.an_share||0;
 s.more+=x.an_more||0;
@@ -232,10 +239,6 @@ if(x.an_login)
 s.login++;
 if(x.an_install)
 s.install++;
-if(x.an_app)
-s.app++;
-else
-s.web++;
 if(x.an_gps===true)
 s.gps++;
 else if(x.an_gps===false)
@@ -243,6 +246,13 @@ s.nogps++;
 else
 s.nonegps++;
 });
+Object.values(lastAccess)
+.forEach(x=>{
+if(x.app)
+s.app++;
+else
+s.web++;
+});    
 s.devices=devices.size;
 /* NEW / RETURN */
 let previous=new Set(
