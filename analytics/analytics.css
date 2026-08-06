@@ -51,10 +51,6 @@ box-shadow:0 1px 4px #0001;
     display:grid;
 }
 
-.period-section.open .collapse-btn span{
-    transform:rotate(90deg);
-}
-
 .period-header,
 .collapse-bar{
 height:42px;
@@ -91,11 +87,12 @@ align-items:center;
 display:none;
 }
 
-.collapsed .collapse-btn .material-symbols-outlined{
+.collapse-btn .material-symbols-outlined{
+transition:.2s;
 transform:rotate(0deg);
 }
 
-.open .collapse-btn .material-symbols-outlined{
+.period-section.open .collapse-btn .material-symbols-outlined{
 transform:rotate(90deg);
 }
 
@@ -118,7 +115,7 @@ box-shadow:0 1px 4px #0001;
 
 .metric-group h3{
 text-align:center;
-font-size:14px;
+font-size:12px;
 font-weight:600;
 color:#444;
 margin:4px 0 10px;
@@ -135,7 +132,7 @@ margin-bottom:6px;
 }
 
 .metric-icon{
-font-size:20px;
+font-size:18px;
 line-height:1;
 }
 
@@ -146,7 +143,7 @@ margin-top:5px;
 }
 
 .metric-value{
-font-size:18px;
+font-size:12px;
 font-weight:700;
 margin-top:3px;
 }
