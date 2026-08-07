@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Aroundo Tips Examples</title>
+
+<style>
+
+body {
+    margin:0;
+    padding:40px;
+    background:#f3f5f8;
+    font-family:Arial, Helvetica, sans-serif;
+    color:#333;
+}
+
+h1 {
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.container {
+    max-width:900px;
+    margin:auto;
+}
+
+.device {
+    background:white;
+    border-radius:25px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    margin-bottom:30px;
+}
+
+.header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo {
+    font-size:24px;
+    font-weight:bold;
+    color:#3b82f6;
+}
+
+.status {
+    font-size:12px;
+    background:#dcfce7;
+    color:#15803d;
+    padding:6px 12px;
+    border-radius:20px;
+}
+
+
+/* TIP BASE */
+
+.tip {
+    margin-top:25px;
+    padding:20px;
+    border-radius:18px;
+    position:relative;
+    max-width:420px;
+    box-shadow:0 5px 15px rgba(0,0,0,.12);
+}
+
+.tip h3 {
+    margin:0 0 10px;
+}
+
+.tip p {
+    margin:0 0 15px;
+    line-height:1.4;
+}
+
+.tip button {
+    border:0;
+    padding:10px 18px;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+
+/* categorie */
+
+.feature {
+    background:#eff6ff;
+    border-left:5px solid #3b82f6;
+}
+
+.feature button {
+    background:#3b82f6;
+    color:white;
+}
+
+
+.release {
+    background:#fef3c7;
+    border-left:5px solid #f59e0b;
+}
+
+.release button {
+    background:#f59e0b;
+    color:white;
+}
+
+
+.education {
+    background:#ecfdf5;
+    border-left:5px solid #10b981;
+}
+
+.education button {
+    background:#10b981;
+    color:white;
+}
+
+
+.warning {
+    background:#fee2e2;
+    border-left:5px solid #ef4444;
+}
+
+.warning button {
+    background:#ef4444;
+    color:white;
+}
+
+
+.marketing {
+    background:#faf5ff;
+    border-left:5px solid #9333ea;
+}
+
+.marketing button {
+    background:#9333ea;
+    color:white;
+}
+
+
+.disabled {
+    position:absolute;
+    right:15px;
+    top:15px;
+    color:#777;
+    font-size:12px;
+}
+
+
+.meta {
+    margin-top:15px;
+    font-size:12px;
+    color:#666;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+<h1>Aroundo Communication Tips</h1>
+
+
+<div class="device">
+
+<div class="header">
+<div class="logo">Aroundo</div>
+<div class="status">utente attivo</div>
+</div>
+
+
+<!-- FEATURE -->
+
+<div class="tip feature">
+
+<h3>📍 Scopri i percorsi vicino a te</h3>
+
+<p>
+Abbiamo rilevato che non hai ancora utilizzato la funzione mappa.
+Prova a cercare luoghi interessanti vicino alla tua posizione.
+</p>
+
+<button>
+Apri mappa
+</button>
+
+<div class="meta">
+Tipo: education |
+Condizione: an_map = 0 |
+Growth: 2
+</div>
+
+</div>
+
+
+
+<!-- RELEASE -->
+
+<div class="tip release">
+
+<h3>🚀 Nuova versione disponibile</h3>
+
+<p>
+È arrivata una nuova versione di Aroundo con miglioramenti
+alla navigazione e maggiore velocità.
+</p>
+
+<button>
+Aggiorna
+</button>
+
+<div class="meta">
+Tipo: release |
+Condizione: versione precedente |
+Repeat: 1
+</div>
+
+</div>
+
+
+
+<!-- EDUCATION -->
+
+<div class="tip education">
+
+<h3>💡 Lo sapevi?</h3>
+
+<p>
+Puoi salvare i tuoi luoghi preferiti e ritrovarli in qualsiasi momento.
+</p>
+
+<button>
+Scopri come
+</button>
+
+<div class="meta">
+Tipo: tutorial |
+Condizione: an_marker = 0
+</div>
+
+</div>
+
+
+
+<!-- WARNING -->
+
+<div class="tip warning">
+
+<h3>⚠️ GPS non attivo</h3>
+
+<p>
+Per migliorare la precisione dei risultati puoi abilitare
+la posizione dal tuo dispositivo.
+</p>
+
+<button>
+Attiva GPS
+</button>
+
+<div class="meta">
+Tipo: assistance |
+Condizione: an_gps = false
+</div>
+
+</div>
+
+
+
+<!-- MARKETING -->
+
+<div class="tip marketing">
+
+<h3>⭐ Nuovo servizio disponibile</h3>
+
+<p>
+Ora puoi organizzare le tue esperienze direttamente da Aroundo.
+</p>
+
+<button>
+Scopri
+</button>
+
+<div class="disabled">
+× Non mostrare più
+</div>
+
+<div class="meta">
+Tipo: communication |
+Growth elevato |
+Utente non interessato: aumenta intervallo
+</div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+</body>
+</html>
