@@ -1,6 +1,4 @@
 import { supabase } from "../supabase.js";
-import { ANALYTICS_FIELDS } from "../analytics/analytics.js";
-
 /*
  * TIP TYPES
  *
@@ -8,29 +6,37 @@ import { ANALYTICS_FIELDS } from "../analytics/analytics.js";
  * Per aggiungere un nuovo tipo si interviene qui.
  */
 export const TIP_TYPES = {
-
     bubble: {
         label: "Bubble",
         className: "tip-bubble"
     },
-
     banner: {
         label: "Banner",
         className: "tip-banner"
     },
-
     modal: {
         label: "Modal",
         className: "tip-modal"
     },
-
     toast: {
         label: "Toast",
         className: "tip-toast"
     }
-
 };
 
+export const ANALYTICS_FIELDS = [
+  "an_open",
+  "an_login",
+  "an_install",
+  "an_share",
+  "an_more",
+  "an_info",
+  "an_marker",
+  "an_map",
+  "an_buy",
+  "an_book",
+  "an_gps"
+];
 
 /*
  * ANALYTICS
@@ -41,7 +47,6 @@ export const TIP_TYPES = {
 export function getAnalyticsFields() {
     return ANALYTICS_FIELDS;
 }
-
 
 /*
  * TIP TYPES
@@ -54,7 +59,6 @@ export function getTipTypes() {
         })
     );
 }
-
 
 /*
  * PROGRESSIONE
@@ -79,46 +83,33 @@ export function calculateProgression(
     interval = Number(interval);
     growth = Number(growth);
     repeat = Number(repeat);
-
     if (!Number.isFinite(interval))
         interval = 1;
-
     if (!Number.isFinite(growth))
         growth = 1;
-
     if (repeat === 0)
         repeat = 10;
-
     const result = [];
-
     let total = 0;
-
     for (let show = 0; show < repeat; show++) {
-
         let increment =
             Math.floor(
                 interval *
                 (show + 1) *
                 growth
             );
-
         if (increment < 1)
             increment = 1;
-
         total += increment;
-
         result.push(total);
     }
-
     return result;
 }
-
 
 /*
  * VALORE DI DEFAULT
  */
 export function defaultTip() {
-
     return {
         id_tips: "",
         tp_text: "",
@@ -131,43 +122,34 @@ export function defaultTip() {
         tp_interval: 1,
         tp_growth: 1
     };
-
 }
-
 
 /*
  * CARICA TIP
  */
 export async function loadTip(id) {
-
     const { data, error } =
         await supabase
             .from("tips")
             .select("*")
             .eq("id_tips", id)
             .single();
-
     if (error)
         throw error;
-
     return data;
 }
-
 
 /*
  * SALVA TIP
  */
 export async function saveTip(tip) {
-
     const { data, error } =
         await supabase
             .from("tips")
             .upsert(tip)
             .select()
             .single();
-
     if (error)
         throw error;
-
     return data;
 }
