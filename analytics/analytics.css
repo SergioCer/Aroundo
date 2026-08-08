@@ -55,12 +55,13 @@ height:42px;
 display:flex;
 align-items:center;
 justify-content:center;
-gap:8px;
+gap:12px;
 }
 
 .collapse-bar{
 justify-content:flex-start;
-padding:0 8px;
+padding:4 8px;
+justify-content: center;    
 }
 
 .period-title{
@@ -140,7 +141,7 @@ margin-top:5px;
 }
 
 .metric-value{
-font-size:12px;
+font-size:14px;
 font-weight:700;
 margin-top:3px;
 }
