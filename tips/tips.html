@@ -2,14 +2,10 @@
 <html lang="it">
 
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>Tip</title>
-
 <style>
 
 body {
@@ -159,213 +155,125 @@ textarea {
 }
 
 </style>
-
 </head>
-
-
 <body>
 
-
 <div class="header">
-
   <div class="title">
-
     <button
       class="bck-btn"
       onclick="location.href='tips_overview.html'">
       ←
     </button>
-
     <span id="pageTitle">
       Nuovo Tip
     </span>
-
     <button
       class="save-btn"
       onclick="save()">
       ✓
     </button>
-
   </div>
-
 </div>
-
-
 <div class="container">
-
-
   <div class="field">
-
     <label>ID Tip</label>
-
     <input
       id="id_tips"
       placeholder="es. welcome">
-
   </div>
-
-
   <br>
-
-
   <div class="field">
-
     <label>Testo</label>
-
     <textarea
       id="tp_text"
       placeholder="Testo del messaggio...">
     </textarea>
-
   </div>
-
-
   <div class="row">
-
     <div class="field">
-
       <label>Tipo</label>
-
       <select id="tp_type"></select>
-
     </div>
-
-
     <div class="field">
-
       <label>Analytics</label>
-
       <select id="tp_analytics"></select>
-
     </div>
-
   </div>
-
-
   <div class="row">
-
     <div class="field">
-
       <label>Condizione</label>
-
       <select id="tp_condition">
-
         <option value="=">=</option>
         <option value="!=">!=</option>
         <option value=">">></option>
         <option value=">=">>=</option>
         <option value="<"><</option>
         <option value="<="><=</option>
-
       </select>
-
     </div>
-
-
     <div class="field">
-
       <label>Valore</label>
-
       <input
         id="tv_value"
         placeholder="es. 10 oppure true">
-
     </div>
-
   </div>
-
-
   <div class="row">
-
     <div class="field">
-
       <label>Repeat</label>
-
       <input
         id="tp_repeat"
         type="number"
         min="0"
         value="1">
-
     </div>
-
-
     <div class="field">
-
       <label>Interval</label>
-
       <input
         id="tp_interval"
         type="number"
         min="1"
         value="1">
-
     </div>
-
-
     <div class="field">
-
       <label>Growth</label>
-
       <input
         id="tp_growth"
         type="number"
         step="0.1"
         value="1">
-
     </div>
-
   </div>
-
-
   <div class="status">
-
     <input
       id="tp_active"
       type="checkbox">
-
     <label
       for="tp_active">
       Tip attivo
     </label>
-
   </div>
-
-
   <div class="preview">
-
     <div class="preview-title">
       Progressione prevista
     </div>
-
     <div
       id="progression"
       class="progression">
     </div>
-
   </div>
-
-
   <div id="tipPreview"
        class="tip-preview tip-bubble">
-
     Anteprima del Tip
-
   </div>
-
-
 </div>
-
 
 <script type="module">
 
-
-import {
-  requireAuth
-} from "../auth-check.js";
+import {requireAuth} from "../auth-check.js";
 
 await requireAuth();
-
 
 import {
   getTipTypes,
@@ -377,196 +285,106 @@ import {
 } from "./tips.js";
 
 
-let tip =
-  defaultTip();
+let tip = defaultTip();
 
 
-const params =
-  new URLSearchParams(
-    location.search
-  );
+const params = new URLSearchParams(location.search);
 
-
-const id =
-  params.get("id");
-
-
-const isNew =
-  params.get("new") === "1";
-
+const id =params.get("id");
+const isNew =params.get("new") === "1";
 
 /* ELEMENTS */
+const idTips = document.getElementById("id_tips");
 
-const idTips =
-  document.getElementById("id_tips");
+const text = document.getElementById("tp_text");
 
-const text =
-  document.getElementById("tp_text");
+const type = document.getElementById("tp_type");
 
-const type =
-  document.getElementById("tp_type");
+const analytics = document.getElementById("tp_analytics");
 
-const analytics =
-  document.getElementById("tp_analytics");
+const condition = document.getElementById("tp_condition");
 
-const condition =
-  document.getElementById("tp_condition");
+const value = document.getElementById("tv_value");
 
-const value =
-  document.getElementById("tv_value");
+const repeat = document.getElementById("tp_repeat");
 
-const repeat =
-  document.getElementById("tp_repeat");
+const interval = document.getElementById("tp_interval");
 
-const interval =
-  document.getElementById("tp_interval");
+const growth = document.getElementById("tp_growth");
 
-const growth =
-  document.getElementById("tp_growth");
-
-const active =
-  document.getElementById("tp_active");
-
+const active = document.getElementById("tp_active");
 
 /* TYPES */
-
 getTipTypes().forEach(item => {
-
-  const option =
-    document.createElement("option");
-
-  option.value =
-    item.value;
-
-  option.textContent =
-    item.label;
-
+  const option = document.createElement("option");
+  option.value = item.value;
+  option.textContent = item.label;
   type.appendChild(option);
-
 });
-
 
 /* ANALYTICS */
-
 getAnalyticsFields().forEach(field => {
-
-  const option =
-    document.createElement("option");
-
-  option.value =
-    field;
-
-  option.textContent =
-    field;
-
+  const option = document.createElement("option");
+  option.value = field;
+  option.textContent = field;
   analytics.appendChild(option);
-
 });
 
-
 /* LOAD */
-
 async function init() {
-
   if (id && !isNew) {
-
     tip =
       await loadTip(id);
-
     document
       .getElementById("pageTitle")
       .textContent =
       "Modifica Tip";
-
   }
-
-
   fill();
-
   update();
-
 }
-
 
 /* FILL */
-
 function fill() {
-
-  idTips.value =
-    tip.id_tips || "";
-
-  text.value =
-    tip.tp_text || "";
-
-  type.value =
-    tip.tp_type || "bubble";
-
-  analytics.value =
-    tip.tp_analytics || "an_open";
-
-  condition.value =
-    tip.tp_condition || ">=";
-
-  value.value =
-    tip.tv_value ?? "";
-
-  repeat.value =
-    tip.tp_repeat ?? 1;
-
-  interval.value =
-    tip.tp_interval ?? 1;
-
-  growth.value =
-    tip.tp_growth ?? 1;
-
-  active.checked =
-    tip.tp_active === true;
-
+  idTips.value = tip.id_tips || "";
+  text.value = tip.tp_text || "";
+  type.value = tip.tp_type || "bubble";
+  analytics.value = tip.tp_analytics || "an_open";
+  condition.value = tip.tp_condition || ">=";
+  value.value = tip.tv_value ?? "";
+  repeat.value = tip.tp_repeat ?? 1;
+  interval.value = tip.tp_interval ?? 1;
+  growth.value = tip.tp_growth ?? 1;
+  active.checked = tip.tp_active === true;
 }
 
-
 /* UPDATE */
-
 function update() {
-
   const values =
     calculateProgression(
       interval.value,
       growth.value,
       repeat.value
     );
-
-
   const box =
     document.getElementById(
       "progression"
     );
-
-
   box.innerHTML = "";
-
-
   values.forEach((value, index) => {
-
     const el =
       document.createElement("div");
-
     el.className =
       "step";
-
     el.textContent =
       `${index + 1}ª → ${value}`;
-
     box.appendChild(el);
-
   });
-
 
   const preview =
     document.getElementById(
       "tipPreview"
     );
-
 
   preview.className =
     "tip-preview " +
@@ -578,16 +396,12 @@ function update() {
         : "tip-bubble"
     );
 
-
   preview.textContent =
     text.value ||
     "Anteprima del Tip";
-
 }
 
-
 /* EVENTS */
-
 [
   text,
   type,
@@ -595,110 +409,70 @@ function update() {
   interval,
   growth
 ].forEach(el => {
-
   el.addEventListener(
     "input",
     update
   );
-
   el.addEventListener(
     "change",
     update
   );
-
 });
 
-
 /* SAVE */
-
 window.save = async () => {
-
   const id =
     idTips.value.trim();
-
-
   if (!id) {
-
     alert(
       "Inserire l'identificativo del Tip."
     );
-
     return;
-
   }
-
-
   if (!text.value.trim()) {
-
     alert(
       "Inserire il testo del Tip."
     );
-
     return;
-
   }
 
-
   const data = {
-
     id_tips: id,
-
     tp_text:
       text.value.trim(),
-
     tp_condition:
       condition.value,
-
     tp_analytics:
       analytics.value,
-
     tv_value:
       value.value.trim(),
-
     tp_type:
       type.value,
-
     tp_active:
       active.checked,
-
     tp_repeat:
       Number(repeat.value),
-
     tp_interval:
       Number(interval.value),
-
     tp_growth:
       Number(growth.value)
-
   };
 
-
   try {
-
     await saveTip(data);
-
     location.href =
       "tips_overview.html";
-
   }
 
   catch(error) {
-
     console.error(error);
-
     alert(
       "Errore durante il salvataggio."
     );
-
   }
-
 };
 
-
 init();
-
 </script>
-
 </body>
-
 </html>
