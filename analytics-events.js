@@ -302,4 +302,87 @@ export function analyticsLocation(lat, lng){
     });
 }
 
+/*
+ * ============================================================
+ * AROUND0 - ANALYTICS / NOTE ARCHITETTURALI
+ * ============================================================
+ *
+ * IDENTIFICATIVO an_device
+ * ------------------------
+ * an_device è un identificativo tecnico casuale generato
+ * localmente tramite crypto.randomUUID() e conservato nel
+ * localStorage del browser.
+ *
+ * Non contiene informazioni personali e non viene costruito
+ * utilizzando nome, email, numero di telefono, IP o altri dati
+ * direttamente identificativi.
+ *
+ * IMPORTANTE:
+ * an_device NON identifica necessariamente il dispositivo fisico
+ * e NON identifica necessariamente una singola persona.
+ *
+ * Lo stesso dispositivo può generare più an_device, ad esempio:
+ * - utilizzando browser differenti;
+ * - utilizzando profili browser differenti;
+ * - cancellando i dati del sito/localStorage;
+ * - utilizzando la modalità privata/incognito;
+ * - cambiando origine/dominio dell'applicazione.
+ *
+ * Di conseguenza an_device deve essere interpretato come:
+ *
+ * "identificativo tecnico persistente dell'installazione/browser
+ *  di Aroundo"
+ *
+ * e non come identificativo certo dell'utente o del dispositivo.
+ *
+ *
+ * UTILIZZO ANALYTICS
+ * ------------------
+ * an_device viene utilizzato esclusivamente per correlare nel
+ * tempo le attività della stessa installazione/browser e per
+ * elaborare statistiche di utilizzo della piattaforma.
+ *
+ * In particolare consente di ricavare indicatori quali:
+ * - utilizzo della piattaforma;
+ * - utenti/dispositivi attivi;
+ * - ritorni in giorni differenti;
+ * - utilizzo delle funzionalità;
+ * - frequenza di utilizzo;
+ * - statistiche necessarie all'ottimizzazione di Aroundo.
+ *
+ * Un "return" indica quindi la presenza dello stesso an_device
+ * in giorni differenti e NON costituisce la prova che la stessa
+ * persona fisica sia tornata.
+ *
+ *
+ * GEOLOCALIZZAZIONE
+ * -----------------
+ * Aroundo utilizza la posizione dell'utente esclusivamente per
+ * funzionalità proprie della piattaforma, ad esempio per offrire
+ * contenuti ed eventi pertinenti alla posizione.
+ *
+ * La posizione viene acquisita esclusivamente se l'utente ha
+ * autorizzato la geolocalizzazione tramite il browser/dispositivo.
+ *
+ * Per minimizzare il dato:
+ * - latitudine e longitudine sono arrotondate a 2 decimali;
+ * - viene registrata al massimo una posizione al giorno;
+ * - viene conservata l'ultima posizione disponibile della giornata;
+ * - non viene registrato uno storico continuo degli spostamenti.
+ *
+ * La posizione non viene utilizzata per pubblicità comportamentale
+ * né per il tracciamento continuo dell'utente.
+ *
+ *
+ * PRINCIPIO DI MINIMIZZAZIONE
+ * ---------------------------
+ * Gli analytics devono raccogliere esclusivamente i dati necessari
+ * alle funzionalità e alle finalità dichiarate di Aroundo.
+ *
+ * L'aggiunta futura di nuovi dati agli analytics deve essere
+ * valutata in relazione alla relativa finalità prima di essere
+ * implementata.
+ *
+ * ============================================================
+ */
 
