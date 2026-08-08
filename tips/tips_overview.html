@@ -149,38 +149,26 @@ td {
 }
 
 </style>
-
 </head>
-
 <body>
 
 <div class="header">
-
   <div class="title">
-
     <button
       class="bck-btn"
       onclick="location.href='../dashboard.html'">
       ←
     </button>
-
     Tips
-
     <button
       class="add-btn"
       onclick="location.href='tips.html?new=1'">
       +
     </button>
-
   </div>
-
 </div>
-
-
 <table>
-
 <colgroup>
-
   <col style="width:60px">
   <col style="width:280px">
   <col style="width:100px">
@@ -189,21 +177,15 @@ td {
   <col style="width:80px">
   <col style="width:80px">
   <col style="width:60px">
-
 </colgroup>
-
-
 <thead>
-
 <tr>
-
 <th>
   <div class="col-header">
     <div class="col-title"
          style="justify-content:center">
       ID
     </div>
-
     <button
       class="reset-btn"
       onclick="resetAll()"
@@ -212,68 +194,44 @@ td {
     </button>
   </div>
 </th>
-
-
 <th>
-
   <div class="col-header">
-
     <div class="col-title">
       Testo
-
       <button
         class="sort-btn"
         onclick="sort('tp_text')">
         ↕
       </button>
     </div>
-
     <input
       class="filter"
       id="filterText"
       oninput="setFilter('tp_text',this.value)">
-
   </div>
-
 </th>
-
-
 <th>
-
   <div class="col-header">
-
     <div class="col-title">
       Tipo
     </div>
-
     <input
       class="filter"
       id="filterType"
       oninput="setFilter('tp_type',this.value)">
-
   </div>
-
 </th>
-
-
 <th>
-
   <div class="col-header">
-
     <div class="col-title">
       Analytics
     </div>
-
     <input
       class="filter"
       id="filterAnalytics"
       oninput="setFilter('tp_analytics',this.value)">
-
   </div>
-
 </th>
-
-
 <th>
   <div class="col-title">
     Repeat
@@ -284,8 +242,6 @@ td {
     </button>
   </div>
 </th>
-
-
 <th>
   <div class="col-title">
     Interval
@@ -296,8 +252,6 @@ td {
     </button>
   </div>
 </th>
-
-
 <th>
   <div class="col-title">
     Growth
@@ -308,45 +262,30 @@ td {
     </button>
   </div>
 </th>
-
-
 <th>
-
   <div class="col-header">
-
     <div class="col-title"
          style="justify-content:center">
       Stato
     </div>
-
     <button
       class="status-filter"
       onclick="toggleActive()"
       id="activeBtn">
       ●
     </button>
-
   </div>
-
 </th>
-
 </tr>
-
 </thead>
-
-
 <tbody id="tbody"></tbody>
-
 </table>
 
-
 <script type="module">
-
 import { requireAuth }
   from "../pages/auth-check.js";
 
 await requireAuth();
-
 
 import { supabase }
   from "../supabase.js";
@@ -356,232 +295,135 @@ import {
   getAnalyticsFields
 } from "./tips.js";
 
-
 let data = [];
-
-
 let state = {
-
   filters: {},
-
   sortField: null,
-
   sortDir: "asc",
-
   active: "all"
-
 };
 
-
 /* LOAD */
-
 async function load() {
-
   const { data: rows, error } =
     await supabase
       .from("tips")
       .select("*");
-
   if (error) {
-
     console.error(error);
-
     return;
-
   }
-
   data = rows || [];
-
   render();
-
 }
 
-
 /* SORT */
-
 window.sort = field => {
-
   if (state.sortField !== field) {
-
     state.sortField = field;
-
     state.sortDir = "asc";
-
   } else {
-
     state.sortDir =
       state.sortDir === "asc"
         ? "desc"
         : "asc";
-
   }
-
   render();
-
 };
-
 
 /* FILTER */
-
 window.setFilter = (field,value) => {
-
   state.filters[field] = value;
-
   render();
-
 };
 
-
 /* RESET */
-
 window.resetAll = () => {
-
   state.filters = {};
-
   state.sortField = null;
-
   state.sortDir = "asc";
-
   state.active = "all";
-
   document
     .querySelectorAll(".filter")
     .forEach(x => x.value = "");
-
   render();
-
 };
-
 
 /* ACTIVE */
-
 window.toggleActive = () => {
-
   if (state.active === "all")
     state.active = "true";
-
   else if (state.active === "true")
     state.active = "false";
-
   else
     state.active = "all";
-
   render();
-
 };
 
-
 /* RENDER */
-
 function render() {
-
   let filtered = [...data];
-
-
   if (state.active === "true")
     filtered =
       filtered.filter(x => x.tp_active === true);
-
-
   if (state.active === "false")
     filtered =
       filtered.filter(x => x.tp_active === false);
-
-
   Object.entries(state.filters)
     .forEach(([key,value]) => {
-
       const v =
         String(value || "").toLowerCase();
-
       if (!v) return;
-
       filtered =
         filtered.filter(row =>
           String(row[key] ?? "")
             .toLowerCase()
             .includes(v)
         );
-
     });
-
-
   if (state.sortField) {
-
     filtered.sort((a,b) => {
-
       const va = a[state.sortField];
       const vb = b[state.sortField];
-
       if (va === vb) return 0;
-
       const result =
         va > vb ? 1 : -1;
-
       return state.sortDir === "asc"
         ? result
         : -result;
-
     });
-
   }
-
 
   const tbody =
     document.getElementById("tbody");
-
   tbody.innerHTML = "";
-
-
   filtered.forEach(row => {
-
     const tr =
       document.createElement("tr");
-
-
     tr.onclick = () =>
       location.href =
         `tips.html?id=${encodeURIComponent(row.id_tips)}`;
-
-
     const type =
       getTipTypes()
         .find(x => x.value === row.tp_type);
-
-
     const active =
       row.tp_active
         ? '<span class="status-ok">✔</span>'
         : '<span class="status-no">✖</span>';
-
-
     tr.innerHTML = `
-
       <td>${row.id_tips || ""}</td>
-
       <td>${row.tp_text || ""}</td>
-
       <td>${type?.label || row.tp_type || ""}</td>
-
       <td>${row.tp_analytics || ""}</td>
-
       <td>${row.tp_repeat ?? ""}</td>
-
       <td>${row.tp_interval ?? ""}</td>
-
       <td>${row.tp_growth ?? ""}</td>
-
       <td style="text-align:center">
         ${active}
       </td>
-
     `;
-
-
     tbody.appendChild(tr);
-
   });
-
 
   document.getElementById("activeBtn").textContent =
     state.active === "all"
@@ -590,10 +432,8 @@ function render() {
         ? "✔"
         : "✖";
 
-
   const reset =
     document.getElementById("resetBtn");
-
   const hasFilters =
     Object.values(state.filters)
       .some(Boolean)
@@ -601,22 +441,15 @@ function render() {
     state.active !== "all"
     ||
     state.sortField !== null;
-
   reset.classList.toggle(
     "active",
     hasFilters
   );
-
   reset.textContent =
     hasFilters ? "↺" : "•";
-
 }
 
-
 load();
-
 </script>
-
 </body>
-
 </html>
