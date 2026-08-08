@@ -4,20 +4,6 @@ let rows=[];
 let currentPeriod="day";
 let currentDate=new Date();
 
-export const ANALYTICS_FIELDS = [
-    "an_open",
-    "an_install",
-    "an_login",
-    "an_gps",
-    "an_share",
-    "an_more",
-    "an_info",
-    "an_marker",
-    "an_map",
-    "an_buy",
-    "an_book"
-];
-
 // LOAD ANALYTICS
 async function loadAnalytics(){
 const from=new Date();
