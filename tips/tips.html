@@ -1,18 +1,27 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Tip</title>
+
 <style>
 
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: #f6f8fb;
   margin: 0;
+  color: #111827;
 }
+
+/* HEADER */
 
 .header {
   display: flex;
@@ -28,27 +37,19 @@ body {
   align-items: center;
 }
 
-.bck-btn,
-.save-btn {
+.bck-btn {
   width: 34px;
   height: 34px;
   border-radius: 17px;
   border: none;
   cursor: pointer;
-  font-weight: bold;
-}
-
-.bck-btn {
   background: #e5e7eb;
   color: #374151;
   font-size: 18px;
+  font-weight: bold;
 }
 
-.save-btn {
-  background: #22c55e;
-  color: white;
-  font-size: 18px;
-}
+/* CONTAINER */
 
 .container {
   max-width: 900px;
@@ -56,7 +57,10 @@ body {
   padding: 20px;
   background: white;
   border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.04);
 }
+
+/* FIELDS */
 
 .row {
   display: flex;
@@ -66,6 +70,7 @@ body {
 
 .field {
   flex: 1;
+  min-width: 0;
 }
 
 label {
@@ -79,11 +84,18 @@ input,
 select,
 textarea {
   width: 100%;
-  box-sizing: border-box;
   padding: 9px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-family: inherit;
+  background: white;
+}
+
+input:disabled,
+select:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
 
 textarea {
@@ -91,63 +103,92 @@ textarea {
   resize: vertical;
 }
 
-.preview {
-  margin-top: 25px;
-  padding: 15px;
-  background: #f6f8fb;
-  border-radius: 10px;
+textarea::placeholder,
+input::placeholder {
+  color: #9ca3af;
 }
 
-.preview-title {
-  font-weight: bold;
-  margin-bottom: 10px;
+/* ICON */
+
+.icon-field {
+  max-width: 180px;
 }
 
-.progression {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.step {
-  background: #dbeafe;
-  color: #1e3a8a;
-  padding: 7px 12px;
-  border-radius: 15px;
-}
-
-.status {
+.icon-preview {
+  height: 39px;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.status input {
-  width: auto;
-}
-
-.simulation {
-  margin-top: 15px;
-  display: grid;
-  gap: 6px;
-}
-
-.simulation-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 10px;
-  background: #f6f8fb;
+  justify-content: center;
+  font-size: 22px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
 }
 
-.simulation-value {
-  font-weight: bold;
+/* CONDITIONS */
+
+.condition-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 1fr 100px;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 12px;
 }
 
-.simulation-main {
-  background: #dcfce7;
-  color: #166534;
+.condition-row.hidden {
+  display: none;
 }
+
+.logic-field {
+  min-width: 0;
+}
+
+/* CTA */
+
+.cta-panel {
+  margin-top: 5px;
+  padding: 14px;
+  background: #faf5ff;
+  border-left: 5px solid #9333ea;
+  border-radius: 8px;
+}
+
+.cta-row {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+}
+
+.cta-toggle {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 17px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  flex: 0 0 34px;
+}
+
+.cta-on {
+  background: #9333ea;
+}
+
+.cta-off {
+  background: #9ca3af;
+}
+
+.cta-url {
+  flex: 2;
+}
+
+/* REPEAT */
+
+.repeat-row {
+  margin-top: 18px;
+}
+
+/* TOOLS */
 
 .tip-tools {
   display: flex;
@@ -169,46 +210,38 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform .12s ease, filter .12s ease;
 }
 
-.progression-btn {
+.tool-btn:hover {
+  transform: scale(1.06);
+  filter: brightness(.95);
+}
+
+.impact-btn {
   background: #3b82f6;
-}
-
-.progression-btn:hover {
-  background: #2563eb;
-}
-
-.preview-btn {
-  background: #22c55e;
-}
-
-.preview-btn:hover {
-  background: #16a34a;
 }
 
 .active-on {
   background: #22c55e;
 }
 
-.active-on:hover {
-  background: #16a34a;
-}
-
 .active-off {
   background: #ef4444;
 }
 
-.active-off:hover {
-  background: #dc2626;
+.preview-btn {
+  background: #9333ea;
 }
+
+/* PROGRESSION */
 
 .progression {
   display: flex;
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .step {
@@ -216,556 +249,1314 @@ textarea {
   color: #1e3a8a;
   padding: 7px 12px;
   border-radius: 15px;
+  font-size: 13px;
 }
-  
+
+/* IMPACT */
+
+.simulation {
+  margin-top: 20px;
+  display: none;
+  gap: 6px;
+}
+
+.simulation.visible {
+  display: grid;
+}
+
+.simulation-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #374151;
+}
+
+.simulation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 9px 11px;
+  background: #f6f8fb;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.simulation-row.condition {
+  background: #f9fafb;
+}
+
+.simulation-value {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.simulation-main {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.simulation-excluded {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.simulation-missing {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+@media (max-width: 700px) {
+
+  .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .condition-row {
+    grid-template-columns: 1fr 100px;
+  }
+
+  .condition-row .value-field {
+    grid-column: 1 / 2;
+  }
+
+  .condition-row .logic-field {
+    grid-column: 2 / 3;
+  }
+
+  .cta-row {
+    flex-wrap: wrap;
+  }
+
+}
+
 </style>
+
 </head>
+
 <body>
 
 <div class="header">
+
   <div class="title">
-    <button
-      class="bck-btn"
-      onclick="location.href='tips_overview.html'">
-      ←
-    </button>
-    <span id="pageTitle">
-      New Tip
-    </span>
-    <button
-      class="save-btn"
-      onclick="save()">
-      ✓
-    </button>
+
+```
+<button
+  class="bck-btn"
+  type="button"
+  onclick="location.href='tips_overview.html'">
+  ←
+</button>
+
+<span id="pageTitle">
+  New Tip
+</span>
+```
+
   </div>
+
 </div>
+
 <div class="container">
+
+  <!-- ID + TYPE -->
+
+  <div class="row">
+
+```
+<div class="field">
+  <label>Tip ID</label>
+
+  <input
+    id="id_tips"
+    placeholder="e.g. 20260809 Welcome">
+</div>
+
+<div class="field">
+  <label>Type</label>
+
+  <select id="tp_type"></select>
+</div>
+```
+
+  </div>
+
+  <!-- ICON + TITLE -->
+
+  <div class="row">
+
+```
+<div class="field icon-field">
+
+  <label>Icon</label>
+
+  <select id="tp_icon"></select>
+
+</div>
+
+<div class="field">
+
+  <label>Title</label>
+
+  <input
+    id="tp_title"
+    placeholder="Short title of the Tip">
+
+</div>
+```
+
+  </div>
+
+  <!-- TEXT -->
+
   <div class="field">
-    <label>Tip ID</label>
+
+```
+<label>Text</label>
+
+<textarea
+  id="tp_text"
+  placeholder="Message text..."></textarea>
+```
+
+  </div>
+
+  <!-- CONDITIONS -->
+
+  <div style="margin-top:18px;">
+
+```
+<div class="condition-row">
+
+  <div class="field">
+    <label>Analytics</label>
+    <select id="tp_analytics_1"></select>
+  </div>
+
+  <div class="field">
+    <label>Condition</label>
+    <select id="tp_condition_1"></select>
+  </div>
+
+  <div class="field value-field">
+    <label>Value</label>
     <input
-      id="id_tips"
-      placeholder="e.g. 20260809 Welcome">
+      id="tv_value_1"
+      placeholder="Value">
   </div>
-  <br>
+
+  <div class="field logic-field">
+    <label>Logic</label>
+    <select id="tp_logic_1">
+      <option value="">—</option>
+      <option value="AND">AND</option>
+      <option value="OR">OR</option>
+      <option value="NOT">NOT</option>
+    </select>
+  </div>
+
+</div>
+
+
+<div
+  id="conditionRow2"
+  class="condition-row hidden">
+
   <div class="field">
-    <label>Text</label>
-    <textarea
-      id="tp_text"
-      placeholder="Message text...">
-    </textarea>
+    <label>Analytics</label>
+    <select id="tp_analytics_2"></select>
   </div>
-  <div class="row">
-    <div class="field">
-      <label>Type</label>
-      <select id="tp_type"></select>
-    </div>
-    <div class="field">
-      <label>Analytics</label>
-      <select id="tp_analytics"></select>
-    </div>
+
+  <div class="field">
+    <label>Condition</label>
+    <select id="tp_condition_2"></select>
   </div>
-  <div class="row">
-    <div class="field">
-      <label>Condition</label>
-      <select id="tp_condition">
-        <option value="=">=</option>
-        <option value="!=">!=</option>
-        <option value=">">></option>
-        <option value=">=">>=</option>
-        <option value="<"><</option>
-        <option value="<="><=</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Valore</label>
-      <input
-        id="tv_value"
-        placeholder="e.g. 10 or true">
-    </div>
+
+  <div class="field value-field">
+    <label>Value</label>
+    <input
+      id="tv_value_2"
+      placeholder="Value">
   </div>
-  <div class="row">
-    <div class="field">
-      <label>Repeat</label>
-      <input
-        id="tp_repeat"
-        type="number"
-        min="0"
-        value="1">
-    </div>
-    <div class="field">
-      <label>Interval</label>
-      <input
-        id="tp_interval"
-        type="number"
-        min="1"
-        value="1">
-    </div>
-    <div class="field">
-      <label>Growth</label>
-      <input
-        id="tp_growth"
-        type="number"
-        step="0.1"
-        value="1">
-    </div>
+
+  <div class="field logic-field">
+    <label>Logic</label>
+    <select id="tp_logic_2">
+      <option value="">—</option>
+      <option value="AND">AND</option>
+      <option value="OR">OR</option>
+      <option value="NOT">NOT</option>
+    </select>
   </div>
-  
-<div class="tip-tools">
+
+</div>
+
+
+<div
+  id="conditionRow3"
+  class="condition-row hidden">
+
+  <div class="field">
+    <label>Analytics</label>
+    <select id="tp_analytics_3"></select>
+  </div>
+
+  <div class="field">
+    <label>Condition</label>
+    <select id="tp_condition_3"></select>
+  </div>
+
+  <div class="field value-field">
+    <label>Value</label>
+    <input
+      id="tv_value_3"
+      placeholder="Value">
+  </div>
+
+</div>
+```
+
+  </div>
+
+  <!-- CTA -->
+
+  <div class="cta-panel">
+
+```
+<div class="cta-row">
+
   <button
-    id="impactBtn"
-    class="tool-btn progression-btn"
+    id="ctaBtn"
+    class="cta-toggle cta-off"
     type="button"
-    title="Estimated Impact">
-    ↗
-  </button>
-  <button
-    id="activeBtn"
-    class="tool-btn"
-    type="button"
-    title="Tip inactive">
+    title="CTA inactive">
     ●
   </button>
-  <button
-    id="previewBtn"
-    class="tool-btn preview-btn"
-    type="button"
-    title="Preview Tip">
-    ▶
-  </button>
+
+  <div class="field">
+
+    <label>Button</label>
+
+    <input
+      id="tp_cta_label"
+      placeholder="e.g. Discover"
+      disabled>
+
+  </div>
+
+  <div class="field cta-url">
+
+    <label>Link</label>
+
+    <input
+      id="tp_cta_url"
+      placeholder="https://..."
+      disabled>
+
+  </div>
+
 </div>
-<div
-  id="progression"
-  class="progression">
+```
+
+  </div>
+
+  <!-- REPEAT -->
+
+  <div class="row repeat-row">
+
+```
+<div class="field">
+
+  <label>Repeat</label>
+
+  <input
+    id="tp_repeat"
+    type="number"
+    min="0"
+    value="1">
+
 </div>
+
+<div class="field">
+
+  <label>Interval</label>
+
+  <input
+    id="tp_interval"
+    type="number"
+    min="1"
+    value="1">
+
+</div>
+
+<div class="field">
+
+  <label>Growth</label>
+
+  <input
+    id="tp_growth"
+    type="number"
+    step="0.1"
+    value="1">
+
+</div>
+```
+
+  </div>
+
+  <!-- TOOLS -->
+
+  <div class="tip-tools">
+
+```
+<button
+  id="impactBtn"
+  class="tool-btn impact-btn"
+  type="button"
+  title="Estimated Impact">
+  ↗
+</button>
+
+<button
+  id="activeBtn"
+  class="tool-btn active-off"
+  type="button"
+  title="Tip inactive">
+  ●
+</button>
+
+<button
+  id="previewBtn"
+  class="tool-btn preview-btn"
+  type="button"
+  title="Preview Tip">
+  ▶
+</button>
+```
+
+  </div>
+
+  <!-- PROGRESSION -->
+
   <div
-  id="simulation"
-  class="simulation">
-</div>
+    id="progression"
+    class="progression">
+  </div>
+
+  <!-- IMPACT RESULT -->
+
+  <div
+    id="simulation"
+    class="simulation">
+  </div>
+
 </div>
 
 <script type="module">
 
-import {requireAuth} from "../pages/auth-check.js";
+import {requireAuth}
+  from "../pages/auth-check.js";
 
 await requireAuth();
 
 import {
   getTipTypes,
   getAnalyticsFields,
+  getConditions,
   calculateProgression,
   defaultTip,
   loadTip,
-  saveTip,
   simulateTip,
   renderTip
 } from "./tips.js";
 
 
+/* STATE */
+
 let tip = defaultTip();
 
+const params =
+  new URLSearchParams(location.search);
 
-const params = new URLSearchParams(location.search);
+const id =
+  params.get("id");
 
-const id =params.get("id");
-const isNew =params.get("new") === "1";
+const isNew =
+  params.get("new") === "1";
+
 
 /* ELEMENTS */
-const idTips = document.getElementById("id_tips");
 
-const text = document.getElementById("tp_text");
+const idTips =
+  document.getElementById("id_tips");
 
-const type = document.getElementById("tp_type");
+const type =
+  document.getElementById("tp_type");
 
-const analytics = document.getElementById("tp_analytics");
+const icon =
+  document.getElementById("tp_icon");
 
-const condition = document.getElementById("tp_condition");
+const title =
+  document.getElementById("tp_title");
 
-let value = document.getElementById("tv_value");
+const text =
+  document.getElementById("tp_text");
 
-const repeat = document.getElementById("tp_repeat");
+const repeat =
+  document.getElementById("tp_repeat");
 
-const interval = document.getElementById("tp_interval");
+const interval =
+  document.getElementById("tp_interval");
 
-const growth = document.getElementById("tp_growth");
+const growth =
+  document.getElementById("tp_growth");
 
-const activeBtn = document.getElementById("activeBtn");
+const activeBtn =
+  document.getElementById("activeBtn");
 
-const impactBtn = document.getElementById("impactBtn");
+const impactBtn =
+  document.getElementById("impactBtn");
 
-const previewBtn = document.getElementById("previewBtn");
+const previewBtn =
+  document.getElementById("previewBtn");
 
-const progression = document.getElementById("progression");
+const ctaBtn =
+  document.getElementById("ctaBtn");
 
-previewBtn.onclick = () => {
-  renderTip({
-    tp_text: text.value,
-    tp_type: type.value
-  });
-};
-  
-function getAnalyticsField() {
-  return getAnalyticsFields()
-    .find(x => x.value === analytics.value);
-}
+const ctaLabel =
+  document.getElementById("tp_cta_label");
 
-function updateAnalytics() {
-  const field = getAnalyticsField();
-  if (!field) return;
-  analytics.title = field.description;
-  condition.innerHTML = "";
-  const conditions =
-    field.type === "boolean"
-      ? ["=", "!="]
-      : [">", ">=", "=", "<=", "<", "!="];
-  conditions.forEach(x => {
-    const option =
-      document.createElement("option");
-    option.value = x;
-    option.textContent = x;
-    condition.appendChild(option);
-  });
-  condition.value =
-    conditions.includes(tip.tp_condition)
-      ? tip.tp_condition
-      : conditions[0];
-  const old = value;
-  const parent = old.parentElement;
-  if (field.type === "boolean") {
-    const select =
-      document.createElement("select");
-    select.id = "tv_value";
-    select.className = old.className;
-    select.title = field.description;
-    ["true", "false"].forEach(x => {
-      const option =
-        document.createElement("option");
-      option.value = x;
-      option.textContent = x;
-      select.appendChild(option);
-    });
-    select.value =
-      String(tip.tv_value || "true");
-    old.replaceWith(select);
-    value = select;
-  } else {
-    if (old.tagName !== "INPUT" ||
-        old.type !== "number") {
-      const input =
-        document.createElement("input");
-      input.id = "tv_value";
-      input.className = old.className;
-      input.type = "number";
-      input.step = "1";
-      input.value = old.value;
-      old.replaceWith(input);
-      value = input;
-    }
-    value.title = field.description;
-    value.placeholder = "Value";
-  }
-  const numeric =
-    field.type === "number";
-  document.getElementById("progression")
-    .hidden = !numeric;
-  interval.disabled = !numeric;
-  growth.disabled = !numeric;
-  update();
-}
-  
+const ctaUrl =
+  document.getElementById("tp_cta_url");
+
+const progression =
+  document.getElementById("progression");
+
+const simulation =
+  document.getElementById("simulation");
+
+
+/* FIELD REFERENCES */
+
+const analyticsFields = [
+  document.getElementById("tp_analytics_1"),
+  document.getElementById("tp_analytics_2"),
+  document.getElementById("tp_analytics_3")
+];
+
+const conditionFields = [
+  document.getElementById("tp_condition_1"),
+  document.getElementById("tp_condition_2"),
+  document.getElementById("tp_condition_3")
+];
+
+const valueFields = [
+  document.getElementById("tv_value_1"),
+  document.getElementById("tv_value_2"),
+  document.getElementById("tv_value_3")
+];
+
+const logicFields = [
+  document.getElementById("tp_logic_1"),
+  document.getElementById("tp_logic_2")
+];
+
+const conditionRows = [
+  null,
+  document.getElementById("conditionRow2"),
+  document.getElementById("conditionRow3")
+];
+
 
 /* TYPES */
+
 getTipTypes().forEach(item => {
-  const option = document.createElement("option");
-  option.value = item.value;
-  option.textContent = item.label;
+
+  const option =
+    document.createElement("option");
+
+  option.value =
+    item.value;
+
+  option.textContent =
+    item.label;
+
   type.appendChild(option);
+
 });
+
+
+/* ICONS */
+
+const icons = [
+  "⭐",
+  "🔔",
+  "ℹ️",
+  "💡",
+  "⚠️",
+  "🎉",
+  "📢",
+  "❤️",
+  "📍",
+  "🚀"
+];
+
+icons.forEach(item => {
+
+  const option =
+    document.createElement("option");
+
+  option.value =
+    item;
+
+  option.textContent =
+    item;
+
+  icon.appendChild(option);
+
+});
+
 
 /* ANALYTICS */
+
 getAnalyticsFields().forEach(field => {
-  const option = document.createElement("option");
-  option.value = field.value;
-  option.textContent = field.label;
-  option.title = field.description;
-  analytics.appendChild(option);
+
+  analyticsFields.forEach(select => {
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      field.value;
+
+    option.textContent =
+      field.label;
+
+    option.title =
+      field.description;
+
+    select.appendChild(option);
+
+  });
+
 });
 
-/* LOAD */
-async function init() {
-  if (id && !isNew) {
-    tip =
-      await loadTip(id);
-    document
-      .getElementById("pageTitle")
-      .textContent =
-      "Edit Tip";
+
+/* CONDITIONS */
+
+function updateConditions(index) {
+
+  const select =
+    analyticsFields[index];
+
+  const condition =
+    conditionFields[index];
+
+  const field =
+    getAnalyticsFields()
+      .find(x =>
+        x.value === select.value
+      );
+
+  if (!field)
+    return;
+
+  condition.innerHTML = "";
+
+  getConditions(field.type)
+    .forEach(operator => {
+
+      const option =
+        document.createElement("option");
+
+      option.value =
+        operator;
+
+      option.textContent =
+        operator;
+
+      condition.appendChild(option);
+
+    });
+
+
+  /*
+   * Boolean values use a select.
+   */
+
+  const old =
+    valueFields[index];
+
+  const currentValue =
+    old.value;
+
+  if (field.type === "boolean") {
+
+    if (old.tagName !== "SELECT") {
+
+      const selectValue =
+        document.createElement("select");
+
+      selectValue.id =
+        old.id;
+
+      selectValue.className =
+        old.className;
+
+      ["true", "false"]
+        .forEach(item => {
+
+          const option =
+            document.createElement("option");
+
+          option.value =
+            item;
+
+          option.textContent =
+            item;
+
+          selectValue.appendChild(option);
+
+        });
+
+      old.replaceWith(selectValue);
+
+      valueFields[index] =
+        selectValue;
+
+    }
+
+    valueFields[index].value =
+      currentValue === "false"
+        ? "false"
+        : "true";
+
+  } else {
+
+    if (old.tagName !== "INPUT") {
+
+      const input =
+        document.createElement("input");
+
+      input.id =
+        old.id;
+
+      input.className =
+        old.className;
+
+      input.placeholder =
+        "Value";
+
+      old.replaceWith(input);
+
+      valueFields[index] =
+        input;
+
+    }
+
+    valueFields[index].type =
+      "number";
+
+    valueFields[index].step =
+      "1";
+
+    valueFields[index].value =
+      currentValue || "";
+
   }
-  fill();
-  updateAnalytics();
+
+  updateProgression();
+
 }
 
-/* FILL */
-function fill() {
-  idTips.value = tip.id_tips || "";
-  text.value = tip.tp_text || "";
-  type.value = tip.tp_type || "bubble";
-  analytics.value = tip.tp_analytics || "an_open";
-  condition.value = tip.tp_condition || ">=";
-  value.value = tip.tv_value ?? "";
-  repeat.value = tip.tp_repeat ?? 1;
-  interval.value = tip.tp_interval ?? 1;
-  growth.value = tip.tp_growth ?? 1;
-  updateActive();
-  interval.title = "Number of views between two successive displays.";
-  growth.title = "Multiplier applied to the current interval.";
-  repeat.title = "Maximum number of displays. 0 = unlimited.";
-  condition.title = "Condition applied to the selected analytics value.";
-  text.title = "Text displayed to the user.";
+
+/* LOGIC VISIBILITY */
+
+function updateLogicRows() {
+
+  const logic1 =
+    logicFields[0].value;
+
+  const logic2 =
+    logicFields[1].value;
+
+
+  conditionRows[1]
+    .classList
+    .toggle(
+      "hidden",
+      !logic1
+    );
+
+  conditionRows[2]
+    .classList
+    .toggle(
+      "hidden",
+      !logic1 || !logic2
+    );
+
 }
+
+
+/* PROGRESSION */
+
+function updateProgression() {
+
+  const field =
+    getAnalyticsFields()
+      .find(x =>
+        x.value === analyticsFields[0].value
+      );
+
+  progression.innerHTML = "";
+
+  if (!field ||
+      field.type !== "number") {
+
+    progression.hidden =
+      true;
+
+    return;
+
+  }
+
+  progression.hidden =
+    false;
+
+  const repeatValue =
+    Number(repeat.value);
+
+  const values =
+    calculateProgression(
+      interval.value,
+      growth.value,
+      repeat.value
+    );
+
+
+  values.forEach((value, index) => {
+
+    const el =
+      document.createElement("div");
+
+    el.className =
+      "step";
+
+    el.textContent =
+      `${index + 1}ª → ${value}`;
+
+    progression.appendChild(el);
+
+  });
+
+
+  if (repeatValue === 0) {
+
+    const el =
+      document.createElement("div");
+
+    el.className =
+      "step";
+
+    el.textContent =
+      "∞ → ...";
+
+    progression.appendChild(el);
+
+  }
+
+  else if (repeatValue > 10) {
+
+    const el =
+      document.createElement("div");
+
+    el.className =
+      "step";
+
+    el.textContent =
+      "11ª → ...";
+
+    progression.appendChild(el);
+
+  }
+
+}
+
+
+/* ACTIVE */
 
 function updateActive() {
-  const on = tip.tp_active === true;
+
+  const active =
+    tip.tp_active === true;
+
   activeBtn.className =
     "tool-btn " +
-    (on ? "active-on" : "active-off");
-  activeBtn.textContent = "●";
+    (
+      active
+        ? "active-on"
+        : "active-off"
+    );
+
+  activeBtn.textContent =
+    "●";
+
   activeBtn.title =
-    on
+    active
       ? "Tip active"
       : "Tip inactive";
+
 }
+
+
+activeBtn.onclick = () => {
+
+  tip.tp_active =
+    !tip.tp_active;
+
+  updateActive();
+
+};
+
+
+/* CTA */
+
+function updateCTA() {
+
+  const active =
+    tip.tp_cta_active === true;
+
+  ctaBtn.className =
+    "cta-toggle " +
+    (
+      active
+        ? "cta-on"
+        : "cta-off"
+    );
+
+  ctaBtn.title =
+    active
+      ? "Button active"
+      : "Button inactive";
+
+  ctaLabel.disabled =
+    !active;
+
+  ctaUrl.disabled =
+    !active;
+
+}
+
+
+ctaBtn.onclick = () => {
+
+  tip.tp_cta_active =
+    !tip.tp_cta_active;
+
+  updateCTA();
+
+};
+
+
+/* PREVIEW */
+
+previewBtn.onclick = () => {
+
+  renderTip({
+
+    tp_type:
+      type.value,
+
+    tp_icon:
+      icon.value,
+
+    tp_title:
+      title.value,
+
+    tp_text:
+      text.value,
+
+    tp_cta_active:
+      tip.tp_cta_active,
+
+    tp_cta_label:
+      ctaLabel.value,
+
+    tp_cta_url:
+      ctaUrl.value,
+
+    tp_repeat:
+      Number(repeat.value)
+
+  });
+
+};
+
+
+/* IMPACT */
 
 impactBtn.onclick = async () => {
 
-  const box =
-    document.getElementById("simulation");
+  simulation.classList.add("visible");
 
-  if (!box) return;
+  simulation.innerHTML =
+    `<div class="simulation-title">
+      Calculating impact...
+    </div>`;
 
-  box.innerHTML =
-    "Calculating...";
 
   try {
 
     const result =
       await simulateTip({
-        tp_analytics:
-          analytics.value,
-        tp_condition:
-          condition.value,
-        tv_value:
-          value.value
+
+        tp_analytics_1:
+          analyticsFields[0].value,
+
+        tp_condition_1:
+          conditionFields[0].value,
+
+        tv_value_1:
+          valueFields[0].value,
+
+        tp_logic_1:
+          logicFields[0].value,
+
+        tp_analytics_2:
+          analyticsFields[1].value,
+
+        tp_condition_2:
+          conditionFields[1].value,
+
+        tv_value_2:
+          valueFields[1].value,
+
+        tp_logic_2:
+          logicFields[1].value,
+
+        tp_analytics_3:
+          analyticsFields[2].value,
+
+        tp_condition_3:
+          conditionFields[2].value,
+
+        tv_value_3:
+          valueFields[2].value
+
       });
 
-    box.innerHTML = `
-      <div class="simulation-row">
+
+    let html = `
+      <div class="simulation-title">
+        Estimated Impact
+      </div>
+
+      <div class="simulation-row simulation-main">
         <span>Devices analyzed</span>
         <span class="simulation-value">
           ${result.total}
         </span>
       </div>
+    `;
+
+
+    result.conditions.forEach(condition => {
+
+      html += `
+        <div class="simulation-row condition">
+          <span>
+            ${condition.text}
+          </span>
+
+          <span class="simulation-value">
+            ${condition.matched}
+          </span>
+        </div>
+      `;
+
+    });
+
+
+    html += `
 
       <div class="simulation-row simulation-main">
         <span>Potentially involved</span>
+
         <span class="simulation-value">
           ${result.involved}
           (${result.percent}%)
         </span>
       </div>
 
-      <div class="simulation-row">
+      <div class="simulation-row simulation-excluded">
         <span>Excluded</span>
+
         <span class="simulation-value">
           ${result.excluded}
         </span>
       </div>
 
-      <div class="simulation-row">
-        <span>Missing / unavailable data</span>
+      <div class="simulation-row simulation-missing">
+        <span>Missing data</span>
+
         <span class="simulation-value">
           ${result.missing}
         </span>
       </div>
+
     `;
 
-  } catch(error) {
+    simulation.innerHTML =
+      html;
+
+  }
+
+  catch(error) {
 
     console.error(error);
 
-    box.innerHTML =
-      "Simulation error.";
+    simulation.innerHTML =
+      `<div class="simulation-row simulation-missing">
+        Simulation error.
+      </div>`;
+
   }
+
 };
-  
-activeBtn.onclick = () => {
-  tip.tp_active =
-    !tip.tp_active;
-  updateActive();
-};
-  
-/* UPDATE */
-function update() {
 
-  const field = getAnalyticsField();
 
-  const box =
-    document.getElementById("progression");
+/* LOAD */
 
-  box.innerHTML = "";
-  box.hidden = !field;
+async function init() {
 
-  if (!field)
-    return;
+  if (id && !isNew) {
 
-  const repeatValue =
-    Number(repeat.value);
+    tip =
+      await loadTip(id);
 
-  if (field.type === "number") {
+    document
+      .getElementById("pageTitle")
+      .textContent =
+      "Edit Tip";
 
-    const values =
-      calculateProgression(
-        interval.value,
-        growth.value,
-        repeat.value
-      );
-
-    values.forEach((value,index) => {
-
-      const el =
-        document.createElement("div");
-
-      el.className = "step";
-
-      el.textContent =
-        `${index + 1}ª → ${value}`;
-
-      box.appendChild(el);
-
-    });
-
-    if (repeatValue === 0) {
-
-      const el =
-        document.createElement("div");
-
-      el.className = "step";
-      el.textContent = "∞ → ...";
-
-      box.appendChild(el);
-
-    } else if (repeatValue > 10) {
-
-      const el =
-        document.createElement("div");
-
-      el.className = "step";
-      el.textContent = "11ª → ...";
-
-      box.appendChild(el);
-    }
-
-  } else {
-
-    const el =
-      document.createElement("div");
-
-    el.className = "step";
-    el.textContent =
-      "1ª → visualizzazione";
-
-    box.appendChild(el);
-
-    if (repeatValue === 0) {
-
-      const el2 =
-        document.createElement("div");
-
-      el2.className = "step";
-      el2.textContent = "∞ → ...";
-
-      box.appendChild(el2);
-
-    } else if (repeatValue > 1) {
-
-      const el2 =
-        document.createElement("div");
-
-      el2.className = "step";
-
-      el2.textContent =
-        repeatValue > 10
-          ? "11ª → ..."
-          : `${repeatValue}ª → ...`;
-
-      box.appendChild(el2);
-    }
   }
+
+
+  fill();
+
 }
 
+
+/* FILL */
+
+function fill() {
+
+  idTips.value =
+    tip.id_tips || "";
+
+  type.value =
+    tip.tp_type || "bubble";
+
+  icon.value =
+    tip.tp_icon || "⭐";
+
+  title.value =
+    tip.tp_title || "";
+
+  text.value =
+    tip.tp_text || "";
+
+
+  analyticsFields[0].value =
+    tip.tp_analytics_1 || "an_open";
+
+  conditionFields[0].value =
+    tip.tp_condition_1 || ">=";
+
+  valueFields[0].value =
+    tip.tv_value_1 ?? "";
+
+
+  analyticsFields[1].value =
+    tip.tp_analytics_2 || "";
+
+  analyticsFields[2].value =
+    tip.tp_analytics_3 || "";
+
+
+  repeat.value =
+    tip.tp_repeat ?? 1;
+
+  interval.value =
+    tip.tp_interval ?? 1;
+
+  growth.value =
+    tip.tp_growth ?? 1;
+
+
+  ctaLabel.value =
+    tip.tp_cta_label || "";
+
+  ctaUrl.value =
+    tip.tp_cta_url || "";
+
+
+  updateActive();
+
+  updateCTA();
+
+
+  /*
+   * Conditions must be rebuilt
+   * after analytics selection.
+   */
+
+  analyticsFields.forEach(
+    (_, index) =>
+      updateConditions(index)
+  );
+
+
+  conditionFields[0].value =
+    tip.tp_condition_1 || ">=";
+
+  conditionFields[1].value =
+    tip.tp_condition_2 || ">=";
+
+  conditionFields[2].value =
+    tip.tp_condition_3 || ">=";
+
+
+  valueFields[0].value =
+    tip.tv_value_1 ?? "";
+
+  valueFields[1].value =
+    tip.tv_value_2 ?? "";
+
+  valueFields[2].value =
+    tip.tv_value_3 ?? "";
+
+
+  logicFields[0].value =
+    tip.tp_logic_1 || "";
+
+  logicFields[1].value =
+    tip.tp_logic_2 || "";
+
+
+  updateLogicRows();
+  updateProgression();
+
+}
+
+
 /* EVENTS */
+
+
+/*
+ * Analytics
+ */
+
+analyticsFields.forEach(
+  (select, index) => {
+
+    select.addEventListener(
+      "change",
+      () => {
+
+        updateConditions(index);
+
+        /*
+         * Selecting a field in row 2/3
+         * is enough to keep the row active.
+         */
+
+        updateLogicRows();
+
+      }
+    );
+
+  }
+);
+
+
+/*
+ * Logic
+ */
+
+logicFields.forEach(
+  select => {
+
+    select.addEventListener(
+      "change",
+      updateLogicRows
+    );
+
+  }
+);
+
+
+/*
+ * Progression
+ */
+
 [
-  text,
-  type,
-  analytics,
-  condition,
   repeat,
   interval,
   growth
-].forEach(el => {
-  el.addEventListener(
-    "input",
-    update
-  );
-  el.addEventListener(
-    "change",
-    el === analytics
-      ? updateAnalytics
-      : update
-  );
-});
+].forEach(
+  element => {
 
-/* SAVE */
-window.save = async () => {
-  const id =
-    idTips.value.trim();
-  if (!id) {
-    alert(
-      "Enter the Tip ID."
+    element.addEventListener(
+      "input",
+      updateProgression
     );
-    return;
+
   }
-  if (!text.value.trim()) {
-    alert(
-      "Enter the Tip text."
-    );
-    return;
-  }
-  const data = {
-    id_tips: id,
-    tp_text: text.value.trim(),
-    tp_condition: condition.value,
-    tp_analytics: analytics.value,
-    tv_value: value.value.trim(),
-    tp_type: type.value,
-    tp_active: tip.tp_active === true,
-    tp_repeat: Number(repeat.value),
-    tp_interval: Number(interval.value),
-    tp_growth: Number(growth.value)
-  };
-  try {
-    await saveTip(data);
-    location.href =
-      "tips_overview.html";
-  }
-  catch(error) {
-    console.error(error);
-    alert(
-      "Error while saving."
-    );
-  }
-};
+);
+
+
+/*
+ * Icon / title / text
+ */
+
+icon.addEventListener(
+  "change",
+  () => {}
+);
+
+title.addEventListener(
+  "input",
+  () => {}
+);
+
+text.addEventListener(
+  "input",
+  () => {}
+);
+
+
+/*
+ * CTA
+ */
+
+ctaLabel.addEventListener(
+  "input",
+  () => {}
+);
+
+ctaUrl.addEventListener(
+  "input",
+  () => {}
+);
+
+
+/* START */
 
 init();
+
 </script>
+
 </body>
 </html>
