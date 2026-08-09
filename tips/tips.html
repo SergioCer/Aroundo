@@ -245,7 +245,7 @@ textarea {
 
   <div class="title">
 
-```
+ 
 <button
   class="bck-btn"
   onclick="location.href='tips_overview.html'">
@@ -261,7 +261,7 @@ textarea {
   onclick="save()">
   ✓
 </button>
-```
+ 
 
   </div>
 
@@ -273,7 +273,7 @@ textarea {
 
   <div class="row">
 
-```
+ 
 <div class="field">
 
   <label>Tip ID</label>
@@ -292,7 +292,7 @@ textarea {
   <select id="tp_type"></select>
 
 </div>
-```
+ 
 
   </div>
 
@@ -300,7 +300,7 @@ textarea {
 
   <div class="row">
 
-```
+ 
 <div class="field">
 
   <label>Icon</label>
@@ -319,7 +319,7 @@ textarea {
     placeholder="Tip title">
 
 </div>
-```
+ 
 
   </div>
 
@@ -327,13 +327,13 @@ textarea {
 
   <div class="field">
 
-```
+ 
 <label>Text</label>
 
 <textarea
   id="tp_text"
   placeholder="Message text..."></textarea>
-```
+ 
 
   </div>
 
@@ -343,7 +343,7 @@ textarea {
 
   <div class="row">
 
-```
+ 
 <div class="field">
 
   <label>Analytics</label>
@@ -371,7 +371,7 @@ textarea {
     placeholder="Value">
 
 </div>
-```
+ 
 
   </div>
 
@@ -382,7 +382,7 @@ textarea {
     class="logic-row"
     hidden>
 
-```
+ 
 <div class="logic-field">
 
   <label>Logic</label>
@@ -397,7 +397,7 @@ textarea {
   </select>
 
 </div>
-```
+ 
 
   </div>
 
@@ -408,7 +408,7 @@ textarea {
     class="row"
     hidden>
 
-```
+ 
 <div class="field">
 
   <label>Analytics</label>
@@ -436,7 +436,7 @@ textarea {
     placeholder="Value">
 
 </div>
-```
+ 
 
   </div>
 
@@ -447,7 +447,7 @@ textarea {
     class="logic-row"
     hidden>
 
-```
+ 
 <div class="logic-field">
 
   <label>Logic</label>
@@ -462,7 +462,7 @@ textarea {
   </select>
 
 </div>
-```
+ 
 
   </div>
 
@@ -473,7 +473,7 @@ textarea {
     class="row"
     hidden>
 
-```
+ 
 <div class="field">
 
   <label>Analytics</label>
@@ -501,7 +501,7 @@ textarea {
     placeholder="Value">
 
 </div>
-```
+ 
 
   </div>
 
@@ -509,7 +509,7 @@ textarea {
 
   <div class="row">
 
-```
+ 
 <div class="field">
 
   <label>Repeat</label>
@@ -547,7 +547,7 @@ textarea {
     value="1">
 
 </div>
-```
+ 
 
   </div>
 
@@ -555,7 +555,7 @@ textarea {
 
   <div class="row">
 
-```
+ 
 <div class="field">
 
   <label>Button</label>
@@ -595,7 +595,7 @@ textarea {
     placeholder="https://...">
 
 </div>
-```
+
 
   </div>
 
@@ -603,7 +603,7 @@ textarea {
 
   <div class="tip-tools">
 
-```
+ 
 <button
   id="impactBtn"
   class="tool-btn impact-btn"
@@ -629,7 +629,7 @@ textarea {
   title="Preview Tip">
   ▶
 </button>
-```
+ 
 
   </div>
 
@@ -891,135 +891,226 @@ Object.values(conditions)
 
 function updateConditionSelect(index) {
 
-  const item =
-    conditions[index];
+  const item = conditions[index];
 
   if (!item)
     return;
 
+  /*
+   * IMPORTANT:
+   * salviamo i valori attualmente presenti nel DOM.
+   * In questo modo update() non sovrascrive
+   * la scelta appena fatta dall'utente.
+   */
+
+  const currentAnalytics =
+    item.analytics.value;
+
+  const currentCondition =
+    item.condition.value;
+
+  const currentValue =
+    item.value.value;
+
+
   const field =
     getAnalyticsFields()
       .find(x =>
-        x.value ===
-        item.analytics.value
+        x.value === currentAnalytics
       );
 
 
-  item.condition.innerHTML = "";
-
+  /* ANALYTICS NON SELEZIONATO */
 
   if (!field) {
 
-    item.condition.disabled =
-      true;
+    item.condition.innerHTML = "";
 
-    item.value.disabled =
-      true;
+    item.condition.disabled = true;
+
+    item.value.disabled = true;
 
     return;
   }
 
 
-  item.condition.disabled =
-    false;
-
-  item.value.disabled =
-    false;
+  item.condition.disabled = false;
+  item.value.disabled = false;
 
 
-  getConditions(field.type)
-    .forEach(operator => {
+  /* CONDITIONS */
 
-      const option =
-        document.createElement("option");
-
-      option.value =
-        operator;
-
-      option.textContent =
-        operator;
-
-      item.condition
-        .appendChild(option);
-
-    });
+  const availableConditions =
+    getConditions(field.type);
 
 
-  item.condition.value =
-    tip[
-      `tp_condition_${index}`
-    ] ||
-    getConditions(field.type)[0];
+  item.condition.innerHTML = "";
 
 
-  item.value.title =
-    field.description;
+  availableConditions.forEach(operator => {
 
+    const option =
+      document.createElement("option");
 
-  if (field.type === "boolean") {
+    option.value =
+      operator;
 
-    const current =
-      item.value.value;
+    option.textContent =
+      operator;
 
-
-    const select =
-      document.createElement("select");
-
-    select.id =
-      `tv_value_${index}`;
-
-    select.style.width =
-      "100%";
-
-    select.style.boxSizing =
-      "border-box";
-
-    select.style.padding =
-      "9px";
-
-    select.style.border =
-      "1px solid #d1d5db";
-
-    select.style.borderRadius =
-      "8px";
-
-    ["true", "false"]
-      .forEach(value => {
-
-        const option =
-          document.createElement("option");
-
-        option.value =
-          value;
-
-        option.textContent =
-          value;
-
-        select.appendChild(
-          option
-        );
-
-      });
-
-
-    select.value =
-      current === "false"
-        ? "false"
-        : "true";
-
-
-    item.value.replaceWith(
-      select
+    item.condition.appendChild(
+      option
     );
 
-    item.value =
-      select;
+  });
+
+
+  /*
+   * Prima proviamo a mantenere la scelta
+   * attuale dell'utente.
+   *
+   * Se non è valida per il nuovo tipo
+   * di analytics, usiamo quella salvata
+   * nel tip oppure la prima disponibile.
+   */
+
+  if (
+    availableConditions.includes(
+      currentCondition
+    )
+  ) {
+
+    item.condition.value =
+      currentCondition;
+
+  } else if (
+    availableConditions.includes(
+      tip[`tp_condition_${index}`]
+    )
+  ) {
+
+    item.condition.value =
+      tip[`tp_condition_${index}`];
 
   } else {
 
+    item.condition.value =
+      availableConditions[0];
+
+  }
+
+
+  /* VALUE */
+
+  const isBoolean =
+    field.type === "boolean";
+
+  const currentIsBoolean =
+    item.value.tagName === "SELECT";
+
+
+  /*
+   * BOOLEAN
+   */
+
+  if (isBoolean) {
+
+    if (!currentIsBoolean) {
+
+      const select =
+        document.createElement("select");
+
+      select.id =
+        `tv_value_${index}`;
+
+      select.style.width =
+        "100%";
+
+      select.style.boxSizing =
+        "border-box";
+
+      select.style.padding =
+        "9px";
+
+      select.style.border =
+        "1px solid #d1d5db";
+
+      select.style.borderRadius =
+        "8px";
+
+
+      ["true", "false"]
+        .forEach(value => {
+
+          const option =
+            document.createElement("option");
+
+          option.value =
+            value;
+
+          option.textContent =
+            value;
+
+          select.appendChild(
+            option
+          );
+
+        });
+
+
+      select.value =
+        currentValue === "false"
+          ? "false"
+          : "true";
+
+
+      item.value.replaceWith(
+        select
+      );
+
+      item.value =
+        select;
+
+
+      /*
+       * Il vecchio elemento è stato sostituito:
+       * registriamo nuovamente l'evento.
+       */
+
+      item.value.addEventListener(
+        "change",
+        update
+      );
+
+    } else {
+
+      /*
+       * Era già un select boolean.
+       * Non lo ricreiamo.
+       */
+
+      item.value.value =
+        currentValue === "false"
+          ? "false"
+          : "true";
+
+    }
+
+
+    item.value.title =
+      field.description;
+
+  }
+
+
+  /*
+   * NUMBER
+   */
+
+  else {
+
     if (
-      item.value.tagName !==
-      "INPUT"
+      item.value.tagName !== "INPUT"
     ) {
 
       const input =
@@ -1049,24 +1140,344 @@ function updateConditionSelect(index) {
       input.style.borderRadius =
         "8px";
 
+
+      /*
+       * Manteniamo il valore esistente.
+       */
+
+      input.value =
+        currentValue;
+
+
       item.value.replaceWith(
         input
       );
 
       item.value =
         input;
+
+
+      /*
+       * Nuovo elemento = nuovo listener.
+       */
+
+      item.value.addEventListener(
+        "input",
+        update
+      );
+
+    } else {
+
+      item.value.type =
+        "number";
+
+      item.value.placeholder =
+        "Value";
+
     }
 
-    item.value.type =
-      "number";
 
-    item.value.placeholder =
-      "Value";
+    item.value.title =
+      field.description;
 
   }
 
 }
 
+function updateConditionSelect(index) {
+
+  const item = conditions[index];
+
+  if (!item)
+    return;
+
+  /*
+   * IMPORTANT:
+   * salviamo i valori attualmente presenti nel DOM.
+   * In questo modo update() non sovrascrive
+   * la scelta appena fatta dall'utente.
+   */
+
+  const currentAnalytics =
+    item.analytics.value;
+
+  const currentCondition =
+    item.condition.value;
+
+  const currentValue =
+    item.value.value;
+
+
+  const field =
+    getAnalyticsFields()
+      .find(x =>
+        x.value === currentAnalytics
+      );
+
+
+  /* ANALYTICS NON SELEZIONATO */
+
+  if (!field) {
+
+    item.condition.innerHTML = "";
+
+    item.condition.disabled = true;
+
+    item.value.disabled = true;
+
+    return;
+  }
+
+
+  item.condition.disabled = false;
+  item.value.disabled = false;
+
+
+  /* CONDITIONS */
+
+  const availableConditions =
+    getConditions(field.type);
+
+
+  item.condition.innerHTML = "";
+
+
+  availableConditions.forEach(operator => {
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      operator;
+
+    option.textContent =
+      operator;
+
+    item.condition.appendChild(
+      option
+    );
+
+  });
+
+
+  /*
+   * Prima proviamo a mantenere la scelta
+   * attuale dell'utente.
+   *
+   * Se non è valida per il nuovo tipo
+   * di analytics, usiamo quella salvata
+   * nel tip oppure la prima disponibile.
+   */
+
+  if (
+    availableConditions.includes(
+      currentCondition
+    )
+  ) {
+
+    item.condition.value =
+      currentCondition;
+
+  } else if (
+    availableConditions.includes(
+      tip[`tp_condition_${index}`]
+    )
+  ) {
+
+    item.condition.value =
+      tip[`tp_condition_${index}`];
+
+  } else {
+
+    item.condition.value =
+      availableConditions[0];
+
+  }
+
+
+  /* VALUE */
+
+  const isBoolean =
+    field.type === "boolean";
+
+  const currentIsBoolean =
+    item.value.tagName === "SELECT";
+
+
+  /*
+   * BOOLEAN
+   */
+
+  if (isBoolean) {
+
+    if (!currentIsBoolean) {
+
+      const select =
+        document.createElement("select");
+
+      select.id =
+        `tv_value_${index}`;
+
+      select.style.width =
+        "100%";
+
+      select.style.boxSizing =
+        "border-box";
+
+      select.style.padding =
+        "9px";
+
+      select.style.border =
+        "1px solid #d1d5db";
+
+      select.style.borderRadius =
+        "8px";
+
+
+      ["true", "false"]
+        .forEach(value => {
+
+          const option =
+            document.createElement("option");
+
+          option.value =
+            value;
+
+          option.textContent =
+            value;
+
+          select.appendChild(
+            option
+          );
+
+        });
+
+
+      select.value =
+        currentValue === "false"
+          ? "false"
+          : "true";
+
+
+      item.value.replaceWith(
+        select
+      );
+
+      item.value =
+        select;
+
+
+      /*
+       * Il vecchio elemento è stato sostituito:
+       * registriamo nuovamente l'evento.
+       */
+
+      item.value.addEventListener(
+        "change",
+        update
+      );
+
+    } else {
+
+      /*
+       * Era già un select boolean.
+       * Non lo ricreiamo.
+       */
+
+      item.value.value =
+        currentValue === "false"
+          ? "false"
+          : "true";
+
+    }
+
+
+    item.value.title =
+      field.description;
+
+  }
+
+
+  /*
+   * NUMBER
+   */
+
+  else {
+
+    if (
+      item.value.tagName !== "INPUT"
+    ) {
+
+      const input =
+        document.createElement("input");
+
+      input.id =
+        `tv_value_${index}`;
+
+      input.type =
+        "number";
+
+      input.placeholder =
+        "Value";
+
+      input.style.width =
+        "100%";
+
+      input.style.boxSizing =
+        "border-box";
+
+      input.style.padding =
+        "9px";
+
+      input.style.border =
+        "1px solid #d1d5db";
+
+      input.style.borderRadius =
+        "8px";
+
+
+      /*
+       * Manteniamo il valore esistente.
+       */
+
+      input.value =
+        currentValue;
+
+
+      item.value.replaceWith(
+        input
+      );
+
+      item.value =
+        input;
+
+
+      /*
+       * Nuovo elemento = nuovo listener.
+       */
+
+      item.value.addEventListener(
+        "input",
+        update
+      );
+
+    } else {
+
+      item.value.type =
+        "number";
+
+      item.value.placeholder =
+        "Value";
+
+    }
+
+
+    item.value.title =
+      field.description;
+
+  }
+
+}
 
 /* =========================================================
    CONDITION ROW VISIBILITY
