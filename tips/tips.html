@@ -391,7 +391,7 @@ const previewBtn = document.getElementById("previewBtn");
 
 const progression = document.getElementById("progression");
 
-window.previewBtn = () => {
+previewBtn.onclick = () => {
   renderTip({
     tp_text: text.value,
     tp_type: type.value
@@ -538,80 +538,101 @@ activeBtn.onclick = () => {
   
 /* UPDATE */
 function update() {
+
   const field = getAnalyticsField();
+
   const box =
     document.getElementById("progression");
+
   box.innerHTML = "";
   box.hidden = !field;
-  if (field) {
-    const repeatValue =
-      Number(repeat.value);
-    if (field.type === "number") {
-      const values =
-        calculateProgression(
-          interval.value,
-          growth.value,
-          repeat.value
-        );
-      values.forEach((value,index) => {
-        const el =
-          document.createElement("div");
-        el.className = "step";
-        el.textContent =
-          `${index + 1}ª → ${value}`;
-        box.appendChild(el);
-      });
-      if (repeatValue === 0) {
-        const el =
-          document.createElement("div");
-        el.className = "step";
-        el.textContent = "∞ → ...";
-        box.appendChild(el);
-      } else if (repeatValue > 10) {
-        const el =
-          document.createElement("div");
-        el.className = "step";
-        el.textContent = "11ª → ...";
-        box.appendChild(el);
-      }
-    } else {
+
+  if (!field)
+    return;
+
+  const repeatValue =
+    Number(repeat.value);
+
+  if (field.type === "number") {
+
+    const values =
+      calculateProgression(
+        interval.value,
+        growth.value,
+        repeat.value
+      );
+
+    values.forEach((value,index) => {
+
       const el =
         document.createElement("div");
+
       el.className = "step";
+
       el.textContent =
-        repeatValue === 0
-          ? "1ª → visualizzazione"
-          : "1ª → visualizzazione";
+        `${index + 1}ª → ${value}`;
+
       box.appendChild(el);
-      if (repeatValue === 0) {
-        const el2 =
-          document.createElement("div");
-        el2.className = "step";
-        el2.textContent = "∞ → ...";
-        box.appendChild(el2);
-      } else if (repeatValue > 1) {
-        const el2 =
-          document.createElement("div");
-        el2.className = "step";
-        el2.textContent =
-          repeatValue > 10
-            ? "11ª → ..."
-            : `${repeatValue}ª → ...`;
-        box.appendChild(el2);
-      }
+
+    });
+
+    if (repeatValue === 0) {
+
+      const el =
+        document.createElement("div");
+
+      el.className = "step";
+      el.textContent = "∞ → ...";
+
+      box.appendChild(el);
+
+    } else if (repeatValue > 10) {
+
+      const el =
+        document.createElement("div");
+
+      el.className = "step";
+      el.textContent = "11ª → ...";
+
+      box.appendChild(el);
+    }
+
+  } else {
+
+    const el =
+      document.createElement("div");
+
+    el.className = "step";
+    el.textContent =
+      "1ª → visualizzazione";
+
+    box.appendChild(el);
+
+    if (repeatValue === 0) {
+
+      const el2 =
+        document.createElement("div");
+
+      el2.className = "step";
+      el2.textContent = "∞ → ...";
+
+      box.appendChild(el2);
+
+    } else if (repeatValue > 1) {
+
+      const el2 =
+        document.createElement("div");
+
+      el2.className = "step";
+
+      el2.textContent =
+        repeatValue > 10
+          ? "11ª → ..."
+          : `${repeatValue}ª → ...`;
+
+      box.appendChild(el2);
     }
   }
-  const preview =
-    document.getElementById("tipPreview");
-  const tipType =
-    getTipTypes()
-      .find(x => x.value === type.value);
-  preview.className =
-    "tip-preview " +
-    (tipType?.className || "tip-bubble");
-  preview.textContent =
-    text.value ||
-    "Tip preview";
 }
 
 /* EVENTS */
@@ -652,35 +673,23 @@ window.save = async () => {
     );
     return;
   }
-
   const data = {
     id_tips: id,
-    tp_text:
-      text.value.trim(),
-    tp_condition:
-      condition.value,
-    tp_analytics:
-      analytics.value,
-    tv_value:
-      value.value.trim(),
-    tp_type:
-      type.value,
-    tp_active:
-      active.checked,
-    tp_repeat:
-      Number(repeat.value),
-    tp_interval:
-      Number(interval.value),
-    tp_growth:
-      Number(growth.value)
+    tp_text: text.value.trim(),
+    tp_condition: condition.value,
+    tp_analytics: analytics.value,
+    tv_value: value.value.trim(),
+    tp_type: type.value,
+    tp_active: tip.tp_active === true,
+    tp_repeat: Number(repeat.value),
+    tp_interval: Number(interval.value),
+    tp_growth: Number(growth.value)
   };
-
   try {
     await saveTip(data);
     location.href =
       "tips_overview.html";
   }
-
   catch(error) {
     console.error(error);
     alert(
@@ -688,58 +697,6 @@ window.save = async () => {
     );
   }
 };
-
- document
-  .getElementById("simulateBtn")
-  .onclick = async () => {
-    const box =
-      document.getElementById("simulation");
-    box.innerHTML =
-      "Calculating...";
-    try {
-      const result=
-        await simulateTip({
-          tp_analytics:
-            analytics.value,
-          tp_condition:
-            condition.value,
-          tv_value:
-            value.value
-        });
-      box.innerHTML=`
-        <div class="simulation-row">
-          <span>Devices analyzed</span>
-          <span class="simulation-value">
-            ${result.total}
-          </span>
-        </div>
-        <div class="simulation-row simulation-main">
-          <span>Potentially involved</span>
-          <span class="simulation-value">
-            ${result.involved}
-            (${result.percent}%)
-          </span>
-        </div>
-        <div class="simulation-row">
-          <span>Excluded</span>
-          <span class="simulation-value">
-            ${result.excluded}
-          </span>
-        </div>
-        <div class="simulation-row">
-          <span>Missing / unavailable data</span>
-          <span class="simulation-value">
-            ${result.missing}
-          </span>
-        </div>
-      `;
-    }
-    catch(error){
-      console.error(error);
-      box.innerHTML =
-        "Simulation error.";
-    }
-  }; 
 
 init();
 </script>
