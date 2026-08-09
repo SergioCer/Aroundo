@@ -1739,27 +1739,16 @@ function updateProgression() {
 }
 
 
-/* =========================================================
-   UPDATE
-   ========================================================= */
-
+/* UPDATE */
 function update() {
-
   updateConditionSelect(1);
   updateConditionSelect(2);
   updateConditionSelect(3);
-
   updateLogicRows();
-
   updateProgression();
-
 }
 
-
-/* =========================================================
-   EVENTS
-   ========================================================= */
-
+/* EVENTS */
 Object.values(conditions)
   .forEach(item => {
 
@@ -1767,6 +1756,13 @@ Object.values(conditions)
       .addEventListener(
         "change",
         () => {
+
+          /*
+           * Quando cambia Analytics:
+           * - aggiorniamo gli operatori
+           * - aggiorniamo il campo Value
+           * - aggiorniamo la visibilità delle righe
+           */
 
           updateConditionSelect(
             Number(
@@ -1794,6 +1790,13 @@ Object.values(conditions)
     item.value
       .addEventListener(
         "input",
+        update
+      );
+
+
+    item.value
+      .addEventListener(
+        "change",
         update
       );
 
@@ -1825,6 +1828,7 @@ growth.addEventListener(
   "input",
   updateProgression
 );
+
 
 
 /* =========================================================
