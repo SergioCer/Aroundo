@@ -180,7 +180,7 @@ textarea {
     <label>Tip ID</label>
     <input
       id="id_tips"
-      placeholder="es. welcome">
+      placeholder="e.g. 20260809 Welcome">
   </div>
   <br>
   <div class="field">
@@ -192,7 +192,7 @@ textarea {
   </div>
   <div class="row">
     <div class="field">
-      <label>Tipo</label>
+      <label>Type</label>
       <select id="tp_type"></select>
     </div>
     <div class="field">
@@ -202,7 +202,7 @@ textarea {
   </div>
   <div class="row">
     <div class="field">
-      <label>Condizione</label>
+      <label>Condition</label>
       <select id="tp_condition">
         <option value="=">=</option>
         <option value="!=">!=</option>
@@ -216,7 +216,7 @@ textarea {
       <label>Valore</label>
       <input
         id="tv_value"
-        placeholder="es. 10 oppure true">
+        placeholder="e.g. 10 or true">
     </div>
   </div>
   <div class="row">
@@ -251,12 +251,12 @@ textarea {
       type="checkbox">
     <label
       for="tp_active">
-      Tip attivo
+      Active
     </label>
   </div>
   <div class="preview">
     <div class="preview-title">
-      Progressione prevista
+      Expected progression
     </div>
     <div
       id="progression"
@@ -265,7 +265,7 @@ textarea {
   </div>
   <div id="tipPreview"
        class="tip-preview tip-bubble">
-    Anteprima del Tip
+    Tip preview
   </div>
 </div>
 
@@ -513,13 +513,13 @@ window.save = async () => {
     idTips.value.trim();
   if (!id) {
     alert(
-      "Insert Tip ID."
+      "Enter the Tip ID."
     );
     return;
   }
   if (!text.value.trim()) {
     alert(
-      "Insert Tip text."
+      "Enter the Tip text."
     );
     return;
   }
@@ -555,7 +555,7 @@ window.save = async () => {
   catch(error) {
     console.error(error);
     alert(
-      "Errore durante il salvataggio."
+      "Error while saving."
     );
   }
 };
