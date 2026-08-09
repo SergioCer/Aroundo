@@ -352,7 +352,7 @@ import {
   defaultTip,
   loadTip,
   saveTip,
-  simulateTip
+  renderTip
 } from "./tips.js";
 
 
@@ -391,6 +391,13 @@ const previewBtn = document.getElementById("previewBtn");
 
 const progression = document.getElementById("progression");
 
+window.previewBtn = () => {
+  renderTip({
+    tp_text: text.value,
+    tp_type: type.value
+  });
+};
+  
 function getAnalyticsField() {
   return getAnalyticsFields()
     .find(x => x.value === analytics.value);
