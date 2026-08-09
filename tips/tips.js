@@ -6,23 +6,86 @@ import { supabase } from "../supabase.js";
  * Per aggiungere un nuovo tipo si interviene qui.
  */
 export const TIP_TYPES = {
-    bubble: {
-        label: "Bubble",
-        className: "tip-bubble"
-    },
-    banner: {
-        label: "Banner",
-        className: "tip-banner"
-    },
-    modal: {
-        label: "Modal",
-        className: "tip-modal"
-    },
-    toast: {
-        label: "Toast",
-        className: "tip-toast"
-    }
+bubble: {
+label: "Bubble",
+position: "bottom-right",
+width: "320px",
+background: "#eff6ff",
+color: "#1e3a8a",
+border: "1px solid #93c5fd",
+radius: "18px",
+shadow: "0 8px 25px rgba(0,0,0,.15)",
+overlay: false,
+acknowledge: true
+},
+
+banner: {
+label: "Banner",
+position: "top-center",
+width: "100%",
+background: "#fef3c7",
+color: "#78350f",
+border: "1px solid #f59e0b",
+radius: "0",
+shadow: "0 4px 15px rgba(0,0,0,.12)",
+overlay: false,
+acknowledge: true
+},
+
+modal: {
+label: "Modal",
+position: "center",
+width: "420px",
+background: "#ffffff",
+color: "#111827",
+border: "2px solid #6366f1",
+radius: "16px",
+shadow: "0 12px 40px rgba(0,0,0,.25)",
+overlay: true,
+acknowledge: true
+},
+
+toast: {
+label: "Toast",
+position: "bottom-center",
+width: "360px",
+background: "#111827",
+color: "#ffffff",
+border: "none",
+radius: "10px",
+shadow: "0 8px 25px rgba(0,0,0,.25)",
+overlay: false,
+acknowledge: true
+},
+
+card: {
+label: "Card",
+position: "center-right",
+width: "360px",
+background: "#ffffff",
+color: "#111827",
+border: "1px solid #d1d5db",
+radius: "14px",
+shadow: "0 10px 30px rgba(0,0,0,.18)",
+overlay: false,
+acknowledge: true
+},
+
+floating: {
+label: "Floating",
+position: "bottom-left",
+width: "300px",
+background: "#f0fdf4",
+color: "#166534",
+border: "1px solid #86efac",
+radius: "20px",
+shadow: "0 8px 28px rgba(0,0,0,.18)",
+overlay: false,
+acknowledge: true
+}
 };
+
+
 
 export const ANALYTICS_FIELDS = {
   an_open: {
