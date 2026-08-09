@@ -116,34 +116,6 @@ textarea {
   border-radius: 15px;
 }
 
-.tip-preview {
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.tip-bubble {
-  background: #eff6ff;
-  border: 1px solid #93c5fd;
-}
-
-.tip-banner {
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-}
-
-.tip-modal {
-  background: white;
-  border: 2px solid #6366f1;
-  box-shadow: 0 5px 20px rgba(0,0,0,.15);
-}
-
-.tip-toast {
-  background: #111827;
-  color: white;
-}
-
 .status {
   display: flex;
   align-items: center;
@@ -175,6 +147,75 @@ textarea {
 .simulation-main {
   background: #dcfce7;
   color: #166534;
+}
+
+.tip-tools {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.tool-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progression-btn {
+  background: #3b82f6;
+}
+
+.progression-btn:hover {
+  background: #2563eb;
+}
+
+.preview-btn {
+  background: #22c55e;
+}
+
+.preview-btn:hover {
+  background: #16a34a;
+}
+
+.active-on {
+  background: #22c55e;
+}
+
+.active-on:hover {
+  background: #16a34a;
+}
+
+.active-off {
+  background: #ef4444;
+}
+
+.active-off:hover {
+  background: #dc2626;
+}
+
+.progression {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.step {
+  background: #dbeafe;
+  color: #1e3a8a;
+  padding: 7px 12px;
+  border-radius: 15px;
 }
   
 </style>
@@ -268,42 +309,34 @@ textarea {
         value="1">
     </div>
   </div>
-  <div class="status">
-    <input
-      id="tp_active"
-      type="checkbox">
-    <label
-      for="tp_active">
-      Active
-    </label>
-  </div>
-  <div class="preview">
-    <div class="preview-title">
-      Expected progression
-    </div>
-    <div
-      id="progression"
-      class="progression">
-    </div>
-  <div class="preview">
-  <div class="preview-title">
-    Estimated Impact
-  </div>
+  
+<div class="tip-tools">
   <button
-    id="simulateBtn"
-    type="button">
-    Simulate Impact
+    id="progressionBtn"
+    class="tool-btn progression-btn"
+    type="button"
+    title="Progression">
+    ↗
   </button>
-  <div
-    id="simulation"
-    class="simulation">
-  </div>
-</div>  
-  </div>
-  <div id="tipPreview"
-       class="tip-preview tip-bubble">
-    Tip preview
-  </div>
+  <button
+    id="activeBtn"
+    class="tool-btn"
+    type="button"
+    title="Tip inactive">
+    ●
+  </button>
+  <button
+    id="previewBtn"
+    class="tool-btn preview-btn"
+    type="button"
+    title="Preview Tip">
+    ▶
+  </button>
+</div>
+<div
+  id="progression"
+  class="progression">
+</div>
 </div>
 
 <script type="module">
@@ -350,7 +383,13 @@ const interval = document.getElementById("tp_interval");
 
 const growth = document.getElementById("tp_growth");
 
-const active = document.getElementById("tp_active");
+const activeBtn = document.getElementById("activeBtn");
+
+const progressionBtn = document.getElementById("progressionBtn");
+
+const previewBtn = document.getElementById("previewBtn");
+
+const progression = document.getElementById("progression");
 
 function getAnalyticsField() {
   return getAnalyticsFields()
@@ -464,7 +503,7 @@ function fill() {
   repeat.value = tip.tp_repeat ?? 1;
   interval.value = tip.tp_interval ?? 1;
   growth.value = tip.tp_growth ?? 1;
-  active.checked = tip.tp_active === true;
+  updateActive();
   interval.title = "Number of views between two successive displays.";
   growth.title = "Multiplier applied to the current interval.";
   repeat.title = "Maximum number of displays. 0 = unlimited.";
@@ -472,6 +511,24 @@ function fill() {
   text.title = "Text displayed to the user.";
 }
 
+function updateActive() {
+  const on = tip.tp_active === true;
+  activeBtn.className =
+    "tool-btn " +
+    (on ? "active-on" : "active-off");
+  activeBtn.textContent = "●";
+  activeBtn.title =
+    on
+      ? "Tip active"
+      : "Tip inactive";
+}
+
+activeBtn.onclick = () => {
+  tip.tp_active =
+    !tip.tp_active;
+  updateActive();
+};
+  
 /* UPDATE */
 function update() {
   const field = getAnalyticsField();
