@@ -200,3 +200,29 @@ export async function saveTip(tip) {
         throw error;
     return data;
 }
+
+/* CONDITION */ 
+export function evaluateCondition( actual, condition, expected )
+{ if(actual===null || actual===undefined) 
+    return null; if( actual === "" || expected === "" ) 
+    return null; if( typeof actual === "boolean" ){ const value= String(expected).toLowerCase(); 
+    if(value!=="true" && value!=="false") return null; 
+    const target=value==="true"; if(condition==="=") return actual===target; 
+    if(condition==="!=") return actual!==target; return null; } 
+ const a=Number(actual); const b=Number(expected); if(!Number.isFinite(a) || !Number.isFinite(b)) return null; 
+ if(condition===">") return a>b; if(condition===">=") return a>=b; if(condition==="=") return a===b; 
+ if(condition==="<") return a<b; if(condition==="<=") return a<=b; if(condition==="!=") return a!==b; return null; } 
+
+/* SIMULATION */ 
+export async function simulateTip(tip)
+{ const field= ANALYTICS_FIELDS[tip.tp_analytics]; 
+    if(!field) throw new Error("Analytics field not found."); 
+    const {data,error}= await supabase .from("analytics") .select("*") .order("an_date",{ascending:false}); 
+    if(error) throw error; const latest=new Map(); (data||[]).forEach(row=>{ 
+    if(!row.an_device) return; if(!latest.has(row.an_device)) latest.set(row.an_device,row); }); 
+    let involved=0; let excluded=0; let missing=0; latest.forEach(row=>{ 
+    const result= evaluateCondition( row[tip.tp_analytics], tip.tp_condition, tip.tv_value ); 
+    if(result===true) involved++; else if(result===false) excluded++; else missing++; }); 
+    const total=latest.size; return { total, involved, excluded, missing, percent: 
+        total ? Math.round( involved/total*100 ) : 0 }; }
+
