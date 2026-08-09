@@ -24,19 +24,63 @@ export const TIP_TYPES = {
     }
 };
 
-export const ANALYTICS_FIELDS = [
-  "an_open",
-  "an_login",
-  "an_install",
-  "an_share",
-  "an_more",
-  "an_info",
-  "an_marker",
-  "an_map",
-  "an_buy",
-  "an_book",
-  "an_gps"
-];
+export const ANALYTICS_FIELDS = {
+  an_open: {
+    type: "number",
+    label: "Open",
+    description: "Number of times Aroundo has been opened."
+  },
+  an_login: {
+    type: "boolean",
+    label: "Login",
+    description: "Whether the user has logged in."
+  },
+  an_install: {
+    type: "boolean",
+    label: "Install",
+    description: "Whether Aroundo has been installed."
+  },
+  an_share: {
+    type: "number",
+    label: "Share",
+    description: "Number of sharing actions."
+  },
+  an_more: {
+    type: "number",
+    label: "More",
+    description: "Number of times the More action has been used."
+  },
+  an_info: {
+    type: "number",
+    label: "Info",
+    description: "Number of times event information has been opened."
+  },
+  an_marker: {
+    type: "number",
+    label: "Marker",
+    description: "Number of event markers selected."
+  },
+  an_map: {
+    type: "number",
+    label: "Map",
+    description: "Number of times the map has been opened."
+  },
+  an_buy: {
+    type: "number",
+    label: "Buy",
+    description: "Number of purchase actions."
+  },
+  an_book: {
+    type: "number",
+    label: "Book",
+    description: "Number of booking actions."
+  },
+  an_gps: {
+    type: "boolean",
+    label: "GPS",
+    description: "Whether location access is enabled."
+  }
+};
 
 /*
  * ANALYTICS
