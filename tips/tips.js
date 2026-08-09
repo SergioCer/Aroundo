@@ -495,6 +495,191 @@ export async function saveTip(tip) {
   return data;
 }
 
+export async function simulateTip(tip) {
+
+  const rows = await supabase
+    .from("analytics")
+    .select("*")
+    .order("an_date", {
+      ascending: false
+    });
+
+  if (rows.error)
+    throw rows.error;
+
+  const data = rows.data || [];
+
+  /*
+   * Ultimo record disponibile per dispositivo.
+   */
+  const latest =
+    new Map();
+
+  data.forEach(row => {
+
+    if (!row.an_device)
+      return;
+
+    if (!latest.has(row.an_device))
+      latest.set(row.an_device, row);
+
+  });
+
+
+  /*
+   * Costruzione condizioni.
+   */
+
+  const conditions = [];
+
+  for (let i = 1; i <= 3; i++) {
+
+    const analytics =
+      tip[`tp_analytics_${i}`];
+
+    if (!analytics)
+      continue;
+
+    const condition =
+      tip[`tp_condition_${i}`];
+
+    const value =
+      tip[`tv_value_${i}`];
+
+    const field =
+      ANALYTICS_FIELDS[analytics];
+
+    if (!field)
+      continue;
+
+    conditions.push({
+      analytics,
+      condition,
+      value,
+      logic:
+        i > 1
+          ? tip[`tp_logic_${i - 1}`]
+          : ""
+    });
+  }
+
+
+  let involved = 0;
+  let excluded = 0;
+  let missing = 0;
+
+  const detail = [];
+
+
+  latest.forEach(row => {
+
+    let result = null;
+
+    for (
+      let i = 0;
+      i < conditions.length;
+      i++
+    ) {
+
+      const item =
+        conditions[i];
+
+      const current =
+        evaluateCondition(
+          row[item.analytics],
+          item.condition,
+          item.value
+        );
+
+      if (i === 0) {
+
+        result = current;
+
+      } else {
+
+        result =
+          evaluateLogic(
+            result,
+            current,
+            item.logic
+          );
+      }
+
+    }
+
+
+    if (result === true) {
+
+      involved++;
+
+    } else if (result === false) {
+
+      excluded++;
+
+    } else {
+
+      missing++;
+
+    }
+
+  });
+
+
+  const total =
+    latest.size;
+
+
+  /*
+   * Testo descrittivo delle condizioni.
+   * Utile per l'Impact parlante.
+   */
+
+  conditions.forEach((item, index) => {
+
+    const field =
+      ANALYTICS_FIELDS[item.analytics];
+
+    detail.push({
+
+      logic:
+        index === 0
+          ? ""
+          : item.logic,
+
+      label:
+        field
+          ? field.label
+          : item.analytics,
+
+      condition:
+        item.condition,
+
+      value:
+        item.value
+
+    });
+
+  });
+
+
+  return {
+
+    total,
+    involved,
+    excluded,
+    missing,
+
+    percent:
+      total
+        ? Math.round(
+            involved / total * 100
+          )
+        : 0,
+
+    detail
+  };
+}
+
 
 /* =========================================================
    RENDER TIP
