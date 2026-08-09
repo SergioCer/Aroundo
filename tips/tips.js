@@ -613,3 +613,252 @@ export function renderTip(tip){
 
   return overlay;
 }
+
+export async function simulateTip(tip) {
+
+  const { data, error } =
+    await supabase
+      .from("analytics")
+      .select("*")
+      .order("an_date", { ascending: false });
+
+  if (error)
+    throw error;
+
+  /*
+   * Un solo record rappresentativo per dispositivo:
+   * prendiamo il più recente disponibile.
+   */
+
+  const latest = new Map();
+
+  (data || []).forEach(row => {
+
+    if (!row.an_device)
+      return;
+
+    if (!latest.has(row.an_device))
+      latest.set(row.an_device, row);
+
+  });
+
+  const rows =
+    Array.from(latest.values());
+
+  const total =
+    rows.length;
+
+
+  /*
+   * CONDITIONS
+   */
+
+  const conditions = [
+    {
+      analytics: tip.tp_analytics_1,
+      condition: tip.tp_condition_1,
+      value: tip.tv_value_1
+    },
+    {
+      analytics: tip.tp_analytics_2,
+      condition: tip.tp_condition_2,
+      value: tip.tv_value_2
+    },
+    {
+      analytics: tip.tp_analytics_3,
+      condition: tip.tp_condition_3,
+      value: tip.tv_value_3
+    }
+  ];
+
+
+  /*
+   * Consideriamo solo le condizioni
+   * realmente configurate.
+   */
+
+  const activeConditions =
+    conditions.filter(c =>
+      c.analytics &&
+      c.condition &&
+      c.value !== ""
+      && c.value !== null
+      && c.value !== undefined
+    );
+
+
+  /*
+   * Descrizione leggibile della condizione.
+   */
+
+  const descriptions =
+    activeConditions.map((c, index) => {
+
+      const field =
+        ANALYTICS_FIELDS[c.analytics];
+
+      const label =
+        field?.label ||
+        c.analytics;
+
+      const logic =
+        index === 0
+          ? ""
+          : (
+              tip[`tp_logic_${index}`] ||
+              "AND"
+            ) + " ";
+
+      return {
+        index,
+        label,
+        condition: c.condition,
+        value: c.value,
+        logic,
+        text:
+          `${logic}${label} ${c.condition} ${c.value}`
+      };
+
+    });
+
+
+  /*
+   * Risultati della simulazione
+   */
+
+  const counters =
+    descriptions.map(() => 0);
+
+  let involved = 0;
+  let excluded = 0;
+  let missing = 0;
+
+
+  /*
+   * VALUTAZIONE DI UN DISPOSITIVO
+   */
+
+  rows.forEach(row => {
+
+    const results = [];
+    let rowMissing = false;
+
+
+    activeConditions.forEach((c, index) => {
+
+      const actual =
+        row[c.analytics];
+
+      const result =
+        evaluateCondition(
+          actual,
+          c.condition,
+          c.value
+        );
+
+      results.push(result);
+
+      if (result === null)
+        rowMissing = true;
+
+      if (result === true)
+        counters[index]++;
+
+    });
+
+
+    /*
+     * Se una condizione non è valutabile,
+     * il dispositivo viene considerato
+     * "missing data".
+     */
+
+    if (rowMissing) {
+
+      missing++;
+      return;
+
+    }
+
+
+    /*
+     * Nessuna condizione:
+     * non possiamo determinare l'impatto.
+     */
+
+    if (!results.length) {
+
+      missing++;
+      return;
+
+    }
+
+
+    /*
+     * Prima condizione
+     */
+
+    let finalResult =
+      results[0];
+
+
+    /*
+     * Condizioni successive
+     */
+
+    for (
+      let i = 1;
+      i < results.length;
+      i++
+    ) {
+
+      const logic =
+        tip[`tp_logic_${i}`] ||
+        "AND";
+
+      finalResult =
+        evaluateLogic(
+          finalResult,
+          results[i],
+          logic
+        );
+
+    }
+
+
+    if (finalResult === true)
+      involved++;
+    else
+      excluded++;
+
+  });
+
+
+  return {
+
+    total,
+
+    involved,
+
+    excluded,
+
+    missing,
+
+    percent:
+      total
+        ? Math.round(
+            involved / total * 100
+          )
+        : 0,
+
+    conditions:
+      descriptions.map((item, index) => ({
+        ...item,
+        matched:
+          counters[index]
+      }))
+
+  };
+
+}
+
