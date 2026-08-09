@@ -475,80 +475,66 @@ function fill() {
 /* UPDATE */
 function update() {
   const field = getAnalyticsField();
-  const numeric =
-    field?.type === "number";
   const box =
-  document.getElementById("progression");
-box.innerHTML = "";
-box.hidden = !field;
-if(field){
-  const repeatValue=
-    Number(repeat.value);
-  if(field.type==="number"){
-    const values=
-      calculateProgression(
-        interval.value,
-        growth.value,
-        repeat.value
-      );
-    values.forEach((value,index)=>{
-      const el=
+    document.getElementById("progression");
+  box.innerHTML = "";
+  box.hidden = !field;
+  if (field) {
+    const repeatValue =
+      Number(repeat.value);
+    if (field.type === "number") {
+      const values =
+        calculateProgression(
+          interval.value,
+          growth.value,
+          repeat.value
+        );
+      values.forEach((value,index) => {
+        const el =
+          document.createElement("div");
+        el.className = "step";
+        el.textContent =
+          `${index + 1}ª → ${value}`;
+        box.appendChild(el);
+      });
+      if (repeatValue === 0) {
+        const el =
+          document.createElement("div");
+        el.className = "step";
+        el.textContent = "∞ → ...";
+        box.appendChild(el);
+      } else if (repeatValue > 10) {
+        const el =
+          document.createElement("div");
+        el.className = "step";
+        el.textContent = "11ª → ...";
+        box.appendChild(el);
+      }
+    } else {
+      const el =
         document.createElement("div");
-      el.className="step";
-      el.textContent=
-        `${index+1}ª → ${value}`;
+      el.className = "step";
+      el.textContent =
+        repeatValue === 0
+          ? "1ª → visualizzazione"
+          : "1ª → visualizzazione";
       box.appendChild(el);
-    });
-    if(repeatValue===0){
-      const el=
-        document.createElement("div");
-      el.className="step";
-      el.textContent="∞ → ...";
-      box.appendChild(el);
-    }
-    else if(repeatValue>10){
-      const el=
-        document.createElement("div");
-      el.className="step";
-      el.textContent="11ª → ...";
-      box.appendChild(el);
-    }
-  }
-  else{
-    const el=
-      document.createElement("div");
-    el.className="step";
-    el.textContent=
-      repeatValue===0
-        ? "1ª → ∞"
-        : "1ª → visualizzazione";
-    box.appendChild(el);
-    if(repeatValue>1){
-      const el2=
-        document.createElement("div");
-      el2.className="step";
-      el2.textContent=
-        repeatValue===0
-          ? "∞ → ..."
-          : repeatValue>10
+      if (repeatValue === 0) {
+        const el2 =
+          document.createElement("div");
+        el2.className = "step";
+        el2.textContent = "∞ → ...";
+        box.appendChild(el2);
+      } else if (repeatValue > 1) {
+        const el2 =
+          document.createElement("div");
+        el2.className = "step";
+        el2.textContent =
+          repeatValue > 10
             ? "11ª → ..."
             : `${repeatValue}ª → ...`;
-      box.appendChild(el2);
-    }
-  }
-}
-    if (Number(repeat.value) === 0) {
-      const el =
-        document.createElement("div");
-      el.className = "step";
-      el.textContent = "∞ → ...";
-      box.appendChild(el);
-    } else if (Number(repeat.value) > 10) {
-      const el =
-        document.createElement("div");
-      el.className = "step";
-      el.textContent = "11ª → ...";
-      box.appendChild(el);
+        box.appendChild(el2);
+      }
     }
   }
   const preview =
