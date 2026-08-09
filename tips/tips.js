@@ -1,91 +1,95 @@
-import {supabase} from "../supabase.js";
+import { supabase } from "../supabase.js";
 
-/* TIP TYPES */
+/* =========================================================
+   TIP TYPES
+   ========================================================= */
 
 export const TIP_TYPES = {
 
   bubble: {
-    label:"Bubble",
-    position:"bottom-right",
-    width:"320px",
-    background:"#eff6ff",
-    color:"#1e3a8a",
-    border:"1px solid #93c5fd",
-    radius:"18px",
-    shadow:"0 8px 25px rgba(0,0,0,.15)",
-    overlay:false,
-    acknowledge:true
+    label: "Bubble",
+    position: "bottom-right",
+    width: "320px",
+    background: "#eff6ff",
+    color: "#1e3a8a",
+    border: "1px solid #93c5fd",
+    radius: "18px",
+    shadow: "0 8px 25px rgba(0,0,0,.15)",
+    overlay: false,
+    acknowledge: true
   },
 
   banner: {
-    label:"Banner",
-    position:"top-center",
-    width:"100%",
-    background:"#fef3c7",
-    color:"#78350f",
-    border:"1px solid #f59e0b",
-    radius:"0",
-    shadow:"0 4px 15px rgba(0,0,0,.12)",
-    overlay:false,
-    acknowledge:true
+    label: "Banner",
+    position: "top-center",
+    width: "100%",
+    background: "#fef3c7",
+    color: "#78350f",
+    border: "1px solid #f59e0b",
+    radius: "0",
+    shadow: "0 4px 15px rgba(0,0,0,.12)",
+    overlay: false,
+    acknowledge: true
   },
 
   modal: {
-    label:"Modal",
-    position:"center",
-    width:"420px",
-    background:"#ffffff",
-    color:"#111827",
-    border:"2px solid #6366f1",
-    radius:"16px",
-    shadow:"0 12px 40px rgba(0,0,0,.25)",
-    overlay:true,
-    acknowledge:true
+    label: "Modal",
+    position: "center",
+    width: "420px",
+    background: "#ffffff",
+    color: "#111827",
+    border: "2px solid #6366f1",
+    radius: "16px",
+    shadow: "0 12px 40px rgba(0,0,0,.25)",
+    overlay: true,
+    acknowledge: true
   },
 
   toast: {
-    label:"Toast",
-    position:"bottom-center",
-    width:"360px",
-    background:"#111827",
-    color:"#ffffff",
-    border:"none",
-    radius:"10px",
-    shadow:"0 8px 25px rgba(0,0,0,.25)",
-    overlay:false,
-    acknowledge:true
+    label: "Toast",
+    position: "bottom-center",
+    width: "360px",
+    background: "#111827",
+    color: "#ffffff",
+    border: "none",
+    radius: "10px",
+    shadow: "0 8px 25px rgba(0,0,0,.25)",
+    overlay: false,
+    acknowledge: true
   },
 
   card: {
-    label:"Card",
-    position:"center-right",
-    width:"360px",
-    background:"#ffffff",
-    color:"#111827",
-    border:"1px solid #d1d5db",
-    radius:"14px",
-    shadow:"0 10px 30px rgba(0,0,0,.18)",
-    overlay:false,
-    acknowledge:true
+    label: "Card",
+    position: "center-right",
+    width: "360px",
+    background: "#ffffff",
+    color: "#111827",
+    border: "1px solid #d1d5db",
+    radius: "14px",
+    shadow: "0 10px 30px rgba(0,0,0,.18)",
+    overlay: false,
+    acknowledge: true
   },
 
   floating: {
-    label:"Floating",
-    position:"bottom-left",
-    width:"300px",
-    background:"#f0fdf4",
-    color:"#166534",
-    border:"1px solid #86efac",
-    radius:"20px",
-    shadow:"0 8px 28px rgba(0,0,0,.18)",
-    overlay:false,
-    acknowledge:true
+    label: "Floating",
+    position: "bottom-left",
+    width: "300px",
+    background: "#f0fdf4",
+    color: "#166534",
+    border: "1px solid #86efac",
+    radius: "20px",
+    shadow: "0 8px 28px rgba(0,0,0,.18)",
+    overlay: false,
+    acknowledge: true
   }
 
 };
 
 
-/* ICONS */
+/* =========================================================
+   ICONS
+   ========================================================= */
 
 export const TIP_ICONS = [
   "⭐",
@@ -101,190 +105,302 @@ export const TIP_ICONS = [
 ];
 
 
-/* ANALYTICS */
+/* =========================================================
+   ANALYTICS
+   ========================================================= */
 
 export const ANALYTICS_FIELDS = {
 
-  an_open:{
-    type:"number",
-    label:"Open",
-    description:"Number of times Aroundo has been opened."
+  an_open: {
+    type: "number",
+    label: "Open",
+    description:
+      "Number of times Aroundo has been opened."
   },
 
-  an_login:{
-    type:"boolean",
-    label:"Login",
-    description:"Whether the user has logged in."
+  an_login: {
+    type: "boolean",
+    label: "Login",
+    description:
+      "Whether the user is logged in."
   },
 
-  an_install:{
-    type:"boolean",
-    label:"Install",
-    description:"Whether Aroundo has been installed."
+  an_install: {
+    type: "boolean",
+    label: "Install",
+    description:
+      "Whether Aroundo has been installed."
   },
 
-  an_share:{
-    type:"number",
-    label:"Share",
-    description:"Number of sharing actions."
+  an_share: {
+    type: "number",
+    label: "Share",
+    description:
+      "Number of sharing actions."
   },
 
-  an_more:{
-    type:"number",
-    label:"More",
-    description:"Number of times the More action has been used."
+  an_more: {
+    type: "number",
+    label: "More",
+    description:
+      "Number of times the More action has been used."
   },
 
-  an_info:{
-    type:"number",
-    label:"Info",
-    description:"Number of times event information has been opened."
+  an_info: {
+    type: "number",
+    label: "Info",
+    description:
+      "Number of times event information has been opened."
   },
 
-  an_marker:{
-    type:"number",
-    label:"Marker",
-    description:"Number of event markers selected."
+  an_marker: {
+    type: "number",
+    label: "Marker",
+    description:
+      "Number of event markers selected."
   },
 
-  an_map:{
-    type:"number",
-    label:"Map",
-    description:"Number of times the map has been opened."
+  an_map: {
+    type: "number",
+    label: "Map",
+    description:
+      "Number of times the map has been opened."
   },
 
-  an_buy:{
-    type:"number",
-    label:"Buy",
-    description:"Number of purchase actions."
+  an_buy: {
+    type: "number",
+    label: "Buy",
+    description:
+      "Number of purchase actions."
   },
 
-  an_book:{
-    type:"number",
-    label:"Book",
-    description:"Number of booking actions."
+  an_book: {
+    type: "number",
+    label: "Book",
+    description:
+      "Number of booking actions."
   },
 
-  an_gps:{
-    type:"boolean",
-    label:"GPS",
-    description:"Whether location access is enabled."
+  an_gps: {
+    type: "boolean",
+    label: "GPS",
+    description:
+      "Whether location access is enabled."
   }
 
 };
 
 
-export function getAnalyticsFields(){
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+export function getAnalyticsFields() {
+
   return Object.entries(ANALYTICS_FIELDS)
-    .map(([value,data])=>({value,...data}));
+    .map(([value, data]) => ({
+      value,
+      ...data
+    }));
+
 }
 
 
-export function getTipTypes(){
+export function getTipTypes() {
+
   return Object.entries(TIP_TYPES)
-    .map(([value,data])=>({value,...data}));
+    .map(([value, data]) => ({
+      value,
+      ...data
+    }));
+
 }
 
 
-/* CONDITIONS */
+export function getConditions(type) {
 
-export function getConditions(type){
   return type === "boolean"
-    ? ["=","!="]
-    : [">",">=","=","<=","<","!="];
+    ? ["=", "!="]
+    : [">", ">=", "=", "<=", "<", "!="];
+
 }
 
 
-export function evaluateCondition(actual,condition,expected){
+/* =========================================================
+   CONDITION EVALUATION
+   ========================================================= */
 
-  if(actual===null || actual===undefined ||
-     actual==="" || expected==="")
+export function evaluateCondition(
+  actual,
+  condition,
+  expected
+) {
+
+  if (
+    actual === null ||
+    actual === undefined ||
+    actual === "" ||
+    expected === ""
+  ) {
     return null;
+  }
 
-  if(typeof actual==="boolean"){
-    const value=String(expected).toLowerCase();
+  /*
+   * BOOLEAN
+   */
 
-    if(value!=="true" && value!=="false")
+  if (typeof actual === "boolean") {
+
+    const value =
+      String(expected).toLowerCase();
+
+    if (
+      value !== "true" &&
+      value !== "false"
+    ) {
       return null;
+    }
 
-    const target=value==="true";
+    const target =
+      value === "true";
 
-    if(condition==="=") return actual===target;
-    if(condition==="!=") return actual!==target;
+    if (condition === "=")
+      return actual === target;
+
+    if (condition === "!=")
+      return actual !== target;
 
     return null;
   }
 
-  const a=Number(actual);
-  const b=Number(expected);
 
-  if(!Number.isFinite(a) || !Number.isFinite(b))
+  /*
+   * NUMBER
+   */
+
+  const a = Number(actual);
+  const b = Number(expected);
+
+  if (
+    !Number.isFinite(a) ||
+    !Number.isFinite(b)
+  ) {
     return null;
+  }
 
-  if(condition===">") return a>b;
-  if(condition===">=") return a>=b;
-  if(condition==="=") return a===b;
-  if(condition==="<") return a<b;
-  if(condition==="<=") return a<=b;
-  if(condition==="!=") return a!==b;
+  if (condition === ">")
+    return a > b;
+
+  if (condition === ">=")
+    return a >= b;
+
+  if (condition === "=")
+    return a === b;
+
+  if (condition === "<")
+    return a < b;
+
+  if (condition === "<=")
+    return a <= b;
+
+  if (condition === "!=")
+    return a !== b;
 
   return null;
 }
 
 
-/* LOGIC */
+/* =========================================================
+   LOGIC
+   ========================================================= */
 
-export function evaluateLogic(first,second,logic){
+/*
+ * Logic connects the PREVIOUS condition
+ * with the CURRENT condition.
+ *
+ * AND:
+ * both must be true
+ *
+ * OR:
+ * at least one must be true
+ *
+ * NOT:
+ * the current condition is negated
+ */
 
-  if(first===null || second===null)
+export function evaluateLogic(
+  previous,
+  current,
+  logic
+) {
+
+  if (
+    previous === null ||
+    current === null
+  ) {
     return null;
+  }
 
-  if(logic==="AND")
-    return first && second;
+  if (logic === "AND")
+    return previous && current;
 
-  if(logic==="OR")
-    return first || second;
+  if (logic === "OR")
+    return previous || current;
 
-  if(logic==="NOT")
-    return first && !second;
+  if (logic === "NOT")
+    return previous && !current;
 
-  return first;
+  return current;
 }
 
 
-/* PROGRESSION */
+/* =========================================================
+   PROGRESSION
+   ========================================================= */
 
-export function calculateProgression(interval,growth,repeat){
+export function calculateProgression(
+  interval,
+  growth,
+  repeat
+) {
 
-  interval=Number(interval);
-  growth=Number(growth);
-  repeat=Number(repeat);
+  interval = Number(interval);
+  growth = Number(growth);
+  repeat = Number(repeat);
 
-  if(!Number.isFinite(interval))
-    interval=1;
+  if (!Number.isFinite(interval))
+    interval = 1;
 
-  if(!Number.isFinite(growth))
-    growth=1;
+  if (!Number.isFinite(growth))
+    growth = 1;
 
-  const limit=
-    repeat===0
+  const limit =
+    repeat === 0
       ? 10
-      : Math.min(repeat,10);
+      : Math.min(repeat, 10);
 
-  const result=[];
-  let total=0;
+  const result = [];
 
-  for(let show=0;show<limit;show++){
+  let total = 0;
 
-    let increment=
+  for (
+    let show = 0;
+    show < limit;
+    show++
+  ) {
+
+    let increment =
       Math.floor(
-        interval*(show+1)*growth
+        interval *
+        (show + 1) *
+        growth
       );
 
-    if(increment<1)
-      increment=1;
+    if (increment < 1)
+      increment = 1;
 
-    total+=increment;
+    total += increment;
+
     result.push(total);
   }
 
@@ -292,288 +408,356 @@ export function calculateProgression(interval,growth,repeat){
 }
 
 
-/* DEFAULT */
+/* =========================================================
+   DEFAULT TIP
+   ========================================================= */
 
-export function defaultTip(){
+export function defaultTip() {
 
   return {
 
-    id_tips:"",
+    id_tips: "",
 
-    tp_type:"bubble",
-    tp_icon:"⭐",
-    tp_title:"",
-    tp_text:"",
+    tp_type: "bubble",
 
-    tp_analytics_1:"an_open",
-    tp_condition_1:">=",
-    tv_value_1:"",
-    tp_logic_1:"",
+    tp_icon: "⭐",
+    tp_title: "",
+    tp_text: "",
 
-    tp_analytics_2:"",
-    tp_condition_2:">=",
-    tv_value_2:"",
-    tp_logic_2:"",
+    tp_analytics_1: "an_open",
+    tp_condition_1: ">=",
+    tv_value_1: "",
+    tp_logic_1: "",
 
-    tp_analytics_3:"",
-    tp_condition_3:">=",
-    tv_value_3:"",
+    tp_analytics_2: "",
+    tp_condition_2: ">=",
+    tv_value_2: "",
+    tp_logic_2: "",
 
-    tp_repeat:1,
-    tp_interval:1,
-    tp_growth:1,
+    tp_analytics_3: "",
+    tp_condition_3: ">=",
+    tv_value_3: "",
 
-    tp_cta_active:false,
-    tp_cta_label:"",
-    tp_cta_url:"",
+    tp_repeat: 1,
+    tp_interval: 1,
+    tp_growth: 1,
 
-    tp_active:false
+    tp_cta_active: false,
+    tp_cta_label: "",
+    tp_cta_url: "",
 
+    tp_active: false
   };
+
 }
 
 
-/* LOAD */
+/* =========================================================
+   LOAD
+   ========================================================= */
 
-export async function loadTip(id){
+export async function loadTip(id) {
 
-  const {data,error}=await supabase
+  const {
+    data,
+    error
+  } = await supabase
     .from("tips")
     .select("*")
-    .eq("id_tips",id)
+    .eq("id_tips", id)
     .single();
 
-  if(error)
+  if (error)
     throw error;
 
   return data;
 }
 
 
-/* SAVE */
+/* =========================================================
+   SAVE
+   ========================================================= */
 
-export async function saveTip(tip){
+export async function saveTip(tip) {
 
-  const {data,error}=await supabase
+  const {
+    data,
+    error
+  } = await supabase
     .from("tips")
     .upsert(tip)
     .select()
     .single();
 
-  if(error)
+  if (error)
     throw error;
 
   return data;
 }
 
 
-/* RENDER TIP */
+/* =========================================================
+   RENDER TIP
+   ========================================================= */
 
-export function renderTip(tip){
+export function renderTip(tip) {
 
-  const model=
+  const model =
     TIP_TYPES[tip.tp_type] ||
     TIP_TYPES.bubble;
 
-  const overlay=
+
+  /*
+   * OVERLAY
+   */
+
+  const overlay =
     document.createElement("div");
 
-  overlay.style.cssText=`
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    display:flex;
-    align-items:${
+  overlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+
+    align-items: ${
       model.position.includes("top")
-        ?"flex-start"
-        :model.position.includes("bottom")
-          ?"flex-end"
-          :"center"
+        ? "flex-start"
+        : model.position.includes("bottom")
+          ? "flex-end"
+          : "center"
     };
-    justify-content:${
+
+    justify-content: ${
       model.position.includes("left")
-        ?"flex-start"
-        :model.position.includes("right")
-          ?"flex-end"
-          :"center"
+        ? "flex-start"
+        : model.position.includes("right")
+          ? "flex-end"
+          : "center"
     };
-    padding:20px;
-    box-sizing:border-box;
-    pointer-events:none;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    pointer-events: none;
   `;
 
-  if(model.overlay)
-    overlay.style.background=
+
+  if (model.overlay) {
+
+    overlay.style.background =
       "rgba(0,0,0,.35)";
+  }
 
 
-  const box=
+  /*
+   * BOX
+   */
+
+  const box =
     document.createElement("div");
 
-  box.style.cssText=`
-    width:${model.width};
-    max-width:calc(100vw - 40px);
-    box-sizing:border-box;
-    padding:20px;
-    background:${model.background};
-    color:${model.color};
-    border:${model.border};
-    border-radius:${model.radius};
-    box-shadow:${model.shadow};
-    font-family:Arial,sans-serif;
-    pointer-events:auto;
-    position:relative;
+  box.style.cssText = `
+    width: ${model.width};
+    max-width: calc(100vw - 40px);
+
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    background: ${model.background};
+    color: ${model.color};
+
+    border: ${model.border};
+    border-radius: ${model.radius};
+
+    box-shadow: ${model.shadow};
+
+    font-family: Arial, sans-serif;
+
+    pointer-events: auto;
+    position: relative;
   `;
 
 
-  /* HEADER */
+  /*
+   * HEADER
+   */
 
-  if(tip.tp_icon || tip.tp_title){
+  if (
+    tip.tp_icon ||
+    tip.tp_title
+  ) {
 
-    const header=
+    const header =
       document.createElement("div");
 
-    header.style.cssText=`
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:12px;
+    header.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
     `;
 
-    if(tip.tp_icon){
 
-      const icon=
+    if (tip.tp_icon) {
+
+      const icon =
         document.createElement("span");
 
-      icon.textContent=
+      icon.textContent =
         tip.tp_icon;
 
-      icon.style.cssText=`
-        font-size:24px;
-        line-height:1;
+      icon.style.cssText = `
+        font-size: 24px;
+        line-height: 1;
       `;
 
       header.appendChild(icon);
     }
 
-    if(tip.tp_title){
 
-      const title=
+    if (tip.tp_title) {
+
+      const title =
         document.createElement("div");
 
-      title.textContent=
+      title.textContent =
         tip.tp_title;
 
-      title.style.cssText=`
-        font-size:18px;
-        font-weight:bold;
-        line-height:1.2;
+      title.style.cssText = `
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 1.2;
       `;
 
       header.appendChild(title);
     }
 
+
     box.appendChild(header);
   }
 
 
-  /* TEXT */
+  /*
+   * TEXT
+   */
 
-  const content=
+  const content =
     document.createElement("div");
 
-  content.textContent=
+  content.textContent =
     tip.tp_text ||
     "Tip preview";
 
-  content.style.cssText=`
-    line-height:1.5;
-    white-space:pre-wrap;
+  content.style.cssText = `
+    line-height: 1.5;
+    white-space: pre-wrap;
   `;
 
   box.appendChild(content);
 
 
-  /* CTA */
+  /*
+   * CTA
+   */
 
-  if(
+  if (
     tip.tp_cta_active &&
     tip.tp_cta_label
-  ){
+  ) {
 
-    const cta=
+    const cta =
       document.createElement("a");
 
-    cta.textContent=
+    cta.textContent =
       tip.tp_cta_label;
 
-    cta.href=
+    cta.href =
       tip.tp_cta_url || "#";
 
-    cta.target="_blank";
-    cta.rel="noopener";
+    cta.target = "_blank";
+    cta.rel = "noopener";
 
-    cta.style.cssText=`
-      display:inline-block;
-      margin-top:16px;
-      padding:9px 18px;
-      border-radius:17px;
-      background:#9333ea;
-      color:white;
-      text-decoration:none;
-      font-weight:bold;
-      font-size:13px;
+    cta.style.cssText = `
+      display: inline-block;
+
+      margin-top: 16px;
+
+      padding: 9px 18px;
+
+      border-radius: 17px;
+
+      background: #9333ea;
+      color: white;
+
+      text-decoration: none;
+
+      font-weight: bold;
+      font-size: 13px;
     `;
 
     box.appendChild(cta);
   }
 
 
-  /* ACTIONS */
+  /*
+   * ACTIONS
+   */
 
-  if(model.acknowledge){
+  if (model.acknowledge) {
 
-    const actions=
+    const actions =
       document.createElement("div");
 
-    actions.style.cssText=`
-      display:flex;
-      justify-content:flex-end;
-      align-items:center;
-      gap:12px;
-      margin-top:18px;
+    actions.style.cssText = `
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
     `;
 
 
     /*
-     * Don't show more non serve
-     * quando il Tip è previsto una sola volta.
+     * DON'T SHOW MORE
+     *
+     * Non ha senso con repeat = 1.
      */
 
-    if(Number(tip.tp_repeat)!==1){
+    if (
+      Number(tip.tp_repeat) !== 1
+    ) {
 
-      const hide=
+      const hide =
         document.createElement("label");
 
-      hide.style.cssText=`
-        display:flex;
-        align-items:center;
-        gap:6px;
-        font-size:12px;
-        cursor:pointer;
-        margin-right:auto;
+      hide.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        font-size: 12px;
+
+        cursor: pointer;
+
+        margin-right: auto;
       `;
 
-      const checkbox=
+
+      const checkbox =
         document.createElement("input");
 
-      checkbox.type="checkbox";
+      checkbox.type = "checkbox";
 
-      const hideText=
+
+      const hideText =
         document.createElement("span");
 
-      hideText.textContent=
+      hideText.textContent =
         "Don't show more";
+
 
       hide.append(
         checkbox,
@@ -584,23 +768,34 @@ export function renderTip(tip){
     }
 
 
-    const ok=
+    /*
+     * OK
+     */
+
+    const ok =
       document.createElement("button");
 
-    ok.textContent="OK";
+    ok.textContent = "OK";
 
-    ok.style.cssText=`
-      border:none;
-      border-radius:17px;
-      padding:8px 18px;
-      background:#22c55e;
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
+    ok.style.cssText = `
+      border: none;
+
+      border-radius: 17px;
+
+      padding: 8px 18px;
+
+      background: #22c55e;
+      color: white;
+
+      font-weight: bold;
+
+      cursor: pointer;
     `;
 
-    ok.onclick=()=>
+
+    ok.onclick = () =>
       overlay.remove();
+
 
     actions.appendChild(ok);
 
@@ -609,256 +804,8 @@ export function renderTip(tip){
 
 
   overlay.appendChild(box);
+
   document.body.appendChild(overlay);
 
   return overlay;
 }
-
-export async function simulateTip(tip) {
-
-  const { data, error } =
-    await supabase
-      .from("analytics")
-      .select("*")
-      .order("an_date", { ascending: false });
-
-  if (error)
-    throw error;
-
-  /*
-   * Un solo record rappresentativo per dispositivo:
-   * prendiamo il più recente disponibile.
-   */
-
-  const latest = new Map();
-
-  (data || []).forEach(row => {
-
-    if (!row.an_device)
-      return;
-
-    if (!latest.has(row.an_device))
-      latest.set(row.an_device, row);
-
-  });
-
-  const rows =
-    Array.from(latest.values());
-
-  const total =
-    rows.length;
-
-
-  /*
-   * CONDITIONS
-   */
-
-  const conditions = [
-    {
-      analytics: tip.tp_analytics_1,
-      condition: tip.tp_condition_1,
-      value: tip.tv_value_1
-    },
-    {
-      analytics: tip.tp_analytics_2,
-      condition: tip.tp_condition_2,
-      value: tip.tv_value_2
-    },
-    {
-      analytics: tip.tp_analytics_3,
-      condition: tip.tp_condition_3,
-      value: tip.tv_value_3
-    }
-  ];
-
-
-  /*
-   * Consideriamo solo le condizioni
-   * realmente configurate.
-   */
-
-  const activeConditions =
-    conditions.filter(c =>
-      c.analytics &&
-      c.condition &&
-      c.value !== ""
-      && c.value !== null
-      && c.value !== undefined
-    );
-
-
-  /*
-   * Descrizione leggibile della condizione.
-   */
-
-  const descriptions =
-    activeConditions.map((c, index) => {
-
-      const field =
-        ANALYTICS_FIELDS[c.analytics];
-
-      const label =
-        field?.label ||
-        c.analytics;
-
-      const logic =
-        index === 0
-          ? ""
-          : (
-              tip[`tp_logic_${index}`] ||
-              "AND"
-            ) + " ";
-
-      return {
-        index,
-        label,
-        condition: c.condition,
-        value: c.value,
-        logic,
-        text:
-          `${logic}${label} ${c.condition} ${c.value}`
-      };
-
-    });
-
-
-  /*
-   * Risultati della simulazione
-   */
-
-  const counters =
-    descriptions.map(() => 0);
-
-  let involved = 0;
-  let excluded = 0;
-  let missing = 0;
-
-
-  /*
-   * VALUTAZIONE DI UN DISPOSITIVO
-   */
-
-  rows.forEach(row => {
-
-    const results = [];
-    let rowMissing = false;
-
-
-    activeConditions.forEach((c, index) => {
-
-      const actual =
-        row[c.analytics];
-
-      const result =
-        evaluateCondition(
-          actual,
-          c.condition,
-          c.value
-        );
-
-      results.push(result);
-
-      if (result === null)
-        rowMissing = true;
-
-      if (result === true)
-        counters[index]++;
-
-    });
-
-
-    /*
-     * Se una condizione non è valutabile,
-     * il dispositivo viene considerato
-     * "missing data".
-     */
-
-    if (rowMissing) {
-
-      missing++;
-      return;
-
-    }
-
-
-    /*
-     * Nessuna condizione:
-     * non possiamo determinare l'impatto.
-     */
-
-    if (!results.length) {
-
-      missing++;
-      return;
-
-    }
-
-
-    /*
-     * Prima condizione
-     */
-
-    let finalResult =
-      results[0];
-
-
-    /*
-     * Condizioni successive
-     */
-
-    for (
-      let i = 1;
-      i < results.length;
-      i++
-    ) {
-
-      const logic =
-        tip[`tp_logic_${i}`] ||
-        "AND";
-
-      finalResult =
-        evaluateLogic(
-          finalResult,
-          results[i],
-          logic
-        );
-
-    }
-
-
-    if (finalResult === true)
-      involved++;
-    else
-      excluded++;
-
-  });
-
-
-  return {
-
-    total,
-
-    involved,
-
-    excluded,
-
-    missing,
-
-    percent:
-      total
-        ? Math.round(
-            involved / total * 100
-          )
-        : 0,
-
-    conditions:
-      descriptions.map((item, index) => ({
-        ...item,
-        matched:
-          counters[index]
-      }))
-
-  };
-
-}
-
