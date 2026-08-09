@@ -166,7 +166,7 @@ textarea {
       ←
     </button>
     <span id="pageTitle">
-      Nuovo Tip
+      New Tip
     </span>
     <button
       class="save-btn"
@@ -177,17 +177,17 @@ textarea {
 </div>
 <div class="container">
   <div class="field">
-    <label>ID Tip</label>
+    <label>Tip ID</label>
     <input
       id="id_tips"
       placeholder="es. welcome">
   </div>
   <br>
   <div class="field">
-    <label>Testo</label>
+    <label>Text</label>
     <textarea
       id="tp_text"
-      placeholder="Testo del messaggio...">
+      placeholder="Message text...">
     </textarea>
   </div>
   <div class="row">
@@ -409,7 +409,7 @@ async function init() {
     document
       .getElementById("pageTitle")
       .textContent =
-      "Modifica Tip";
+      "Edit Tip";
   }
   fill();
   updateAnalytics();
@@ -513,13 +513,13 @@ window.save = async () => {
     idTips.value.trim();
   if (!id) {
     alert(
-      "Inserire l'identificativo del Tip."
+      "Insert Tip ID."
     );
     return;
   }
   if (!text.value.trim()) {
     alert(
-      "Inserire il testo del Tip."
+      "Insert Tip text."
     );
     return;
   }
