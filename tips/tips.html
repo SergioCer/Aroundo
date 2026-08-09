@@ -3,16 +3,14 @@
 <html lang="it">
 
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>Tip</title>
 
 <style>
-
-* {
-  box-sizing: border-box;
-}
 
 body {
   font-family: Arial, sans-serif;
@@ -20,8 +18,6 @@ body {
   margin: 0;
   color: #111827;
 }
-
-/* HEADER */
 
 .header {
   display: flex;
@@ -37,19 +33,27 @@ body {
   align-items: center;
 }
 
-.bck-btn {
+.bck-btn,
+.save-btn {
   width: 34px;
   height: 34px;
   border-radius: 17px;
   border: none;
   cursor: pointer;
-  background: #e5e7eb;
-  color: #374151;
-  font-size: 18px;
   font-weight: bold;
 }
 
-/* CONTAINER */
+.bck-btn {
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 18px;
+}
+
+.save-btn {
+  background: #22c55e;
+  color: white;
+  font-size: 18px;
+}
 
 .container {
   max-width: 900px;
@@ -57,10 +61,7 @@ body {
   padding: 20px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,.04);
 }
-
-/* FIELDS */
 
 .row {
   display: flex;
@@ -84,6 +85,7 @@ input,
 select,
 textarea {
   width: 100%;
+  box-sizing: border-box;
   padding: 9px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -95,7 +97,6 @@ input:disabled,
 select:disabled {
   background: #f3f4f6;
   color: #9ca3af;
-  cursor: not-allowed;
 }
 
 textarea {
@@ -103,92 +104,37 @@ textarea {
   resize: vertical;
 }
 
-textarea::placeholder,
-input::placeholder {
-  color: #9ca3af;
-}
-
-/* ICON */
-
-.icon-field {
-  max-width: 180px;
-}
-
-.icon-preview {
-  height: 39px;
+.logic-row {
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 22px;
-  background: #f9fafb;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-}
-
-/* CONDITIONS */
-
-.condition-row {
-  display: grid;
-  grid-template-columns: 1fr 120px 1fr 100px;
-  gap: 10px;
-  align-items: end;
-  margin-bottom: 12px;
-}
-
-.condition-row.hidden {
-  display: none;
+  margin: -5px 0 10px;
 }
 
 .logic-field {
-  min-width: 0;
+  width: 180px;
 }
 
-/* CTA */
-
-.cta-panel {
-  margin-top: 5px;
-  padding: 14px;
-  background: #faf5ff;
-  border-left: 5px solid #9333ea;
-  border-radius: 8px;
+.logic-field label {
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
 }
 
-.cta-row {
+.progression {
   display: flex;
-  gap: 10px;
-  align-items: end;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
 }
 
-.cta-toggle {
-  width: 34px;
-  height: 34px;
-  border: none;
-  border-radius: 17px;
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-  flex: 0 0 34px;
+.step {
+  background: #dbeafe;
+  color: #1e3a8a;
+  padding: 7px 12px;
+  border-radius: 15px;
+  font-size: 13px;
 }
-
-.cta-on {
-  background: #9333ea;
-}
-
-.cta-off {
-  background: #9ca3af;
-}
-
-.cta-url {
-  flex: 2;
-}
-
-/* REPEAT */
-
-.repeat-row {
-  margin-top: 18px;
-}
-
-/* TOOLS */
 
 .tip-tools {
   display: flex;
@@ -210,85 +156,63 @@ input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform .12s ease, filter .12s ease;
-}
-
-.tool-btn:hover {
-  transform: scale(1.06);
-  filter: brightness(.95);
 }
 
 .impact-btn {
   background: #3b82f6;
 }
 
-.active-on {
-  background: #22c55e;
-}
-
-.active-off {
-  background: #ef4444;
+.impact-btn:hover {
+  background: #2563eb;
 }
 
 .preview-btn {
   background: #9333ea;
 }
 
-/* PROGRESSION */
-
-.progression {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 14px;
+.preview-btn:hover {
+  background: #7e22ce;
 }
 
-.step {
-  background: #dbeafe;
-  color: #1e3a8a;
-  padding: 7px 12px;
-  border-radius: 15px;
-  font-size: 13px;
+.active-on {
+  background: #22c55e;
 }
 
-/* IMPACT */
+.active-on:hover {
+  background: #16a34a;
+}
+
+.active-off {
+  background: #ef4444;
+}
+
+.active-off:hover {
+  background: #dc2626;
+}
 
 .simulation {
-  margin-top: 20px;
-  display: none;
+  margin-top: 18px;
+  display: grid;
   gap: 6px;
 }
 
-.simulation.visible {
-  display: grid;
-}
-
 .simulation-title {
-  font-size: 14px;
   font-weight: bold;
   margin-bottom: 5px;
-  color: #374151;
 }
 
 .simulation-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   gap: 20px;
-  padding: 9px 11px;
+  padding: 8px 10px;
   background: #f6f8fb;
   border-radius: 8px;
-  font-size: 13px;
-}
-
-.simulation-row.condition {
-  background: #f9fafb;
 }
 
 .simulation-value {
   font-weight: bold;
-  white-space: nowrap;
+  text-align: right;
 }
 
 .simulation-main {
@@ -296,39 +220,19 @@ input::placeholder {
   color: #166534;
 }
 
-.simulation-excluded {
-  background: #fee2e2;
-  color: #991b1b;
+.simulation-condition {
+  background: #faf5ff;
+  border-left: 4px solid #9333ea;
 }
 
-.simulation-missing {
-  background: #fef3c7;
-  color: #92400e;
+.simulation-logic {
+  color: #9333ea;
+  font-weight: bold;
+  margin-right: 6px;
 }
 
-@media (max-width: 700px) {
-
-  .row {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .condition-row {
-    grid-template-columns: 1fr 100px;
-  }
-
-  .condition-row .value-field {
-    grid-column: 1 / 2;
-  }
-
-  .condition-row .logic-field {
-    grid-column: 2 / 3;
-  }
-
-  .cta-row {
-    flex-wrap: wrap;
-  }
-
+.cta-preview {
+  display: none;
 }
 
 </style>
@@ -344,7 +248,6 @@ input::placeholder {
 ```
 <button
   class="bck-btn"
-  type="button"
   onclick="location.href='tips_overview.html'">
   ←
 </button>
@@ -352,6 +255,12 @@ input::placeholder {
 <span id="pageTitle">
   New Tip
 </span>
+
+<button
+  class="save-btn"
+  onclick="save()">
+  ✓
+</button>
 ```
 
   </div>
@@ -360,34 +269,39 @@ input::placeholder {
 
 <div class="container">
 
-  <!-- ID + TYPE -->
+  <!-- ID / TYPE -->
 
   <div class="row">
 
 ```
 <div class="field">
+
   <label>Tip ID</label>
 
   <input
     id="id_tips"
     placeholder="e.g. 20260809 Welcome">
+
 </div>
 
+
 <div class="field">
+
   <label>Type</label>
 
   <select id="tp_type"></select>
+
 </div>
 ```
 
   </div>
 
-  <!-- ICON + TITLE -->
+  <!-- ICON / TITLE -->
 
   <div class="row">
 
 ```
-<div class="field icon-field">
+<div class="field">
 
   <label>Icon</label>
 
@@ -395,13 +309,14 @@ input::placeholder {
 
 </div>
 
+
 <div class="field">
 
   <label>Title</label>
 
   <input
     id="tp_title"
-    placeholder="Short title of the Tip">
+    placeholder="Tip title">
 
 </div>
 ```
@@ -422,148 +337,177 @@ input::placeholder {
 
   </div>
 
-  <!-- CONDITIONS -->
+  <br>
 
-  <div style="margin-top:18px;">
+  <!-- CONDITION 1 -->
+
+  <div class="row">
 
 ```
-<div class="condition-row">
+<div class="field">
 
-  <div class="field">
-    <label>Analytics</label>
-    <select id="tp_analytics_1"></select>
-  </div>
+  <label>Analytics</label>
 
-  <div class="field">
-    <label>Condition</label>
-    <select id="tp_condition_1"></select>
-  </div>
-
-  <div class="field value-field">
-    <label>Value</label>
-    <input
-      id="tv_value_1"
-      placeholder="Value">
-  </div>
-
-  <div class="field logic-field">
-    <label>Logic</label>
-    <select id="tp_logic_1">
-      <option value="">—</option>
-      <option value="AND">AND</option>
-      <option value="OR">OR</option>
-      <option value="NOT">NOT</option>
-    </select>
-  </div>
+  <select id="tp_analytics_1"></select>
 
 </div>
 
 
-<div
-  id="conditionRow2"
-  class="condition-row hidden">
+<div class="field">
 
-  <div class="field">
-    <label>Analytics</label>
-    <select id="tp_analytics_2"></select>
-  </div>
+  <label>Condition</label>
 
-  <div class="field">
-    <label>Condition</label>
-    <select id="tp_condition_2"></select>
-  </div>
-
-  <div class="field value-field">
-    <label>Value</label>
-    <input
-      id="tv_value_2"
-      placeholder="Value">
-  </div>
-
-  <div class="field logic-field">
-    <label>Logic</label>
-    <select id="tp_logic_2">
-      <option value="">—</option>
-      <option value="AND">AND</option>
-      <option value="OR">OR</option>
-      <option value="NOT">NOT</option>
-    </select>
-  </div>
+  <select id="tp_condition_1"></select>
 
 </div>
 
 
-<div
-  id="conditionRow3"
-  class="condition-row hidden">
+<div class="field">
 
-  <div class="field">
-    <label>Analytics</label>
-    <select id="tp_analytics_3"></select>
-  </div>
+  <label>Value</label>
 
-  <div class="field">
-    <label>Condition</label>
-    <select id="tp_condition_3"></select>
-  </div>
-
-  <div class="field value-field">
-    <label>Value</label>
-    <input
-      id="tv_value_3"
-      placeholder="Value">
-  </div>
+  <input
+    id="tv_value_1"
+    placeholder="Value">
 
 </div>
 ```
 
   </div>
 
-  <!-- CTA -->
+  <!-- LOGIC 1 -->
 
-  <div class="cta-panel">
+  <div
+    id="logicRow1"
+    class="logic-row"
+    hidden>
 
 ```
-<div class="cta-row">
+<div class="logic-field">
 
-  <button
-    id="ctaBtn"
-    class="cta-toggle cta-off"
-    type="button"
-    title="CTA inactive">
-    ●
-  </button>
+  <label>Logic</label>
 
-  <div class="field">
+  <select id="tp_logic_1">
 
-    <label>Button</label>
+    <option value="">--</option>
+    <option value="AND">AND</option>
+    <option value="OR">OR</option>
+    <option value="NOT">NOT</option>
 
-    <input
-      id="tp_cta_label"
-      placeholder="e.g. Discover"
-      disabled>
-
-  </div>
-
-  <div class="field cta-url">
-
-    <label>Link</label>
-
-    <input
-      id="tp_cta_url"
-      placeholder="https://..."
-      disabled>
-
-  </div>
+  </select>
 
 </div>
 ```
 
   </div>
 
-  <!-- REPEAT -->
+  <!-- CONDITION 2 -->
 
-  <div class="row repeat-row">
+  <div
+    id="conditionRow2"
+    class="row"
+    hidden>
+
+```
+<div class="field">
+
+  <label>Analytics</label>
+
+  <select id="tp_analytics_2"></select>
+
+</div>
+
+
+<div class="field">
+
+  <label>Condition</label>
+
+  <select id="tp_condition_2"></select>
+
+</div>
+
+
+<div class="field">
+
+  <label>Value</label>
+
+  <input
+    id="tv_value_2"
+    placeholder="Value">
+
+</div>
+```
+
+  </div>
+
+  <!-- LOGIC 2 -->
+
+  <div
+    id="logicRow2"
+    class="logic-row"
+    hidden>
+
+```
+<div class="logic-field">
+
+  <label>Logic</label>
+
+  <select id="tp_logic_2">
+
+    <option value="">--</option>
+    <option value="AND">AND</option>
+    <option value="OR">OR</option>
+    <option value="NOT">NOT</option>
+
+  </select>
+
+</div>
+```
+
+  </div>
+
+  <!-- CONDITION 3 -->
+
+  <div
+    id="conditionRow3"
+    class="row"
+    hidden>
+
+```
+<div class="field">
+
+  <label>Analytics</label>
+
+  <select id="tp_analytics_3"></select>
+
+</div>
+
+
+<div class="field">
+
+  <label>Condition</label>
+
+  <select id="tp_condition_3"></select>
+
+</div>
+
+
+<div class="field">
+
+  <label>Value</label>
+
+  <input
+    id="tv_value_3"
+    placeholder="Value">
+
+</div>
+```
+
+  </div>
+
+  <!-- REPEAT / INTERVAL / GROWTH -->
+
+  <div class="row">
 
 ```
 <div class="field">
@@ -578,6 +522,7 @@ input::placeholder {
 
 </div>
 
+
 <div class="field">
 
   <label>Interval</label>
@@ -590,6 +535,7 @@ input::placeholder {
 
 </div>
 
+
 <div class="field">
 
   <label>Growth</label>
@@ -599,6 +545,54 @@ input::placeholder {
     type="number"
     step="0.1"
     value="1">
+
+</div>
+```
+
+  </div>
+
+  <!-- CTA -->
+
+  <div class="row">
+
+```
+<div class="field">
+
+  <label>Button</label>
+
+  <select id="tp_cta_active">
+
+    <option value="false">
+      Disabled
+    </option>
+
+    <option value="true">
+      Enabled
+    </option>
+
+  </select>
+
+</div>
+
+
+<div class="field">
+
+  <label>Button label</label>
+
+  <input
+    id="tp_cta_label"
+    placeholder="e.g. Scopri">
+
+</div>
+
+
+<div class="field">
+
+  <label>Link</label>
+
+  <input
+    id="tp_cta_url"
+    placeholder="https://...">
 
 </div>
 ```
@@ -618,6 +612,7 @@ input::placeholder {
   ↗
 </button>
 
+
 <button
   id="activeBtn"
   class="tool-btn active-off"
@@ -625,6 +620,7 @@ input::placeholder {
   title="Tip inactive">
   ●
 </button>
+
 
 <button
   id="previewBtn"
@@ -644,7 +640,7 @@ input::placeholder {
     class="progression">
   </div>
 
-  <!-- IMPACT RESULT -->
+  <!-- IMPACT -->
 
   <div
     id="simulation"
@@ -655,29 +651,35 @@ input::placeholder {
 
 <script type="module">
 
-import {requireAuth}
-  from "../pages/auth-check.js";
+import {
+  requireAuth
+} from "../pages/auth-check.js";
 
 await requireAuth();
 
+
 import {
+  TIP_ICONS,
   getTipTypes,
   getAnalyticsFields,
   getConditions,
   calculateProgression,
   defaultTip,
   loadTip,
+  saveTip,
   simulateTip,
   renderTip
 } from "./tips.js";
 
 
-/* STATE */
+let tip =
+  defaultTip();
 
-let tip = defaultTip();
 
 const params =
-  new URLSearchParams(location.search);
+  new URLSearchParams(
+    location.search
+  );
 
 const id =
   params.get("id");
@@ -703,15 +705,6 @@ const title =
 const text =
   document.getElementById("tp_text");
 
-const repeat =
-  document.getElementById("tp_repeat");
-
-const interval =
-  document.getElementById("tp_interval");
-
-const growth =
-  document.getElementById("tp_growth");
-
 const activeBtn =
   document.getElementById("activeBtn");
 
@@ -721,14 +714,14 @@ const impactBtn =
 const previewBtn =
   document.getElementById("previewBtn");
 
-const ctaBtn =
-  document.getElementById("ctaBtn");
+const repeat =
+  document.getElementById("tp_repeat");
 
-const ctaLabel =
-  document.getElementById("tp_cta_label");
+const interval =
+  document.getElementById("tp_interval");
 
-const ctaUrl =
-  document.getElementById("tp_cta_url");
+const growth =
+  document.getElementById("tp_growth");
 
 const progression =
   document.getElementById("progression");
@@ -737,39 +730,95 @@ const simulation =
   document.getElementById("simulation");
 
 
-/* FIELD REFERENCES */
+/* CONDITION ELEMENTS */
 
-const analyticsFields = [
-  document.getElementById("tp_analytics_1"),
-  document.getElementById("tp_analytics_2"),
-  document.getElementById("tp_analytics_3")
-];
+const conditions = {
 
-const conditionFields = [
-  document.getElementById("tp_condition_1"),
-  document.getElementById("tp_condition_2"),
-  document.getElementById("tp_condition_3")
-];
+  1: {
+    analytics:
+      document.getElementById(
+        "tp_analytics_1"
+      ),
 
-const valueFields = [
-  document.getElementById("tv_value_1"),
-  document.getElementById("tv_value_2"),
-  document.getElementById("tv_value_3")
-];
+    condition:
+      document.getElementById(
+        "tp_condition_1"
+      ),
 
-const logicFields = [
-  document.getElementById("tp_logic_1"),
-  document.getElementById("tp_logic_2")
-];
+    value:
+      document.getElementById(
+        "tv_value_1"
+      )
+  },
 
-const conditionRows = [
-  null,
-  document.getElementById("conditionRow2"),
-  document.getElementById("conditionRow3")
-];
+  2: {
+    analytics:
+      document.getElementById(
+        "tp_analytics_2"
+      ),
+
+    condition:
+      document.getElementById(
+        "tp_condition_2"
+      ),
+
+    value:
+      document.getElementById(
+        "tv_value_2"
+      )
+  },
+
+  3: {
+    analytics:
+      document.getElementById(
+        "tp_analytics_3"
+      ),
+
+    condition:
+      document.getElementById(
+        "tp_condition_3"
+      ),
+
+    value:
+      document.getElementById(
+        "tv_value_3"
+      )
+  }
+
+};
 
 
-/* TYPES */
+const logic1 =
+  document.getElementById(
+    "tp_logic_1"
+  );
+
+const logic2 =
+  document.getElementById(
+    "tp_logic_2"
+  );
+
+
+/* =========================================================
+   POPULATE ICONS
+   ========================================================= */
+
+TIP_ICONS.forEach(item => {
+
+  const option =
+    document.createElement("option");
+
+  option.value = item;
+  option.textContent = item;
+
+  icon.appendChild(option);
+
+});
+
+
+/* =========================================================
+   POPULATE TYPES
+   ========================================================= */
 
 getTipTypes().forEach(item => {
 
@@ -787,82 +836,96 @@ getTipTypes().forEach(item => {
 });
 
 
-/* ICONS */
+/* =========================================================
+   POPULATE ANALYTICS
+   ========================================================= */
 
-const icons = [
-  "⭐",
-  "🔔",
-  "ℹ️",
-  "💡",
-  "⚠️",
-  "🎉",
-  "📢",
-  "❤️",
-  "📍",
-  "🚀"
-];
+function populateAnalytics(select) {
 
-icons.forEach(item => {
+  select.innerHTML = "";
 
-  const option =
+  const empty =
     document.createElement("option");
 
-  option.value =
-    item;
+  empty.value = "";
+  empty.textContent = "--";
 
-  option.textContent =
-    item;
-
-  icon.appendChild(option);
-
-});
+  select.appendChild(empty);
 
 
-/* ANALYTICS */
+  getAnalyticsFields()
+    .forEach(field => {
 
-getAnalyticsFields().forEach(field => {
+      const option =
+        document.createElement("option");
 
-  analyticsFields.forEach(select => {
+      option.value =
+        field.value;
 
-    const option =
-      document.createElement("option");
+      option.textContent =
+        field.label;
 
-    option.value =
-      field.value;
+      option.title =
+        field.description;
 
-    option.textContent =
-      field.label;
+      select.appendChild(option);
 
-    option.title =
-      field.description;
+    });
 
-    select.appendChild(option);
+}
+
+
+Object.values(conditions)
+  .forEach(item => {
+
+    populateAnalytics(
+      item.analytics
+    );
 
   });
 
-});
 
+/* =========================================================
+   CONDITION SELECT
+   ========================================================= */
 
-/* CONDITIONS */
+function updateConditionSelect(index) {
 
-function updateConditions(index) {
+  const item =
+    conditions[index];
 
-  const select =
-    analyticsFields[index];
-
-  const condition =
-    conditionFields[index];
+  if (!item)
+    return;
 
   const field =
     getAnalyticsFields()
       .find(x =>
-        x.value === select.value
+        x.value ===
+        item.analytics.value
       );
 
-  if (!field)
-    return;
 
-  condition.innerHTML = "";
+  item.condition.innerHTML = "";
+
+
+  if (!field) {
+
+    item.condition.disabled =
+      true;
+
+    item.value.disabled =
+      true;
+
+    return;
+  }
+
+
+  item.condition.disabled =
+    false;
+
+  item.value.disabled =
+    false;
+
 
   getConditions(field.type)
     .forEach(operator => {
@@ -876,234 +939,225 @@ function updateConditions(index) {
       option.textContent =
         operator;
 
-      condition.appendChild(option);
+      item.condition
+        .appendChild(option);
 
     });
 
 
-  /*
-   * Boolean values use a select.
-   */
+  item.condition.value =
+    tip[
+      `tp_condition_${index}`
+    ] ||
+    getConditions(field.type)[0];
 
-  const old =
-    valueFields[index];
 
-  const currentValue =
-    old.value;
+  item.value.title =
+    field.description;
+
 
   if (field.type === "boolean") {
 
-    if (old.tagName !== "SELECT") {
+    const current =
+      item.value.value;
 
-      const selectValue =
-        document.createElement("select");
 
-      selectValue.id =
-        old.id;
+    const select =
+      document.createElement("select");
 
-      selectValue.className =
-        old.className;
+    select.id =
+      `tv_value_${index}`;
 
-      ["true", "false"]
-        .forEach(item => {
+    select.style.width =
+      "100%";
 
-          const option =
-            document.createElement("option");
+    select.style.boxSizing =
+      "border-box";
 
-          option.value =
-            item;
+    select.style.padding =
+      "9px";
 
-          option.textContent =
-            item;
+    select.style.border =
+      "1px solid #d1d5db";
 
-          selectValue.appendChild(option);
+    select.style.borderRadius =
+      "8px";
 
-        });
+    ["true", "false"]
+      .forEach(value => {
 
-      old.replaceWith(selectValue);
+        const option =
+          document.createElement("option");
 
-      valueFields[index] =
-        selectValue;
+        option.value =
+          value;
 
-    }
+        option.textContent =
+          value;
 
-    valueFields[index].value =
-      currentValue === "false"
+        select.appendChild(
+          option
+        );
+
+      });
+
+
+    select.value =
+      current === "false"
         ? "false"
         : "true";
 
+
+    item.value.replaceWith(
+      select
+    );
+
+    item.value =
+      select;
+
   } else {
 
-    if (old.tagName !== "INPUT") {
+    if (
+      item.value.tagName !==
+      "INPUT"
+    ) {
 
       const input =
         document.createElement("input");
 
       input.id =
-        old.id;
+        `tv_value_${index}`;
 
-      input.className =
-        old.className;
+      input.type =
+        "number";
 
       input.placeholder =
         "Value";
 
-      old.replaceWith(input);
+      input.style.width =
+        "100%";
 
-      valueFields[index] =
+      input.style.boxSizing =
+        "border-box";
+
+      input.style.padding =
+        "9px";
+
+      input.style.border =
+        "1px solid #d1d5db";
+
+      input.style.borderRadius =
+        "8px";
+
+      item.value.replaceWith(
+        input
+      );
+
+      item.value =
         input;
-
     }
 
-    valueFields[index].type =
+    item.value.type =
       "number";
 
-    valueFields[index].step =
-      "1";
-
-    valueFields[index].value =
-      currentValue || "";
+    item.value.placeholder =
+      "Value";
 
   }
-
-  updateProgression();
 
 }
 
 
-/* LOGIC VISIBILITY */
+/* =========================================================
+   CONDITION ROW VISIBILITY
+   ========================================================= */
 
 function updateLogicRows() {
 
-  const logic1 =
-    logicFields[0].value;
+  const has1 =
+    !!conditions[1]
+      .analytics.value;
 
-  const logic2 =
-    logicFields[1].value;
+  const logic1Value =
+    logic1.value;
 
-
-  conditionRows[1]
-    .classList
-    .toggle(
-      "hidden",
-      !logic1
-    );
-
-  conditionRows[2]
-    .classList
-    .toggle(
-      "hidden",
-      !logic1 || !logic2
-    );
-
-}
+  const has2 =
+    has1 &&
+    !!logic1Value;
 
 
-/* PROGRESSION */
+  document.getElementById(
+    "logicRow1"
+  ).hidden =
+    !has1;
 
-function updateProgression() {
 
-  const field =
-    getAnalyticsFields()
-      .find(x =>
-        x.value === analyticsFields[0].value
-      );
+  document.getElementById(
+    "conditionRow2"
+  ).hidden =
+    !has2;
 
-  progression.innerHTML = "";
 
-  if (!field ||
-      field.type !== "number") {
+  if (!has2) {
 
-    progression.hidden =
-      true;
+    logic2.value = "";
+
+    document.getElementById(
+      "logicRow2"
+    ).hidden = true;
+
+    document.getElementById(
+      "conditionRow3"
+    ).hidden = true;
 
     return;
-
   }
 
-  progression.hidden =
-    false;
 
-  const repeatValue =
-    Number(repeat.value);
-
-  const values =
-    calculateProgression(
-      interval.value,
-      growth.value,
-      repeat.value
-    );
+  document.getElementById(
+    "logicRow2"
+  ).hidden = false;
 
 
-  values.forEach((value, index) => {
-
-    const el =
-      document.createElement("div");
-
-    el.className =
-      "step";
-
-    el.textContent =
-      `${index + 1}ª → ${value}`;
-
-    progression.appendChild(el);
-
-  });
+  const has3 =
+    !!conditions[2]
+      .analytics.value &&
+    !!logic2.value;
 
 
-  if (repeatValue === 0) {
-
-    const el =
-      document.createElement("div");
-
-    el.className =
-      "step";
-
-    el.textContent =
-      "∞ → ...";
-
-    progression.appendChild(el);
-
-  }
-
-  else if (repeatValue > 10) {
-
-    const el =
-      document.createElement("div");
-
-    el.className =
-      "step";
-
-    el.textContent =
-      "11ª → ...";
-
-    progression.appendChild(el);
-
-  }
+  document.getElementById(
+    "conditionRow3"
+  ).hidden =
+    !has3;
 
 }
 
 
-/* ACTIVE */
+/* =========================================================
+   ACTIVE
+   ========================================================= */
 
 function updateActive() {
 
-  const active =
+  const on =
     tip.tp_active === true;
+
 
   activeBtn.className =
     "tool-btn " +
     (
-      active
+      on
         ? "active-on"
         : "active-off"
     );
 
+
   activeBtn.textContent =
     "●";
 
+
   activeBtn.title =
-    active
+    on
       ? "Tip active"
       : "Tip inactive";
 
@@ -1120,46 +1174,251 @@ activeBtn.onclick = () => {
 };
 
 
-/* CTA */
+/* =========================================================
+   PROGRESSION
+   ========================================================= */
 
-function updateCTA() {
+function updateProgression() {
 
-  const active =
-    tip.tp_cta_active === true;
+  progression.innerHTML = "";
 
-  ctaBtn.className =
-    "cta-toggle " +
-    (
-      active
-        ? "cta-on"
-        : "cta-off"
+
+  const first =
+    conditions[1];
+
+  const field =
+    getAnalyticsFields()
+      .find(x =>
+        x.value ===
+        first.analytics.value
+      );
+
+
+  if (!field) {
+
+    progression.hidden =
+      true;
+
+    return;
+  }
+
+
+  progression.hidden =
+    false;
+
+
+  const repeatValue =
+    Number(
+      repeat.value
     );
 
-  ctaBtn.title =
-    active
-      ? "Button active"
-      : "Button inactive";
 
-  ctaLabel.disabled =
-    !active;
+  if (field.type === "number") {
 
-  ctaUrl.disabled =
-    !active;
+    const values =
+      calculateProgression(
+        interval.value,
+        growth.value,
+        repeat.value
+      );
+
+
+    values.forEach(
+      (value, index) => {
+
+        const el =
+          document.createElement("div");
+
+        el.className =
+          "step";
+
+        el.textContent =
+          `${index + 1}ª → ${value}`;
+
+        progression
+          .appendChild(el);
+
+      }
+    );
+
+
+    if (repeatValue === 0) {
+
+      const el =
+        document.createElement("div");
+
+      el.className =
+        "step";
+
+      el.textContent =
+        "∞ → ...";
+
+      progression
+        .appendChild(el);
+
+    } else if (
+      repeatValue > 10
+    ) {
+
+      const el =
+        document.createElement("div");
+
+      el.className =
+        "step";
+
+      el.textContent =
+        "11ª → ...";
+
+      progression
+        .appendChild(el);
+
+    }
+
+  } else {
+
+    const el =
+      document.createElement("div");
+
+    el.className =
+      "step";
+
+    el.textContent =
+      "1ª → visualizzazione";
+
+    progression
+      .appendChild(el);
+
+
+    if (repeatValue === 0) {
+
+      const el2 =
+        document.createElement("div");
+
+      el2.className =
+        "step";
+
+      el2.textContent =
+        "∞ → ...";
+
+      progression
+        .appendChild(el2);
+
+    } else if (
+      repeatValue > 1
+    ) {
+
+      const el2 =
+        document.createElement("div");
+
+      el2.className =
+        "step";
+
+      el2.textContent =
+        repeatValue > 10
+          ? "11ª → ..."
+          : `${repeatValue}ª → ...`;
+
+      progression
+        .appendChild(el2);
+
+    }
+
+  }
 
 }
 
 
-ctaBtn.onclick = () => {
+/* =========================================================
+   UPDATE
+   ========================================================= */
 
-  tip.tp_cta_active =
-    !tip.tp_cta_active;
+function update() {
 
-  updateCTA();
+  updateConditionSelect(1);
+  updateConditionSelect(2);
+  updateConditionSelect(3);
 
-};
+  updateLogicRows();
+
+  updateProgression();
+
+}
 
 
-/* PREVIEW */
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+Object.values(conditions)
+  .forEach(item => {
+
+    item.analytics
+      .addEventListener(
+        "change",
+        () => {
+
+          updateConditionSelect(
+            Number(
+              item.analytics.id
+                .split("_")
+                .pop()
+            )
+          );
+
+          updateLogicRows();
+
+          updateProgression();
+
+        }
+      );
+
+
+    item.condition
+      .addEventListener(
+        "change",
+        update
+      );
+
+
+    item.value
+      .addEventListener(
+        "input",
+        update
+      );
+
+  });
+
+
+logic1.addEventListener(
+  "change",
+  update
+);
+
+logic2.addEventListener(
+  "change",
+  update
+);
+
+
+repeat.addEventListener(
+  "input",
+  updateProgression
+);
+
+interval.addEventListener(
+  "input",
+  updateProgression
+);
+
+growth.addEventListener(
+  "input",
+  updateProgression
+);
+
+
+/* =========================================================
+   PREVIEW
+   ========================================================= */
 
 previewBtn.onclick = () => {
 
@@ -1177,166 +1436,467 @@ previewBtn.onclick = () => {
     tp_text:
       text.value,
 
+    tp_repeat:
+      Number(repeat.value),
+
     tp_cta_active:
-      tip.tp_cta_active,
+      document.getElementById(
+        "tp_cta_active"
+      ).value === "true",
 
     tp_cta_label:
-      ctaLabel.value,
+      document.getElementById(
+        "tp_cta_label"
+      ).value,
 
     tp_cta_url:
-      ctaUrl.value,
-
-    tp_repeat:
-      Number(repeat.value)
+      document.getElementById(
+        "tp_cta_url"
+      ).value
 
   });
 
 };
 
 
-/* IMPACT */
+/* =========================================================
+   IMPACT
+   ========================================================= */
 
-impactBtn.onclick = async () => {
+impactBtn.onclick =
+  async () => {
 
-  simulation.classList.add("visible");
-
-  simulation.innerHTML =
-    `<div class="simulation-title">
-      Calculating impact...
-    </div>`;
+    simulation.innerHTML =
+      "Calculating...";
 
 
-  try {
+    try {
 
-    const result =
-      await simulateTip({
+      const data = {
 
         tp_analytics_1:
-          analyticsFields[0].value,
+          conditions[1]
+            .analytics.value,
 
         tp_condition_1:
-          conditionFields[0].value,
+          conditions[1]
+            .condition.value,
 
         tv_value_1:
-          valueFields[0].value,
+          conditions[1]
+            .value.value,
 
         tp_logic_1:
-          logicFields[0].value,
+          logic1.value,
 
         tp_analytics_2:
-          analyticsFields[1].value,
+          conditions[2]
+            .analytics.value,
 
         tp_condition_2:
-          conditionFields[1].value,
+          conditions[2]
+            .condition.value,
 
         tv_value_2:
-          valueFields[1].value,
+          conditions[2]
+            .value.value,
 
         tp_logic_2:
-          logicFields[1].value,
+          logic2.value,
 
         tp_analytics_3:
-          analyticsFields[2].value,
+          conditions[3]
+            .analytics.value,
 
         tp_condition_3:
-          conditionFields[2].value,
+          conditions[3]
+            .condition.value,
 
         tv_value_3:
-          valueFields[2].value
+          conditions[3]
+            .value.value
 
-      });
-
-
-    let html = `
-      <div class="simulation-title">
-        Estimated Impact
-      </div>
-
-      <div class="simulation-row simulation-main">
-        <span>Devices analyzed</span>
-        <span class="simulation-value">
-          ${result.total}
-        </span>
-      </div>
-    `;
+      };
 
 
-    result.conditions.forEach(condition => {
+      const result =
+        await simulateTip(data);
 
-      html += `
-        <div class="simulation-row condition">
+
+      let html = `
+
+        <div class="simulation-title">
+          Estimated Impact
+        </div>
+
+        <div class="simulation-row">
           <span>
-            ${condition.text}
+            Devices analyzed
           </span>
 
           <span class="simulation-value">
-            ${condition.matched}
+            ${result.total}
           </span>
         </div>
       `;
 
-    });
+
+      result.detail
+        .forEach(item => {
+
+          html += `
+
+            <div class="simulation-row simulation-condition">
+
+              <span>
+
+                ${
+                  item.logic
+                    ? `<span class="simulation-logic">
+                         (${item.logic})
+                       </span>`
+                    : ""
+                }
+
+                ${item.label}
+                ${item.condition}
+                ${item.value}
+
+              </span>
+
+            </div>
+
+          `;
+
+        });
 
 
-    html += `
+      html += `
 
-      <div class="simulation-row simulation-main">
-        <span>Potentially involved</span>
+        <div class="simulation-row simulation-main">
 
-        <span class="simulation-value">
-          ${result.involved}
-          (${result.percent}%)
-        </span>
-      </div>
+          <span>
+            Potentially involved
+          </span>
 
-      <div class="simulation-row simulation-excluded">
-        <span>Excluded</span>
+          <span class="simulation-value">
+            ${result.involved}
+            (${result.percent}%)
+          </span>
 
-        <span class="simulation-value">
-          ${result.excluded}
-        </span>
-      </div>
+        </div>
 
-      <div class="simulation-row simulation-missing">
-        <span>Missing data</span>
+        <div class="simulation-row">
 
-        <span class="simulation-value">
-          ${result.missing}
-        </span>
-      </div>
+          <span>
+            Excluded
+          </span>
 
-    `;
+          <span class="simulation-value">
+            ${result.excluded}
+          </span>
 
-    simulation.innerHTML =
-      html;
+        </div>
+
+        <div class="simulation-row">
+
+          <span>
+            Missing data
+          </span>
+
+          <span class="simulation-value">
+            ${result.missing}
+          </span>
+
+        </div>
+
+      `;
+
+
+      simulation.innerHTML =
+        html;
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      simulation.innerHTML =
+        "Simulation error.";
+
+    }
+
+  };
+
+
+/* =========================================================
+   FILL
+   ========================================================= */
+
+function fill() {
+
+  idTips.value =
+    tip.id_tips || "";
+
+  type.value =
+    tip.tp_type ||
+    "bubble";
+
+  icon.value =
+    tip.tp_icon ||
+    TIP_ICONS[0];
+
+  title.value =
+    tip.tp_title ||
+    "";
+
+  text.value =
+    tip.tp_text ||
+    "";
+
+
+  for (
+    let i = 1;
+    i <= 3;
+    i++
+  ) {
+
+    conditions[i]
+      .analytics.value =
+      tip[
+        `tp_analytics_${i}`
+      ] || "";
+
+    conditions[i]
+      .condition.value =
+      tip[
+        `tp_condition_${i}`
+      ] || ">=";
+
+    conditions[i]
+      .value.value =
+      tip[
+        `tv_value_${i}`
+      ] || "";
 
   }
 
-  catch(error) {
 
-    console.error(error);
+  logic1.value =
+    tip.tp_logic_1 ||
+    "";
 
-    simulation.innerHTML =
-      `<div class="simulation-row simulation-missing">
-        Simulation error.
-      </div>`;
-
-  }
-
-};
+  logic2.value =
+    tip.tp_logic_2 ||
+    "";
 
 
-/* LOAD */
+  repeat.value =
+    tip.tp_repeat ??
+    1;
+
+  interval.value =
+    tip.tp_interval ??
+    1;
+
+  growth.value =
+    tip.tp_growth ??
+    1;
+
+
+  document.getElementById(
+    "tp_cta_active"
+  ).value =
+    tip.tp_cta_active
+      ? "true"
+      : "false";
+
+
+  document.getElementById(
+    "tp_cta_label"
+  ).value =
+    tip.tp_cta_label ||
+    "";
+
+
+  document.getElementById(
+    "tp_cta_url"
+  ).value =
+    tip.tp_cta_url ||
+    "";
+
+
+  updateActive();
+
+}
+
+
+/* =========================================================
+   SAVE
+   ========================================================= */
+
+window.save =
+  async () => {
+
+    const data = {
+
+      id_tips:
+        idTips.value.trim(),
+
+      tp_type:
+        type.value,
+
+      tp_icon:
+        icon.value,
+
+      tp_title:
+        title.value.trim(),
+
+      tp_text:
+        text.value.trim(),
+
+
+      tp_analytics_1:
+        conditions[1]
+          .analytics.value,
+
+      tp_condition_1:
+        conditions[1]
+          .condition.value,
+
+      tv_value_1:
+        conditions[1]
+          .value.value,
+
+      tp_logic_1:
+        logic1.value,
+
+
+      tp_analytics_2:
+        conditions[2]
+          .analytics.value,
+
+      tp_condition_2:
+        conditions[2]
+          .condition.value,
+
+      tv_value_2:
+        conditions[2]
+          .value.value,
+
+      tp_logic_2:
+        logic2.value,
+
+
+      tp_analytics_3:
+        conditions[3]
+          .analytics.value,
+
+      tp_condition_3:
+        conditions[3]
+          .condition.value,
+
+      tv_value_3:
+        conditions[3]
+          .value.value,
+
+
+      tp_repeat:
+        Number(
+          repeat.value
+        ),
+
+      tp_interval:
+        Number(
+          interval.value
+        ),
+
+      tp_growth:
+        Number(
+          growth.value
+        ),
+
+
+      tp_cta_active:
+        document.getElementById(
+          "tp_cta_active"
+        ).value === "true",
+
+      tp_cta_label:
+        document.getElementById(
+          "tp_cta_label"
+        ).value.trim(),
+
+      tp_cta_url:
+        document.getElementById(
+          "tp_cta_url"
+        ).value.trim(),
+
+
+      tp_active:
+        tip.tp_active === true
+
+    };
+
+
+    if (!data.id_tips) {
+
+      alert(
+        "Enter the Tip ID."
+      );
+
+      return;
+    }
+
+
+    if (!data.tp_text) {
+
+      alert(
+        "Enter the Tip text."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      await saveTip(data);
+
+      location.href =
+        "tips_overview.html";
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error while saving."
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   INIT
+   ========================================================= */
 
 async function init() {
 
-  if (id && !isNew) {
+  if (
+    id &&
+    !isNew
+  ) {
 
     tip =
       await loadTip(id);
 
     document
-      .getElementById("pageTitle")
+      .getElementById(
+        "pageTitle"
+      )
       .textContent =
       "Edit Tip";
 
@@ -1345,214 +1905,10 @@ async function init() {
 
   fill();
 
-}
-
-
-/* FILL */
-
-function fill() {
-
-  idTips.value =
-    tip.id_tips || "";
-
-  type.value =
-    tip.tp_type || "bubble";
-
-  icon.value =
-    tip.tp_icon || "⭐";
-
-  title.value =
-    tip.tp_title || "";
-
-  text.value =
-    tip.tp_text || "";
-
-
-  analyticsFields[0].value =
-    tip.tp_analytics_1 || "an_open";
-
-  conditionFields[0].value =
-    tip.tp_condition_1 || ">=";
-
-  valueFields[0].value =
-    tip.tv_value_1 ?? "";
-
-
-  analyticsFields[1].value =
-    tip.tp_analytics_2 || "";
-
-  analyticsFields[2].value =
-    tip.tp_analytics_3 || "";
-
-
-  repeat.value =
-    tip.tp_repeat ?? 1;
-
-  interval.value =
-    tip.tp_interval ?? 1;
-
-  growth.value =
-    tip.tp_growth ?? 1;
-
-
-  ctaLabel.value =
-    tip.tp_cta_label || "";
-
-  ctaUrl.value =
-    tip.tp_cta_url || "";
-
-
-  updateActive();
-
-  updateCTA();
-
-
-  /*
-   * Conditions must be rebuilt
-   * after analytics selection.
-   */
-
-  analyticsFields.forEach(
-    (_, index) =>
-      updateConditions(index)
-  );
-
-
-  conditionFields[0].value =
-    tip.tp_condition_1 || ">=";
-
-  conditionFields[1].value =
-    tip.tp_condition_2 || ">=";
-
-  conditionFields[2].value =
-    tip.tp_condition_3 || ">=";
-
-
-  valueFields[0].value =
-    tip.tv_value_1 ?? "";
-
-  valueFields[1].value =
-    tip.tv_value_2 ?? "";
-
-  valueFields[2].value =
-    tip.tv_value_3 ?? "";
-
-
-  logicFields[0].value =
-    tip.tp_logic_1 || "";
-
-  logicFields[1].value =
-    tip.tp_logic_2 || "";
-
-
-  updateLogicRows();
-  updateProgression();
+  update();
 
 }
 
-
-/* EVENTS */
-
-
-/*
- * Analytics
- */
-
-analyticsFields.forEach(
-  (select, index) => {
-
-    select.addEventListener(
-      "change",
-      () => {
-
-        updateConditions(index);
-
-        /*
-         * Selecting a field in row 2/3
-         * is enough to keep the row active.
-         */
-
-        updateLogicRows();
-
-      }
-    );
-
-  }
-);
-
-
-/*
- * Logic
- */
-
-logicFields.forEach(
-  select => {
-
-    select.addEventListener(
-      "change",
-      updateLogicRows
-    );
-
-  }
-);
-
-
-/*
- * Progression
- */
-
-[
-  repeat,
-  interval,
-  growth
-].forEach(
-  element => {
-
-    element.addEventListener(
-      "input",
-      updateProgression
-    );
-
-  }
-);
-
-
-/*
- * Icon / title / text
- */
-
-icon.addEventListener(
-  "change",
-  () => {}
-);
-
-title.addEventListener(
-  "input",
-  () => {}
-);
-
-text.addEventListener(
-  "input",
-  () => {}
-);
-
-
-/*
- * CTA
- */
-
-ctaLabel.addEventListener(
-  "input",
-  () => {}
-);
-
-ctaUrl.addEventListener(
-  "input",
-  () => {}
-);
-
-
-/* START */
 
 init();
 
