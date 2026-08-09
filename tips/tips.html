@@ -304,7 +304,7 @@ const analytics = document.getElementById("tp_analytics");
 
 const condition = document.getElementById("tp_condition");
 
-const value = document.getElementById("tv_value");
+let value = document.getElementById("tv_value");
 
 const repeat = document.getElementById("tp_repeat");
 
@@ -313,6 +313,76 @@ const interval = document.getElementById("tp_interval");
 const growth = document.getElementById("tp_growth");
 
 const active = document.getElementById("tp_active");
+
+function getAnalyticsField() {
+  return getAnalyticsFields()
+    .find(x => x.value === analytics.value);
+}
+
+function updateAnalytics() {
+  const field = getAnalyticsField();
+  if (!field) return;
+  analytics.title = field.description;
+  condition.innerHTML = "";
+  const conditions =
+    field.type === "boolean"
+      ? ["=", "!="]
+      : [">", ">=", "=", "<=", "<", "!="];
+  conditions.forEach(x => {
+    const option =
+      document.createElement("option");
+    option.value = x;
+    option.textContent = x;
+    condition.appendChild(option);
+  });
+  condition.value =
+    conditions.includes(tip.tp_condition)
+      ? tip.tp_condition
+      : conditions[0];
+  const old = value;
+  const parent = old.parentElement;
+  if (field.type === "boolean") {
+    const select =
+      document.createElement("select");
+    select.id = "tv_value";
+    select.className = old.className;
+    select.title = field.description;
+    ["true", "false"].forEach(x => {
+      const option =
+        document.createElement("option");
+      option.value = x;
+      option.textContent = x;
+      select.appendChild(option);
+    });
+    select.value =
+      String(tip.tv_value || "true");
+    old.replaceWith(select);
+    value = select;
+  } else {
+    if (old.tagName !== "INPUT" ||
+        old.type !== "number") {
+      const input =
+        document.createElement("input");
+      input.id = "tv_value";
+      input.className = old.className;
+      input.type = "number";
+      input.step = "1";
+      input.value = old.value;
+      old.replaceWith(input);
+      value = input;
+    }
+    value.title = field.description;
+    value.placeholder = "Value";
+  }
+  const numeric =
+    field.type === "number";
+  document.getElementById("progression")
+    .hidden = !numeric;
+  interval.disabled = !numeric;
+  growth.disabled = !numeric;
+  update();
+}
+  
 
 /* TYPES */
 getTipTypes().forEach(item => {
@@ -341,7 +411,7 @@ async function init() {
       "Modifica Tip";
   }
   fill();
-  update();
+  updateAnalytics();
 }
 
 /* FILL */
@@ -356,49 +426,63 @@ function fill() {
   interval.value = tip.tp_interval ?? 1;
   growth.value = tip.tp_growth ?? 1;
   active.checked = tip.tp_active === true;
+  interval.title = "Number of views between two successive displays.";
+  growth.title = "Multiplier applied to the current interval.";
+  repeat.title = "Maximum number of displays. 0 = unlimited.";
+  condition.title = "Condition applied to the selected analytics value.";
+  text.title = "Text displayed to the user.";
 }
 
 /* UPDATE */
 function update() {
-  const values =
-    calculateProgression(
-      interval.value,
-      growth.value,
-      repeat.value
-    );
+  const field = getAnalyticsField();
+  const numeric =
+    field?.type === "number";
   const box =
-    document.getElementById(
-      "progression"
-    );
+    document.getElementById("progression");
   box.innerHTML = "";
-  values.forEach((value, index) => {
-    const el =
-      document.createElement("div");
-    el.className =
-      "step";
-    el.textContent =
-      `${index + 1}ª → ${value}`;
-    box.appendChild(el);
-  });
-
+  box.hidden = !numeric;
+  if (numeric) {
+    const values =
+      calculateProgression(
+        interval.value,
+        growth.value,
+        repeat.value
+      );
+    values.slice(0, 10)
+      .forEach((value, index) => {
+        const el =
+          document.createElement("div");
+        el.className = "step";
+        el.textContent =
+          `${index + 1}ª → ${value}`;
+        box.appendChild(el);
+      });
+    if (Number(repeat.value) === 0) {
+      const el =
+        document.createElement("div");
+      el.className = "step";
+      el.textContent = "∞ → ...";
+      box.appendChild(el);
+    } else if (Number(repeat.value) > 10) {
+      const el =
+        document.createElement("div");
+      el.className = "step";
+      el.textContent = "11ª → ...";
+      box.appendChild(el);
+    }
+  }
   const preview =
-    document.getElementById(
-      "tipPreview"
-    );
-
+    document.getElementById("tipPreview");
+  const tipType =
+    getTipTypes()
+      .find(x => x.value === type.value);
   preview.className =
     "tip-preview " +
-    (
-      getTipTypes()
-        .find(x => x.value === type.value)
-        ?.value === type.value
-        ? `tip-${type.value}`
-        : "tip-bubble"
-    );
-
+    (tipType?.className || "tip-bubble");
   preview.textContent =
     text.value ||
-    "Anteprima del Tip";
+    "Tip preview";
 }
 
 /* EVENTS */
@@ -415,7 +499,9 @@ function update() {
   );
   el.addEventListener(
     "change",
-    update
+    el === analytics
+      ? updateAnalytics
+      : update
   );
 });
 
