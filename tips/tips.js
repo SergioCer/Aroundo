@@ -289,3 +289,140 @@ export async function simulateTip(tip)
     const total=latest.size; return { total, involved, excluded, missing, percent: 
         total ? Math.round( involved/total*100 ) : 0 }; }
 
+export function renderTip(tip) {
+
+  const model =
+    TIP_TYPES[tip.tp_type] ||
+    TIP_TYPES.bubble;
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: ${
+      model.position.includes("top")
+        ? "flex-start"
+        : model.position.includes("bottom")
+          ? "flex-end"
+          : "center"
+    };
+    justify-content: ${
+      model.position.includes("left")
+        ? "flex-start"
+        : model.position.includes("right")
+          ? "flex-end"
+          : "center"
+    };
+    padding: 20px;
+    box-sizing: border-box;
+    pointer-events: none;
+  `;
+
+  if (model.overlay) {
+    overlay.style.background =
+      "rgba(0,0,0,.35)";
+  }
+
+  const box =
+    document.createElement("div");
+
+  box.style.cssText = `
+    width: ${model.width};
+    max-width: calc(100vw - 40px);
+    box-sizing: border-box;
+    padding: 20px;
+    background: ${model.background};
+    color: ${model.color};
+    border: ${model.border};
+    border-radius: ${model.radius};
+    box-shadow: ${model.shadow};
+    font-family: Arial, sans-serif;
+    pointer-events: auto;
+  `;
+
+  const content =
+    document.createElement("div");
+
+  content.textContent =
+    tip.tp_text || "Tip preview";
+
+  content.style.cssText = `
+    line-height: 1.5;
+    white-space: pre-wrap;
+  `;
+
+  box.appendChild(content);
+
+  const actions =
+    document.createElement("div");
+
+  actions.style.cssText = `
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+  `;
+
+  const hide =
+    document.createElement("label");
+
+  hide.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  `;
+
+  const checkbox =
+    document.createElement("input");
+
+  checkbox.type = "checkbox";
+
+  const hideText =
+    document.createElement("span");
+
+  hideText.textContent =
+    "Non mostrare più";
+
+  hide.append(
+    checkbox,
+    hideText
+  );
+
+  const ok =
+    document.createElement("button");
+
+  ok.textContent = "OK";
+
+  ok.style.cssText = `
+    border: none;
+    border-radius: 17px;
+    padding: 8px 18px;
+    background: #22c55e;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  `;
+
+  actions.append(
+    hide,
+    ok
+  );
+
+  box.appendChild(actions);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  ok.onclick = () =>
+    overlay.remove();
+
+  return overlay;
+}
+
+
