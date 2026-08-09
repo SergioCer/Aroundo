@@ -84,12 +84,13 @@ export const ANALYTICS_FIELDS = {
 
 /*
  * ANALYTICS
- *
- * Gli Analytics disponibili vengono letti
- * direttamente da analytics.js.
  */
 export function getAnalyticsFields() {
-    return ANALYTICS_FIELDS;
+  return Object.entries(ANALYTICS_FIELDS)
+    .map(([value, data]) => ({
+      value,
+      ...data
+    }));
 }
 
 /*
