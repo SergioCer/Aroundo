@@ -119,36 +119,38 @@ export function getTipTypes() {
  * interval 3 / growth 0.5:
  * 1 - 4 - 8 - 14 - 21
  */
-export function calculateProgression(
-    interval,
-    growth,
-    repeat
-) {
 
-    interval = Number(interval);
-    growth = Number(growth);
-    repeat = Number(repeat);
-    if (!Number.isFinite(interval))
-        interval = 1;
-    if (!Number.isFinite(growth))
-        growth = 1;
-    if (repeat === 0)
-        repeat = 10;
-    const result = [];
-    let total = 0;
-    for (let show = 0; show < repeat; show++) {
-        let increment =
-            Math.floor(
-                interval *
-                (show + 1) *
-                growth
-            );
-        if (increment < 1)
-            increment = 1;
-        total += increment;
-        result.push(total);
-    }
-    return result;
+export function calculateProgression(
+  interval,
+  growth,
+  repeat
+) {
+  interval = Number(interval);
+  growth = Number(growth);
+  repeat = Number(repeat);
+  if (!Number.isFinite(interval))
+    interval = 1;
+  if (!Number.isFinite(growth))
+    growth = 1;
+  const limit =
+    repeat === 0
+      ? 10
+      : Math.min(repeat, 10);
+  const result = [];
+  let total = 0;
+  for (let show = 0; show < limit; show++) {
+    let increment =
+      Math.floor(
+        interval *
+        (show + 1) *
+        growth
+      );
+    if (increment < 1)
+      increment = 1;
+    total += increment;
+    result.push(total);
+  }
+  return result;
 }
 
 /*
