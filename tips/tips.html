@@ -395,8 +395,9 @@ getTipTypes().forEach(item => {
 /* ANALYTICS */
 getAnalyticsFields().forEach(field => {
   const option = document.createElement("option");
-  option.value = field;
-  option.textContent = field;
+  option.value = field.value;
+  option.textContent = field.label;
+  option.title = field.description;
   analytics.appendChild(option);
 });
 
@@ -489,6 +490,7 @@ function update() {
 [
   text,
   type,
+  analytics,
   repeat,
   interval,
   growth
