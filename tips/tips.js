@@ -801,33 +801,6 @@ export function renderTip(tip) {
   `;
   box.appendChild(content);
 
-  /* CTA */
-  if (
-    tip.tp_cta_active &&
-    tip.tp_cta_label
-  ) {
-    const cta =
-      document.createElement("a");
-    cta.textContent =
-      tip.tp_cta_label;
-    cta.href =
-      tip.tp_cta_url || "#";
-    cta.target = "_blank";
-    cta.rel = "noopener";
-    cta.style.cssText = `
-      display: inline-block;
-      margin-top: 16px;
-      padding: 9px 18px;
-      border-radius: 17px;
-      background: #9333ea;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 13px;
-    `;
-    box.appendChild(cta);
-  }
-
   /* ACTIONS */
 if (model.acknowledge) {
   const actions =
