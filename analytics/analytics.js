@@ -57,14 +57,15 @@ return "";
 // STATS
 function stats(data,allData){
 let devices=new Set();
-let s={
-open:0,login:0,install:0,share:0,marker:0,map:0,buy:0,book:0,more:0,info:0,gps:0,nogps:0,nonegps:0,app:0,web:0,newUsers:0,returnUsers:0,retention:0,avgOpen:0,trust:0
-};
+let s={open:0,login:0,install:0,share:0,marker:0,map:0,buy:0,book:0,more:0,info:0,gps:0,nogps:0,nonegps:0,app:0,web:0,newUsers:0,returnUsers:0,retention:0,avgOpen:0,trust:0};
 let deviceState={};
-
+let gpsState={};
 data.forEach(x=>{
-if(x.an_device)devices.add(x.an_device);
-if(!deviceState[x.an_device])deviceState[x.an_device]={app:x.an_app,platform:x.an_platform};
+if(x.an_device)
+devices.add(x.an_device);
+if(!(x.an_device in deviceState)){deviceState[x.an_device]={app:x.an_app,platform:x.an_platform};}
+if(!(x.an_device in gpsState))
+gpsState[x.an_device]=x.an_gps;
 s.open+=x.an_open||0;
 s.share+=x.an_share||0;
 s.marker+=x.an_marker||0;
@@ -75,31 +76,38 @@ s.more+=x.an_more||0;
 s.info+=x.an_info||0;
 s.login+=x.an_login||0;
 s.install+=x.an_install||0;
-if(x.an_gps===true)s.gps++;
-else if(x.an_gps===false)s.nogps++;
-else s.nonegps++;
 });
-
-Object.values(deviceState).forEach(d=>{
-if(d.app)s.app++;
-else s.web++;
+Object.values(gpsState).forEach(gps=>{
+if(gps===true)s.gps++;
+else 
+if(gps===false)
+s.nogps++;
+else
+s.nonegps++;
 });
-
+Object.values(deviceState).forEach(d=>{if(d.app)s.app++;
+else
+s.web++;
+});
 s.devices=devices.size;
-
-let previous=new Set(allData.filter(x=>!data.includes(x)).map(x=>x.an_device));
+let previous=new Set(allData .filter(x=>!data.includes(x)) .map(x=>x.an_device));
 let current=new Set(data.map(x=>x.an_device));
-
 current.forEach(id=>{
-if(previous.has(id))s.returnUsers++;
-else s.newUsers++;
+if(previous.has(id))
+s.returnUsers++;
+else
+s.newUsers++;
 });
-
-s.retention=s.devices?Math.round((s.returnUsers/s.devices)*100):0;
-s.avgOpen=s.devices?(s.open/s.devices).toFixed(1):"0";
-s.trust=s.devices?Math.round((s.gps/s.devices)*100):0;
+s.retention=s.devices
+?Math.round((s.returnUsers/s.devices)*100)
+:0;
+s.avgOpen=s.devices
+?(s.open/s.devices).toFixed(1)
+:"0";
+s.trust=s.devices
+?Math.round((s.gps/s.devices)*100)
+:0;
 s.deviceState=deviceState;
-
 return s;
 }
 
