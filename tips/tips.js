@@ -1,164 +1,206 @@
 import { supabase } from "../supabase.js";
 
-/* TIP TYPES */
+/* =========================================================
+   TIP TYPES
+   ---------------------------------------------------------
+   Visual design is intentionally hardcoded.
+   These values are NOT stored in the database.
+   ========================================================= */
 
 export const TIP_TYPES = {
 
   bubble: {
     label: "Bubble",
-    description: "Friendly contextual tips and lightweight guidance.",
+    description: "Friendly contextual suggestion",
+
     position: "bottom-right",
-    width: "320px",
+
+    width: "340px",
+
     background: "#eff6ff",
-    color: "#1e3a8a",
-    border: "1px solid #93c5fd",
-    radius: "22px",
-    shadow: "0 8px 25px rgba(30,58,138,.16)",
-    button: {
-      background: "#9333ea",
-      color: "#ffffff",
-      border: "none",
-      radius: "17px"
-    },
-    closeButton: {
-      background: "#dbeafe",
-      color: "#1e3a8a",
-      border: "1px solid #bfdbfe",
-      radius: "17px"
-    },
+    color: "#172554",
+
+    border: "2px solid #60a5fa",
+    radius: "28px 28px 28px 8px",
+
+    shadow:
+      "0 12px 35px rgba(30,64,175,.18)",
+
+    fontFamily:
+      "Arial, sans-serif",
+
+    titleSize: "18px",
+    textSize: "14px",
+
+    padding: "22px",
+
     overlay: false,
-    acknowledge: true
+    acknowledge: true,
+
+    shape: "bubble"
   },
 
-  banner: {
-    label: "Banner",
-    description: "General announcements, onboarding messages and important information.",
-    position: "top-center",
-    width: "100%",
-    background: "#fef3c7",
-    color: "#78350f",
-    border: "1px solid #f59e0b",
-    radius: "0",
-    shadow: "0 4px 15px rgba(120,53,15,.14)",
-    button: {
-      background: "#9333ea",
-      color: "#ffffff",
-      border: "none",
-      radius: "17px"
-    },
-    closeButton: {
-      background: "#fde68a",
-      color: "#78350f",
-      border: "1px solid #f59e0b",
-      radius: "17px"
-    },
-    overlay: false,
-    acknowledge: true
-  },
 
   modal: {
     label: "Modal",
-    description: "Important messages that require attention or a deliberate action.",
+    description: "Important information requiring attention",
+
     position: "center",
-    width: "440px",
+
+    width: "460px",
+
     background: "#ffffff",
     color: "#111827",
-    border: "2px solid #6366f1",
-    radius: "18px",
-    shadow: "0 18px 50px rgba(0,0,0,.28)",
-    button: {
-      background: "#9333ea",
-      color: "#ffffff",
-      border: "none",
-      radius: "17px"
-    },
-    closeButton: {
-      background: "#f3f4f6",
-      color: "#374151",
-      border: "1px solid #d1d5db",
-      radius: "17px"
-    },
+
+    border: "3px solid #6366f1",
+    radius: "42px",
+
+    shadow:
+      "0 25px 70px rgba(31,41,55,.28)",
+
+    fontFamily:
+      "Georgia, 'Times New Roman', serif",
+
+    titleSize: "24px",
+    textSize: "16px",
+
+    padding: "34px",
+
     overlay: true,
-    acknowledge: true
+    acknowledge: true,
+
+    shape: "modal"
   },
+
+
+  banner: {
+    label: "Banner",
+    description: "General announcement",
+
+    position: "top-center",
+
+    width: "100%",
+
+    background: "#fef3c7",
+    color: "#78350f",
+
+    border: "0",
+    borderBottom: "4px solid #f59e0b",
+    radius: "0",
+
+    shadow:
+      "0 6px 20px rgba(120,53,15,.16)",
+
+    fontFamily:
+      "Arial, sans-serif",
+
+    titleSize: "17px",
+    textSize: "14px",
+
+    padding: "16px 28px",
+
+    overlay: false,
+    acknowledge: true,
+
+    shape: "banner"
+  },
+
 
   toast: {
     label: "Toast",
-    description: "Short, temporary notifications that should not interrupt the user.",
+    description: "Quick feedback or short message",
+
     position: "bottom-center",
-    width: "360px",
+
+    width: "290px",
+
     background: "#111827",
     color: "#ffffff",
+
     border: "none",
-    radius: "10px",
-    shadow: "0 8px 25px rgba(0,0,0,.25)",
-    button: {
-      background: "#9333ea",
-      color: "#ffffff",
-      border: "none",
-      radius: "15px"
-    },
-    closeButton: {
-      background: "#374151",
-      color: "#ffffff",
-      border: "1px solid #4b5563",
-      radius: "15px"
-    },
+    radius: "8px",
+
+    shadow:
+      "0 14px 35px rgba(0,0,0,.28)",
+
+    fontFamily:
+      "'Trebuchet MS', Arial, sans-serif",
+
+    titleSize: "17px",
+    textSize: "15px",
+
+    padding: "17px",
+
     overlay: false,
-    acknowledge: true
+    acknowledge: true,
+
+    shape: "toast"
   },
+
 
   card: {
     label: "Card",
-    description: "Richer contextual content with more information or multiple elements.",
+    description: "Detailed informational message",
+
     position: "center-right",
-    width: "380px",
+
+    width: "370px",
+
     background: "#ffffff",
-    color: "#111827",
+    color: "#1f2937",
+
     border: "1px solid #d1d5db",
-    radius: "12px",
-    shadow: "0 12px 35px rgba(0,0,0,.16)",
-    button: {
-      background: "#9333ea",
-      color: "#ffffff",
-      border: "none",
-      radius: "8px"
-    },
-    closeButton: {
-      background: "#f3f4f6",
-      color: "#374151",
-      border: "1px solid #d1d5db",
-      radius: "8px"
-    },
+    radius: "6px",
+
+    shadow:
+      "8px 12px 35px rgba(0,0,0,.14)",
+
+    fontFamily:
+      "'Segoe UI', Arial, sans-serif",
+
+    titleSize: "20px",
+    textSize: "14px",
+
+    padding: "26px",
+
     overlay: false,
-    acknowledge: true
+    acknowledge: true,
+
+    shape: "card"
   },
+
 
   floating: {
     label: "Floating",
-    description: "Persistent or subtle guidance that stays visible without blocking the interface.",
+    description: "Friendly, unobtrusive message",
+
     position: "bottom-left",
-    width: "300px",
+
+    width: "310px",
+
     background: "#f0fdf4",
     color: "#166534",
+
     border: "2px solid #86efac",
-    radius: "28px",
-    shadow: "0 10px 30px rgba(22,101,52,.16)",
-    button: {
-      background: "#9333ea",
-      color: "#ffffff",
-      border: "none",
-      radius: "17px"
-    },
-    closeButton: {
-      background: "#dcfce7",
-      color: "#166534",
-      border: "1px solid #86efac",
-      radius: "17px"
-    },
+    radius: "34px 34px 12px 34px",
+
+    shadow:
+      "0 14px 38px rgba(22,101,52,.16)",
+
+    fontFamily:
+      "'Trebuchet MS', Arial, sans-serif",
+
+    titleSize: "19px",
+    textSize: "14px",
+
+    padding: "23px",
+
     overlay: false,
-    acknowledge: true
+    acknowledge: true,
+
+    shape: "floating"
   }
+
 };
 
 /* =========================================================
@@ -704,200 +746,643 @@ export function renderTip(tip) {
   /* OVERLAY */
   const overlay =
     document.createElement("div");
+
+  const vertical =
+    model.position.includes("top")
+      ? "flex-start"
+      : model.position.includes("bottom")
+        ? "flex-end"
+        : "center";
+
+  const horizontal =
+    model.position.includes("left")
+      ? "flex-start"
+      : model.position.includes("right")
+        ? "flex-end"
+        : "center";
+
+
   overlay.style.cssText = `
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    align-items: ${
-      model.position.includes("top")
-        ? "flex-start"
-        : model.position.includes("bottom")
-          ? "flex-end"
-          : "center"
-    };
-    justify-content: ${
-      model.position.includes("left")
-        ? "flex-start"
-        : model.position.includes("right")
-          ? "flex-end"
-          : "center"
-    };
-    padding: 20px;
-    box-sizing: border-box;
-    pointer-events: none;
+    position:fixed;
+    inset:0;
+    z-index:99999;
+
+    display:flex;
+    align-items:${vertical};
+    justify-content:${horizontal};
+
+    padding:${model.shape === "banner"
+      ? "0"
+      : "20px"};
+
+    box-sizing:border-box;
+
+    pointer-events:none;
+
+    background:${model.overlay
+      ? "rgba(15,23,42,.48)"
+      : "transparent"};
+
+    animation:aroundoTipIn .22s ease-out;
   `;
-  if (model.overlay) {
-    overlay.style.background =
-      "rgba(0,0,0,.35)";
-  }
 
   /* BOX */
   const box =
     document.createElement("div");
+
+
   box.style.cssText = `
-    width: ${model.width};
-    max-width: calc(100vw - 40px);
-    box-sizing: border-box;
-    padding: 20px;
-    background: ${model.background};
-    color: ${model.color};
-    border: ${model.border};
-    border-radius: ${model.radius};
-    box-shadow: ${model.shadow};
-    font-family: Arial, sans-serif;
-    pointer-events: auto;
-    position: relative;
+    width:${model.width};
+    max-width:calc(100vw - 40px);
+
+    box-sizing:border-box;
+
+    padding:${model.padding};
+
+    background:${model.background};
+    color:${model.color};
+
+    border:${model.border};
+    ${model.borderBottom
+      ? `border-bottom:${model.borderBottom};`
+      : ""}
+
+    border-radius:${model.radius};
+
+    box-shadow:${model.shadow};
+
+    font-family:${model.fontFamily};
+
+    position:relative;
+
+    pointer-events:auto;
+
+    overflow:hidden;
   `;
 
+  /* -------------------------------------------------------
+     BUBBLE TAIL
+     ------------------------------------------------------- */
+
+  if (model.shape === "bubble") {
+
+    const tail =
+      document.createElement("div");
+
+    tail.style.cssText = `
+      position:absolute;
+      bottom:-1px;
+      left:-1px;
+
+      width:26px;
+      height:26px;
+
+      background:${model.background};
+
+      border-left:${model.border};
+      border-bottom:${model.border};
+
+      transform:skewY(-35deg);
+      transform-origin:bottom left;
+    `;
+
+    box.appendChild(tail);
+  }
+
+  
+
+  /* -------------------------------------------------------
+     FLOATING DECORATION
+     ------------------------------------------------------- */
+
+  if (model.shape === "floating") {
+
+    const glow =
+      document.createElement("div");
+
+    glow.style.cssText = `
+      position:absolute;
+      width:90px;
+      height:90px;
+
+      top:-45px;
+      right:-35px;
+
+      border-radius:50%;
+
+      background:#bbf7d0;
+
+      opacity:.45;
+
+      pointer-events:none;
+    `;
+
+    box.appendChild(glow);
+  }
+
+  
+
+  /* -------------------------------------------------------
+     CARD ACCENT
+     ------------------------------------------------------- */
+
+  if (model.shape === "card") {
+
+    const accent =
+      document.createElement("div");
+
+    accent.style.cssText = `
+      position:absolute;
+
+      left:0;
+      top:0;
+      bottom:0;
+
+      width:5px;
+
+      background:#6366f1;
+    `;
+
+    box.appendChild(accent);
+  }
+
+  
   /* HEADER */
-  if (
-    tip.tp_icon ||
-    tip.tp_title
-  ) {
+  if (tip.tp_icon || tip.tp_title) {
+
     const header =
       document.createElement("div");
+
+
     header.style.cssText = `
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      display:flex;
+      align-items:center;
+
+      gap:${model.shape === "modal"
+        ? "14px"
+        : "10px"};
+
+      margin-bottom:
+        ${tip.tp_text ? "13px" : "0"};
     `;
+
+
     if (tip.tp_icon) {
+
       const icon =
         document.createElement("span");
+
       icon.textContent =
         tip.tp_icon;
+
+
       icon.style.cssText = `
-        font-size: 24px;
-        line-height: 1;
+        font-size:
+          ${model.shape === "toast"
+            ? "21px"
+            : model.shape === "modal"
+              ? "30px"
+              : "24px"};
+
+        line-height:1;
+
+        flex:none;
       `;
+
       header.appendChild(icon);
     }
+
+
     if (tip.tp_title) {
+
       const title =
         document.createElement("div");
+
       title.textContent =
         tip.tp_title;
+
+
       title.style.cssText = `
-        font-size: 18px;
-        font-weight: bold;
-        line-height: 1.2;
+        font-size:${model.titleSize};
+        font-weight:
+          ${model.shape === "modal"
+            ? "700"
+            : "600"};
+
+        line-height:1.2;
+
+        letter-spacing:
+          ${model.shape === "toast"
+            ? ".2px"
+            : "0"};
+
+        flex:1;
       `;
+
+
       header.appendChild(title);
     }
+
+
     box.appendChild(header);
   }
 
   /* TEXT */
-  const content =
-    document.createElement("div");
-  content.textContent =
-    tip.tp_text ||
-    "Tip preview";
-  content.style.cssText = `
-    line-height: 1.5;
-    white-space: pre-wrap;
-  `;
-  box.appendChild(content);
+
+  if (tip.tp_text) {
+
+    const content =
+      document.createElement("div");
+
+
+    content.textContent =
+      tip.tp_text;
+
+
+    content.style.cssText = `
+      font-size:${model.textSize};
+
+      line-height:
+        ${model.shape === "toast"
+          ? "1.35"
+          : "1.55"};
+
+      white-space:pre-wrap;
+
+      ${model.shape === "modal"
+        ? "text-align:center;"
+        : ""}
+
+      ${model.shape === "banner"
+        ? "max-width:1100px;"
+        : ""}
+    `;
+
+
+    box.appendChild(content);
+  }
 
   /* ACTIONS */
-if (model.acknowledge) {
-  const actions =
-    document.createElement("div");
-  actions.style.cssText = `
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:10px;
-    margin-top:20px;
-  `;
+  if (model.acknowledge) {
 
-  /* DON'T SHOW MORE */
-  if (Number(tip.tp_repeat) !== 1) {
-    const hide =
-      document.createElement("label");
-    hide.style.cssText = `
+    const actions =
+      document.createElement("div");
+
+
+    actions.style.cssText = `
       display:flex;
+
+      justify-content:flex-end;
       align-items:center;
-      gap:6px;
-      font-size:12px;
-      cursor:pointer;
-      margin-right:auto;
-      opacity:.85;
+
+      gap:10px;
+
+      margin-top:20px;
+
+      ${model.shape === "modal"
+        ? "justify-content:center;"
+        : ""}
     `;
-    const checkbox =
-      document.createElement("input");
-    checkbox.type = "checkbox";
-    const hideText =
-      document.createElement("span");
-    hideText.textContent =
-      "Don't show more";
-    hide.append(
-      checkbox,
-      hideText
-    );
-    actions.appendChild(hide);
-  }
+
+    /* -----------------------------------------------------
+       GOT IT / DON'T REMIND ME
+       ----------------------------------------------------- */
+
+    if (
+      Number(tip.tp_repeat) !== 1
+    ) {
+
+      const remind =
+        document.createElement("button");
+
+
+      remind.type =
+        "button";
+
+
+      remind.innerHTML = `
+        <span
+          style="
+            display:block;
+            line-height:1.1;
+          "
+        >
+          Got it
+        </span>
+
+        <span
+          class="aroundo-remind-label"
+          style="
+            display:block;
+            margin-top:3px;
+            font-size:11px;
+            text-decoration:none;
+          "
+        >
+          Don't remind me
+        </span>
+      `;
+
+
+      remind.style.cssText = `
+        border:none;
+        background:transparent;
+
+        color:${model.color};
+
+        padding:4px 6px;
+
+        cursor:pointer;
+
+        font-family:inherit;
+
+        font-size:12px;
+        font-weight:600;
+
+        text-align:center;
+
+        opacity:.82;
+
+        transition:
+          opacity .15s ease,
+          transform .15s ease;
+      `;
+
+
+      let dontRemind =
+        false;
+
+
+      remind.onclick = () => {
+
+        dontRemind =
+          !dontRemind;
+
+
+        const label =
+          remind.querySelector(
+            ".aroundo-remind-label"
+          );
+
+
+        if (dontRemind) {
+
+          label.style.textDecoration =
+            "line-through";
+
+          remind.style.opacity =
+            "1";
+
+        } else {
+
+          label.style.textDecoration =
+            "none";
+
+          remind.style.opacity =
+            ".82";
+        }
+
+      };
+
+
+      actions.appendChild(remind);
+    }
 
   /* CTA */
   if (
     tip.tp_cta_active &&
     tip.tp_cta_label
   ) {
+
     const cta =
       document.createElement("a");
+
+
     cta.textContent =
       tip.tp_cta_label;
+
+
     cta.href =
       tip.tp_cta_url || "#";
+
+
     cta.target =
       "_blank";
+
     cta.rel =
       "noopener";
+
+
     cta.style.cssText = `
       display:inline-flex;
+
       align-items:center;
       justify-content:center;
-      padding:8px 17px;
-      border-radius:${model.button.radius};
-      background:${model.button.background};
-      color:${model.button.color};
-      border:${model.button.border};
+
+      margin-top:18px;
+
+      padding:9px 18px;
+
+      border-radius:18px;
+
+      background:#9333ea;
+      color:#ffffff;
+
       text-decoration:none;
-      font-weight:bold;
+
+      font-weight:600;
       font-size:13px;
-      box-sizing:border-box;
-      cursor:pointer;
+
+      transition:
+        transform .15s ease,
+        background .15s ease;
     `;
-    actions.appendChild(cta);
+
+
+    cta.onmouseenter =
+      () => {
+        cta.style.background =
+          "#7e22ce";
+
+        cta.style.transform =
+          "translateY(-1px)";
+      };
+
+
+    cta.onmouseleave =
+      () => {
+        cta.style.background =
+          "#9333ea";
+
+        cta.style.transform =
+          "translateY(0)";
+      };
+
+
+    box.appendChild(cta);
   }
 
+
   /* OK */
-  const ok =
-    document.createElement("button");
-  ok.textContent =
-    "OK";
-  ok.style.cssText = `
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:8px 17px;
-    border-radius:${model.closeButton.radius};
-    background:${model.closeButton.background};
-    color:${model.closeButton.color};
-    border:${model.closeButton.border};
-    font-weight:bold;
-    font-size:13px;
-    box-sizing:border-box;
-    cursor:pointer;
-  `;
-  ok.onclick = () =>
-    overlay.remove();
-  actions.appendChild(ok);
-  box.appendChild(actions);
-}
+    const ok =
+      document.createElement("button");
+
+
+    ok.type =
+      "button";
+
+
+    ok.textContent =
+      "OK";
+
+
+    ok.style.cssText = `
+      border:none;
+
+      border-radius:18px;
+
+      padding:9px 20px;
+
+      background:#22c55e;
+      color:white;
+
+      font-family:inherit;
+
+      font-weight:700;
+      font-size:13px;
+
+      cursor:pointer;
+
+      transition:
+        transform .15s ease,
+        background .15s ease;
+    `;
+
+
+    ok.onmouseenter =
+      () => {
+
+        ok.style.background =
+          "#16a34a";
+
+        ok.style.transform =
+          "translateY(-1px)";
+      };
+
+
+    ok.onmouseleave =
+      () => {
+
+        ok.style.background =
+          "#22c55e";
+
+        ok.style.transform =
+          "translateY(0)";
+      };
+
+
+    ok.onclick =
+      () => {
+
+        overlay.remove();
+      };
+
+
+    actions.appendChild(ok);
+
+
+    box.appendChild(actions);
+  }
+
+  /* -------------------------------------------------------
+     BANNER LAYOUT
+     ------------------------------------------------------- */
+
+  if (model.shape === "banner") {
+
+    box.style.display =
+      "flex";
+
+    box.style.alignItems =
+      "center";
+
+    box.style.gap =
+      "24px";
+
+    box.style.borderRadius =
+      "0";
+
+
+    const children =
+      [...box.children];
+
+
+    children.forEach(child => {
+
+      if (
+        child.style &&
+        child.style.marginBottom
+      ) {
+        child.style.marginBottom =
+          "0";
+      }
+    });
+  }
+
+
   overlay.appendChild(box);
-  document.body.appendChild(overlay);
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  /* -------------------------------------------------------
+     ANIMATION
+     ------------------------------------------------------- */
+
+  if (
+    !document.getElementById(
+      "aroundo-tip-animation"
+    )
+  ) {
+
+    const style =
+      document.createElement("style");
+
+
+    style.id =
+      "aroundo-tip-animation";
+
+
+    style.textContent = `
+
+      @keyframes aroundoTipIn {
+
+        from {
+          opacity:0;
+          transform:
+            translateY(8px)
+            scale(.98);
+        }
+
+        to {
+          opacity:1;
+          transform:
+            translateY(0)
+            scale(1);
+        }
+
+      }
+
+    `;
+
+
+    document.head.appendChild(
+      style
+    );
+  }
+
+
   return overlay;
 }
