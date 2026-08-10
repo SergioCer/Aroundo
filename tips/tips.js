@@ -1,11 +1,6 @@
 import { supabase } from "../supabase.js";
 
-/* =========================================================
-   TIP TYPES
-   ---------------------------------------------------------
-   Visual design is intentionally hardcoded.
-   These values are NOT stored in the database.
-   ========================================================= */
+/* TIP TYPES: Visual design is intentionally hardcoded. These values are NOT stored in the database. */
 export const TIP_TYPES = {
   bubble: {
     label: "Bubble",
@@ -135,9 +130,7 @@ export const TIP_TYPES = {
   }
 };
 
-/* =========================================================
-   ICONS
-   ========================================================= */
+/* ICONS */
 export const TIP_ICONS = [
    "👋",
    "🎉",
@@ -152,80 +145,28 @@ export const TIP_ICONS = [
    "⚠️"
 ];
 
-/* =========================================================
-   ANALYTICS
-   ========================================================= */
-export const ANALYTICS_FIELDS = {
-  an_open: {
-    type: "number",
-    label: "Open",
-    description: "Number of times Aroundo has been opened."
-  },
-  an_login: {
-    type: "boolean",
-    label: "Login",
-    description: "Whether the user is logged in."
-  },
-  an_install: {
-    type: "boolean",
-    label: "Install",
-    description: "Whether Aroundo has been installed."
-  },
-  an_share: {
-    type: "number",
-    label: "Share",
-    description: "Number of sharing actions."
-  },
-  an_more: {
-    type: "number",
-    label: "More",
-    description: "Number of times the More action has been used."
-  },
-  an_info: {
-    type: "number",
-    label: "Info",
-    description: "Number of times event information has been opened."
-  },
-  an_marker: {
-    type: "number",
-    label: "Marker",
-    description: "Number of event markers selected."
-  },
-  an_map: {
-    type: "number",
-    label: "Map",
-    description: "Number of times the map has been opened."
-  },
-  an_buy: {
-    type: "number",
-    label: "Buy",
-    description: "Number of purchase actions."
-  },
-  an_book: {
-    type: "number",
-    label: "Book",
-    description: "Number of booking actions."
-  },
-  an_gps: {
-    type: "boolean",
-    label: "GPS",
-    description: "Whether location access is enabled."
-  },
-   an_platform:{
-   type:"string",
-   label:"Platform",
-   description:"Operating system used by the device."
-   },
-   an_app:{
-   type:"boolean",
-   label:"App",
-   description:"Whether Aroundo is running as installed app."
-   }
+/* ANALYTICS */
+export const ANALYTICS_FIELDS={
+an_open:{type:"number",label:"Open",description:"Number of times Aroundo has been opened."},
+an_login:{type:"boolean",label:"Login",description:"Whether the user is logged in."},
+an_install:{type:"boolean",label:"Install",description:"Whether Aroundo has been installed."},
+an_share:{type:"number",label:"Share",description:"Number of sharing actions."},
+an_more:{type:"number",label:"More",description:"Number of times the More action has been used."},
+an_info:{type:"number",label:"Info",description:"Number of times event information has been opened."},
+an_marker:{type:"number",label:"Marker",description:"Number of event markers selected."},
+an_map:{type:"number",label:"Map",description:"Number of times the map has been opened."},
+an_buy:{type:"number",label:"Buy",description:"Number of purchase actions."},
+an_book:{type:"number",label:"Book",description:"Number of booking actions."},
+an_gps:{type:"boolean",label:"GPS",description:"Whether location access is enabled."},
+an_platform:{type:"string",label:"Platform",description:"Operating system used by the device."},
+an_app:{type:"boolean",label:"App",description:"Whether Aroundo is running as installed app."}
 };
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
+export const ANALYTICS_OPTIONS={
+an_platform:["Android","iOS","Windows","macOS","Linux","Other"]
+};
+
+/* HELPERS */
 export function getAnalyticsFields() {
   return Object.entries(ANALYTICS_FIELDS)
     .map(([value, data]) => ({
@@ -233,6 +174,7 @@ export function getAnalyticsFields() {
       ...data
     }));
 }
+
 export function getTipTypes() {
   return Object.entries(TIP_TYPES)
     .map(([value, data]) => ({
@@ -240,86 +182,45 @@ export function getTipTypes() {
       ...data
     }));
 }
+
 export function getConditions(type){
-if(type==="boolean"||type==="string")return["=","!="];
+if(type==="boolean")return["=","!="];
+if(type==="string")return["=","!="];
 return[">",">=","=","<=","<","!="];
 }
 
-/* =========================================================
-   CONDITION EVALUATION
-   ========================================================= */
-export function evaluateCondition(
-  actual,
-  condition,
-  expected
-) {
-  if (
-    actual === null ||
-    actual === undefined ||
-    actual === "" ||
-    expected === ""
-  ) {
-    return null;
-  }
-  /* BOOLEAN */
-  if (typeof actual === "boolean") {
-    const value =
-      String(expected).toLowerCase();
-    if (
-      value !== "true" &&
-      value !== "false"
-    ) {
-      return null;
-    }
-    const target =
-      value === "true";
-    if (condition === "=")
-      return actual === target;
-    if (condition === "!=")
-      return actual !== target;
-    return null;
-  }
-
-  /* NUMBER */
-  const a = Number(actual);
-  const b = Number(expected);
-  if (
-    !Number.isFinite(a) ||
-    !Number.isFinite(b)
-  ) {
-    return null;
-  }
-  if (condition === ">")
-    return a > b;
-  if (condition === ">=")
-    return a >= b;
-  if (condition === "=")
-    return a === b;
-  if (condition === "<")
-    return a < b;
-  if (condition === "<=")
-    return a <= b;
-  if (condition === "!=")
-    return a !== b;
-  return null;
+/* CONDITION EVALUATION */
+export function evaluateCondition(actual,condition,expected){
+if(actual===null||actual===undefined||actual===""||expected==="")return null;
+if(typeof actual==="boolean"){
+const target=String(expected).toLowerCase();
+if(target!=="true"&&target!=="false")return null;
+if(condition==="=")return actual===(target==="true");
+if(condition==="!=")return actual!==(target==="true");
+return null;
+}
+if(typeof actual==="string"){
+if(condition==="=")return actual===String(expected);
+if(condition==="!=")return actual!==String(expected);
+return null;
+}
+const a=Number(actual),b=Number(expected);
+if(!Number.isFinite(a)||!Number.isFinite(b))return null;
+if(condition===">")return a>b;
+if(condition===">=")return a>=b;
+if(condition==="=")return a===b;
+if(condition==="<=")return a<=b;
+if(condition==="<")return a<b;
+if(condition==="!=")return a!==b;
+return null;
 }
 
-/* =========================================================
-   LOGIC
-   ========================================================= */
-/*
- * Logic connects the PREVIOUS condition
- * with the CURRENT condition.
- *
- * AND:
- * both must be true
- *
- * OR:
- * at least one must be true
- *
- * NOT:
- * the current condition is negated
- */
+/* LOGIC
+Logic connects the PREVIOUS condition with the CURRENT condition.
+AND: both must be true
+OR: at least one must be true
+NOT: the current condition is negated
+*/
 export function evaluateLogic(
   previous,
   current,
@@ -340,9 +241,7 @@ export function evaluateLogic(
   return current;
 }
 
-/* =========================================================
-   PROGRESSION
-   ========================================================= */
+/* PROGRESSION */
 export function calculateProgression(
   interval,
   growth,
@@ -380,9 +279,7 @@ export function calculateProgression(
   return result;
 }
 
-/* =========================================================
-   DEFAULT TIP
-   ========================================================= */
+/* DEFAULT TIP */
 export function defaultTip() {
   return {
     id_tips: "",
@@ -411,9 +308,7 @@ export function defaultTip() {
   };
 }
 
-/* =========================================================
-   LOAD
-   ========================================================= */
+/* LOAD */
 export async function loadTip(id) {
   const {
     data,
@@ -428,9 +323,7 @@ export async function loadTip(id) {
   return data;
 }
 
-/* =========================================================
-   SAVE
-   ========================================================= */
+/* SAVE */
 export async function saveTip(tip) {
   const {
     data,
@@ -624,9 +517,7 @@ export function renderTip(tip) {
     overflow:hidden;
   `;
 
-  /* -------------------------------------------------------
-     BUBBLE TAIL
-     ------------------------------------------------------- */
+  /* BUBBLE TAIL */
   if (model.shape === "bubble") {
     const tail =
       document.createElement("div");
@@ -645,9 +536,7 @@ export function renderTip(tip) {
     box.appendChild(tail);
   }
 
-  /* -------------------------------------------------------
-     FLOATING DECORATION
-     ------------------------------------------------------- */
+  /* FLOATING DECORATION */
   if (model.shape === "floating") {
     const glow =
       document.createElement("div");
@@ -665,9 +554,7 @@ export function renderTip(tip) {
     box.appendChild(glow);
   }
 
-  /* -------------------------------------------------------
-     CARD ACCENT
-     ------------------------------------------------------- */
+  /* CARD ACCENT */
   if (model.shape === "card") {
     const accent =
       document.createElement("div");
@@ -801,9 +688,7 @@ actions.appendChild(ok);
 box.appendChild(actions);
 }
 
-  /* -------------------------------------------------------
-     BANNER LAYOUT
-     ------------------------------------------------------- */
+  /* BANNER LAYOUT */
   if (model.shape === "banner") {
     box.style.display =
       "flex";
@@ -830,9 +715,7 @@ box.appendChild(actions);
     overlay
   );
 
-  /* -------------------------------------------------------
-     ANIMATION
-     ------------------------------------------------------- */
+  /* ANIMATION */
   if (
     !document.getElementById(
       "aroundo-tip-animation"
