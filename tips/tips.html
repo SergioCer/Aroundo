@@ -651,8 +651,7 @@ function updateConditionSelect(index) {
       .find(x =>
         x.value === currentAnalytics
       );
-  
-/* ANALYTICS NON SELEZIONATO */
+  /* ANALYTICS NON SELEZIONATO */
   if (!field) {
     item.condition.innerHTML = "";
     item.condition.disabled = true;
@@ -661,7 +660,6 @@ function updateConditionSelect(index) {
   }
   item.condition.disabled = false;
   item.value.disabled = false;
-
 /* CONDITIONS */
   const availableConditions =
     getConditions(field.type);
@@ -677,7 +675,6 @@ function updateConditionSelect(index) {
       option
     );
   });
-
   /*
    * Prima proviamo a mantenere la scelta
    * attuale dell'utente.
@@ -686,32 +683,24 @@ function updateConditionSelect(index) {
    * di analytics, usiamo quella salvata
    * nel tip oppure la prima disponibile.
    */
-
   if (
     availableConditions.includes(
       currentCondition
     )
   ) {
-
     item.condition.value =
       currentCondition;
-
   } else if (
     availableConditions.includes(
       tip[`tp_condition_${index}`]
     )
   ) {
-
     item.condition.value =
       tip[`tp_condition_${index}`];
-
   } else {
-
     item.condition.value =
       availableConditions[0];
-
   }
-
   /* VALUE */
   const isBoolean =
     field.type === "boolean";
@@ -719,8 +708,6 @@ function updateConditionSelect(index) {
     field.type === "string";
   const isPlatform =
     currentAnalytics === "an_platform";
-  const currentValue =
-    item.value.value;
   if (isBoolean) {
     if (item.value.tagName !== "SELECT") {
       const select = document.createElement("select");
@@ -770,7 +757,7 @@ function updateConditionSelect(index) {
     item.value.value = currentValue;
   }
   item.value.title = field.description;
-
+}
 
 /* CONDITION ROW VISIBILITY */
 
