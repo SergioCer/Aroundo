@@ -126,9 +126,7 @@ function renderSection(type){
 const data=filter(rows,type,currentDate);
 const s=stats(data,rows);
 const platforms=platformStats(s.deviceState);
-
 document.getElementById(type+"Title").textContent=periodLabel(type,currentDate);
-
 document.getElementById(type+"Metrics").innerHTML=`
 <div class="metric-group">
 <h3>Use</h3>
