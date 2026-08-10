@@ -159,69 +159,68 @@ export const ANALYTICS_FIELDS = {
   an_open: {
     type: "number",
     label: "Open",
-    description:
-      "Number of times Aroundo has been opened."
+    description: "Number of times Aroundo has been opened."
   },
   an_login: {
     type: "boolean",
     label: "Login",
-    description:
-      "Whether the user is logged in."
+    description: "Whether the user is logged in."
   },
   an_install: {
     type: "boolean",
     label: "Install",
-    description:
-      "Whether Aroundo has been installed."
+    description: "Whether Aroundo has been installed."
   },
   an_share: {
     type: "number",
     label: "Share",
-    description:
-      "Number of sharing actions."
+    description: "Number of sharing actions."
   },
   an_more: {
     type: "number",
     label: "More",
-    description:
-      "Number of times the More action has been used."
+    description: "Number of times the More action has been used."
   },
   an_info: {
     type: "number",
     label: "Info",
-    description:
-      "Number of times event information has been opened."
+    description: "Number of times event information has been opened."
   },
   an_marker: {
     type: "number",
     label: "Marker",
-    description:
-      "Number of event markers selected."
+    description: "Number of event markers selected."
   },
   an_map: {
     type: "number",
     label: "Map",
-    description:
-      "Number of times the map has been opened."
+    description: "Number of times the map has been opened."
   },
   an_buy: {
     type: "number",
     label: "Buy",
-    description:
-      "Number of purchase actions."
+    description: "Number of purchase actions."
   },
   an_book: {
     type: "number",
     label: "Book",
-    description:
-      "Number of booking actions."
+    description: "Number of booking actions."
   },
   an_gps: {
     type: "boolean",
     label: "GPS",
-    description:
-      "Whether location access is enabled."
-  }
+    description: "Whether location access is enabled."
+  },
+   an_platform:{
+   type:"string",
+   label:"Platform",
+   description:"Operating system used by the device."
+   },
+   an_app:{
+   type:"boolean",
+   label:"App",
+   description:"Whether Aroundo is running as installed app."
+   }
 };
 
 /* =========================================================
@@ -241,10 +240,9 @@ export function getTipTypes() {
       ...data
     }));
 }
-export function getConditions(type) {
-  return type === "boolean"
-    ? ["=", "!="]
-    : [">", ">=", "=", "<=", "<", "!="];
+export function getConditions(type){
+if(type==="boolean"||type==="string")return["=","!="];
+return[">",">=","=","<=","<","!="];
 }
 
 /* =========================================================
