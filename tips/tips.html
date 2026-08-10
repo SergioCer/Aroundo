@@ -475,24 +475,11 @@ import {
 
 await requireAuth();
 
-
-import {
-  TIP_ICONS,
-  getTipTypes,
-  getAnalyticsFields,
-  getConditions,
-  calculateProgression,
-  defaultTip,
-  loadTip,
-  saveTip,
-  simulateTip,
-  renderTip
-} from "./tips.js";
-
+import { TIP_ICONS, getTipTypes, getAnalyticsFields, getConditions, ANALYTICS_OPTIONS, calculateProgression, 
+        defaultTip, loadTip, saveTip, simulateTip, renderTip } from "./tips.js";
 
 let tip =
   defaultTip();
-
 
 const params =
   new URLSearchParams(
@@ -505,104 +492,78 @@ const id =
 const isNew =
   params.get("new") === "1";
 
-
 /* ELEMENTS */
-
 const idTips =
   document.getElementById("id_tips");
-
 const type =
   document.getElementById("tp_type");
-
 const icon =
   document.getElementById("tp_icon");
-
 const title =
   document.getElementById("tp_title");
-
 const text =
   document.getElementById("tp_text");
-
 const activeBtn =
   document.getElementById("activeBtn");
-
 const impactBtn =
   document.getElementById("impactBtn");
-
 const previewBtn =
   document.getElementById("previewBtn");
-
 const repeat =
   document.getElementById("tp_repeat");
-
 const interval =
   document.getElementById("tp_interval");
-
 const growth =
   document.getElementById("tp_growth");
-
 const progression =
   document.getElementById("progression");
-
 const simulation =
   document.getElementById("simulation");
 
-
 /* CONDITION ELEMENTS */
-
 const conditions = {
-
   1: {
     analytics:
       document.getElementById(
         "tp_analytics_1"
       ),
-
     condition:
       document.getElementById(
         "tp_condition_1"
       ),
-
     value:
       document.getElementById(
         "tv_value_1"
       )
   },
-
   2: {
     analytics:
       document.getElementById(
         "tp_analytics_2"
       ),
-
     condition:
       document.getElementById(
         "tp_condition_2"
       ),
-
     value:
       document.getElementById(
         "tv_value_2"
       )
   },
-
   3: {
     analytics:
       document.getElementById(
         "tp_analytics_3"
       ),
-
     condition:
       document.getElementById(
         "tp_condition_3"
       ),
-
     value:
       document.getElementById(
         "tv_value_3"
       )
   }
-
 };
 
 
@@ -610,181 +571,112 @@ const logic1 =
   document.getElementById(
     "tp_logic_1"
   );
-
 const logic2 =
   document.getElementById(
     "tp_logic_2"
   );
 
-
-/* =========================================================
-   POPULATE ICONS
-   ========================================================= */
-
+/* POPULATE ICONS */
 TIP_ICONS.forEach(item => {
-
   const option =
     document.createElement("option");
-
   option.value = item;
   option.textContent = item;
-
   icon.appendChild(option);
-
 });
 
-
-/* =========================================================
-   POPULATE TYPES
-   ========================================================= */
-
+/* POPULATE TYPES */
 getTipTypes().forEach(item => {
-
   const option =
     document.createElement("option");
-
   option.value =
     item.value;
-
   option.textContent =
     item.label;
-
   option.title =
     item.description;      
-      
+     
   type.appendChild(option);
-
 });
 
-
-/* =========================================================
-   POPULATE ANALYTICS
-   ========================================================= */
-
+/* POPULATE ANALYTICS */
 function populateAnalytics(select) {
-
   select.innerHTML = "";
-
   const empty =
     document.createElement("option");
-
   empty.value = "";
   empty.textContent = "--";
-
   select.appendChild(empty);
-
-
   getAnalyticsFields()
     .forEach(field => {
-
       const option =
         document.createElement("option");
-
       option.value =
         field.value;
-
       option.textContent =
         field.label;
-
       option.title =
         field.description;
-
       select.appendChild(option);
-
     });
-
 }
-
 
 Object.values(conditions)
   .forEach(item => {
-
     populateAnalytics(
       item.analytics
     );
-
   });
 
 
-/* =========================================================
-   CONDITION SELECT
-   ========================================================= */
-
+/* CONDITION SELECT */
 function updateConditionSelect(index) {
-
   const item = conditions[index];
-
   if (!item)
     return;
-
   /*
    * IMPORTANT:
    * salviamo i valori attualmente presenti nel DOM.
    * In questo modo update() non sovrascrive
    * la scelta appena fatta dall'utente.
    */
-
   const currentAnalytics =
     item.analytics.value;
-
   const currentCondition =
     item.condition.value;
-
   const currentValue =
     item.value.value;
-
-
   const field =
     getAnalyticsFields()
       .find(x =>
         x.value === currentAnalytics
       );
-
-
-  /* ANALYTICS NON SELEZIONATO */
-
+  
+/* ANALYTICS NON SELEZIONATO */
   if (!field) {
-
     item.condition.innerHTML = "";
-
     item.condition.disabled = true;
-
     item.value.disabled = true;
-
     return;
   }
-
-
   item.condition.disabled = false;
   item.value.disabled = false;
 
-
-  /* CONDITIONS */
-
+/* CONDITIONS */
   const availableConditions =
     getConditions(field.type);
-
-
   item.condition.innerHTML = "";
-
-
   availableConditions.forEach(operator => {
-
     const option =
       document.createElement("option");
-
     option.value =
       operator;
-
     option.textContent =
       operator;
-
     item.condition.appendChild(
       option
     );
-
   });
-
 
   /*
    * Prima proviamo a mantenere la scelta
@@ -820,266 +712,113 @@ function updateConditionSelect(index) {
 
   }
 
-
   /* VALUE */
-
   const isBoolean =
     field.type === "boolean";
-
-  const currentIsBoolean =
-    item.value.tagName === "SELECT";
-
-
-  /*
-   * BOOLEAN
-   */
-
+  const isString =
+    field.type === "string";
+  const isPlatform =
+    currentAnalytics === "an_platform";
+  const currentValue =
+    item.value.value;
   if (isBoolean) {
-
-    if (!currentIsBoolean) {
-
-      const select =
-        document.createElement("select");
-
-      select.id =
-        `tv_value_${index}`;
-
-      select.style.width =
-        "100%";
-
-      select.style.boxSizing =
-        "border-box";
-
-      select.style.padding =
-        "9px";
-
-      select.style.border =
-        "1px solid #d1d5db";
-
-      select.style.borderRadius =
-        "8px";
-
-
-      ["true", "false"]
-        .forEach(value => {
-
-          const option =
-            document.createElement("option");
-
-          option.value =
-            value;
-
-          option.textContent =
-            value;
-
-          select.appendChild(
-            option
-          );
-
-        });
-
-
-      select.value =
-        currentValue === "false"
-          ? "false"
-          : "true";
-
-
-      item.value.replaceWith(
-        select
-      );
-
-      item.value =
-        select;
-
-
-      /*
-       * Il vecchio elemento è stato sostituito:
-       * registriamo nuovamente l'evento.
-       */
-
-      item.value.addEventListener(
-        "change",
-        update
-      );
-
-    } else {
-
-      /*
-       * Era già un select boolean.
-       * Non lo ricreiamo.
-       */
-
-      item.value.value =
-        currentValue === "false"
-          ? "false"
-          : "true";
-
+    if (item.value.tagName !== "SELECT") {
+      const select = document.createElement("select");
+      select.id = `tv_value_${index}`;
+      item.value.replaceWith(select);
+      item.value = select;
+      item.value.addEventListener("change", update);
     }
-
-
-    item.value.title =
-      field.description;
-
-  }
-
-
-  /*
-   * NUMBER
-   */
-
-  else {
-
-    if (
-      item.value.tagName !== "INPUT"
-    ) {
-
-      const input =
-        document.createElement("input");
-
-      input.id =
-        `tv_value_${index}`;
-
-      input.type =
-        "number";
-
-      input.placeholder =
-        "Value";
-
-      input.style.width =
-        "100%";
-
-      input.style.boxSizing =
-        "border-box";
-
-      input.style.padding =
-        "9px";
-
-      input.style.border =
-        "1px solid #d1d5db";
-
-      input.style.borderRadius =
-        "8px";
-
-
-      /*
-       * Manteniamo il valore esistente.
-       */
-
-      input.value =
-        currentValue;
-
-
-      item.value.replaceWith(
-        input
-      );
-
-      item.value =
-        input;
-
-
-      /*
-       * Nuovo elemento = nuovo listener.
-       */
-
-      item.value.addEventListener(
-        "input",
-        update
-      );
-
-    } else {
-
-      item.value.type =
-        "number";
-
-      item.value.placeholder =
-        "Value";
-
+    item.value.innerHTML = "";
+    ["true","false"].forEach(value => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      item.value.appendChild(option);
+    });
+    item.value.value = currentValue === "false" ? "false" : "true";
+  } else if (isPlatform) {
+    if (item.value.tagName !== "SELECT") {
+      const select = document.createElement("select");
+      select.id = `tv_value_${index}`;
+      item.value.replaceWith(select);
+      item.value = select;
+      item.value.addEventListener("change", update);
     }
-
-
-    item.value.title =
-      field.description;
-
+    item.value.innerHTML = "";
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = "--";
+    item.value.appendChild(empty);
+    ANALYTICS_OPTIONS[currentAnalytics].forEach(value => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      item.value.appendChild(option);
+    });
+    item.value.value = currentValue;
+  } else {
+    if (item.value.tagName !== "INPUT") {
+      const input = document.createElement("input");
+      input.id = `tv_value_${index}`;
+      item.value.replaceWith(input);
+      item.value = input;
+      item.value.addEventListener("input", update);
+    }
+    item.value.type = isString ? "text" : "number";
+    item.value.placeholder = "Value";
+    item.value.value = currentValue;
   }
+  item.value.title = field.description;
 
-}
 
-/* =========================================================
-   CONDITION ROW VISIBILITY
-   ========================================================= */
+/* CONDITION ROW VISIBILITY */
 
 function updateLogicRows() {
-
   const has1 =
     !!conditions[1]
       .analytics.value;
-
   const logic1Value =
     logic1.value;
-
   const has2 =
     has1 &&
     !!logic1Value;
-
-
   document.getElementById(
     "logicRow1"
   ).hidden =
     !has1;
-
-
   document.getElementById(
     "conditionRow2"
   ).hidden =
     !has2;
-
-
   if (!has2) {
-
     logic2.value = "";
-
     document.getElementById(
       "logicRow2"
     ).hidden = true;
-
     document.getElementById(
       "conditionRow3"
     ).hidden = true;
-
     return;
   }
-
-
   document.getElementById(
     "logicRow2"
   ).hidden = false;
-
-
   const has3 =
     !!conditions[2]
       .analytics.value &&
     !!logic2.value;
-
-
   document.getElementById(
     "conditionRow3"
   ).hidden =
     !has3;
-
 }
 
-
-/* =========================================================
-   ACTIVE
-   ========================================================= */
+/* ACTIVE */
 
 function updateActive() {
-
   const on =
     tip.tp_active === true;
-
-
   activeBtn.className =
     "tool-btn " +
     (
@@ -1087,183 +826,116 @@ function updateActive() {
         ? "active-on"
         : "active-off"
     );
-
-
   activeBtn.textContent =
     "●";
-
-
   activeBtn.title =
     on
       ? "Tip active"
       : "Tip inactive";
-
 }
-
-
 activeBtn.onclick = () => {
-
   tip.tp_active =
     !tip.tp_active;
-
   updateActive();
-
 };
 
-
-/* =========================================================
-   PROGRESSION
-   ========================================================= */
+/* PROGRESSION */
 
 function updateProgression() {
-
   progression.innerHTML = "";
-
-
   const first =
     conditions[1];
-
   const field =
     getAnalyticsFields()
       .find(x =>
         x.value ===
         first.analytics.value
       );
-
-
   if (!field) {
-
     progression.hidden =
       true;
-
     return;
   }
-
-
   progression.hidden =
     false;
-
-
   const repeatValue =
     Number(
       repeat.value
     );
-
-
   if (field.type === "number") {
-
     const values =
       calculateProgression(
         interval.value,
         growth.value,
         repeat.value
       );
-
-
     values.forEach(
       (value, index) => {
-
         const el =
           document.createElement("div");
-
         el.className =
           "step";
-
         el.textContent =
           `${index + 1}ª → ${value}`;
-
         progression
           .appendChild(el);
-
       }
     );
-
-
     if (repeatValue === 0) {
-
       const el =
         document.createElement("div");
-
       el.className =
         "step";
-
       el.textContent =
         "∞ → ...";
-
       progression
         .appendChild(el);
-
     } else if (
       repeatValue > 10
     ) {
-
       const el =
         document.createElement("div");
-
       el.className =
         "step";
-
       el.textContent =
         "11ª → ...";
-
       progression
         .appendChild(el);
-
     }
-
   } else {
-
     const el =
       document.createElement("div");
-
     el.className =
       "step";
-
     el.textContent =
       "1ª → visualizzazione";
-
     progression
       .appendChild(el);
-
-
     if (repeatValue === 0) {
-
       const el2 =
         document.createElement("div");
-
       el2.className =
         "step";
-
       el2.textContent =
         "∞ → ...";
-
       progression
         .appendChild(el2);
-
     } else if (
       repeatValue > 1
     ) {
-
       const el2 =
         document.createElement("div");
-
       el2.className =
         "step";
-
       el2.textContent =
         repeatValue > 10
           ? "11ª → ..."
           : `${repeatValue}ª → ...`;
-
       progression
         .appendChild(el2);
-
     }
-
   }
-
 }
-
 
 /* UPDATE */
 function update() {
