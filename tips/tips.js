@@ -762,258 +762,45 @@ export function renderTip(tip) {
 
 /* ACTIONS */
 if (model.acknowledge) {
+const actions = document.createElement("div");
+actions.style.cssText = `display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:20px;${model.shape === "modal" ? "justify-content:center;" : ""}`;
 
-  const actions =
-    document.createElement("div");
+/* GOT IT / DON'T REMIND ME */
+if (Number(tip.tp_repeat) !== 1) {
+const remind = document.createElement("button");
+remind.type = "button";
+remind.innerHTML = `<span style="display:block;line-height:1.1;">Got it</span><span class="aroundo-remind-label" style="display:block;margin-top:3px;font-size:11px;text-decoration:none;">Don't remind me</span>`;
+remind.style.cssText = `border:1px solid ${model.color};border-radius:8px;background:transparent;color:${model.color};padding:6px 10px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;text-align:center;opacity:.82;transition:opacity .15s ease,transform .15s ease,background .15s ease;`;
+let dontRemind = false;
+remind.onmouseenter = () => { if (!dontRemind) remind.style.opacity = "1"; remind.style.transform = "translateY(-1px)"; };
+remind.onmouseleave = () => { remind.style.opacity = dontRemind ? "1" : ".82"; remind.style.transform = "translateY(0)"; };
+remind.onclick = () => { dontRemind = !dontRemind; const label = remind.querySelector(".aroundo-remind-label"); label.style.textDecoration = dontRemind ? "line-through" : "none"; remind.style.opacity = dontRemind ? "1" : ".82"; };
+actions.appendChild(remind);
+}
 
-  actions.style.cssText = `
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:10px;
-    margin-top:20px;
-    flex-wrap:wrap;
-    ${model.shape === "modal"
-      ? "justify-content:center;"
-      : ""}
-  `;
+/* CTA */
+if (tip.tp_cta_active && tip.tp_cta_label) {
+const cta = document.createElement("a");
+cta.textContent = tip.tp_cta_label;
+cta.href = tip.tp_cta_url || "#";
+cta.target = "_blank";
+cta.rel = "noopener";
+cta.style.cssText = `display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:18px;background:#9333ea;color:#ffffff;text-decoration:none;font-weight:600;font-size:13px;transition:transform .15s ease,background .15s ease;`;
+cta.onmouseenter = () => { cta.style.background = "#7e22ce"; cta.style.transform = "translateY(-1px)"; };
+cta.onmouseleave = () => { cta.style.background = "#9333ea"; cta.style.transform = "translateY(0)"; };
+actions.appendChild(cta);
+}
 
-
-  /* -----------------------------------------------------
-     DON'T REMIND ME
-     ----------------------------------------------------- */
-
-  if (
-    Number(tip.tp_repeat) !== 1
-  ) {
-
-    const remind =
-      document.createElement("button");
-
-    remind.type =
-      "button";
-
-    remind.textContent =
-      "Don't remind me";
-
-    remind.style.cssText = `
-      border:1px solid ${model.color};
-      border-radius:16px;
-      background:transparent;
-      color:${model.color};
-      padding:7px 12px;
-      cursor:pointer;
-      font-family:inherit;
-      font-size:12px;
-      font-weight:600;
-      line-height:1;
-      opacity:.72;
-      transition:
-        opacity .15s ease,
-        background .15s ease,
-        text-decoration .15s ease,
-        transform .15s ease;
-    `;
-
-    let dontRemind =
-      false;
-
-    remind.onclick = () => {
-
-      dontRemind =
-        !dontRemind;
-
-      if (dontRemind) {
-
-        remind.style.textDecoration =
-          "line-through";
-
-        remind.style.opacity =
-          "1";
-
-        remind.style.background =
-          "rgba(148,163,184,.12)";
-
-      } else {
-
-        remind.style.textDecoration =
-          "none";
-
-        remind.style.opacity =
-          ".72";
-
-        remind.style.background =
-          "transparent";
-
-      }
-
-    };
-
-    remind.onmouseenter =
-      () => {
-
-        if (!dontRemind) {
-          remind.style.opacity =
-            "1";
-        }
-
-        remind.style.transform =
-          "translateY(-1px)";
-      };
-
-    remind.onmouseleave =
-      () => {
-
-        remind.style.opacity =
-          dontRemind
-            ? "1"
-            : ".72";
-
-        remind.style.transform =
-          "translateY(0)";
-      };
-
-    actions.appendChild(
-      remind
-    );
-  }
-
-
-  /* -----------------------------------------------------
-     CTA
-     ----------------------------------------------------- */
-
-  if (
-    tip.tp_cta_active &&
-    tip.tp_cta_label
-  ) {
-
-    const cta =
-      document.createElement("a");
-
-    cta.textContent =
-      tip.tp_cta_label;
-
-    cta.href =
-      tip.tp_cta_url || "#";
-
-    cta.target =
-      "_blank";
-
-    cta.rel =
-      "noopener";
-
-    cta.style.cssText = `
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      box-sizing:border-box;
-      min-height:32px;
-      padding:8px 16px;
-      border-radius:18px;
-      background:#9333ea;
-      color:#ffffff;
-      text-decoration:none;
-      font-family:inherit;
-      font-weight:600;
-      font-size:13px;
-      line-height:1;
-      white-space:nowrap;
-      transition:
-        transform .15s ease,
-        background .15s ease;
-    `;
-
-    cta.onmouseenter =
-      () => {
-
-        cta.style.background =
-          "#7e22ce";
-
-        cta.style.transform =
-          "translateY(-1px)";
-      };
-
-    cta.onmouseleave =
-      () => {
-
-        cta.style.background =
-          "#9333ea";
-
-        cta.style.transform =
-          "translateY(0)";
-      };
-
-    actions.appendChild(
-      cta
-    );
-  }
-
-
-  /* -----------------------------------------------------
-     OK
-     ----------------------------------------------------- */
-
-  const ok =
-    document.createElement("button");
-
-  ok.type =
-    "button";
-
-  ok.textContent =
-    "OK";
-
-  ok.style.cssText = `
-    border:none;
-    border-radius:18px;
-    min-height:32px;
-    padding:8px 18px;
-    background:#22c55e;
-    color:white;
-    font-family:inherit;
-    font-weight:700;
-    font-size:13px;
-    line-height:1;
-    cursor:pointer;
-    white-space:nowrap;
-    transition:
-      transform .15s ease,
-      background .15s ease;
-  `;
-
-  ok.onmouseenter =
-    () => {
-
-      ok.style.background =
-        "#16a34a";
-
-      ok.style.transform =
-        "translateY(-1px)";
-    };
-
-  ok.onmouseleave =
-    () => {
-
-      ok.style.background =
-        "#22c55e";
-
-      ok.style.transform =
-        "translateY(0)";
-    };
-
-  ok.onclick =
-    () => {
-      overlay.remove();
-    };
-
-  actions.appendChild(
-    ok
-  );
-
-
-  box.appendChild(
-    actions
-  );
+/* OK */
+const ok = document.createElement("button");
+ok.type = "button";
+ok.textContent = "OK";
+ok.style.cssText = `border:none;border-radius:18px;padding:9px 20px;background:#22c55e;color:white;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:transform .15s ease,background .15s ease;`;
+ok.onmouseenter = () => { ok.style.background = "#16a34a"; ok.style.transform = "translateY(-1px)"; };
+ok.onmouseleave = () => { ok.style.background = "#22c55e"; ok.style.transform = "translateY(0)"; };
+ok.onclick = () => { overlay.remove(); };
+actions.appendChild(ok);
+box.appendChild(actions);
 }
 
   /* -------------------------------------------------------
