@@ -49,7 +49,6 @@ box-shadow:0 1px 4px #0001;
     display:grid;
 }
 
-.period-header,
 .collapse-bar{
 height:42px;
 display:flex;
@@ -80,10 +79,6 @@ cursor:pointer;
 color:#555;
 display:flex;
 align-items:center;
-}
-
-.collapsed .metrics-grid{
-display:none;
 }
 
 .collapse-btn .material-symbols-outlined{
