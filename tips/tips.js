@@ -1,52 +1,90 @@
 import { supabase } from "../supabase.js";
 
-/* =========================================================
-   TIP TYPES
-   ========================================================= */
+/* TIP TYPES */
 
 export const TIP_TYPES = {
 
   bubble: {
     label: "Bubble",
+    description: "Friendly contextual tips and lightweight guidance.",
     position: "bottom-right",
     width: "320px",
     background: "#eff6ff",
     color: "#1e3a8a",
     border: "1px solid #93c5fd",
-    radius: "18px",
-    shadow: "0 8px 25px rgba(0,0,0,.15)",
+    radius: "22px",
+    shadow: "0 8px 25px rgba(30,58,138,.16)",
+    button: {
+      background: "#9333ea",
+      color: "#ffffff",
+      border: "none",
+      radius: "17px"
+    },
+    closeButton: {
+      background: "#dbeafe",
+      color: "#1e3a8a",
+      border: "1px solid #bfdbfe",
+      radius: "17px"
+    },
     overlay: false,
     acknowledge: true
   },
 
   banner: {
     label: "Banner",
+    description: "General announcements, onboarding messages and important information.",
     position: "top-center",
     width: "100%",
     background: "#fef3c7",
     color: "#78350f",
     border: "1px solid #f59e0b",
     radius: "0",
-    shadow: "0 4px 15px rgba(0,0,0,.12)",
+    shadow: "0 4px 15px rgba(120,53,15,.14)",
+    button: {
+      background: "#9333ea",
+      color: "#ffffff",
+      border: "none",
+      radius: "17px"
+    },
+    closeButton: {
+      background: "#fde68a",
+      color: "#78350f",
+      border: "1px solid #f59e0b",
+      radius: "17px"
+    },
     overlay: false,
     acknowledge: true
   },
 
   modal: {
     label: "Modal",
+    description: "Important messages that require attention or a deliberate action.",
     position: "center",
-    width: "420px",
+    width: "440px",
     background: "#ffffff",
     color: "#111827",
     border: "2px solid #6366f1",
-    radius: "16px",
-    shadow: "0 12px 40px rgba(0,0,0,.25)",
+    radius: "18px",
+    shadow: "0 18px 50px rgba(0,0,0,.28)",
+    button: {
+      background: "#9333ea",
+      color: "#ffffff",
+      border: "none",
+      radius: "17px"
+    },
+    closeButton: {
+      background: "#f3f4f6",
+      color: "#374151",
+      border: "1px solid #d1d5db",
+      radius: "17px"
+    },
     overlay: true,
     acknowledge: true
   },
 
   toast: {
     label: "Toast",
+    description: "Short, temporary notifications that should not interrupt the user.",
     position: "bottom-center",
     width: "360px",
     background: "#111827",
@@ -54,38 +92,74 @@ export const TIP_TYPES = {
     border: "none",
     radius: "10px",
     shadow: "0 8px 25px rgba(0,0,0,.25)",
+    button: {
+      background: "#9333ea",
+      color: "#ffffff",
+      border: "none",
+      radius: "15px"
+    },
+    closeButton: {
+      background: "#374151",
+      color: "#ffffff",
+      border: "1px solid #4b5563",
+      radius: "15px"
+    },
     overlay: false,
     acknowledge: true
   },
 
   card: {
     label: "Card",
+    description: "Richer contextual content with more information or multiple elements.",
     position: "center-right",
-    width: "360px",
+    width: "380px",
     background: "#ffffff",
     color: "#111827",
     border: "1px solid #d1d5db",
-    radius: "14px",
-    shadow: "0 10px 30px rgba(0,0,0,.18)",
+    radius: "12px",
+    shadow: "0 12px 35px rgba(0,0,0,.16)",
+    button: {
+      background: "#9333ea",
+      color: "#ffffff",
+      border: "none",
+      radius: "8px"
+    },
+    closeButton: {
+      background: "#f3f4f6",
+      color: "#374151",
+      border: "1px solid #d1d5db",
+      radius: "8px"
+    },
     overlay: false,
     acknowledge: true
   },
 
   floating: {
     label: "Floating",
+    description: "Persistent or subtle guidance that stays visible without blocking the interface.",
     position: "bottom-left",
     width: "300px",
     background: "#f0fdf4",
     color: "#166534",
-    border: "1px solid #86efac",
-    radius: "20px",
-    shadow: "0 8px 28px rgba(0,0,0,.18)",
+    border: "2px solid #86efac",
+    radius: "28px",
+    shadow: "0 10px 30px rgba(22,101,52,.16)",
+    button: {
+      background: "#9333ea",
+      color: "#ffffff",
+      border: "none",
+      radius: "17px"
+    },
+    closeButton: {
+      background: "#dcfce7",
+      color: "#166534",
+      border: "1px solid #86efac",
+      radius: "17px"
+    },
     overlay: false,
     acknowledge: true
   }
-
 };
-
 
 /* =========================================================
    ICONS
