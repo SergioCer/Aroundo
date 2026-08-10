@@ -153,9 +153,9 @@ ${metric("🆕","New",s.newUsers,"New devices")}
 ${metric("🔁","Return",s.returnUsers,"Returning devices",s.retention+"%")}
 ${metric("⬇️","Install",s.install,"Installations")}
 ${metric("🔑","Login",s.login,"Logins")}
-${metric("🟢","Granted",s.gps,"GPS permission")}
-${metric("🔴","Denied",s.nogps,"GPS permission")}
-${metric("⚪","None",s.nonegps,"GPS permission")}
+${metric("🟢","Granted",s.gps,"GPS Permitted")}
+${metric("🔴","Denied",s.nogps,"GPS Denied")}
+${metric("⚪","None",s.nonegps,"GPS Unknow")}
 ${metric("🎯","Trust",s.trust+"%","GPS trust")}
 </div>
 <div class="metric-group">
