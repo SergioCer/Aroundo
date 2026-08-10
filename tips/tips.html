@@ -236,374 +236,203 @@ textarea {
 }
 
 </style>
-
 </head>
-
 <body>
 
 <div class="header">
-
   <div class="title">
-
- 
 <button
   class="bck-btn"
   onclick="location.href='tips_overview.html'">
   ←
 </button>
-
 <span id="pageTitle">
   New Tip
 </span>
-
 <button
   class="save-btn"
   onclick="save()">
   ✓
 </button>
- 
-
   </div>
-
 </div>
-
 <div class="container">
-
   <!-- ID / TYPE -->
-
   <div class="row">
-
- 
 <div class="field">
-
   <label>Tip ID</label>
-
   <input
     id="id_tips"
     placeholder="e.g. 20260809 Welcome">
-
 </div>
-
-
 <div class="field">
-
   <label>Type</label>
-
   <select id="tp_type"></select>
-
 </div>
- 
-
   </div>
-
   <!-- ICON / TITLE -->
-
   <div class="row">
-
- 
 <div class="field">
-
   <label>Icon</label>
-
   <select id="tp_icon"></select>
-
 </div>
-
-
 <div class="field">
-
   <label>Title</label>
-
   <input
     id="tp_title"
     placeholder="Tip title">
-
 </div>
- 
-
   </div>
-
   <!-- TEXT -->
-
   <div class="field">
-
- 
 <label>Text</label>
-
 <textarea
   id="tp_text"
   placeholder="Message text..."></textarea>
- 
-
   </div>
-
   <br>
-
   <!-- CONDITION 1 -->
-
   <div class="row">
-
- 
 <div class="field">
-
   <label>Analytics</label>
-
   <select id="tp_analytics_1"></select>
-
 </div>
-
-
 <div class="field">
-
   <label>Condition</label>
-
   <select id="tp_condition_1"></select>
-
 </div>
-
-
 <div class="field">
-
   <label>Value</label>
-
   <input
     id="tv_value_1"
     placeholder="Value">
-
 </div>
- 
-
   </div>
-
   <!-- LOGIC 1 -->
-
   <div
     id="logicRow1"
     class="logic-row"
     hidden>
-
- 
 <div class="logic-field">
-
   <label>Logic</label>
-
   <select id="tp_logic_1">
-
     <option value="">--</option>
     <option value="AND">AND</option>
     <option value="OR">OR</option>
     <option value="NOT">NOT</option>
-
   </select>
-
 </div>
- 
-
   </div>
-
   <!-- CONDITION 2 -->
-
   <div
     id="conditionRow2"
     class="row"
     hidden>
-
- 
 <div class="field">
-
   <label>Analytics</label>
-
   <select id="tp_analytics_2"></select>
-
 </div>
-
-
 <div class="field">
-
   <label>Condition</label>
-
   <select id="tp_condition_2"></select>
-
 </div>
-
-
 <div class="field">
-
   <label>Value</label>
-
   <input
     id="tv_value_2"
     placeholder="Value">
-
 </div>
- 
-
   </div>
-
   <!-- LOGIC 2 -->
-
   <div
     id="logicRow2"
     class="logic-row"
     hidden>
-
- 
 <div class="logic-field">
-
   <label>Logic</label>
-
   <select id="tp_logic_2">
-
     <option value="">--</option>
     <option value="AND">AND</option>
     <option value="OR">OR</option>
     <option value="NOT">NOT</option>
-
   </select>
-
 </div>
- 
-
   </div>
-
   <!-- CONDITION 3 -->
-
   <div
     id="conditionRow3"
     class="row"
     hidden>
-
- 
 <div class="field">
-
   <label>Analytics</label>
-
   <select id="tp_analytics_3"></select>
-
 </div>
-
-
 <div class="field">
-
   <label>Condition</label>
-
   <select id="tp_condition_3"></select>
-
 </div>
-
-
 <div class="field">
-
   <label>Value</label>
-
   <input
     id="tv_value_3"
     placeholder="Value">
-
 </div>
- 
-
   </div>
-
   <!-- REPEAT / INTERVAL / GROWTH -->
-
   <div class="row">
-
- 
 <div class="field">
-
   <label>Repeat</label>
-
   <input
     id="tp_repeat"
     type="number"
     min="0"
     value="1">
-
 </div>
-
-
 <div class="field">
-
   <label>Interval</label>
-
   <input
     id="tp_interval"
     type="number"
     min="1"
     value="1">
-
 </div>
-
-
 <div class="field">
-
   <label>Growth</label>
-
   <input
     id="tp_growth"
     type="number"
     step="0.1"
     value="1">
-
 </div>
- 
-
   </div>
-
   <!-- CTA -->
-
   <div class="row">
-
- 
 <div class="field">
-
   <label>Button</label>
-
   <select id="tp_cta_active">
-
     <option value="false">
       Disabled
     </option>
-
     <option value="true">
       Enabled
     </option>
-
   </select>
-
 </div>
-
-
 <div class="field">
-
   <label>Button label</label>
-
   <input
     id="tp_cta_label"
     placeholder="e.g. Scopri">
-
 </div>
-
-
 <div class="field">
-
   <label>Link</label>
-
   <input
     id="tp_cta_url"
     placeholder="https://...">
-
 </div>
-
-
   </div>
-
   <!-- TOOLS -->
-
   <div class="tip-tools">
-
- 
 <button
   id="impactBtn"
   class="tool-btn impact-btn"
@@ -611,8 +440,6 @@ textarea {
   title="Estimated Impact">
   ↗
 </button>
-
-
 <button
   id="activeBtn"
   class="tool-btn active-off"
@@ -620,8 +447,6 @@ textarea {
   title="Tip inactive">
   ●
 </button>
-
-
 <button
   id="previewBtn"
   class="tool-btn preview-btn"
@@ -629,24 +454,17 @@ textarea {
   title="Preview Tip">
   ▶
 </button>
- 
-
   </div>
-
   <!-- PROGRESSION -->
-
   <div
     id="progression"
     class="progression">
   </div>
-
   <!-- IMPACT -->
-
   <div
     id="simulation"
     class="simulation">
   </div>
-
 </div>
 
 <script type="module">
