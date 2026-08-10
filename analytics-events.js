@@ -94,78 +94,50 @@ async function updateAnalytics(values){
         data &&
         data.length
     ){
-        const current =
-        data[0];
+        const current = data[0];
         const update = {};
-        if(values.open){
-            update.an_open =
+        if(values.open){ update.an_open =
             current.an_open + 1;
         }
-        if(values.share){
-            update.an_share =
+        if(values.share){ update.an_share =
             current.an_share + 1;
         }
-        if(values.marker){
-            update.an_marker =
+        if(values.marker){ update.an_marker =
             current.an_marker + 1;
         }
-        if(values.map){
-            update.an_map =
+        if(values.map){ update.an_map =
             current.an_map + 1;
         }
-        if(values.buy){
-            update.an_buy =
+        if(values.buy){ update.an_buy =
             current.an_buy + 1;
         }
-        if(values.book){
-            update.an_book =
+        if(values.book){ update.an_book =
             current.an_book + 1;
         }
-        if(values.more){
-            update.an_more =
+        if(values.more){ update.an_more =
             current.an_more + 1;
         }
-        if(values.info){
-            update.an_info =
+        if(values.info){ update.an_info =
             current.an_info + 1;
         }
-        if(
-            values.login === true
-        ){
-            update.an_login =
-            true;
+        if(values.login){ update.an_login =
+            current.an_login+1;
         }
-        if(
-            values.install === true
-        ){
-            update.an_install =
-            true;
+        if(values.install){update.an_install =
+            current.an_install+1;
         }
-        if(
-            values.gps !== undefined
-        ){
-
-            update.an_gps =
-            values.gps;
+        if(values.gps !== undefined){
+        update.an_gps = values.gps;
         }
-        if(
-            values.lat !== undefined &&
-            values.lng !== undefined
-        ){
+        if(values.lat !== undefined && values.lng !== undefined){
             update.an_lat = values.lat;
             update.an_lng = values.lng;
         }
-        if(
-            values.app !== undefined
-        ){
-            update.an_app =
-            values.app;
+        if(values.app !== undefined){
+            update.an_app = values.app;
         }
-        if(
-            values.platform
-        ){
-            update.an_platform =
-            values.platform;
+        if(values.platform){
+            update.an_platform = values.platform;
         }
         await supabase
         .from("analytics")
@@ -183,40 +155,23 @@ async function updateAnalytics(values){
         return;
     }
     const insert = {
-        an_date:
-        date,
-        an_device:
-        device,
-        an_platform:
-        getPlatform(),
-        an_app:
-        getAppMode(),
-        an_install:
-        values.install === true,
-        an_login:
-        values.login === true,
-        an_gps:
-        values.gps ?? null,
-        an_lat:
-        values.lat ?? null,
-        an_lng:
-        values.lng ?? null,
-        an_open:
-        values.open ? 1 : 0,
-        an_share:
-        values.share ? 1 : 0,
-        an_marker:
-        values.marker ? 1 : 0,
-        an_map:
-        values.map ? 1 : 0,
-        an_buy:
-        values.buy ? 1 : 0,
-        an_book:
-        values.book ? 1 : 0,
-        an_more:
-        values.more ? 1 : 0,
-        an_info:
-        values.info ? 1 : 0
+        an_date:date,
+        an_device:device,
+        an_platform:getPlatform(),
+        an_app:getAppMode(),
+        an_install:values.install===true?1:0,
+        an_login:values.login===true?1:0,
+        an_gps:values.gps ?? null,
+        an_lat:values.lat ?? null,
+        an_lng:values.lng ?? null,
+        an_open:values.open ? 1 : 0,
+        an_share:values.share ? 1 : 0,
+        an_marker:values.marker ? 1 : 0,
+        an_map:values.map ? 1 : 0,
+        an_buy:values.buy ? 1 : 0,
+        an_book:values.book ? 1 : 0,
+        an_more:values.more ? 1 : 0,
+        an_info:values.info ? 1 : 0
     };
     await supabase
     .from("analytics")
