@@ -7,7 +7,9 @@ let currentDate=new Date();
 async function loadAnalytics(){
 const from=new Date();
 from.setFullYear(from.getFullYear()-1);
-const {data,error}=await supabase.from("analytics").select(`an_date,an_device,an_platform,an_app,an_install,an_login,an_gps,an_open,an_share,an_more,an_info,an_marker,an_map,an_buy,an_book`).gte("an_date",from.toISOString().split("T")[0]).order("an_date",{ascending:false});
+const {data,error}=await supabase.from("analytics").select(
+`an_date,an_device,an_platform,an_app,an_install,an_login,an_gps,an_open,an_share,an_more,an_info,an_marker,an_map,an_buy,an_book`).gte("an_date",
+from.toISOString().split("T")[0]).order("an_date",{ascending:false});
 if(error){console.error(error);return;}
 rows=data||[];
 const {data:info,error:infoError}=await supabase.from("analytics_info").select("ai_last_update").single();
@@ -113,7 +115,8 @@ return Object.entries(platforms).map(([platform,count])=>({platform,count,percen
 
 // METRIC
 function metric(icon,label,value,text,secondary=""){
-return `<div class="metric"><div class="metric-icon">${icon}</div><div class="metric-label">${label}</div><div class="metric-value">${value}${secondary?`<span class="metric-secondary">${secondary}</span>`:""}</div></div>`;
+return `<div class="metric"><div class="metric-icon">${icon}</div><div class="metric-label">${label}</div><div class="metric-value">${value}${secondary?`
+<span class="metric-secondary">${secondary}</span>`:""}</div></div>`;
 }
 
 // RENDER SECTION
