@@ -66,7 +66,6 @@ info.ai_last_update
 render();
 }
 
-
 // DATE HELPERS
 function cleanDate(d){
 return new Date(
@@ -75,7 +74,6 @@ d.getMonth(),
 d.getDate()
 );
 }
-
 
 // RANGE CALENDARIO
 function getRange(type,date){
@@ -186,7 +184,6 @@ month:"long"
 if(type==="year")
 return date.getFullYear();
 }
-
 
 // STATS
 function stats(data,allData){
@@ -308,7 +305,6 @@ Math.round(
 0
 }));
 }
-
 
 // METRIC
 function metric(icon,label,value,text,secondary=""){
