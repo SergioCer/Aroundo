@@ -6,207 +6,138 @@ import { supabase } from "../supabase.js";
    Visual design is intentionally hardcoded.
    These values are NOT stored in the database.
    ========================================================= */
-
 export const TIP_TYPES = {
-
   bubble: {
     label: "Bubble",
     description: "Friendly contextual suggestion",
-
     position: "bottom-right",
-
     width: "340px",
-
     background: "#eff6ff",
     color: "#172554",
-
     border: "2px solid #60a5fa",
     radius: "28px 28px 28px 8px",
-
     shadow:
       "0 12px 35px rgba(30,64,175,.18)",
-
     fontFamily:
       "Arial, sans-serif",
-
     titleSize: "18px",
     textSize: "14px",
-
     padding: "22px",
-
     overlay: false,
     acknowledge: true,
-
     shape: "bubble"
   },
-
 
   modal: {
     label: "Modal",
     description: "Important information requiring attention",
-
     position: "center",
-
     width: "460px",
-
     background: "#ffffff",
     color: "#111827",
-
     border: "3px solid #6366f1",
     radius: "42px",
-
     shadow:
       "0 25px 70px rgba(31,41,55,.28)",
-
     fontFamily:
       "Georgia, 'Times New Roman', serif",
-
     titleSize: "24px",
     textSize: "16px",
-
     padding: "34px",
-
     overlay: true,
     acknowledge: true,
-
     shape: "modal"
   },
-
 
   banner: {
     label: "Banner",
     description: "General announcement",
-
     position: "top-center",
-
     width: "100%",
-
     background: "#fef3c7",
     color: "#78350f",
-
     border: "0",
     borderBottom: "4px solid #f59e0b",
     radius: "0",
-
     shadow:
       "0 6px 20px rgba(120,53,15,.16)",
-
     fontFamily:
       "Arial, sans-serif",
-
     titleSize: "17px",
     textSize: "14px",
-
     padding: "16px 28px",
-
     overlay: false,
     acknowledge: true,
-
     shape: "banner"
   },
-
 
   toast: {
     label: "Toast",
     description: "Quick feedback or short message",
-
     position: "bottom-center",
-
     width: "290px",
-
     background: "#111827",
     color: "#ffffff",
-
     border: "none",
     radius: "8px",
-
     shadow:
       "0 14px 35px rgba(0,0,0,.28)",
-
     fontFamily:
       "'Trebuchet MS', Arial, sans-serif",
-
     titleSize: "17px",
     textSize: "15px",
-
     padding: "17px",
-
     overlay: false,
     acknowledge: true,
-
     shape: "toast"
   },
-
 
   card: {
     label: "Card",
     description: "Detailed informational message",
-
     position: "center-right",
-
     width: "370px",
-
     background: "#ffffff",
     color: "#1f2937",
-
     border: "1px solid #d1d5db",
     radius: "6px",
-
     shadow:
       "8px 12px 35px rgba(0,0,0,.14)",
-
     fontFamily:
       "'Segoe UI', Arial, sans-serif",
-
     titleSize: "20px",
     textSize: "14px",
-
     padding: "26px",
-
     overlay: false,
     acknowledge: true,
-
     shape: "card"
   },
-
 
   floating: {
     label: "Floating",
     description: "Friendly, unobtrusive message",
-
     position: "bottom-left",
-
     width: "310px",
-
     background: "#f0fdf4",
     color: "#166534",
-
     border: "2px solid #86efac",
     radius: "34px 34px 12px 34px",
-
     shadow:
       "0 14px 38px rgba(22,101,52,.16)",
-
     fontFamily:
       "'Trebuchet MS', Arial, sans-serif",
-
     titleSize: "19px",
     textSize: "14px",
-
     padding: "23px",
-
     overlay: false,
     acknowledge: true,
-
     shape: "floating"
   }
-
 };
 
 /* =========================================================
    ICONS
    ========================================================= */
-
 export const TIP_ICONS = [
    "👋",
    "🎉",
@@ -221,138 +152,109 @@ export const TIP_ICONS = [
    "⚠️"
 ];
 
-
 /* =========================================================
    ANALYTICS
    ========================================================= */
-
 export const ANALYTICS_FIELDS = {
-
   an_open: {
     type: "number",
     label: "Open",
     description:
       "Number of times Aroundo has been opened."
   },
-
   an_login: {
     type: "boolean",
     label: "Login",
     description:
       "Whether the user is logged in."
   },
-
   an_install: {
     type: "boolean",
     label: "Install",
     description:
       "Whether Aroundo has been installed."
   },
-
   an_share: {
     type: "number",
     label: "Share",
     description:
       "Number of sharing actions."
   },
-
   an_more: {
     type: "number",
     label: "More",
     description:
       "Number of times the More action has been used."
   },
-
   an_info: {
     type: "number",
     label: "Info",
     description:
       "Number of times event information has been opened."
   },
-
   an_marker: {
     type: "number",
     label: "Marker",
     description:
       "Number of event markers selected."
   },
-
   an_map: {
     type: "number",
     label: "Map",
     description:
       "Number of times the map has been opened."
   },
-
   an_buy: {
     type: "number",
     label: "Buy",
     description:
       "Number of purchase actions."
   },
-
   an_book: {
     type: "number",
     label: "Book",
     description:
       "Number of booking actions."
   },
-
   an_gps: {
     type: "boolean",
     label: "GPS",
     description:
       "Whether location access is enabled."
   }
-
 };
-
 
 /* =========================================================
    HELPERS
    ========================================================= */
-
 export function getAnalyticsFields() {
-
   return Object.entries(ANALYTICS_FIELDS)
     .map(([value, data]) => ({
       value,
       ...data
     }));
-
 }
-
-
 export function getTipTypes() {
-
   return Object.entries(TIP_TYPES)
     .map(([value, data]) => ({
       value,
       ...data
     }));
-
 }
-
-
 export function getConditions(type) {
-
   return type === "boolean"
     ? ["=", "!="]
     : [">", ">=", "=", "<=", "<", "!="];
-
 }
-
 
 /* =========================================================
    CONDITION EVALUATION
    ========================================================= */
-
 export function evaluateCondition(
   actual,
   condition,
   expected
 ) {
-
   if (
     actual === null ||
     actual === undefined ||
@@ -361,76 +263,52 @@ export function evaluateCondition(
   ) {
     return null;
   }
-
-  /*
-   * BOOLEAN
-   */
-
+  /* BOOLEAN */
   if (typeof actual === "boolean") {
-
     const value =
       String(expected).toLowerCase();
-
     if (
       value !== "true" &&
       value !== "false"
     ) {
       return null;
     }
-
     const target =
       value === "true";
-
     if (condition === "=")
       return actual === target;
-
     if (condition === "!=")
       return actual !== target;
-
     return null;
   }
 
-
-  /*
-   * NUMBER
-   */
-
+  /* NUMBER */
   const a = Number(actual);
   const b = Number(expected);
-
   if (
     !Number.isFinite(a) ||
     !Number.isFinite(b)
   ) {
     return null;
   }
-
   if (condition === ">")
     return a > b;
-
   if (condition === ">=")
     return a >= b;
-
   if (condition === "=")
     return a === b;
-
   if (condition === "<")
     return a < b;
-
   if (condition === "<=")
     return a <= b;
-
   if (condition === "!=")
     return a !== b;
-
   return null;
 }
-
 
 /* =========================================================
    LOGIC
    ========================================================= */
-
 /*
  * Logic connects the PREVIOUS condition
  * with the CURRENT condition.
@@ -444,137 +322,101 @@ export function evaluateCondition(
  * NOT:
  * the current condition is negated
  */
-
 export function evaluateLogic(
   previous,
   current,
   logic
 ) {
-
   if (
     previous === null ||
     current === null
   ) {
     return null;
   }
-
   if (logic === "AND")
     return previous && current;
-
   if (logic === "OR")
     return previous || current;
-
   if (logic === "NOT")
     return previous && !current;
-
   return current;
 }
-
 
 /* =========================================================
    PROGRESSION
    ========================================================= */
-
 export function calculateProgression(
   interval,
   growth,
   repeat
 ) {
-
   interval = Number(interval);
   growth = Number(growth);
   repeat = Number(repeat);
-
   if (!Number.isFinite(interval))
     interval = 1;
-
   if (!Number.isFinite(growth))
     growth = 1;
-
   const limit =
     repeat === 0
       ? 10
       : Math.min(repeat, 10);
-
   const result = [];
-
   let total = 0;
-
   for (
     let show = 0;
     show < limit;
     show++
   ) {
-
     let increment =
       Math.floor(
         interval *
         (show + 1) *
         growth
       );
-
     if (increment < 1)
       increment = 1;
-
     total += increment;
-
     result.push(total);
   }
-
   return result;
 }
-
 
 /* =========================================================
    DEFAULT TIP
    ========================================================= */
-
 export function defaultTip() {
-
   return {
-
     id_tips: "",
-
     tp_type: "bubble",
-
     tp_icon: "⭐",
     tp_title: "",
     tp_text: "",
-
     tp_analytics_1: "an_open",
     tp_condition_1: ">=",
     tv_value_1: "",
     tp_logic_1: "",
-
     tp_analytics_2: "",
     tp_condition_2: ">=",
     tv_value_2: "",
     tp_logic_2: "",
-
     tp_analytics_3: "",
     tp_condition_3: ">=",
     tv_value_3: "",
-
     tp_repeat: 1,
     tp_interval: 1,
     tp_growth: 1,
-
     tp_cta_active: false,
     tp_cta_label: "",
     tp_cta_url: "",
-
     tp_active: false
   };
-
 }
-
 
 /* =========================================================
    LOAD
    ========================================================= */
-
 export async function loadTip(id) {
-
   const {
     data,
     error
@@ -583,20 +425,15 @@ export async function loadTip(id) {
     .select("*")
     .eq("id_tips", id)
     .single();
-
   if (error)
     throw error;
-
   return data;
 }
-
 
 /* =========================================================
    SAVE
    ========================================================= */
-
 export async function saveTip(tip) {
-
   const {
     data,
     error
@@ -605,27 +442,20 @@ export async function saveTip(tip) {
     .upsert(tip)
     .select()
     .single();
-
   if (error)
     throw error;
-
   return data;
 }
-
 export async function simulateTip(tip) {
-
   const rows = await supabase
     .from("analytics")
     .select("*")
     .order("an_date", {
       ascending: false
     });
-
   if (rows.error)
     throw rows.error;
-
   const data = rows.data || [];
-
   /* Ultimo record disponibile per dispositivo. */
   const latest =
     new Map();
@@ -635,7 +465,6 @@ export async function simulateTip(tip) {
     if (!latest.has(row.an_device))
       latest.set(row.an_device, row);
   });
-
   /* Costruzione condizioni. */
   const conditions = [];
   for (let i = 1; i <= 3; i++) {
@@ -736,7 +565,6 @@ export async function simulateTip(tip) {
   };
 }
 
-
 /* RENDER TIP */
 export function renderTip(tip) {
   const model =
@@ -746,196 +574,134 @@ export function renderTip(tip) {
   /* OVERLAY */
   const overlay =
     document.createElement("div");
-
   const vertical =
     model.position.includes("top")
       ? "flex-start"
       : model.position.includes("bottom")
         ? "flex-end"
         : "center";
-
   const horizontal =
     model.position.includes("left")
       ? "flex-start"
       : model.position.includes("right")
         ? "flex-end"
         : "center";
-
-
   overlay.style.cssText = `
     position:fixed;
     inset:0;
     z-index:99999;
-
     display:flex;
     align-items:${vertical};
     justify-content:${horizontal};
-
     padding:${model.shape === "banner"
       ? "0"
       : "20px"};
-
     box-sizing:border-box;
-
     pointer-events:none;
-
     background:${model.overlay
       ? "rgba(15,23,42,.48)"
       : "transparent"};
-
     animation:aroundoTipIn .22s ease-out;
   `;
 
   /* BOX */
   const box =
     document.createElement("div");
-
-
   box.style.cssText = `
     width:${model.width};
     max-width:calc(100vw - 40px);
-
     box-sizing:border-box;
-
     padding:${model.padding};
-
     background:${model.background};
     color:${model.color};
-
     border:${model.border};
     ${model.borderBottom
       ? `border-bottom:${model.borderBottom};`
       : ""}
-
     border-radius:${model.radius};
-
     box-shadow:${model.shadow};
-
     font-family:${model.fontFamily};
-
     position:relative;
-
     pointer-events:auto;
-
     overflow:hidden;
   `;
 
   /* -------------------------------------------------------
      BUBBLE TAIL
      ------------------------------------------------------- */
-
   if (model.shape === "bubble") {
-
     const tail =
       document.createElement("div");
-
     tail.style.cssText = `
       position:absolute;
       bottom:-1px;
       left:-1px;
-
       width:26px;
       height:26px;
-
       background:${model.background};
-
       border-left:${model.border};
       border-bottom:${model.border};
-
       transform:skewY(-35deg);
       transform-origin:bottom left;
     `;
-
     box.appendChild(tail);
   }
-
-  
 
   /* -------------------------------------------------------
      FLOATING DECORATION
      ------------------------------------------------------- */
-
   if (model.shape === "floating") {
-
     const glow =
       document.createElement("div");
-
     glow.style.cssText = `
       position:absolute;
       width:90px;
       height:90px;
-
       top:-45px;
       right:-35px;
-
       border-radius:50%;
-
       background:#bbf7d0;
-
       opacity:.45;
-
       pointer-events:none;
     `;
-
     box.appendChild(glow);
   }
-
-  
 
   /* -------------------------------------------------------
      CARD ACCENT
      ------------------------------------------------------- */
-
   if (model.shape === "card") {
-
     const accent =
       document.createElement("div");
-
     accent.style.cssText = `
       position:absolute;
-
       left:0;
       top:0;
       bottom:0;
-
       width:5px;
-
       background:#6366f1;
     `;
-
     box.appendChild(accent);
   }
-
   
   /* HEADER */
   if (tip.tp_icon || tip.tp_title) {
-
     const header =
       document.createElement("div");
-
-
     header.style.cssText = `
       display:flex;
       align-items:center;
-
       gap:${model.shape === "modal"
         ? "14px"
         : "10px"};
-
       margin-bottom:
         ${tip.tp_text ? "13px" : "0"};
     `;
-
-
     if (tip.tp_icon) {
-
       const icon =
         document.createElement("span");
-
       icon.textContent =
         tip.tp_icon;
-
-
       icon.style.cssText = `
         font-size:
           ${model.shape === "toast"
@@ -943,102 +709,67 @@ export function renderTip(tip) {
             : model.shape === "modal"
               ? "30px"
               : "24px"};
-
         line-height:1;
-
         flex:none;
       `;
-
       header.appendChild(icon);
     }
-
-
     if (tip.tp_title) {
-
       const title =
         document.createElement("div");
-
       title.textContent =
         tip.tp_title;
-
-
       title.style.cssText = `
         font-size:${model.titleSize};
         font-weight:
           ${model.shape === "modal"
             ? "700"
             : "600"};
-
         line-height:1.2;
-
         letter-spacing:
           ${model.shape === "toast"
             ? ".2px"
             : "0"};
-
         flex:1;
       `;
-
-
       header.appendChild(title);
     }
-
-
     box.appendChild(header);
   }
 
   /* TEXT */
-
   if (tip.tp_text) {
-
     const content =
       document.createElement("div");
-
-
     content.textContent =
       tip.tp_text;
-
-
     content.style.cssText = `
       font-size:${model.textSize};
-
       line-height:
         ${model.shape === "toast"
           ? "1.35"
           : "1.55"};
-
       white-space:pre-wrap;
-
       ${model.shape === "modal"
         ? "text-align:center;"
         : ""}
-
       ${model.shape === "banner"
         ? "max-width:1100px;"
         : ""}
     `;
-
-
     box.appendChild(content);
   }
 
-  /* ACTIONS */
+   /* ACTIONS */
   if (model.acknowledge) {
-
     const actions =
       document.createElement("div");
-
-
     actions.style.cssText = `
       display:flex;
-
       justify-content:flex-end;
       align-items:center;
-
       gap:10px;
-
       margin-top:20px;
-
       ${model.shape === "modal"
         ? "justify-content:center;"
         : ""}
@@ -1047,19 +778,13 @@ export function renderTip(tip) {
     /* -----------------------------------------------------
        GOT IT / DON'T REMIND ME
        ----------------------------------------------------- */
-
     if (
       Number(tip.tp_repeat) !== 1
     ) {
-
       const remind =
         document.createElement("button");
-
-
       remind.type =
         "button";
-
-
       remind.innerHTML = `
         <span
           style="
@@ -1069,7 +794,6 @@ export function renderTip(tip) {
         >
           Got it
         </span>
-
         <span
           class="aroundo-remind-label"
           style="
@@ -1082,243 +806,151 @@ export function renderTip(tip) {
           Don't remind me
         </span>
       `;
-
-
       remind.style.cssText = `
         border:none;
         background:transparent;
-
         color:${model.color};
-
         padding:4px 6px;
-
         cursor:pointer;
-
         font-family:inherit;
-
         font-size:12px;
         font-weight:600;
-
         text-align:center;
-
         opacity:.82;
-
         transition:
           opacity .15s ease,
           transform .15s ease;
       `;
-
-
       let dontRemind =
         false;
-
-
       remind.onclick = () => {
-
         dontRemind =
           !dontRemind;
-
-
         const label =
           remind.querySelector(
             ".aroundo-remind-label"
           );
-
-
         if (dontRemind) {
-
           label.style.textDecoration =
             "line-through";
-
           remind.style.opacity =
             "1";
-
         } else {
-
           label.style.textDecoration =
             "none";
-
           remind.style.opacity =
             ".82";
         }
-
       };
-
-
       actions.appendChild(remind);
     }
 
-  /* CTA */
+   /* CTA */
   if (
     tip.tp_cta_active &&
     tip.tp_cta_label
   ) {
-
     const cta =
       document.createElement("a");
-
-
     cta.textContent =
       tip.tp_cta_label;
-
-
     cta.href =
       tip.tp_cta_url || "#";
-
-
     cta.target =
       "_blank";
-
     cta.rel =
       "noopener";
-
-
     cta.style.cssText = `
       display:inline-flex;
-
       align-items:center;
       justify-content:center;
-
       margin-top:18px;
-
       padding:9px 18px;
-
       border-radius:18px;
-
       background:#9333ea;
       color:#ffffff;
-
       text-decoration:none;
-
       font-weight:600;
       font-size:13px;
-
       transition:
         transform .15s ease,
         background .15s ease;
     `;
-
-
     cta.onmouseenter =
       () => {
         cta.style.background =
           "#7e22ce";
-
         cta.style.transform =
           "translateY(-1px)";
       };
-
-
     cta.onmouseleave =
       () => {
         cta.style.background =
           "#9333ea";
-
         cta.style.transform =
           "translateY(0)";
       };
-
-
     box.appendChild(cta);
   }
-
 
   /* OK */
     const ok =
       document.createElement("button");
-
-
     ok.type =
       "button";
-
-
     ok.textContent =
       "OK";
-
-
     ok.style.cssText = `
       border:none;
-
       border-radius:18px;
-
       padding:9px 20px;
-
       background:#22c55e;
       color:white;
-
       font-family:inherit;
-
       font-weight:700;
       font-size:13px;
-
       cursor:pointer;
-
       transition:
         transform .15s ease,
         background .15s ease;
     `;
-
-
     ok.onmouseenter =
       () => {
-
         ok.style.background =
           "#16a34a";
-
         ok.style.transform =
           "translateY(-1px)";
       };
-
-
     ok.onmouseleave =
       () => {
-
         ok.style.background =
           "#22c55e";
-
         ok.style.transform =
           "translateY(0)";
       };
-
-
     ok.onclick =
       () => {
-
         overlay.remove();
       };
-
-
     actions.appendChild(ok);
-
-
     box.appendChild(actions);
   }
 
   /* -------------------------------------------------------
      BANNER LAYOUT
      ------------------------------------------------------- */
-
   if (model.shape === "banner") {
-
     box.style.display =
       "flex";
-
     box.style.alignItems =
       "center";
-
     box.style.gap =
       "24px";
-
     box.style.borderRadius =
       "0";
-
-
     const children =
       [...box.children];
-
-
     children.forEach(child => {
-
       if (
         child.style &&
         child.style.marginBottom
@@ -1328,61 +960,42 @@ export function renderTip(tip) {
       }
     });
   }
-
-
   overlay.appendChild(box);
-
   document.body.appendChild(
     overlay
   );
 
-
   /* -------------------------------------------------------
      ANIMATION
      ------------------------------------------------------- */
-
   if (
     !document.getElementById(
       "aroundo-tip-animation"
     )
   ) {
-
     const style =
       document.createElement("style");
-
-
     style.id =
       "aroundo-tip-animation";
-
-
     style.textContent = `
-
       @keyframes aroundoTipIn {
-
         from {
           opacity:0;
           transform:
             translateY(8px)
             scale(.98);
         }
-
         to {
           opacity:1;
           transform:
             translateY(0)
             scale(1);
         }
-
       }
-
     `;
-
-
     document.head.appendChild(
       style
     );
   }
-
-
   return overlay;
 }
