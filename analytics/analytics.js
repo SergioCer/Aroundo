@@ -114,9 +114,11 @@ return Object.entries(platforms).map(([platform,count])=>({platform,count,percen
 }
 
 // METRIC
-function metric(icon,label,value,text,secondary=""){
-return `<div class="metric"><div class="metric-icon">${icon}</div><div class="metric-label">${label}</div><div class="metric-value">${value}${secondary?`
-<span class="metric-secondary">${secondary}</span>`:""}</div></div>`;
+function metric(icon,label,value,text,secondary=""){return`
+<div class="metric" title="${text}">
+<div class="metric-icon">${icon}</div>
+<div class="metric-label">${label}</div>
+<div class="metric-value">${value}${secondary?`<span class="metric-secondary"> (${secondary})</span>`:""}</div></div>`;
 }
 
 // RENDER SECTION
