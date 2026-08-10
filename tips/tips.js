@@ -584,49 +584,31 @@ export async function simulateTip(tip) {
 
   const data = rows.data || [];
 
-  /*
-   * Ultimo record disponibile per dispositivo.
-   */
+  /* Ultimo record disponibile per dispositivo. */
   const latest =
     new Map();
-
   data.forEach(row => {
-
     if (!row.an_device)
       return;
-
     if (!latest.has(row.an_device))
       latest.set(row.an_device, row);
-
   });
 
-
-  /*
-   * Costruzione condizioni.
-   */
-
+  /* Costruzione condizioni. */
   const conditions = [];
-
   for (let i = 1; i <= 3; i++) {
-
     const analytics =
       tip[`tp_analytics_${i}`];
-
     if (!analytics)
       continue;
-
     const condition =
       tip[`tp_condition_${i}`];
-
     const value =
       tip[`tv_value_${i}`];
-
     const field =
       ANALYTICS_FIELDS[analytics];
-
     if (!field)
       continue;
-
     conditions.push({
       analytics,
       condition,
@@ -637,41 +619,28 @@ export async function simulateTip(tip) {
           : ""
     });
   }
-
-
   let involved = 0;
   let excluded = 0;
   let missing = 0;
-
   const detail = [];
-
-
   latest.forEach(row => {
-
     let result = null;
-
     for (
       let i = 0;
       i < conditions.length;
       i++
     ) {
-
       const item =
         conditions[i];
-
       const current =
         evaluateCondition(
           row[item.analytics],
           item.condition,
           item.value
         );
-
       if (i === 0) {
-
         result = current;
-
       } else {
-
         result =
           evaluateLogic(
             result,
@@ -679,108 +648,67 @@ export async function simulateTip(tip) {
             item.logic
           );
       }
-
     }
-
-
     if (result === true) {
-
       involved++;
-
     } else if (result === false) {
-
       excluded++;
-
     } else {
-
       missing++;
-
     }
-
   });
-
-
   const total =
     latest.size;
-
-
-  /*
-   * Testo descrittivo delle condizioni.
-   * Utile per l'Impact parlante.
-   */
-
+  
+  /* Testo descrittivo delle condizioni. Utile per l'Impact parlante. */
   conditions.forEach((item, index) => {
-
     const field =
       ANALYTICS_FIELDS[item.analytics];
-
     detail.push({
-
       logic:
         index === 0
           ? ""
           : item.logic,
-
       label:
         field
           ? field.label
           : item.analytics,
-
       condition:
         item.condition,
-
       value:
         item.value
-
     });
-
   });
-
-
   return {
-
     total,
     involved,
     excluded,
     missing,
-
     percent:
       total
         ? Math.round(
             involved / total * 100
           )
         : 0,
-
     detail
   };
 }
 
 
-/* =========================================================
-   RENDER TIP
-   ========================================================= */
-
+/* RENDER TIP */
 export function renderTip(tip) {
-
   const model =
     TIP_TYPES[tip.tp_type] ||
     TIP_TYPES.bubble;
 
-
-  /*
-   * OVERLAY
-   */
-
+  /* OVERLAY */
   const overlay =
     document.createElement("div");
-
   overlay.style.cssText = `
     position: fixed;
     inset: 0;
     z-index: 99999;
-
     display: flex;
-
     align-items: ${
       model.position.includes("top")
         ? "flex-start"
@@ -788,7 +716,6 @@ export function renderTip(tip) {
           ? "flex-end"
           : "center"
     };
-
     justify-content: ${
       model.position.includes("left")
         ? "flex-start"
@@ -796,276 +723,208 @@ export function renderTip(tip) {
           ? "flex-end"
           : "center"
     };
-
     padding: 20px;
     box-sizing: border-box;
-
     pointer-events: none;
   `;
-
-
   if (model.overlay) {
-
     overlay.style.background =
       "rgba(0,0,0,.35)";
   }
 
-
-  /*
-   * BOX
-   */
-
+  /* BOX */
   const box =
     document.createElement("div");
-
   box.style.cssText = `
     width: ${model.width};
     max-width: calc(100vw - 40px);
-
     box-sizing: border-box;
-
     padding: 20px;
-
     background: ${model.background};
     color: ${model.color};
-
     border: ${model.border};
     border-radius: ${model.radius};
-
     box-shadow: ${model.shadow};
-
     font-family: Arial, sans-serif;
-
     pointer-events: auto;
     position: relative;
   `;
 
-
-  /*
-   * HEADER
-   */
-
+  /* HEADER */
   if (
     tip.tp_icon ||
     tip.tp_title
   ) {
-
     const header =
       document.createElement("div");
-
     header.style.cssText = `
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 12px;
     `;
-
-
     if (tip.tp_icon) {
-
       const icon =
         document.createElement("span");
-
       icon.textContent =
         tip.tp_icon;
-
       icon.style.cssText = `
         font-size: 24px;
         line-height: 1;
       `;
-
       header.appendChild(icon);
     }
-
-
     if (tip.tp_title) {
-
       const title =
         document.createElement("div");
-
       title.textContent =
         tip.tp_title;
-
       title.style.cssText = `
         font-size: 18px;
         font-weight: bold;
         line-height: 1.2;
       `;
-
       header.appendChild(title);
     }
-
-
     box.appendChild(header);
   }
 
-
-  /*
-   * TEXT
-   */
-
+  /* TEXT */
   const content =
     document.createElement("div");
-
   content.textContent =
     tip.tp_text ||
     "Tip preview";
-
   content.style.cssText = `
     line-height: 1.5;
     white-space: pre-wrap;
   `;
-
   box.appendChild(content);
 
-
-  /*
-   * CTA
-   */
-
+  /* CTA */
   if (
     tip.tp_cta_active &&
     tip.tp_cta_label
   ) {
-
     const cta =
       document.createElement("a");
-
     cta.textContent =
       tip.tp_cta_label;
-
     cta.href =
       tip.tp_cta_url || "#";
-
     cta.target = "_blank";
     cta.rel = "noopener";
-
     cta.style.cssText = `
       display: inline-block;
-
       margin-top: 16px;
-
       padding: 9px 18px;
-
       border-radius: 17px;
-
       background: #9333ea;
       color: white;
-
       text-decoration: none;
-
       font-weight: bold;
       font-size: 13px;
     `;
-
     box.appendChild(cta);
   }
 
+  /* ACTIONS */
+if (model.acknowledge) {
+  const actions =
+    document.createElement("div");
+  actions.style.cssText = `
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:10px;
+    margin-top:20px;
+  `;
 
-  /*
-   * ACTIONS
-   */
-
-  if (model.acknowledge) {
-
-    const actions =
-      document.createElement("div");
-
-    actions.style.cssText = `
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 12px;
-      margin-top: 18px;
+  /* DON'T SHOW MORE */
+  if (Number(tip.tp_repeat) !== 1) {
+    const hide =
+      document.createElement("label");
+    hide.style.cssText = `
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      cursor:pointer;
+      margin-right:auto;
+      opacity:.85;
     `;
-
-
-    /*
-     * DON'T SHOW MORE
-     *
-     * Non ha senso con repeat = 1.
-     */
-
-    if (
-      Number(tip.tp_repeat) !== 1
-    ) {
-
-      const hide =
-        document.createElement("label");
-
-      hide.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        font-size: 12px;
-
-        cursor: pointer;
-
-        margin-right: auto;
-      `;
-
-
-      const checkbox =
-        document.createElement("input");
-
-      checkbox.type = "checkbox";
-
-
-      const hideText =
-        document.createElement("span");
-
-      hideText.textContent =
-        "Don't show more";
-
-
-      hide.append(
-        checkbox,
-        hideText
-      );
-
-      actions.appendChild(hide);
-    }
-
-
-    /*
-     * OK
-     */
-
-    const ok =
-      document.createElement("button");
-
-    ok.textContent = "OK";
-
-    ok.style.cssText = `
-      border: none;
-
-      border-radius: 17px;
-
-      padding: 8px 18px;
-
-      background: #22c55e;
-      color: white;
-
-      font-weight: bold;
-
-      cursor: pointer;
-    `;
-
-
-    ok.onclick = () =>
-      overlay.remove();
-
-
-    actions.appendChild(ok);
-
-    box.appendChild(actions);
+    const checkbox =
+      document.createElement("input");
+    checkbox.type = "checkbox";
+    const hideText =
+      document.createElement("span");
+    hideText.textContent =
+      "Don't show more";
+    hide.append(
+      checkbox,
+      hideText
+    );
+    actions.appendChild(hide);
   }
 
+  /* CTA */
+  if (
+    tip.tp_cta_active &&
+    tip.tp_cta_label
+  ) {
+    const cta =
+      document.createElement("a");
+    cta.textContent =
+      tip.tp_cta_label;
+    cta.href =
+      tip.tp_cta_url || "#";
+    cta.target =
+      "_blank";
+    cta.rel =
+      "noopener";
+    cta.style.cssText = `
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 17px;
+      border-radius:${model.button.radius};
+      background:${model.button.background};
+      color:${model.button.color};
+      border:${model.button.border};
+      text-decoration:none;
+      font-weight:bold;
+      font-size:13px;
+      box-sizing:border-box;
+      cursor:pointer;
+    `;
+    actions.appendChild(cta);
+  }
 
+  /* OK */
+  const ok =
+    document.createElement("button");
+  ok.textContent =
+    "OK";
+  ok.style.cssText = `
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 17px;
+    border-radius:${model.closeButton.radius};
+    background:${model.closeButton.background};
+    color:${model.closeButton.color};
+    border:${model.closeButton.border};
+    font-weight:bold;
+    font-size:13px;
+    box-sizing:border-box;
+    cursor:pointer;
+  `;
+  ok.onclick = () =>
+    overlay.remove();
+  actions.appendChild(ok);
+  box.appendChild(actions);
+}
   overlay.appendChild(box);
-
   document.body.appendChild(overlay);
-
   return overlay;
 }
