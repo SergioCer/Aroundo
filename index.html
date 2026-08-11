@@ -66,7 +66,6 @@
     /* Titolo */
     .title {
       font-size: 22px;
-      font-size: 22px;
       color: #3b82f6;
       letter-spacing: 1px;
       font-weight: bold;
@@ -648,9 +647,9 @@
     /* Pulsante base */
     .action-btn {
       min-width: 48px;
-      display: inline-flex;       /* ⭐ fondamentale */
-      justify-content: center;    /* ⭐ centra orizzontale */
-      align-items: center;        /* ⭐ centra verticale */
+      /* display: inline-flex;      CANCELLARE /* ⭐ fondamentale */
+      /* justify-content: center;   CANCELLARE /* ⭐ centra orizzontale */
+      /* align-items: center;       CANCELLARE /* ⭐ centra verticale */
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 11px;
@@ -984,7 +983,7 @@ OK
   window.analyticsBuy = analyticsBuy;
   window.analyticsBook = analyticsBook;
   let categories = [];
-  let icons = {};
+  // CANCELLARE let icons = {};
   let events = [];
   let markers = [];
   let timelineMode = 'live'; // Modalità della timeline 'past' | 'live' | 'day'
@@ -1088,26 +1087,31 @@ OK
    window.addEventListener('resize', resizeCanvas);
    map.on('move zoom resize', resizeCanvas);
 
-    // Aggiorna ogni 2 minuti
-    setInterval(renderEvents, 120000);
-    // Preleva nuovamente eventi ogni 10 minuti
-    setInterval(async () => { const data = await fetchEvents(); if (data) { events = data; renderEvents(); } }, 10 * 60 * 1000);
+  // Aggiorna lo stato visivo dei marker ogni 2 minuti
+  setInterval(renderEvents, 2 * 60 * 1000);
+
+  // Ricarica gli eventi da Supabase ogni 10 minuti
+  setInterval(async () => {const data = await fetchEvents();
+      if (data) {events = data;
+      renderEvents();
+    }
+  }, 10 * 60 * 1000);
 
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. prende le categorie con relative icone e colori
   categories = await fetchCategories();
-  icons = {};
-  categories.forEach(cat => {
-  icons[cat.id_categoria] = createIcon(cat.mc_colore);
-  });
+  // CANCELLARE icons = {};
+  // CANCELLARE categories.forEach(cat => {
+  // CANCELLARE icons[cat.id_categoria] = createIcon(cat.mc_colore);
+  // CANCELLARE });
   events = await fetchEvents();
   // 3. Crea il menu Categorie
   buildCategoryMenu();
   // 4. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
   // 5. Verifica se Geolocalizzazione Attiva o Disattiva
-  checkGeoStatus()
+  checkGeoStatus();
   setupTimeline();
   renderEvents();
   updateDateUI();
@@ -1366,7 +1370,7 @@ function requestUserLocation() {
           category: parseInt(e.id_categoria),
           start: new Date(e.ev_inizio),
           end: e.ev_fine ? new Date(e.ev_fine) : null,
-          active: e.ev_attivo
+          // CANCELLARE active: e.ev_attivo
         });
       });
         updateMarkerVisibility();
@@ -1383,7 +1387,7 @@ oms.addListener('click', function (marker) {
 });
 
     // Dimensione dei Markers  
-    function createIcon(color, state, intensity) {
+    function createIcon(color, state) {
       const size = markerSizes[state] || 10;
       return L.divIcon({
       className: '',
@@ -2260,36 +2264,32 @@ if (state !== 'countdown' && marker.fireworkInterval) {
 
 const overlay = document.getElementById('mapOverlay');
 const toggle = document.getElementById('overlayToggle');
-let timeout = 3 * 1000; // 3 secondi tempo di chiusura popup del login
 
-// chiusura overlay
+//// Gestione Overlay
+let timeout = 3 * 1000; // dopo 3 secondi minimizza l'Overlay 'minimizeOverlay()'
+// Chiusura
 function minimizeOverlay() {
   overlay.classList.add('minimized');
   toggle.style.display = 'flex';
 }
-
-// apertura overlay
+// Apertura
 function openOverlay() {
   overlay.classList.remove('minimized');
   toggle.style.display = 'none';
 }
-
 // click fuori → chiude
 document.addEventListener('click', (e) => {
   if (!overlay.contains(e.target) && !toggle.contains(e.target) && !overlay.classList.contains('minimized')) {
     minimizeOverlay();
   }
 });
-
 // evita chiusura cliccando dentro
 overlay.addEventListener('click', (e) => {
   e.stopPropagation();
 });
-
 // click icona → riapre
 toggle.addEventListener('click', openOverlay);
-
-// timer 30 minuti
+// Minimizza l'overlay dopo 3 secondi
 setTimeout(() => { minimizeOverlay(); }, timeout);
 
 // per il service-worker.js
