@@ -298,96 +298,57 @@ async function updateAnalytics(values){
 
 /* EVENTS */
 export function analyticsOpen(){
-  return updateAnalytics({
-    open:true
-  });
+  return updateAnalytics({open:true});
 }
 
 export function analyticsShare(){
-  return updateAnalytics({
-    share:true,
-    entrance:"share"
-  });
+  return updateAnalytics({share:true});
 }
 
 export function analyticsMarker(){
-  return updateAnalytics({
-    marker:true
-  });
+  return updateAnalytics({marker:true});
 }
 
 export function analyticsMap(){
-  return updateAnalytics({
-    map:true
-  });
+  return updateAnalytics({map:true});
 }
 
 export function analyticsBuy(){
-  return updateAnalytics({
-    buy:true
-  });
+  return updateAnalytics({buy:true});
 }
 
 export function analyticsBook(){
-  return updateAnalytics({
-    book:true
-  });
+  return updateAnalytics({book:true});
 }
 
 export function analyticsMore(){
-  return updateAnalytics({
-    more:true
-  });
+  return updateAnalytics({more:true});
 }
 
 export function analyticsInfo(){
-  return updateAnalytics({
-    info:true
-  });
+  return updateAnalytics({info:true});
 }
 
 export function analyticsLogin(){
-  return updateAnalytics({
-    login:true
-  });
+  return updateAnalytics({login:true});
 }
 
 export function analyticsInstall(){
-  return updateAnalytics({
-    install:true
-  });
+  return updateAnalytics({install:true});
 }
 
 export function analyticsGPS(value){
-  return updateAnalytics({
-    gps:value
-  });
+  return updateAnalytics({gps:value});
 }
 
-export function analyticsLocation(
-  lat,
-  lng
-){
-  return updateAnalytics({
-    lat:
-      Number(
-        lat.toFixed(2)
-      ),
-    lng:
-      Number(
-        lng.toFixed(2)
-      )
-  });
+export function analyticsLocation(lat,lng){
+  return updateAnalytics({lat: Number(lat.toFixed(2)),
+    lng: Number(lng.toFixed(2))});
 }
 
 /* ENTRANCE */
-export function analyticsEntrance(
-  source
-){
-  return updateAnalytics({
-    entrance:
-      source || null
-  });
+export function analyticsEntrance(source){
+  return updateAnalytics({entrance: source || null});
 }
 
 /*
