@@ -1497,7 +1497,11 @@ oms.addListener('click', function (marker) {
     });
  }
                                                          
-  /* GESTIONE TIMELINE */ 
+  /* GESTIONE TIMELINE:
+    Determina la modalità della timeline in base alla data selezionata:
+     - past = giorno precedente a oggi 00-24.
+     - live = oggi+domani, timeline inizia dall'ora corrente fino alle 24 più tutta la giornata completa di domani 00-24.
+     - day  = giorno successivo ad oggi, 00-24 */ 
   function updateTimelineMode() {
       const currentDay = new Date(currentDate);
       currentDay.setHours(0,0,0,0);
@@ -1513,7 +1517,9 @@ oms.addListener('click', function (marker) {
       }
   }
   
-  /* Compone il giorno ed il mese corrente */  
+    /* Aggiorna le informazioni testuali della timeline:
+       data, giorno della settimana e posizione dei giorni
+       nella modalità live/day */
     function updateDateUI() {
       dayText.innerText = currentDate.getDate();
       dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
@@ -1560,7 +1566,9 @@ oms.addListener('click', function (marker) {
     }
   }
 
-   // Genera la timeline
+     /* Ricrea lo slider temporale in base alla modalità corrente.
+       Distrugge l'eventuale slider precedente, calcola il range
+       temporale e aggiorna la posizione dell'indicatore di mezzanotte. */
     function setupTimeline() {
       //-- distrugge vecchio slider per ricrearlo da zero
       if (slider.noUiSlider) {
@@ -1599,7 +1607,8 @@ oms.addListener('click', function (marker) {
       }
     }
 
-     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
+    /* Aggiorna le etichette orarie delle maniglie dello slider
+       e aggiorna la visibilità dei marker in base all'intervallo selezionato. */
     function updateHandles(values) {
     //-- Offset
       const startOffset = Math.round(values[0]);
@@ -1628,7 +1637,9 @@ oms.addListener('click', function (marker) {
     updateMarkerVisibility(startDate,endDate);
   }
 
-    // Calcola il range della Timeline
+    /* Calcola inizio e fine della timeline in base alla modalità:
+       live = dall'ora corrente alla fine del giorno successivo
+       past/day = dall'inizio alla fine della giornata selezionata */
     function getTimelineRange () {
       let start, end;
       if (timelineMode === 'live') {
@@ -1643,7 +1654,7 @@ oms.addListener('click', function (marker) {
         return { start, end };
     }
 
-    // Posiziona la mezzanotte nella Timeline
+    /* Calcola la posizione relativa della mezzanotte nella modalità live. */
     function getMidnightPosition(totalHours) {
       if (timelineMode === 'live') {
         const currentHour = new Date().getHours();
