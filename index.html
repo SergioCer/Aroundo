@@ -1176,14 +1176,6 @@ function requestUserLocation() {
       renderEvents();
     });
 
-    document.getElementById("reset-day").addEventListener("click", () => {
-      currentDate = new Date(); // oggi
-      updateTimelineMode();
-      updateDateUI();
-      setupTimeline();
-      renderEvents();
-    });
-
     window.showMessage = function(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";};
 
     window.closeMessage = function () {document.getElementById("messageDialog").style.display = "none";};
@@ -1211,21 +1203,6 @@ function requestUserLocation() {
               time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);
       }
       return time;
-  }
-  
-    function updateTimelineMode() {
-      const currentDay = new Date(currentDate);
-      currentDay.setHours(0,0,0,0);
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const diffDays = Math.round((currentDay - today) / 86400000);
-      if (diffDays < 0) {
-      timelineMode = 'past';
-      } else if (diffDays === 0) {
-      timelineMode = 'live';
-      } else {
-      timelineMode = 'day';
-      }
   }
   
   // Preleva le Categorie da supabase
@@ -1519,9 +1496,24 @@ oms.addListener('click', function (marker) {
       }
     });
  }
+                                                         
+  /* GESTIONE TIMELINE */ 
+  function updateTimelineMode() {
+      const currentDay = new Date(currentDate);
+      currentDay.setHours(0,0,0,0);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const diffDays = Math.round((currentDay - today) / 86400000);
+      if (diffDays < 0) {
+      timelineMode = 'past';
+      } else if (diffDays === 0) {
+      timelineMode = 'live';
+      } else {
+      timelineMode = 'day';
+      }
+  }
   
-                                                       
-    /* Compone il giorno ed il mese corrente nel rettangolo */  
+  /* Compone il giorno ed il mese corrente */  
     function updateDateUI() {
       dayText.innerText = currentDate.getDate();
       dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
@@ -1567,7 +1559,138 @@ oms.addListener('click', function (marker) {
     currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
     }
   }
+
+   // Genera la timeline
+    function setupTimeline() {
+      //-- distrugge vecchio slider per ricrearlo da zero
+      if (slider.noUiSlider) {
+      slider.noUiSlider.destroy();
+      slider.noUiSlider = null;
+      }
+      const { start, end } = getTimelineRange();
+      // ore totali reali del range
+      totalHours = Math.ceil((end - start) / 3600000);
+      //-- Controllo di sicurezza per evitare errori.
+      if (!totalHours || isNaN(totalHours)) {
+      console.error("Invalid timeline range", totalHours);
+      return;
+      }
+      //-- Crea lo slider con doppia maniglia
+      noUiSlider.create(slider, {
+      start: [0, totalHours],
+      connect: true,
+      step: 1,
+      range: {
+        min: 0,
+        max: totalHours
+        }
+      });
+      //-- Ad ogni movimento dello slider agiorna la mappa
+      slider.noUiSlider.on('update', updateHandles);
+      //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
+      const midnight = document.getElementById('midnight');
+      if (timelineMode === 'live') {
+      midnightPercent = getMidnightPosition(totalHours);
+      midnight.style.display = "block"; 
+      midnight.style.left = `${midnightPercent * 100}%`;
+      } else {
+      // nascondi barra in day mode
+      midnight.style.display = "none";
+      }
+    }
+
+     //-- Se slider si muove, aggiorna orari labels in base a posizione slider
+    function updateHandles(values) {
+    //-- Offset
+      const startOffset = Math.round(values[0]);
+      const endOffset = Math.round(values[1]);
+    // baseTime coerente con la modalità timeline
+      const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
+      const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
+      const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
+    //-- Crea le etichette delle maniglie
+      const formatTime = (date) =>
+      date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
+      const startLabel = formatTime(startDate);
+      const endLabel   = formatTime(endDate);
+      const handles = slider.querySelectorAll('.noUi-handle');
+      handles.forEach((h, i) => {
+        let label =
+          h.querySelector('.handle-label');
+        if (!label) {
+          label = document.createElement('div');
+          label.className = 'handle-label';
+          h.appendChild(label);
+        }
+    //-- Inserisce ora di inizio e di fine
+      label.innerText = i === 0 ? startLabel : endLabel;
+    });
+    updateMarkerVisibility(startDate,endDate);
+  }
+
+    // Calcola il range della Timeline
+    function getTimelineRange () {
+      let start, end;
+      if (timelineMode === 'live') {
+        start = getAppTime('live'); // Ora corrente
+        end = new Date(start);
+        end.setDate(end.getDate() + 1) ; // Domani
+        end.setHours(23, 59, 59, 999);  // fine giornata domani
+        } else {
+        start = getAppTime('startOfDay'); // Inizio Giorno
+        end = getAppTime('endOfDay'); // Fine Giorno
+        }
+        return { start, end };
+    }
+
+    // Posiziona la mezzanotte nella Timeline
+    function getMidnightPosition(totalHours) {
+      if (timelineMode === 'live') {
+        const currentHour = new Date().getHours();
+        const remainingToday = 24 - currentHour;
+        return remainingToday / totalHours;
+      }
+      return 0;
+    }
   
+    function prevDay() {
+    if (timelineMode === 'live') {
+      timelineMode = 'past';
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+      return;
+    }
+    // Gli altri casi: spostamento effettivo indietro di un giorno
+    currentDate.setDate(currentDate.getDate() - 1);
+    timelineMode = 'past';
+    updateTimelineMode();
+  }
+
+    function nextDay() {
+     const today = new Date();
+      today.setHours(0,0,0,0);
+      const current = new Date(currentDate);
+      current.setHours(0,0,0,0);
+      if (timelineMode === 'past' &&
+        current.getTime() === today.getTime()) {   
+      timelineMode = 'live';
+      updateTimelineMode();
+      return;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+      timelineMode = 'day';
+      updateTimelineMode();
+    }
+  
+    document.getElementById("reset-day").addEventListener("click", () => {
+      currentDate = new Date(); // oggi
+      updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+    });
+
     /* Formatta la data in stile Italiano 00:00 */   
     function formatTime(dateString) {
       const d = new Date(dateString);
@@ -1871,98 +1994,7 @@ oms.addListener('click', function (marker) {
             () => {updateGeoStatus(false);},
             {timeout:5000});
     }
-    
-    // Calcola il range della Timeline
-    function getTimelineRange () {
-      let start, end;
-      if (timelineMode === 'live') {
-        start = getAppTime('live'); // Ora corrente
-        end = new Date(start);
-        end.setDate(end.getDate() + 1) ; // Domani
-        end.setHours(23, 59, 59, 999);  // fine giornata domani
-        } else {
-        start = getAppTime('startOfDay'); // Inizio Giorno
-        end = getAppTime('endOfDay'); // Fine Giorno
-        }
-        return { start, end };
-    }
-
-    // Posiziona la mezzanotte nella Timeline
-    function getMidnightPosition(totalHours) {
-      if (timelineMode === 'live') {
-        const currentHour = new Date().getHours();
-        const remainingToday = 24 - currentHour;
-        return remainingToday / totalHours;
-      }
-      return 0;
-    }
  
-    // Genera la timeline
-    function setupTimeline() {
-      //-- distrugge vecchio slider per ricrearlo da zero
-      if (slider.noUiSlider) {
-      slider.noUiSlider.destroy();
-      slider.noUiSlider = null;
-      }
-      const { start, end } = getTimelineRange();
-      // ore totali reali del range
-      totalHours = Math.ceil((end - start) / 3600000);
-      //-- Controllo di sicurezza per evitare errori.
-      if (!totalHours || isNaN(totalHours)) {
-      console.error("Invalid timeline range", totalHours);
-      return;
-      }
-      //-- Crea lo slider con doppia maniglia
-      noUiSlider.create(slider, {
-      start: [0, totalHours],
-      connect: true,
-      step: 1,
-      range: {
-        min: 0,
-        max: totalHours
-        }
-      });
-      //-- Ad ogni movimento dello slider agiorna la mappa
-      slider.noUiSlider.on('update', updateHandles);
-      //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
-      const midnight = document.getElementById('midnight');
-      if (timelineMode === 'live') {
-      midnightPercent = getMidnightPosition(totalHours);
-      midnight.style.display = "block"; 
-      midnight.style.left = `${midnightPercent * 100}%`;
-      } else {
-      // nascondi barra in day mode
-      midnight.style.display = "none";
-      }
-    }
-    //-- Se slider si muove, aggiorna orari labels in base a posizione slider
-    function updateHandles(values) {
-    //-- Offset
-      const startOffset = Math.round(values[0]);
-      const endOffset = Math.round(values[1]);
-    // baseTime coerente con la modalità timeline
-      const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
-      const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
-      const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
-    //-- Crea le etichette delle maniglie
-      const formatTime = (date) =>
-      date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
-      const startLabel = formatTime(startDate);
-      const endLabel   = formatTime(endDate);
-      const handles = slider.querySelectorAll('.noUi-handle');
-      handles.forEach((h, i) => {
-        let label =
-          h.querySelector('.handle-label');
-        if (!label) {
-          label = document.createElement('div');
-          label.className = 'handle-label';
-          h.appendChild(label);
-        }
-    //-- Inserisce ora di inizio e di fine
-      label.innerText = i === 0 ? startLabel : endLabel;
-    });
-    updateMarkerVisibility(startDate,endDate);
-  }
     // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
     function getContrastColor(hex) {
       hex = hex.replace('#', '');
@@ -1974,36 +2006,6 @@ oms.addListener('click', function (marker) {
       return brightness > 150
       ? '#111'
       : '#fff';
-    }
-
-    function prevDay() {
-    if (timelineMode === 'live') {
-      timelineMode = 'past';
-      updateDateUI();
-      setupTimeline();
-      renderEvents();
-      return;
-    }
-    // Gli altri casi: spostamento effettivo indietro di un giorno
-    currentDate.setDate(currentDate.getDate() - 1);
-    timelineMode = 'past';
-    updateTimelineMode();
-  }
-
-    function nextDay() {
-     const today = new Date();
-      today.setHours(0,0,0,0);
-      const current = new Date(currentDate);
-      current.setHours(0,0,0,0);
-      if (timelineMode === 'past' &&
-        current.getTime() === today.getTime()) {   
-      timelineMode = 'live';
-      updateTimelineMode();
-      return;
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
-      timelineMode = 'day';
-      updateTimelineMode();
     }
   
     function getUpcomingEvents(hours = 12) {
