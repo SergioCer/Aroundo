@@ -647,9 +647,6 @@
     /* Pulsante base */
     .action-btn {
       min-width: 48px;
-      /* display: inline-flex;      CANCELLARE /* ⭐ fondamentale */
-      /* justify-content: center;   CANCELLARE /* ⭐ centra orizzontale */
-      /* align-items: center;       CANCELLARE /* ⭐ centra verticale */
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 11px;
@@ -983,7 +980,6 @@ OK
   window.analyticsBuy = analyticsBuy;
   window.analyticsBook = analyticsBook;
   let categories = [];
-  // CANCELLARE let icons = {};
   let events = [];
   let markers = [];
   let timelineMode = 'live'; // Modalità della timeline 'past' | 'live' | 'day'
@@ -1090,21 +1086,17 @@ OK
   // Aggiorna lo stato visivo dei marker ogni 2 minuti
   setInterval(renderEvents, 2 * 60 * 1000);
 
-  // Ricarica gli eventi da Supabase ogni 10 minuti
+  // Ricarica gli eventi da Supabase ogni 30 minuti
   setInterval(async () => {const data = await fetchEvents();
       if (data) {events = data;
       renderEvents();
     }
-  }, 10 * 60 * 1000);
+  }, 30 * 60 * 1000);
 
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. prende le categorie con relative icone e colori
   categories = await fetchCategories();
-  // CANCELLARE icons = {};
-  // CANCELLARE categories.forEach(cat => {
-  // CANCELLARE icons[cat.id_categoria] = createIcon(cat.mc_colore);
-  // CANCELLARE });
   events = await fetchEvents();
   // 3. Crea il menu Categorie
   buildCategoryMenu();
@@ -1370,7 +1362,6 @@ function requestUserLocation() {
           category: parseInt(e.id_categoria),
           start: new Date(e.ev_inizio),
           end: e.ev_fine ? new Date(e.ev_fine) : null,
-          // CANCELLARE active: e.ev_attivo
         });
       });
         updateMarkerVisibility();
@@ -1889,13 +1880,18 @@ oms.addListener('click', function (marker) {
         geoText.textContent === "Check Location Settings"
       ) {
         requestUserLocation();
+        
       }
     });
 
-    // aggiornamento quando ritorni nell'app
+    // aggiornamento al rientro sulla piattaforma
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         checkGeoStatus();
+        updateTimelineMode();
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
       }
     });
 
