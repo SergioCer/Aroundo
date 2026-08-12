@@ -639,7 +639,7 @@ export function renderTip(tip) {
         ? "text-align:center;"
         : ""}
       ${model.shape === "banner"
-        ? "max-width:1100px;"
+        ? "max-width:1100px;flex:1;min-width:0;"
         : ""}
     `;
     box.appendChild(content);
@@ -688,28 +688,25 @@ actions.appendChild(ok);
 box.appendChild(actions);
 }
 
-  /* BANNER LAYOUT */
-  if (model.shape === "banner") {
-    box.style.display =
-      "flex";
-    box.style.alignItems =
-      "center";
-    box.style.gap =
-      "24px";
-    box.style.borderRadius =
-      "0";
-    const children =
-      [...box.children];
-    children.forEach(child => {
-      if (
-        child.style &&
-        child.style.marginBottom
-      ) {
-        child.style.marginBottom =
-          "0";
-      }
-    });
+/* BANNER LAYOUT */
+if (model.shape === "banner") {
+  box.style.display = "flex";
+  box.style.alignItems = "center";
+  box.style.gap = "24px";
+  box.style.borderRadius = "0";
+  box.style.flexWrap = "wrap";
+  const children = [...box.children];
+  children.forEach(child => {
+    if (child.style && child.style.marginBottom) {
+      child.style.marginBottom = "0";
+    }
+  });
+  const actions = box.lastElementChild;
+  if (actions) {
+    actions.style.flex = "0 0 auto";
   }
+}
+ 
   overlay.appendChild(box);
   document.body.appendChild(
     overlay
