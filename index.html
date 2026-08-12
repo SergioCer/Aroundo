@@ -1036,7 +1036,7 @@ OK
   // 🌿 Base Mappa NEUTRA BUONA
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
 
-    // Seleziona il div "Login"
+    // Seleziona il div Login
     const loginBtn = document.getElementById('loginBtn');
     const { data } = await supabase.auth.getSession();
       if(data.session){
@@ -1082,17 +1082,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 1. prende le categorie con relative icone e colori
   categories = await fetchCategories();
   events = await fetchEvents();
-  // 3. Crea il menu Categorie
+  // 2. Crea il menu Categorie
   buildCategoryMenu();
-  // 4. inizializza checkbox con tutti selezionati
+  // 3. inizializza checkbox con tutti selezionati
   document.getElementById('select-all-toggle').checked = true;
-  // 5. Verifica se Geolocalizzazione Attiva o Disattiva
+  // 4. inizializza il resto
+  analyticsOpen();
   checkGeoStatus();
   setupTimeline();
   renderEvents();
   updateDateUI();
   updateTicker();  // ATTENZIONE Inserito per evitare l'aggiornamento ogni minuto ( adesso ogni 5 minuti ) ma consentire al caricamento di vedere le news.
-  analyticsOpen();
 });
       
     noUiSlider.create(slider, {
@@ -1990,7 +1990,6 @@ oms.addListener('click', function (marker) {
         geoText.textContent === "Check Location Settings"
       ) {
         requestUserLocation();
-        
       }
     });
 
