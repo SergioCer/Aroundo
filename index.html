@@ -1112,39 +1112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateMarkerVisibility(start, end);
     });
 
-// Autorizzazione per la posizione GPS dell'utente
-function requestUserLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-      (pos) => {
-      analyticsGPS(true);
-      updateGeoStatus(true);
-      const userLat = pos.coords.latitude;
-      const userLng = pos.coords.longitude;
-      analyticsLocation(userLat, userLng); // Statistiche, salva le ultime coordinate rilevate a 2 decimali         
-      // Calcolo approssimativo dello zoom in base agli eventi vicini
-      const nearbyEvents = events.filter(e => {
-      const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
-      return distance <= 25000; // 25 km
-      });
-      let zoomLevel = 10; // Provincia
-      if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
-      else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
-      else zoomLevel = 9; // Regione
-      map.setView([userLat, userLng], zoomLevel);
-      },
-      (err) => {
-      analyticsGPS(false);
-      updateGeoError();        
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
-      );
-    } else {
-      updateGeoError();
-      map.setView([defaultLat, defaultLng], defaultZoom);
-      }
-  }
-    
     const SHARE_URL = "https://aroundo.it/?src=share";
     document.getElementById("shareBtn").onclick = async () => {
       await analyticsShare();
@@ -2004,14 +1971,51 @@ oms.addListener('click', function (marker) {
       }
     });
 
+    // Verifica se il GPS è attivo
     function checkGeoStatus() {
-        navigator.geolocation.getCurrentPosition(
-            () => {updateGeoStatus(true);},
-            () => {updateGeoStatus(false);},
-            {timeout:5000});
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {updateGeoStatus(true);},
+        () => {updateGeoStatus(false);},
+        { timeout: 5000 });
     }
- 
-    // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
+
+    // Autorizzazione per la posizione GPS dell'utente
+    function requestUserLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+          (pos) => {
+          const userLat = pos.coords.latitude;
+          const userLng = pos.coords.longitude;
+          analyticsGPS(true, userLat, userLng);
+          updateGeoStatus(true);
+          // Calcolo approssimativo dello zoom in base agli eventi vicini
+          const nearbyEvents = events.filter(e => {
+          const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
+          return distance <= 25000; // 25 km
+          });
+          let zoomLevel = 10; // Provincia
+          if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
+          else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
+          else zoomLevel = 9; // Regione
+          map.setView([userLat, userLng], zoomLevel);
+          },
+          (err) => {
+            if(err.code === 1){
+              analyticsGPS(false); // Utente ha rifiutato
+            }else{
+              analyticsGPS(null); // Stato non determinabile
+            }
+            updateGeoError();
+            map.setView([defaultLat, defaultLng], defaultZoom);
+            });
+        } else {
+          analyticsGPS(null); // Geolocalizzazione non disponibile
+          updateGeoError();
+          map.setView([defaultLat, defaultLng], defaultZoom);
+        }
+      }
+  
+     // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
     function getContrastColor(hex) {
       hex = hex.replace('#', '');
       const r = parseInt(hex.substr(0,2),16);
