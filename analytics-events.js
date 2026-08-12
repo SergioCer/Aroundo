@@ -337,13 +337,11 @@ export function analyticsInstall(){
   return updateAnalytics({install:true});
 }
 
-export function analyticsGPS(value){
-  return updateAnalytics({gps:value});
-}
-
-export function analyticsLocation(lat,lng){
-  return updateAnalytics({lat: Number(lat.toFixed(2)),
-    lng: Number(lng.toFixed(2))});
+export function analyticsGPS(value, lat = null, lng = null){
+  return updateAnalytics({gps: value,
+    lat: lat !== null ? Number(lat.toFixed(2)) : undefined,
+    lng: lng !== null ? Number(lng.toFixed(2)) : undefined
+  });
 }
 
 /* ENTRANCE */
