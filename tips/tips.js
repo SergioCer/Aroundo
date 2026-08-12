@@ -691,19 +691,39 @@ box.appendChild(actions);
 /* BANNER LAYOUT */
 if (model.shape === "banner") {
   box.style.display = "flex";
-  box.style.alignItems = "center";
-  box.style.gap = "24px";
+  box.style.flexDirection = "column";
+  box.style.alignItems = "stretch";
+  box.style.gap = "0";
   box.style.borderRadius = "0";
-  box.style.flexWrap = "wrap";
   const children = [...box.children];
   children.forEach(child => {
     if (child.style && child.style.marginBottom) {
       child.style.marginBottom = "0";
     }
   });
-  const actions = box.lastElementChild;
+  const header = children.find(x =>
+    x.style &&
+    x.style.display === "flex"
+  );
+  const content = children.find(x =>
+    x.style &&
+    x.style.whiteSpace === "pre-wrap"
+  );
+  const actions = children[children.length - 1];
+  if (header) {
+    header.style.width = "100%";
+    header.style.flex = "none";
+    header.style.marginBottom = "10px";
+  }
+  if (content) {
+    content.style.width = "100%";
+    content.style.maxWidth = "1100px";
+    content.style.flex = "none";
+  }
   if (actions) {
-    actions.style.flex = "0 0 auto";
+    actions.style.width = "100%";
+    actions.style.flex = "none";
+    actions.style.marginTop = "20px";
   }
 }
  
