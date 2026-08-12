@@ -159,7 +159,7 @@ ${metric("👁","Open",s.open,"Number of openings",s.avgOpen)}
       const percent=s.entranceTotal
         ? Math.round((count/s.entranceTotal)*100)
         : 0;
-      return `${source} / ${count} (${percent}%)`;
+      return `${source}: ${count} (${percent}%)`;
     }).join(" · ")}
     </div>
   </div>
