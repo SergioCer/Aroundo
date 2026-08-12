@@ -8,7 +8,7 @@ async function loadAnalytics(){
 const from=new Date();
 from.setFullYear(from.getFullYear()-1);
 const {data,error}=await supabase.from("analytics").select(
-`an_date,an_device,an_platform,an_app,an_install,an_login,an_gps,an_open,an_share,an_more,an_info,an_marker,an_map,an_buy,an_book`).gte("an_date",
+`an_date,an_device,an_platform,an_app,an_install,an_login,an_gps,an_open,an_share,an_more,an_info,an_marker,an_map,an_buy,an_book,an_entrance`).gte("an_date",
 from.toISOString().split("T")[0]).order("an_date",{ascending:false});
 if(error){console.error(error);return;}
 rows=data||[];
@@ -60,10 +60,12 @@ let devices=new Set();
 let s={open:0,login:0,install:0,share:0,marker:0,map:0,buy:0,book:0,more:0,info:0,gps:0,nogps:0,nonegps:0,app:0,web:0,newUsers:0,returnUsers:0,retention:0,avgOpen:0,trust:0};
 let deviceState={};
 let gpsState={};
+let entranceState={};
 data.forEach(x=>{
 if(x.an_device)
 devices.add(x.an_device);
 if(!(x.an_device in deviceState)){deviceState[x.an_device]={app:x.an_app,platform:x.an_platform};}
+if(x.an_device){entranceState[x.an_device]=x.an_entrance;}  
 if(!(x.an_device in gpsState))
 gpsState[x.an_device]=x.an_gps;
 s.open+=x.an_open||0;
@@ -92,6 +94,13 @@ s.web++;
 s.devices=devices.size;
 let previous=new Set(allData .filter(x=>!data.includes(x)) .map(x=>x.an_device));
 let current=new Set(data.map(x=>x.an_device));
+let entrances={};
+Object.values(entranceState).forEach(v=>{
+  const key=v||"other";
+  entrances[key]=(entrances[key]||0)+1;
+});
+s.entranceTotal=Object.values(entrances).reduce((a,b)=>a+b,0);  
+s.entrances=entrances;  
 current.forEach(id=>{
 if(previous.has(id))
 s.returnUsers++;
@@ -143,6 +152,17 @@ ${metric("🌐","Web",s.web,"Web usage")}
 ${metric("📲","App",s.app,"App usage",s.devices?Math.round((s.app/s.devices)*100)+"%":"0%")}
 ${metric("📤","Share",s.share,"Sharing")}
 ${metric("👁","Open",s.open,"Number of openings",s.avgOpen)}
+<div class="metric">
+  <div class="metric-label">Entrance</div>
+  <div class="metric-value">
+    ${Object.entries(s.entrances).map(([source,count])=>{
+      const percent=s.entranceTotal
+        ? Math.round((count/s.entranceTotal)*100)
+        : 0;
+      return `${source} / ${count} (${percent}%)`;
+    }).join(" · ")}
+    </div>
+  </div>
 </div>
 <div class="metric-group">
 <h3>Interaction</h3>
