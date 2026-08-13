@@ -1153,7 +1153,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.closeMessage = function () {document.getElementById("messageDialog").style.display = "none";};
   
-    // Data unica: currentDate = giorno 'logico' 
+    /* Restituisce una data/ora di riferimento.
+       Modalità: startOfDay, endOfDay, live o ora corrente sul giorno logico.
+       Chiamata da: getTimelineRange(), updateHandles(), getUpcomingEvents(). */
     function getAppTime(mode = 'now') {
       const day = new Date(currentDate);
       let time = new Date();
@@ -1217,7 +1219,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return data;
   }
 
-    // Ricrea i markers 
+    /* RICOSTRUISCE I MARKER — ricrea la rappresentazione grafica di tutti gli eventi.
+       Azioni: rimuove i marker esistenti, calcola lo stato degli eventi, crea e registra i nuovi marker, 
+       collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
+       Chiamata da: inizializzazione; navigazione giorno; reset; rientro pagina; aggiornamento eventi periodico. */
     function renderEvents() {
       // pulizia markers precedenti
       markers.forEach(m => {
@@ -1239,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
         const stateClass = stateData.state;
         
-        //-- 🎨 ICONA
+        // 🎨 ICONA
         const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
           icon: createIcon(
             categories.find(c =>
@@ -1255,7 +1260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         oms.addMarker(marker);
         markersCluster.addLayer(marker);
         updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
-         //-- Visualizza i dettagli dell'evento selezionato con Popup //
+        // Visualizza i dettagli dell'evento selezionato con Popup //
             const startDate = new Date(e.ev_inizio);
             const now = new Date();
             const tomorrow = new Date();
@@ -1279,7 +1284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         analyticsMarker();
         window.openBasePopup(e, this.getLatLng());
         });
-        //-- 📦 STORAGE DATI (NO LOGICA)
+        // 📦 STORAGE DATI (NO LOGICA)
         markers.push({
           marker,
           category: parseInt(e.id_categoria),
@@ -1314,7 +1319,11 @@ oms.addListener('click', function (marker) {
       });
     }
 
-    /* Mostra o nasconde i Marker delle categorie */
+    /* FILTRA I MARKER — determina quali marker devono essere visibili.
+       Azioni: ricava categorie attive, verifica sovrapposizione temporale
+       e aggiunge/rimuove i marker dal cluster; arresta eventuali fireworks
+       dei marker nascosti.
+       Chiamata da: updateHandles(), renderEvents(), filtro categorie. */
     function updateMarkerVisibility(start, end) {
       // Se non vengono passati parametri, usa il range corrente della timeline
       if (!start || !end) {
@@ -1570,7 +1579,7 @@ oms.addListener('click', function (marker) {
         }
       });
       // Ad ogni movimento dello slider agiorna la mappa
-      slider.noUiSlider.on('update', updateHandles);
+      slider.noUiSlider.on('update', dles);
       // Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
       const midnight = document.getElementById('midnight');
       if (timelineMode === 'live') {
@@ -1583,17 +1592,19 @@ oms.addListener('click', function (marker) {
       }
     }
 
-    /* Aggiorna le etichette orarie delle maniglie dello slider
-       e aggiorna la visibilità dei marker in base all'intervallo selezionato. */
+    /* Aggiorna le etichette delle maniglie e il filtro temporale dei marker.
+       Azioni: converte gli offset dello slider in date/ore reali,
+       aggiorna le etichette e applica il range alla visibilità dei marker.
+       Chiamata da: evento 'update' dello slider. */
     function updateHandles(values) {
-    //-- Offset
+      // Offset
       const startOffset = Math.round(values[0]);
       const endOffset = Math.round(values[1]);
-    // baseTime coerente con la modalità timeline
+      // baseTime coerente con la modalità timeline
       const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
       const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
       const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
-    //-- Crea le etichette delle maniglie
+      // Crea le etichette delle maniglie
       const formatTime = (date) =>
       date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
       const startLabel = formatTime(startDate);
@@ -1607,15 +1618,17 @@ oms.addListener('click', function (marker) {
           label.className = 'handle-label';
           h.appendChild(label);
         }
-    //-- Inserisce ora di inizio e di fine
+      // Inserisce ora di inizio e di fine
       label.innerText = i === 0 ? startLabel : endLabel;
     });
     updateMarkerVisibility(startDate,endDate);
   }
 
-    /* Calcola inizio e fine della timeline in base alla modalità:
-       live = dall'ora corrente alla fine del giorno successivo
-       past/day = dall'inizio alla fine della giornata selezionata */
+      /* Calcola il range temporale della timeline.
+         Azioni: determina data/ora di inizio e fine in base a timelineMode.
+         live = ora corrente → fine di domani;
+         past/day = 00:00 → 23:59 del giorno selezionato.
+         Chiamata da: setupTimeline(); updateMarkerVisibility(). */
     function getTimelineRange () {
       let start, end;
       if (timelineMode === 'live') {
@@ -1630,7 +1643,10 @@ oms.addListener('click', function (marker) {
         return { start, end };
     }
 
-    /* Calcola la posizione relativa della mezzanotte nella modalità live. */
+    /* Calcola la posizione relativa della mezzanotte nella modalità live. 
+       Azioni: determina la percentuale relativa della mezzanotte rispetto
+       al range temporale corrente; restituisce 0 fuori dalla modalità live.
+       Chiamata da: setupTimeline().*/
     function getMidnightPosition(totalHours) {
       if (timelineMode === 'live') {
         const currentHour = new Date().getHours();
@@ -1639,7 +1655,11 @@ oms.addListener('click', function (marker) {
       }
       return 0;
     }
-  
+
+    /* Gestisce la navigazione al giorno precedente.
+       Azioni: in modalità live passa al giorno passato; altrimenti
+       arretra currentDate di un giorno e aggiorna timelineMode.
+       Chiamata da: pulsante prev-day. */
     function prevDay() {
     if (timelineMode === 'live') {
       timelineMode = 'past';
@@ -1654,6 +1674,10 @@ oms.addListener('click', function (marker) {
     updateTimelineMode();
   }
 
+    /* Gestisce la navigazione al giorno successivo.
+       Azioni: da oggi in modalità past passa a live; altrimenti
+       avanza currentDate di un giorno e aggiorna timelineMode.
+       Chiamata da: pulsante next-day. */
     function nextDay() {
      const today = new Date();
       today.setHours(0,0,0,0);
@@ -1678,13 +1702,16 @@ oms.addListener('click', function (marker) {
       renderEvents();
     });
 
-    /* Formatta la data in stile Italiano 00:00 */   
+    /* Converte una data/ora nel formato HH:MM italiano.
+       Chiamata da: popup evento; popup dettagli; ticker. */
     function formatTime(dateString) {
       const d = new Date(dateString);
       return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
   }
 
-    /* Temporizzazione dei Marker */
+    /* Determina lo stato temporale di un evento rispetto all'ora attuale.
+       Azioni: calcola distanza dall'inizio e durata; assegna lo stato del marker (futuro, countdown, in corso o terminato).
+       Chiamata da: renderEvents(). */
     function getEventState(startDate, endDate) {
       const now = new Date();
       const diffMinutes = (startDate - now) / 1000 / 60;
@@ -1714,7 +1741,9 @@ oms.addListener('click', function (marker) {
       return { state: 'started' };
   }
 
-    /* EX *****  marker.bindPopup  ***** sotto POPUP nuovo */
+    /* Costruisce e apre il popup base dell'evento.
+       Azioni: determina/formatta la data, prepara contenuto e dati per "More...", posiziona e apre il popup sulla mappa.
+       Chiamata da: click sul marker in renderEvents(). */
     window.openBasePopup = function(e, latlng) {
           const startDate = new Date(e.ev_inizio);
           const now = new Date();
@@ -1776,6 +1805,9 @@ oms.addListener('click', function (marker) {
       .openOn(map);
     };
 
+    /* Costruisce e apre il popup dettagli dell'evento.
+       Azioni: prepara informazioni su luogo, immagine, descrizione, prezzo e azioni disponibili; apre il popup sulla mappa.
+       Chiamata da: pulsante "More..." di openBasePopup(). */
     window.openDetailPopup = function(e, latlng) {
       analyticsMore();
       const content = `
@@ -1882,8 +1914,12 @@ oms.addListener('click', function (marker) {
       .openOn(map);
     };
 
-  // ***** INSTALLAZIONE APP ***** //
-  // Intercetta la richiesta di installazione
+    // ***** INSTALLAZIONE APP ***** //
+    // Gestisce la disponibilità e l'avvio dell'installazione PWA.
+    // Azioni: intercetta la richiesta di installazione, mostra il pulsante,
+    // avvia il prompt al click, registra l'avvenuta installazione e
+    // nasconde il pulsante.
+    // Gestisce separatamente l'installazione manuale su iOS.
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
