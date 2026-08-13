@@ -1132,7 +1132,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
-      updateTimelineMode();
       updateDateUI();
       setupTimeline();
       renderEvents();
@@ -1660,10 +1659,15 @@ oms.addListener('click', function (marker) {
     function prevDay() {
       if (timelineMode === 'live') {
         timelineMode = 'past';
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
         return;
       }
+      // Gli altri casi: spostamento effettivo indietro di un giorno
       currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
+      updateTimelineMode();
     }
 
     /* Gestisce la navigazione al giorno successivo.
