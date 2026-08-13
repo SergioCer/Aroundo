@@ -1139,14 +1139,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
       updateDateUI();
-      ();
+      setupTimeline();
       renderEvents();
     });
 
     document.getElementById("next-day").addEventListener("click", () => {nextDay();
       updateTimelineMode();
       updateDateUI();
-      ();
+      setupTimeline();
       renderEvents();
     });
 
