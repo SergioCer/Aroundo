@@ -1580,7 +1580,7 @@ oms.addListener('click', function (marker) {
         }
       });
       // Ad ogni movimento dello slider agiorna la mappa
-      slider.noUiSlider.on('update', dles);
+      slider.noUiSlider.on('update', updateHandles);
       // Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
       const midnight = document.getElementById('midnight');
       if (timelineMode === 'live') {
