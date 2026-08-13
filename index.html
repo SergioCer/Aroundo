@@ -1079,15 +1079,9 @@ OK
 
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. prende le categorie con relative icone e colori
   categories = await fetchCategories();
   events = await fetchEvents();
-  // 2. Crea il menu Categorie
   buildCategoryMenu();
-  // 3. inizializza checkbox con tutti selezionati
-  /* CANCELLARE, la funzione buildCategoryMenu già seleziona tutti true 
-  document.getElementById('select-all-toggle').checked = true; */
-  
   analyticsOpen();
   checkGeoStatus();
   setupTimeline();
@@ -1138,6 +1132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
+      updateTimelineMode();
       updateDateUI();
       setupTimeline();
       renderEvents();
@@ -1388,7 +1383,8 @@ oms.addListener('click', function (marker) {
     .openOn(map);
 }
 
-    // Costruisce Checkbox Categorie, Pulsante toggle del menù, select all, listeners  
+    /* Costruisce e inizializza il menu categorie.
+       Azioni: crea le checkbox, le seleziona tutte, configura toggle e listener. */
     function buildCategoryMenu() {
       const menuItemsDiv = document.getElementById('menu-items');
       // checkbox per ogni categoria
@@ -1662,18 +1658,13 @@ oms.addListener('click', function (marker) {
        arretra currentDate di un giorno e aggiorna timelineMode.
        Chiamata da: pulsante prev-day. */
     function prevDay() {
-    if (timelineMode === 'live') {
+      if (timelineMode === 'live') {
+        timelineMode = 'past';
+        return;
+      }
+      currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
-      updateDateUI();
-      setupTimeline();
-      renderEvents();
-      return;
     }
-    // Gli altri casi: spostamento effettivo indietro di un giorno
-    currentDate.setDate(currentDate.getDate() - 1);
-    timelineMode = 'past';
-    updateTimelineMode();
-  }
 
     /* Gestisce la navigazione al giorno successivo.
        Azioni: da oggi in modalità past passa a live; altrimenti
