@@ -1138,14 +1138,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     document.getElementById("prev-day").addEventListener("click", () => {prevDay();
       updateDateUI();
-      setupTimeline();
+      ();
       renderEvents();
     });
 
     document.getElementById("next-day").addEventListener("click", () => {nextDay();
       updateTimelineMode();
       updateDateUI();
-      setupTimeline();
+      ();
       renderEvents();
     });
 
@@ -1539,11 +1539,14 @@ oms.addListener('click', function (marker) {
     }
   }
 
-     /* Ricrea lo slider temporale in base alla modalità corrente.
-       Distrugge l'eventuale slider precedente, calcola il range
-       temporale e aggiorna la posizione dell'indicatore di mezzanotte. */
+      /* Ricrea lo slider temporale in base alla modalità corrente.
+      Azioni: distrugge l'eventuale slider precedente, calcola il range
+      temporale, ricrea lo slider e calcola/imposta la posizione
+      dell'indicatore di mezzanotte o lo nasconde.
+      Chiamata da: inizializzazione; navigazione giorno (prev/next);
+      reset giorno; rientro nella pagina. */
     function setupTimeline() {
-      //-- distrugge vecchio slider per ricrearlo da zero
+      // distrugge vecchio slider per ricrearlo da zero
       if (slider.noUiSlider) {
       slider.noUiSlider.destroy();
       slider.noUiSlider = null;
@@ -1551,12 +1554,12 @@ oms.addListener('click', function (marker) {
       const { start, end } = getTimelineRange();
       // ore totali reali del range
       totalHours = Math.ceil((end - start) / 3600000);
-      //-- Controllo di sicurezza per evitare errori.
+      // Controllo di sicurezza per evitare errori.
       if (!totalHours || isNaN(totalHours)) {
       console.error("Invalid timeline range", totalHours);
       return;
       }
-      //-- Crea lo slider con doppia maniglia
+      // Crea lo slider con doppia maniglia
       noUiSlider.create(slider, {
       start: [0, totalHours],
       connect: true,
@@ -1566,9 +1569,9 @@ oms.addListener('click', function (marker) {
         max: totalHours
         }
       });
-      //-- Ad ogni movimento dello slider agiorna la mappa
+      // Ad ogni movimento dello slider agiorna la mappa
       slider.noUiSlider.on('update', updateHandles);
-      //-- Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
+      // Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
       const midnight = document.getElementById('midnight');
       if (timelineMode === 'live') {
       midnightPercent = getMidnightPosition(totalHours);
