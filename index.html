@@ -1959,7 +1959,9 @@ oms.addListener('click', function (marker) {
     }
   }
 
-    // Verifica se Geolocalizzazione è Attiva o Disattiva
+    /* Aggiorna lo stato visivo della geolocalizzazione.
+       Azioni: modifica colore, testo e stile dell'indicatore GPS in base allo stato attivo/non attivo.
+       Chiamata da: checkGeoStatus(); requestUserLocation(). */
     const geoStatus = document.getElementById("geoStatus");
     const geoDot = document.getElementById("geoDot");
     const geoText = document.getElementById("geoText");
@@ -1981,6 +1983,7 @@ oms.addListener('click', function (marker) {
       }
     }
 
+    /* rappresenta lo stato di errore della geolocalizzazione. */
     function updateGeoError() {
       geoDot.style.background = "#dc2626";
       geoText.textContent = "Check Location Settings";
@@ -1999,7 +2002,7 @@ oms.addListener('click', function (marker) {
       }
     });
 
-    // aggiornamento al rientro sulla piattaforma
+    // aggiornamento al rientro sulla piattaforma.
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         checkGeoStatus();
@@ -2010,7 +2013,9 @@ oms.addListener('click', function (marker) {
       }
     });
 
-    // Verifica se il GPS è attivo
+    /* Verifica se la geolocalizzazione è disponibile.
+       Azioni: richiede una posizione GPS; aggiorna lo stato visivo in base all'esito.
+       Chiamata da: caricamento pagina; rientro nella pagina. */
     function checkGeoStatus() {
       navigator.geolocation.getCurrentPosition(
         (pos) => {updateGeoStatus(true);},
@@ -2018,7 +2023,9 @@ oms.addListener('click', function (marker) {
         { timeout: 5000 });
     }
 
-    // Autorizzazione per la posizione GPS dell'utente
+    /* Acquisisce la posizione dell'utente e aggiorna la mappa.
+       Azioni: richiede il GPS, registra l'esito, aggiorna lo stato GPS, calcola la densità degli eventi vicini e centra/scala la mappa.
+       Chiamata da: click su "Enable location..." / errore GPS. */
     function requestUserLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -2054,7 +2061,9 @@ oms.addListener('click', function (marker) {
         }
       }
   
-     // per le label delle categorie, utilizza il testo bianco o nero in risalto sul colore di fondo
+     /* Determina il colore del testo in base al colore di sfondo.
+       Azioni: calcola la luminosità del colore e restituisce nero o bianco per garantire il contrasto.
+       Chiamata da: buildCategoryMenu(). */
     function getContrastColor(hex) {
       hex = hex.replace('#', '');
       const r = parseInt(hex.substr(0,2),16);
@@ -2066,21 +2075,11 @@ oms.addListener('click', function (marker) {
       ? '#111'
       : '#fff';
     }
-  
-    function getUpcomingEvents(hours = 12) {
-    const now = timelineMode === 'live'
-        ? getAppTime('live')
-        : getAppTime('startOfDay');
-    const limit = new Date(now);
-    limit.setHours(limit.getHours() + hours);    
-    return events.filter(e => {
-      const start = new Date(e.ev_inizio);
-      return start > now && start <= limit;
-    }).sort((a,b)=>
-      new Date(a.ev_inizio) - new Date(b.ev_inizio)
-    );
-  }
 
+    /* Aggiorna il ticker degli eventi imminenti.
+       Azioni: recupera gli eventi imminenti, genera l'HTML e lo inserisce nel ticker.
+       Chiamata da: caricamento pagina. 
+       Punto da verificare: updateTicker() viene aggiornato al caricamento, ma non nei cicli periodici di renderEvents() / fetchEvents().*/
     function updateTicker(){
     const list = getUpcomingEvents(20); // Numero di News da visualizzare
     const html = list.map(e => {
@@ -2105,14 +2104,34 @@ oms.addListener('click', function (marker) {
     document.getElementById('eventTickerContent').innerHTML = html;
   }
 
+    /* Seleziona gli eventi imminenti entro un intervallo temporale.
+       Azioni: determina l'ora di riferimento, calcola il limite temporale, filtra gli eventi futuri e li ordina per orario di inizio.
+       Chiamata da: updateTicker(). */
+    function getUpcomingEvents(hours = 12) {
+    const now = timelineMode === 'live'
+        ? getAppTime('live')
+        : getAppTime('startOfDay');
+    const limit = new Date(now);
+    limit.setHours(limit.getHours() + hours);    
+    return events.filter(e => {
+      const start = new Date(e.ev_inizio);
+      return start > now && start <= limit;
+    }).sort((a,b)=>
+      new Date(a.ev_inizio) - new Date(b.ev_inizio)
+    );
+  }
+
+    /* Converte coordinate geografiche in coordinate del canvas.
+       Azioni: converte lat/lng nelle coordinate x/y relative alla mappa.
+       Chiamata da: triggerFirework(). */
     function latLngToCanvasXY(lat, lng) {
       const point = map.latLngToContainerPoint([lat, lng]);
       return { x: point.x, y: point.y };
     }
 
-// ====================================================
-// FIREWORKS SCENICI SUL CANVAS
-// ====================================================
+    /* Inizializza una particella del fuoco d'artificio.
+       Azioni: memorizza posizione, colore, velocità e durata e inizializza i parametri grafici della particella.
+       Chiamata da: Firework.createParticles(). */
 class Particle {
   constructor(x, y, color, vx, vy, life) {
     this.x = x;
@@ -2127,6 +2146,9 @@ class Particle {
     this.spikes = 5; // punte della stella
   }
 
+    /* Aggiorna lo stato fisico della particella.
+       Azioni: aggiorna posizione, gravità, durata e trasparenza.
+       Chiamata da: Firework.update(). */
   update() {
     this.x += this.vx;
     this.y += this.vy;
@@ -2135,12 +2157,14 @@ class Particle {
     this.alpha = Math.max(0, this.life / 60);
   }
 
+  /* Disegna la particella sul canvas.
+     Azioni: applica trasparenza/colore e disegna la stella.
+     Chiamata da: Firework.draw(). */
   draw(ctx) {
     ctx.save();
     ctx.globalAlpha = this.alpha;
     ctx.fillStyle = this.color;
     ctx.translate(this.x, this.y);
-
     ctx.beginPath();
     for (let i = 0; i < this.spikes * 2; i++) {
       const r = i % 2 === 0 ? this.radiusOuter : this.radiusInner;
@@ -2152,11 +2176,13 @@ class Particle {
     }
     ctx.closePath();
     ctx.fill();
-
     ctx.restore();
   }
 }
 
+    /* Inizializza un fuoco d'artificio.
+       Azioni: imposta posizione, traiettoria, stato di esplosione, particelle e parametri grafici.
+       Chiamata da: triggerFirework(). */
 class Firework {
   constructor(x, y) {
     this.x = x; // coordinata orizzontale
@@ -2171,9 +2197,15 @@ class Firework {
     this.currentY = y; // quota corrente
     this.trail = []; // punti della scia
   }
-  
+
+  /* Verifica se il fuoco d'artificio è terminato.
+     Azioni: restituisce true quando è esploso e non ha più particelle.
+     Chiamata da: animateFX(). */
   isDead() { return this.exploded && this.particles.length === 0;}
 
+  /* Aggiorna lo stato del fuoco d'artificio.
+     Azioni: aggiorna il razzo durante la salita, gestisce l'esplosione, aggiorna le particelle e rimuove quelle terminate.
+     Chiamata da: animateFX(). */
   update() {
     if (!this.exploded) {
       this.x += this.vx; 
@@ -2183,11 +2215,13 @@ class Firework {
       if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
       if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } // esplode quando raggiunge la quota stabilita (210px)
     }
-    // Aggiorna particelle esplose
-    this.particles.forEach(p => p.update()); // aggiorna le particelle
+    this.particles.forEach(p => p.update()); // aggiorna le particelle esplose
     this.particles = this.particles.filter(p => p.life > 0); // elimina particelle morte
   }
 
+  /* Crea le particelle dell'esplosione.
+     Azioni: genera particelle con direzione, velocità, colore e durata casuali.
+     Chiamata da: Firework.update(). */
   createParticles() {
     const count = 10 + Math.floor(Math.random() * 10); // Numero di stelline che esplodono
     for (let i = 0; i < count; i++) {
@@ -2202,8 +2236,10 @@ class Firework {
     }
   }
 
+  /* Disegna il fuoco d'artificio sul canvas.
+     Azioni: disegna scia, razzo e particelle esplose.
+     Chiamata da: animateFX(). */
   draw(ctx) {
-    // Disegna la scia del razzo
     ctx.save();
     for (let i = 0; i < this.trail.length; i++) {
       const p = this.trail[i];
@@ -2227,15 +2263,17 @@ class Firework {
   }
   }
   
-  // ====================================================
-// GESTIONE FIREWORKS SULLA MAPPA
-// ====================================================
-
+  /* Avvia un nuovo fuoco d'artificio nella posizione indicata.
+     Azioni: converte la posizione geografica in coordinate canvas e crea un nuovo Firework.
+     Chiamata da: updateMarkerState(). */
   function triggerFirework(latLng) {
   const { x, y } = latLngToCanvasXY(latLng.lat, latLng.lng);
   fireworks.push(new Firework(x, y));
 }
 
+  /* Esegue il ciclo di animazione dei fireworks.
+     Azioni: pulisce il canvas, aggiorna e disegna tutti i fireworks, elimina quelli terminati e richiede il frame successivo.
+     Chiamata da: avvio dello script; richiama sé stessa tramite requestAnimationFrame(). */
 function animateFX() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   fireworks.forEach(fw => {
@@ -2252,7 +2290,11 @@ requestAnimationFrame(animateFX);
 }
 animateFX();
 
-// Lancia i fuochi se lo stato è countdown  
+    /* Aggiorna lo stato visivo e i fireworks del marker.
+       Azioni: imposta lo stato, verifica se l'evento è terminato, avvia/interrompe i fireworks in base allo stato.
+       Chiamata da: renderEvents(). 
+       Possibile duplicazione: getEventState() determina già finished, 
+       mentre updateMarkerState() contiene una seconda verifica di fine evento tramite evFine, che però attualmente non riceve il parametro.*/
 function updateMarkerState(marker, state, latLng, evFine) {
   marker.state = state;
   // Calcola se l'evento è finito
@@ -2270,7 +2312,7 @@ function updateMarkerState(marker, state, latLng, evFine) {
   // Evento attuale, fuochi solo se in countdown
   if (state === 'countdown' && !marker.fireworkInterval) {
   triggerFirework(latLng);
-  marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2500); // Un fuoco ogni X secondi 1=1000
+  marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2500); // Un fuoco ogni X secondi 1''=1000
 }
 if (state !== 'countdown' && marker.fireworkInterval) {
   clearInterval(marker.fireworkInterval);
@@ -2279,17 +2321,21 @@ if (state !== 'countdown' && marker.fireworkInterval) {
   return;
 }
 
+/* Gestione Overlay */
 const overlay = document.getElementById('mapOverlay');
 const toggle = document.getElementById('overlayToggle');
-
-//// Gestione Overlay
 let timeout = 3 * 1000; // dopo 3 secondi minimizza l'Overlay 'minimizeOverlay()'
-// Chiusura
+
+/* Minimizza l'overlay principale.
+   Azioni: applica lo stato CSS minimizzato e mostra il pulsante di riapertura.
+   Chiamata da: click esterno; timer iniziale. */  
 function minimizeOverlay() {
   overlay.classList.add('minimized');
   toggle.style.display = 'flex';
 }
-// Apertura
+/* Apre l'overlay principale.
+   Azioni: rimuove lo stato minimizzato e nasconde il pulsante di riapertura.
+   Chiamata da: click sul pulsante toggle. */
 function openOverlay() {
   overlay.classList.remove('minimized');
   toggle.style.display = 'none';
@@ -2309,7 +2355,7 @@ toggle.addEventListener('click', openOverlay);
 // Minimizza l'overlay dopo 3 secondi
 setTimeout(() => { minimizeOverlay(); }, timeout);
 
-// per il service-worker.js
+/* Registra il Service Worker dell'app, se supportato dal browser. */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js');
 }
