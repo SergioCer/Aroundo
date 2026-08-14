@@ -131,19 +131,7 @@ export const TIP_TYPES = {
 };
 
 /* ICONS */
-export const TIP_ICONS = [
-   "👋",
-   "🎉",
-   "❤️",
-   "🚀",
-   "📍",
-   "💡",
-   "📢",
-   "🔔",
-   "ℹ️",
-   "⭐",
-   "⚠️"
-];
+export const TIP_ICONS = ["👋","🎉","❤️","🚀","📍","💡","📢","🔔","ℹ️","⭐","⚠️"];
 
 /* ANALYTICS */
 export const ANALYTICS_FIELDS={
@@ -170,18 +158,12 @@ dv_platform:["Android","iOS","Windows","macOS","Linux","Other"]
 /* HELPERS */
 export function getAnalyticsFields() {
   return Object.entries(ANALYTICS_FIELDS)
-    .map(([value, data]) => ({
-      value,
-      ...data
-    }));
+    .map(([value, data]) => ({value,...data}));
 }
 
 export function getTipTypes() {
   return Object.entries(TIP_TYPES)
-    .map(([value, data]) => ({
-      value,
-      ...data
-    }));
+    .map(([value, data]) => ({value,...data}));
 }
 
 export function getConditions(type){
@@ -222,15 +204,8 @@ AND: both must be true
 OR: at least one must be true
 NOT: the current condition is negated
 */
-export function evaluateLogic(
-  previous,
-  current,
-  logic
-) {
-  if (
-    previous === null ||
-    current === null
-  ) {
+export function evaluateLogic(previous, current, logic) {
+  if (previous === null || current === null) {
     return null;
   }
   if (logic === "AND")
@@ -243,37 +218,18 @@ export function evaluateLogic(
 }
 
 /* PROGRESSION */
-export function calculateProgression(
-  interval,
-  growth,
-  repeat
-) {
+export function calculateProgression(interval, growth, repeat) {
   interval = Number(interval);
   growth = Number(growth);
   repeat = Number(repeat);
-  if (!Number.isFinite(interval))
-    interval = 1;
-  if (!Number.isFinite(growth))
-    growth = 1;
-  const limit =
-    repeat === 0
-      ? 10
-      : Math.min(repeat, 10);
+  if (!Number.isFinite(interval)) interval = 1;
+  if (!Number.isFinite(growth)) growth = 1;
+  const limit = repeat === 0 ? 10 : Math.min(repeat, 10);
   const result = [];
   let total = 0;
-  for (
-    let show = 0;
-    show < limit;
-    show++
-  ) {
-    let increment =
-      Math.floor(
-        interval *
-        (show + 1) *
-        growth
-      );
-    if (increment < 1)
-      increment = 1;
+  for (let show = 0; show < limit; show++) {
+    let increment = Math.floor(interval * (show + 1) * growth);
+    if (increment < 1) increment = 1;
     total += increment;
     result.push(total);
   }
@@ -311,10 +267,7 @@ export function defaultTip() {
 
 /* LOAD */
 export async function loadTip(id) {
-  const {
-    data,
-    error
-  } = await supabase
+  const {data, error} = await supabase
     .from("tips")
     .select("*")
     .eq("id_tips", id)
@@ -326,10 +279,7 @@ export async function loadTip(id) {
 
 /* SAVE */
 export async function saveTip(tip) {
-  const {
-    data,
-    error
-  } = await supabase
+  const {data, error} = await supabase
     .from("tips")
     .upsert(tip)
     .select()
@@ -409,69 +359,27 @@ value:item.value
 });
 });
 const total=latest.size;
-return{
-total,
-involved,
-excluded,
-missing,
-percent:total?Math.round(involved/total*100):0,
-detail
-};
+return{total, involved, excluded, missing, percent:total?Math.round(involved/total*100):0, detail};
 }
 
 /* RENDER TIP */
 export function renderTip(tip) {
-  const model =
-    TIP_TYPES[tip.tp_type] ||
-    TIP_TYPES.bubble;
+  const model = TIP_TYPES[tip.tp_type] || TIP_TYPES.bubble;
 
   /* OVERLAY */
-  const overlay =
-    document.createElement("div");
-  const vertical =
-    model.position.includes("top")
-      ? "flex-start"
-      : model.position.includes("bottom")
-        ? "flex-end"
-        : "center";
-  const horizontal =
-    model.position.includes("left")
-      ? "flex-start"
-      : model.position.includes("right")
-        ? "flex-end"
-        : "center";
-  overlay.style.cssText = `
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    display:flex;
-    align-items:${vertical};
-    justify-content:${horizontal};
-    padding:${model.shape === "banner"
-      ? "0"
-      : "20px"};
-    box-sizing:border-box;
-    pointer-events:none;
-    background:${model.overlay
-      ? "rgba(15,23,42,.48)"
-      : "transparent"};
+  const overlay = document.createElement("div");
+  const vertical = model.position.includes("top") ? "flex-start" : model.position.includes("bottom") ? "flex-end" : "center";
+  const horizontal = model.position.includes("left") ? "flex-start" : model.position.includes("right") ? "flex-end" : "center";
+  overlay.style.cssText = `position:fixed; inset:0; z-index:99999; display:flex; align-items:${vertical}; justify-content:${horizontal};
+    padding:${model.shape === "banner" ? "0" : "20px"}; box-sizing:border-box; pointer-events:none; background:${model.overlay ? "rgba(15,23,42,.48)" : "transparent"};
     animation:aroundoTipIn .22s ease-out;
   `;
 
   /* BOX */
-  const box =
-    document.createElement("div");
-  box.style.cssText = `
-    width:${model.width};
-    max-width:calc(100vw - 40px);
-    box-sizing:border-box;
-    padding:${model.padding};
-    background:${model.background};
-    color:${model.color};
-    border:${model.border};
-    ${model.borderBottom
-      ? `border-bottom:${model.borderBottom};`
-      : ""}
+  const box = document.createElement("div");
+  box.style.cssText = `width:${model.width}; max-width:calc(100vw - 40px); box-sizing:border-box; padding:${model.padding}; background:${model.background};
+    color:${model.color}; border:${model.border}; ${model.borderBottom
+      ? `border-bottom:${model.borderBottom};`: ""}
     border-radius:${model.radius};
     box-shadow:${model.shadow};
     font-family:${model.fontFamily};
@@ -482,104 +390,39 @@ export function renderTip(tip) {
 
   /* BUBBLE TAIL */
   if (model.shape === "bubble") {
-    const tail =
-      document.createElement("div");
-    tail.style.cssText = `
-      position:absolute;
-      bottom:-1px;
-      left:-1px;
-      width:26px;
-      height:26px;
-      background:${model.background};
-      border-left:${model.border};
-      border-bottom:${model.border};
-      transform:skewY(-35deg);
-      transform-origin:bottom left;
-    `;
+    const tail = document.createElement("div");
+    tail.style.cssText = `position:absolute; bottom:-1px; left:-1px; width:26px; height:26px; background:${model.background};
+      border-left:${model.border}; border-bottom:${model.border}; transform:skewY(-35deg); transform-origin:bottom left;`;
     box.appendChild(tail);
   }
 
   /* FLOATING DECORATION */
   if (model.shape === "floating") {
-    const glow =
-      document.createElement("div");
-    glow.style.cssText = `
-      position:absolute;
-      width:90px;
-      height:90px;
-      top:-45px;
-      right:-35px;
-      border-radius:50%;
-      background:#bbf7d0;
-      opacity:.45;
-      pointer-events:none;
-    `;
+    const glow = document.createElement("div");
+    glow.style.cssText = `position:absolute; width:90px; height:90px; top:-45px; right:-35px; border-radius:50%; background:#bbf7d0;
+      opacity:.45; pointer-events:none;`;
     box.appendChild(glow);
   }
 
   /* CARD ACCENT */
   if (model.shape === "card") {
-    const accent =
-      document.createElement("div");
-    accent.style.cssText = `
-      position:absolute;
-      left:0;
-      top:0;
-      bottom:0;
-      width:5px;
-      background:#6366f1;
-    `;
+    const accent = document.createElement("div"); accent.style.cssText = ` position:absolute; left:0; top:0; bottom:0; width:5px; background:#6366f1;`;
     box.appendChild(accent);
   }
   
   /* HEADER */
   if (tip.tp_icon || tip.tp_title) {
-    const header =
-      document.createElement("div");
-    header.style.cssText = `
-      display:flex;
-      align-items:center;
-      gap:${model.shape === "modal"
-        ? "14px"
-        : "10px"};
-      margin-bottom:
-        ${tip.tp_text ? "13px" : "0"};
-    `;
+    const header = document.createElement("div"); header.style.cssText = ` display:flex; align-items:center; gap:${model.shape === "modal" ? "14px" : "10px"};
+      margin-bottom: ${tip.tp_text ? "13px" : "0"};`;
     if (tip.tp_icon) {
-      const icon =
-        document.createElement("span");
-      icon.textContent =
-        tip.tp_icon;
-      icon.style.cssText = `
-        font-size:
-          ${model.shape === "toast"
-            ? "21px"
-            : model.shape === "modal"
-              ? "30px"
-              : "24px"};
-        line-height:1;
-        flex:none;
-      `;
+      const icon = document.createElement("span"); icon.textContent =  tip.tp_icon; icon.style.cssText = ` font-size: ${model.shape === "toast" ? "21px"
+            : model.shape === "modal" ? "30px" : "24px"}; line-height:1; flex:none;`;
       header.appendChild(icon);
     }
     if (tip.tp_title) {
-      const title =
-        document.createElement("div");
-      title.textContent =
-        tip.tp_title;
-      title.style.cssText = `
-        font-size:${model.titleSize};
-        font-weight:
-          ${model.shape === "modal"
-            ? "700"
-            : "600"};
-        line-height:1.2;
-        letter-spacing:
-          ${model.shape === "toast"
-            ? ".2px"
-            : "0"};
-        flex:1;
-      `;
+      const title = document.createElement("div"); title.textContent = tip.tp_title;
+      title.style.cssText = `font-size:${model.titleSize}; font-weight: ${model.shape === "modal" ? "700" : "600"};
+        line-height:1.2; letter-spacing: ${model.shape === "toast" ? ".2px" : "0"}; flex:1;`;
       header.appendChild(title);
     }
     box.appendChild(header);
@@ -587,24 +430,10 @@ export function renderTip(tip) {
 
   /* TEXT */
   if (tip.tp_text) {
-    const content =
-      document.createElement("div");
-    content.textContent =
-      tip.tp_text;
-    content.style.cssText = `
-      font-size:${model.textSize};
-      line-height:
-        ${model.shape === "toast"
-          ? "1.35"
-          : "1.55"};
-      white-space:pre-wrap;
-      ${model.shape === "modal"
-        ? "text-align:center;"
-        : ""}
-      ${model.shape === "banner"
-        ? "max-width:1100px;flex:1;min-width:0;"
-        : ""}
-    `;
+    const content = document.createElement("div");
+    content.textContent = tip.tp_text; content.style.cssText = `font-size:${model.textSize}; line-height: ${model.shape === "toast" ? "1.35" : "1.55"};
+      white-space:pre-wrap; ${model.shape === "modal" ? "text-align:center;" : ""}
+      ${model.shape === "banner" ? "max-width:1100px;flex:1;min-width:0;" : ""}`;
     box.appendChild(content);
   }
 
@@ -664,14 +493,8 @@ if (model.shape === "banner") {
       child.style.marginBottom = "0";
     }
   });
-  const header = children.find(x =>
-    x.style &&
-    x.style.display === "flex"
-  );
-  const content = children.find(x =>
-    x.style &&
-    x.style.whiteSpace === "pre-wrap"
-  );
+  const header = children.find(x => x.style && x.style.display === "flex");
+  const content = children.find(x => x.style && x.style.whiteSpace === "pre-wrap");
   const actions = children[children.length - 1];
   if (header) {
     header.style.width = "100%";
@@ -696,34 +519,12 @@ if (model.shape === "banner") {
   );
 
   /* ANIMATION */
-  if (
-    !document.getElementById(
-      "aroundo-tip-animation"
-    )
+  if ( !document.getElementById("aroundo-tip-animation")
   ) {
-    const style =
-      document.createElement("style");
-    style.id =
-      "aroundo-tip-animation";
-    style.textContent = `
-      @keyframes aroundoTipIn {
-        from {
-          opacity:0;
-          transform:
-            translateY(8px)
-            scale(.98);
-        }
-        to {
-          opacity:1;
-          transform:
-            translateY(0)
-            scale(1);
-        }
-      }
-    `;
-    document.head.appendChild(
-      style
-    );
+    const style = document.createElement("style"); style.id = "aroundo-tip-animation";
+    style.textContent = `@keyframes aroundoTipIn { from { opacity:0; transform: translateY(8px) scale(.98); }
+        to { opacity:1; transform: translateY(0) scale(1); } }`;
+    document.head.appendChild(style);
   }
   return overlay;
 }
