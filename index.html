@@ -1143,6 +1143,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
       updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
     });
   
     /* Gestione: Prev - Next - Reset, nelle modalità: Live - Past - Day
