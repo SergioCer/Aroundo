@@ -1145,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       /* Gli altri casi: spostamento effettivo indietro di un giorno */
       currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
-      updateTimelineMode();
+      // CANCELLARE   updateTimelineMode();
       updateDateUI();
       setupTimeline();
       renderEvents();
@@ -1172,7 +1172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     document.getElementById("reset-day").addEventListener("click", () => {
       currentDate = new Date(); // oggi
-      updateTimelineMode();
+      ();
       updateDateUI();
       setupTimeline();
       renderEvents();
