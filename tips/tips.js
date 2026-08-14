@@ -149,6 +149,16 @@ export function getAnalyticsFields() {
     .map(([value, data]) => ({value,...data}));
 }
 
+export async function getTipOptions(){
+  const {data,error}=await supabase
+    .from("devices")
+    .select("dv_platform,dv_entrance");
+  if(error)throw error;
+  const platforms=[...new Set((data||[]).map(x=>x.dv_platform).filter(Boolean))];
+  const entrances=[...new Set((data||[]).map(x=>x.dv_entrance).filter(Boolean))];
+  return {platforms,entrances};
+}
+
 export function getTipTypes() {
   return Object.entries(TIP_TYPES)
     .map(([value, data]) => ({value,...data}));
