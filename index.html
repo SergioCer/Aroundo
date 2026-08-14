@@ -1221,13 +1221,78 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
     }
   }
-                                                           
-  /* GESTIONE TIMELINE:
+
+    /* Ricrea lo slider temporale in base alla modalità corrente.
+      Azioni: distrugge l'eventuale slider precedente, calcola il range temporale, ricrea lo slider e calcola/imposta la posizione dell'indicatore di mezzanotte o lo nasconde.
+      Chiamata da: inizializzazione; navigazione giorno (prev/next); reset giorno; rientro nella pagina. */
+    function setupTimeline() {
+      // distrugge vecchio slider per ricrearlo da zero
+      if (slider.noUiSlider) {
+      slider.noUiSlider.destroy();
+      slider.noUiSlider = null;
+      }
+      const { start, end } = getTimelineRange();
+      // ore totali reali del range
+      totalHours = Math.ceil((end - start) / 3600000);
+      // Controllo di sicurezza per evitare errori.
+      if (!totalHours || isNaN(totalHours)) {console.error("Invalid timeline range", totalHours);
+      return;
+      }
+      // Crea lo slider con doppia maniglia
+      noUiSlider.create(slider, {start: [0, totalHours], connect: true, step: 1, range: { min: 0, max: totalHours }});
+      // Ad ogni movimento dello slider agiorna la mappa
+      slider.noUiSlider.on('update', updateHandles);
+      // Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
+      const midnight = document.getElementById('midnight');
+      if (timelineMode === 'live') {
+      midnightPercent = getMidnightPosition(totalHours);
+      midnight.style.display = "block"; 
+      midnight.style.left = `${midnightPercent * 100}%`;
+      } else {
+      // nascondi barra in day mode
+      midnight.style.display = "none";
+      }
+    }
+
+    /* Calcola il range temporale della timeline.
+       Azioni: determina data/ora di inizio e fine in base a timelineMode: live = ora corrente → fine di domani; past/day = 00:00 → 23:59 del giorno selezionato.
+       Chiamata da: setupTimeline(); updateMarkerVisibility(). */
+    function getTimelineRange () {
+      let start, end;
+      if (timelineMode === 'live') {
+        start = getAppTime('live'); // Ora corrente
+        end = new Date(start);
+        end.setDate(end.getDate() + 1) ; // Domani
+        end.setHours(23, 59, 59, 999);  // fine giornata domani
+        } else {
+        start = getAppTime('startOfDay'); // Inizio Giorno
+        end = getAppTime('endOfDay'); // Fine Giorno
+        }
+        return { start, end };
+    }
+  
+    /* Restituisce una data/ora di riferimento.
+       Modalità: startOfDay, endOfDay, live o ora corrente sul giorno logico.
+       Chiamata da: getTimelineRange(), updateHandles(), getUpcomingEvents(). */
+    function getAppTime(mode = 'now') {
+      const day = new Date(currentDate);
+      let time = new Date();
+      switch(mode) {case 'startOfDay': time = new Date(day); time.setHours(0,0,0,0); break;
+          case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break;
+          // ora reale se siamo in modalità LIVE
+          case 'live': time = new Date(); break;
+          // ora corrente entro il giorno logico
+          default: time = new Date(day); time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);
+        }
+      return time;
+    }
+  
+    /* GESTIONE TIMELINE:
     Determina la modalità della timeline in base alla data selezionata:
      - past = giorno precedente a oggi 00-24.
      - live = oggi+domani, timeline inizia dall'ora corrente fino alle 24 più tutta la giornata completa di domani 00-24.
      - day  = giorno successivo ad oggi, 00-24 */ 
-  function updateTimelineMode() {
+    function updateTimelineMode() {
       const currentDay = new Date(currentDate);
       currentDay.setHours(0,0,0,0);
       const today = new Date();
@@ -1237,38 +1302,40 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else if (diffDays === 0) {timelineMode = 'live';
       } else {timelineMode = 'day';
       }
-  }
+    }
 
+    /* Aggiorna le etichette delle maniglie e il filtro temporale dei marker.
+       Azioni: converte gli offset dello slider in date/ore reali, aggiorna le etichette e applica il range alla visibilità dei marker.
+       Chiamata da: evento 'update' dello slider. */
+    function updateHandles(values) {
+      // Offset
+      const startOffset = Math.round(values[0]);
+      const endOffset = Math.round(values[1]);
+      // baseTime coerente con la modalità timeline
+      const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
+      const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
+      const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
+      // Crea le etichette delle maniglie
+      const formatTime = (date) =>
+      date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
+      const startLabel = formatTime(startDate);
+      const endLabel   = formatTime(endDate);
+      const handles = slider.querySelectorAll('.noUi-handle');
+      handles.forEach((h, i) => {let label = h.querySelector('.handle-label');
+        if (!label) {
+          label = document.createElement('div');
+          label.className = 'handle-label';
+          h.appendChild(label);
+        }
+      // Inserisce ora di inizio e di fine
+      label.innerText = i === 0 ? startLabel : endLabel;
+    });
+    updateMarkerVisibility(startDate,endDate);
+  }
+  
     window.showMessage = function(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";};
 
     window.closeMessage = function () {document.getElementById("messageDialog").style.display = "none";};
-  
-    /* Restituisce una data/ora di riferimento.
-       Modalità: startOfDay, endOfDay, live o ora corrente sul giorno logico.
-       Chiamata da: getTimelineRange(), updateHandles(), getUpcomingEvents(). */
-    function getAppTime(mode = 'now') {
-      const day = new Date(currentDate);
-      let time = new Date();
-      switch(mode) {
-          case 'startOfDay':
-              time = new Date(day);
-              time.setHours(0,0,0,0);
-              break;
-          case 'endOfDay':
-              time = new Date(day);
-              time.setHours(23,59,59,999);
-              break;
-          case 'live': 
-              // ora reale se siamo in modalità LIVE
-              time = new Date();
-              break;
-          default: 
-              // ora corrente entro il giorno logico
-              time = new Date(day);
-              time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);
-      }
-      return time;
-  }
   
   // Preleva le Categorie da supabase
   async function fetchCategories() {
@@ -1285,25 +1352,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
   // Preleva gli Eventi ed Organizzatori da supabase
-  async function fetchEvents() {
-    let query = supabase      
-      .from('eventi')
-      .select(`
-      *,
-      organizzatori (or_nome),  
-      luoghi (
-      lu_lat,
-      lu_lng,
-      lu_location,
-      lu_descrizione,
-      id_comune,
-      comuni (co_descrizione)
-      )
-      `)
+  async function fetchEvents() {let query = supabase .from('eventi')
+      .select(`*, organizzatori (or_nome), luoghi (lu_lat, lu_lng, lu_location, lu_descrizione, id_comune, comuni (co_descrizione))`)
       .eq('ev_attivo', true);
-    const { data, error } = await query;  //     
-    if (error) {
-      console.error("Errore caricamento eventi:", error);
+    const { data, error } = await query;
+    if (error) {console.error("Errore caricamento eventi:", error);
     return [];
     }
     return data;
@@ -1324,25 +1377,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       markersCluster.removeLayer(m.marker);
       });
       markers = [];
-      events.sort((a, b) =>
-        new Date(a.ev_inizio) - new Date(b.ev_inizio)
-    );
+      events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
       events.forEach(e => {
-        const stateData = getEventState(
-          new Date(e.ev_inizio),
-          e.ev_fine ? new Date(e.ev_fine) : null
-        );
+        const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
         const stateClass = stateData.state;
-        
         // 🎨 ICONA
         const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
-          icon: createIcon(
-            categories.find(c =>
-              c.id_categoria === e.id_categoria
-            )?.mc_colore || '#999',
-            stateClass
-            // NOTA (1) intensity
-          )
+          icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)
         })
         marker.evTime = new Date(e.ev_inizio).getTime();
         marker.__eventData = e; // sempre per spiderizza
@@ -1362,12 +1403,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const align = isToday ? 'flex-start' : (isTomorrow ? 'flex-end' : 'center');
             // Formatta la data per il popup
             let dayLabel;
-            if (isToday) {
-              dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-            } else if (isTomorrow) {
-              dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-            } else {
-              dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
+            if (isToday) { dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+            } else if (isTomorrow) { dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+            } else { dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
             }
         /* Richiama il POPUP */
         marker.on('click', function () {
@@ -1375,36 +1413,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.openBasePopup(e, this.getLatLng());
         });
         // 📦 STORAGE DATI (NO LOGICA)
-        markers.push({
-          marker,
-          category: parseInt(e.id_categoria),
-          start: new Date(e.ev_inizio),
-          end: e.ev_fine ? new Date(e.ev_fine) : null,
-        });
+        markers.push({ marker, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
         updateMarkerVisibility();
     }
 
-  // potenzialmente da CANCELLARE MA ATTENZIONE dovrebbe ordinare i marker per orario per la spiderizzazione ma fino a quando non c'è un filtro dal database non funziona. 
-oms.addListener('click', function (marker) {
-    const group = markers.filter(m =>
-    m.marker.getLatLng().lat === marker.getLatLng().lat &&
-    m.marker.getLatLng().lng === marker.getLatLng().lng
-  );
-  group.sort((a, b) => a.marker.evTime - b.marker.evTime);
-  openOrderedPopup(marker);
-});
+    // potenzialmente da CANCELLARE MA ATTENZIONE dovrebbe ordinare i marker per orario per la spiderizzazione ma fino a quando non c'è un filtro dal database non funziona. 
+    oms.addListener('click', function (marker) {
+        const group = markers.filter(m => m.marker.getLatLng().lat === marker.getLatLng().lat && m.marker.getLatLng().lng === marker.getLatLng().lng);
+      group.sort((a, b) => a.marker.evTime - b.marker.evTime);
+      openOrderedPopup(marker);
+    });
 
     // Dimensione dei Markers  
     function createIcon(color, state) {
       const size = markerSizes[state] || 10;
-      return L.divIcon({
-      className: '',
-      html: `
-      <div class="pulse ${state}"
-      style="--c:${color};width:${size}px;height:${size}px;">
-      </div>
-      `,
+      return L.divIcon({ className: '', html: `<div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div>`,
       iconSize: [size, size]
       });
     }
@@ -1447,36 +1471,36 @@ oms.addListener('click', function (marker) {
         });
     }
 
-  function openOrderedPopup(marker) {
-  const group = oms.getMarkers().filter(m =>
-    m.getLatLng().lat === marker.getLatLng().lat &&
-    m.getLatLng().lng === marker.getLatLng().lng
-  );
-  group.sort((a, b) => new Date(a.evInizio) - new Date(b.evInizio));
-  const first = group[0];
-  const e = first.__eventData; // recupero dati evento
-  const content = `
-    <div style="min-width:140px; font-size:12px; line-height:1.3;">
-      <div style="text-align:center; font-weight:700; margin-bottom:6px;">
-        ${e.ev_titolo}
+    function openOrderedPopup(marker) {
+    const group = oms.getMarkers().filter(m =>
+      m.getLatLng().lat === marker.getLatLng().lat &&
+      m.getLatLng().lng === marker.getLatLng().lng
+    );
+    group.sort((a, b) => new Date(a.evInizio) - new Date(b.evInizio));
+    const first = group[0];
+    const e = first.__eventData; // recupero dati evento
+    const content = `
+      <div style="min-width:140px; font-size:12px; line-height:1.3;">
+        <div style="text-align:center; font-weight:700; margin-bottom:6px;">
+          ${e.ev_titolo}
+        </div>
+        <div style="text-align:center; margin-bottom:6px;">
+          ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+        </div>
+        <div style="font-size:12px; color:#555;">
+          ${e.ev_descrizione || ''}
+        </div>
+        <div style="margin-top:6px;">
+          By: ${e.organizzatori?.or_nome || ''}
+        </div>
       </div>
-      <div style="text-align:center; margin-bottom:6px;">
-        ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
-      </div>
-      <div style="font-size:12px; color:#555;">
-        ${e.ev_descrizione || ''}
-      </div>
-      <div style="margin-top:6px;">
-        By: ${e.organizzatori?.or_nome || ''}
-      </div>
-    </div>
-  `;
-  L.popup()
-    .setLatLng(first.getLatLng())
-    .setContent(content)
-    .openOn(map);
-}
-
+    `;
+    L.popup()
+      .setLatLng(first.getLatLng())
+      .setContent(content)
+      .openOn(map);
+  }
+  
     /* Costruisce e inizializza il menu categorie.
        Azioni: crea le checkbox, le seleziona tutte, configura toggle e listener. */
     function buildCategoryMenu() {
@@ -1570,101 +1594,6 @@ oms.addListener('click', function (marker) {
     });
  }
   
-      /* Ricrea lo slider temporale in base alla modalità corrente.
-      Azioni: distrugge l'eventuale slider precedente, calcola il range
-      temporale, ricrea lo slider e calcola/imposta la posizione
-      dell'indicatore di mezzanotte o lo nasconde.
-      Chiamata da: inizializzazione; navigazione giorno (prev/next);
-      reset giorno; rientro nella pagina. */
-    function setupTimeline() {
-      // distrugge vecchio slider per ricrearlo da zero
-      if (slider.noUiSlider) {
-      slider.noUiSlider.destroy();
-      slider.noUiSlider = null;
-      }
-      const { start, end } = getTimelineRange();
-      // ore totali reali del range
-      totalHours = Math.ceil((end - start) / 3600000);
-      // Controllo di sicurezza per evitare errori.
-      if (!totalHours || isNaN(totalHours)) {
-      console.error("Invalid timeline range", totalHours);
-      return;
-      }
-      // Crea lo slider con doppia maniglia
-      noUiSlider.create(slider, {
-      start: [0, totalHours],
-      connect: true,
-      step: 1,
-      range: {
-        min: 0,
-        max: totalHours
-        }
-      });
-      // Ad ogni movimento dello slider agiorna la mappa
-      slider.noUiSlider.on('update', updateHandles);
-      // Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
-      const midnight = document.getElementById('midnight');
-      if (timelineMode === 'live') {
-      midnightPercent = getMidnightPosition(totalHours);
-      midnight.style.display = "block"; 
-      midnight.style.left = `${midnightPercent * 100}%`;
-      } else {
-      // nascondi barra in day mode
-      midnight.style.display = "none";
-      }
-    }
-
-    /* Aggiorna le etichette delle maniglie e il filtro temporale dei marker.
-       Azioni: converte gli offset dello slider in date/ore reali,
-       aggiorna le etichette e applica il range alla visibilità dei marker.
-       Chiamata da: evento 'update' dello slider. */
-    function updateHandles(values) {
-      // Offset
-      const startOffset = Math.round(values[0]);
-      const endOffset = Math.round(values[1]);
-      // baseTime coerente con la modalità timeline
-      const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
-      const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
-      const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
-      // Crea le etichette delle maniglie
-      const formatTime = (date) =>
-      date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
-      const startLabel = formatTime(startDate);
-      const endLabel   = formatTime(endDate);
-      const handles = slider.querySelectorAll('.noUi-handle');
-      handles.forEach((h, i) => {
-        let label =
-          h.querySelector('.handle-label');
-        if (!label) {
-          label = document.createElement('div');
-          label.className = 'handle-label';
-          h.appendChild(label);
-        }
-      // Inserisce ora di inizio e di fine
-      label.innerText = i === 0 ? startLabel : endLabel;
-    });
-    updateMarkerVisibility(startDate,endDate);
-  }
-
-      /* Calcola il range temporale della timeline.
-         Azioni: determina data/ora di inizio e fine in base a timelineMode.
-         live = ora corrente → fine di domani;
-         past/day = 00:00 → 23:59 del giorno selezionato.
-         Chiamata da: setupTimeline(); updateMarkerVisibility(). */
-    function getTimelineRange () {
-      let start, end;
-      if (timelineMode === 'live') {
-        start = getAppTime('live'); // Ora corrente
-        end = new Date(start);
-        end.setDate(end.getDate() + 1) ; // Domani
-        end.setHours(23, 59, 59, 999);  // fine giornata domani
-        } else {
-        start = getAppTime('startOfDay'); // Inizio Giorno
-        end = getAppTime('endOfDay'); // Fine Giorno
-        }
-        return { start, end };
-    }
-
     /* Calcola la posizione relativa della mezzanotte nella modalità live. 
        Azioni: determina la percentuale relativa della mezzanotte rispetto
        al range temporale corrente; restituisce 0 fuori dalla modalità live.
