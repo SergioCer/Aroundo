@@ -2,45 +2,22 @@ import { supabase } from './supabase.js';
 
 function getDeviceId(){
   let id = localStorage.getItem("aroundo_device_id");
-  if(!id){
-    id =
-      crypto.randomUUID
-      ?
-      crypto.randomUUID()
-      :
-      Date.now().toString(36)
-      +
-      Math.random()
-        .toString(36)
-        .substring(2);
-    localStorage.setItem("aroundo_device_id", id);
-  }
+  if(!id){ id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random() .toString(36) .substring(2); localStorage.setItem("aroundo_device_id", id);}
   return id;
 }
 
 function getPlatform(){
   const ua = navigator.userAgent.toLowerCase();
-  if(ua.includes("android"))
-    return "Android";
-  if(
-    ua.includes("iphone") ||
-    ua.includes("ipad")
-  )
-    return "iOS";
-  if(ua.includes("windows"))
-    return "Windows";
-  if(ua.includes("mac"))
-    return "macOS";
-  if(ua.includes("linux"))
-    return "Linux";
+  if(ua.includes("android")) return "Android";
+  if(ua.includes("iphone") || ua.includes("ipad")) return "iOS";
+  if(ua.includes("windows")) return "Windows";
+  if(ua.includes("mac")) return "macOS";
+  if(ua.includes("linux")) return "Linux";
   return "Unknown";
 }
 
 function getAppMode(){
-  if(
-    window.matchMedia(
-      "(display-mode: standalone)"
-    ).matches ||
+  if(window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true
   ){
     return true;
@@ -63,8 +40,7 @@ async function getDevice() {
     .select(`id_device, dv_first_access, dv_platform, dv_app, dv_entrance`)
     .eq("dv_device", device)
     .single();
-  if (error || !data) {
-    console.error("Device lookup error:", error?.message || "Device not found");
+  if (error || !data) {console.error("Device lookup error:", error?.message || "Device not found");
     return null;
   }
   return data;
@@ -103,52 +79,28 @@ async function updateAnalytics(values){
   }
 
    /* RECORD GIA' ESISTENTE */
-  if(
-    data &&
-    data.length
-  ){
+  if(data && data.length){
     const current =  data[0];
     const update = {};
-    if(values.open)
-      update.an_open = current.an_open + 1;
-    if(values.share)
-      update.an_share = current.an_share + 1;
-    if(values.marker)
-      update.an_marker = current.an_marker + 1;
-    if(values.map)
-      update.an_map = current.an_map + 1;
-    if(values.buy)
-      update.an_buy = current.an_buy + 1;
-    if(values.book)
-      update.an_book = current.an_book + 1;
-    if(values.more)
-      update.an_more = current.an_more + 1;
-    if(values.info)
-      update.an_info = current.an_info + 1;
-    if(values.login)
-      update.an_login = current.an_login + 1;
-    if(values.install)
-      update.an_install = current.an_install + 1;
-    if(values.gps !== undefined)
-      update.an_gps = values.gps;
-    if(
-      values.lat !== undefined &&
-      values.lng !== undefined
-    ){
-      update.an_lat = values.lat;
-      update.an_lng = values.lng;
-    }
+    if(values.open) update.an_open = current.an_open + 1;
+    if(values.share) update.an_share = current.an_share + 1;
+    if(values.marker) update.an_marker = current.an_marker + 1;
+    if(values.map) update.an_map = current.an_map + 1;
+    if(values.buy) update.an_buy = current.an_buy + 1;
+    if(values.book) update.an_book = current.an_book + 1;
+    if(values.more) update.an_more = current.an_more + 1;
+    if(values.info) update.an_info = current.an_info + 1;
+    if(values.login) update.an_login = current.an_login + 1;
+    if(values.install) update.an_install = current.an_install + 1;
+    if(values.gps !== undefined) update.an_gps = values.gps;
+    if(values.lat !== undefined && values.lng !== undefined){update.an_lat = values.lat; update.an_lng = values.lng;}
     await supabase
       .from("analytics")
       .update(update)
-      .eq(
-        "id_analytics",
-        current.id_analytics
-      );
+      .eq("id_analytics", current.id_analytics);
     await supabase
       .from("analytics_info")
-      .update({ai_last_update: new Date().toISOString()
-      })
+      .update({ai_last_update: new Date().toISOString()})
       .eq("id_analytics_info", 1);
     return;
   }
@@ -176,71 +128,29 @@ async function updateAnalytics(values){
     .insert(insert);
   await supabase
     .from("analytics_info")
-    .update({
-      ai_last_update:
-        new Date().toISOString()
-    })
-    .eq(
-      "id_analytics_info",
-      1
-    );
+    .update({ ai_last_update: new Date().toISOString()})
+    .eq("id_analytics_info", 1);
 }
 
 /* EVENTS */
-export function analyticsOpen(){
-  return updateAnalytics({open:true});
-}
-
-export function analyticsShare(){
-  return updateAnalytics({share:true});
-}
-
-export function analyticsMarker(){
-  return updateAnalytics({marker:true});
-}
-
-export function analyticsMap(){
-  return updateAnalytics({map:true});
-}
-
-export function analyticsBuy(){
-  return updateAnalytics({buy:true});
-}
-
-export function analyticsBook(){
-  return updateAnalytics({book:true});
-}
-
-export function analyticsMore(){
-  return updateAnalytics({more:true});
-}
-
-export function analyticsInfo(){
-  return updateAnalytics({info:true});
-}
-
-export function analyticsLogin(){
-  return updateAnalytics({login:true});
-}
-
-export function analyticsInstall(){
-  return updateAnalytics({install:true});
-}
-
-export function analyticsGPS(value, lat = null, lng = null){
-  return updateAnalytics({gps: value,
+export function analyticsOpen(){return updateAnalytics({open:true});}
+export function analyticsShare(){return updateAnalytics({share:true});}
+export function analyticsMarker(){return updateAnalytics({marker:true});}
+export function analyticsMap(){return updateAnalytics({map:true});}
+export function analyticsBuy(){return updateAnalytics({buy:true});}
+export function analyticsBook(){return updateAnalytics({book:true});}
+export function analyticsMore(){return updateAnalytics({more:true});}
+export function analyticsInfo(){return updateAnalytics({info:true});}
+export function analyticsLogin(){return updateAnalytics({login:true});}
+export function analyticsInstall(){return updateAnalytics({install:true});}
+export function analyticsGPS(value, lat = null, lng = null){return updateAnalytics({gps: value,
     lat: lat !== null ? Number(lat.toFixed(2)) : undefined,
     lng: lng !== null ? Number(lng.toFixed(2)) : undefined
   });
 }
 
 /* ENTRANCE */
-export function analyticsEntrance(source){
-  return updateAnalytics({entrance: source || null});
-}
-
-
-
+export function analyticsEntrance(source){return updateAnalytics({entrance: source || null});}
 
 /*
  * ============================================================
