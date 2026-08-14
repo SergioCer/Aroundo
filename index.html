@@ -1131,6 +1131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href="pages/why-aroundo.html";
       };
 
+  /* Gestione: Prev - Next - Reset, nelle modalità: Live - Past - Day */
     document.getElementById("prev-day").addEventListener("click", () => {
       if (timelineMode === 'live') {
         timelineMode = 'past';
@@ -1148,36 +1149,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderEvents();
     });
   
-    /* Gestione: Prev - Next - Reset, nelle modalità: Live - Past - Day
-      document.getElementById("prev-day").addEventListener("click", () => {
-        prevDay();
-        updateDateUI();
-        setupTimeline();
-        renderEvents();
-      });
- */
-    /* Gestisce la navigazione al giorno precedente.
-       Azioni: in modalità live passa al giorno passato; altrimenti
-       arretra currentDate di un giorno e aggiorna timelineMode.
-       Chiamata da: pulsante prev-day. 
-    function prevDay() {
-      if (timelineMode === 'live') {
-        timelineMode = 'past';
-        updateDateUI();
-        setupTimeline();
-        renderEvents();
-        return;
-      }
-      // Gli altri casi: spostamento effettivo indietro di un giorno
-      currentDate.setDate(currentDate.getDate() - 1);
-      timelineMode = 'past';
-      updateTimelineMode();
-    }  
-*/
-
     document.getElementById("next-day").addEventListener("click", () => {
-      nextDay();
-      updateTimelineMode();
+      /* nextDay(); */
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const current = new Date(currentDate);
+      current.setHours(0,0,0,0);
+      if (timelineMode === 'past' && current.getTime() === today.getTime()
+      ) { 
+        timelineMode = 'live';
+     } else {
+      currentDate.setDate(currentDate.getDate() + 1);
+      timelineMode = 'day';
+    }
+      // updateTimelineMode();
       updateDateUI();
       setupTimeline();
       renderEvents();
@@ -1186,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* Gestisce la navigazione al giorno successivo.
        Azioni: da oggi in modalità past passa a live; altrimenti
        avanza currentDate di un giorno e aggiorna timelineMode.
-       Chiamata da: pulsante next-day. */
+       Chiamata da: pulsante next-day. 
     function nextDay() {
      const today = new Date();
       today.setHours(0,0,0,0);
@@ -1200,7 +1185,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentDate.setDate(currentDate.getDate() + 1);
       timelineMode = 'day';
     }
-
+*/
+  
     document.getElementById("reset-day").addEventListener("click", () => {
       currentDate = new Date(); // oggi
       updateTimelineMode();
