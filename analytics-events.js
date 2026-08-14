@@ -104,9 +104,22 @@ async function updateAnalytics(values){
       an_more: values.more ? 1 : 0,
       an_info: values.info ? 1 : 0
     };
-    await supabase
+    
+  
+    /* await supabase
       .from("analytics")
-      .insert(insert);
+      .insert(insert); */
+
+const { error: insertError } = await supabase
+  .from("analytics")
+  .insert(insert);
+
+if (insertError) {
+  console.error("Analytics insert error:", insertError);
+  return;
+}
+
+  
     await supabase
       .from("analytics_info")
       .update({ ai_last_update: new Date().toISOString()})
