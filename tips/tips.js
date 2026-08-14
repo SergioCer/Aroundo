@@ -11,10 +11,8 @@ export const TIP_TYPES = {
     color: "#172554",
     border: "2px solid #60a5fa",
     radius: "28px 28px 28px 8px",
-    shadow:
-      "0 12px 35px rgba(30,64,175,.18)",
-    fontFamily:
-      "Arial, sans-serif",
+    shadow: "0 12px 35px rgba(30,64,175,.18)",
+    fontFamily: "Arial, sans-serif",
     titleSize: "18px",
     textSize: "14px",
     padding: "22px",
@@ -32,10 +30,8 @@ export const TIP_TYPES = {
     color: "#111827",
     border: "3px solid #6366f1",
     radius: "42px",
-    shadow:
-      "0 25px 70px rgba(31,41,55,.28)",
-    fontFamily:
-      "Georgia, 'Times New Roman', serif",
+    shadow: "0 25px 70px rgba(31,41,55,.28)",
+    fontFamily: "Georgia, 'Times New Roman', serif",
     titleSize: "24px",
     textSize: "16px",
     padding: "34px",
@@ -54,10 +50,8 @@ export const TIP_TYPES = {
     border: "0",
     borderBottom: "4px solid #f59e0b",
     radius: "0",
-    shadow:
-      "0 6px 20px rgba(120,53,15,.16)",
-    fontFamily:
-      "Arial, sans-serif",
+    shadow: "0 6px 20px rgba(120,53,15,.16)",
+    fontFamily: "Arial, sans-serif",
     titleSize: "17px",
     textSize: "14px",
     padding: "16px 28px",
@@ -75,10 +69,8 @@ export const TIP_TYPES = {
     color: "#ffffff",
     border: "none",
     radius: "8px",
-    shadow:
-      "0 14px 35px rgba(0,0,0,.28)",
-    fontFamily:
-      "'Trebuchet MS', Arial, sans-serif",
+    shadow: "0 14px 35px rgba(0,0,0,.28)",
+    fontFamily: "'Trebuchet MS', Arial, sans-serif",
     titleSize: "17px",
     textSize: "15px",
     padding: "17px",
@@ -96,10 +88,8 @@ export const TIP_TYPES = {
     color: "#1f2937",
     border: "1px solid #d1d5db",
     radius: "6px",
-    shadow:
-      "8px 12px 35px rgba(0,0,0,.14)",
-    fontFamily:
-      "'Segoe UI', Arial, sans-serif",
+    shadow: "8px 12px 35px rgba(0,0,0,.14)",
+    fontFamily: "'Segoe UI', Arial, sans-serif",
     titleSize: "20px",
     textSize: "14px",
     padding: "26px",
@@ -117,10 +107,8 @@ export const TIP_TYPES = {
     color: "#166534",
     border: "2px solid #86efac",
     radius: "34px 34px 12px 34px",
-    shadow:
-      "0 14px 38px rgba(22,101,52,.16)",
-    fontFamily:
-      "'Trebuchet MS', Arial, sans-serif",
+    shadow: "0 14px 38px rgba(22,101,52,.16)",
+    fontFamily: "'Trebuchet MS', Arial, sans-serif",
     titleSize: "19px",
     textSize: "14px",
     padding: "23px",
