@@ -1125,37 +1125,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     };
 
-      /* Richiama la pagina Info */
+    /* Richiama la pagina Info */
       document.getElementById("infoBtn").onclick=function(){
-      analyticsInfo();
-      window.location.href="pages/why-aroundo.html";
-    };
-  
-    document.getElementById("prev-day").addEventListener("click", () => {prevDay();
-      updateDateUI();
-      setupTimeline();
-      renderEvents();
-    });
+        analyticsInfo();
+        window.location.href="pages/why-aroundo.html";
+      };
 
-    document.getElementById("next-day").addEventListener("click", () => {nextDay();
+    document.getElementById("prev-day").addEventListener("click", () => {
+      if (timelineMode === 'live') {
+        timelineMode = 'past';
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
+        return;
+      }
+      // Gli altri casi: spostamento effettivo indietro di un giorno
+      currentDate.setDate(currentDate.getDate() - 1);
+      timelineMode = 'past';
       updateTimelineMode();
-      updateDateUI();
-      setupTimeline();
-      renderEvents();
     });
   
-    document.getElementById("reset-day").addEventListener("click", () => {
-      currentDate = new Date(); // oggi
-      updateTimelineMode();
-      updateDateUI();
-      setupTimeline();
-      renderEvents();
-    });
-
+    /* Gestione: Prev - Next - Reset, nelle modalità: Live - Past - Day
+      document.getElementById("prev-day").addEventListener("click", () => {
+        prevDay();
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
+      });
+ */
     /* Gestisce la navigazione al giorno precedente.
        Azioni: in modalità live passa al giorno passato; altrimenti
        arretra currentDate di un giorno e aggiorna timelineMode.
-       Chiamata da: pulsante prev-day. */
+       Chiamata da: pulsante prev-day. 
     function prevDay() {
       if (timelineMode === 'live') {
         timelineMode = 'past';
@@ -1168,8 +1169,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
       updateTimelineMode();
-    }
+    }  
+*/
 
+    document.getElementById("next-day").addEventListener("click", () => {
+      nextDay();
+      updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+    });
+  
     /* Gestisce la navigazione al giorno successivo.
        Azioni: da oggi in modalità past passa a live; altrimenti
        avanza currentDate di un giorno e aggiorna timelineMode.
@@ -1182,14 +1192,87 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (timelineMode === 'past' &&
         current.getTime() === today.getTime()) {   
       timelineMode = 'live';
-      /* CANCELLARE ridondante. updateTimelineMode(); */
       return;
       }
       currentDate.setDate(currentDate.getDate() + 1);
       timelineMode = 'day';
-      /* CANCELLARE ridondante.  updateTimelineMode(); */
     }
-  
+
+    document.getElementById("reset-day").addEventListener("click", () => {
+      currentDate = new Date(); // oggi
+      updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+    });
+
+    /* Aggiorna le informazioni testuali della timeline:
+       data, giorno della settimana e posizione dei giorni
+       nella modalità live/day.
+       Richimata da: DOM; visibilitychange; prevday in modalità Live. Listener: prev-day; next-day; reset-day */
+    function updateDateUI() {
+      dayText.innerText = currentDate.getDate();
+      dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
+    // -- Posizionamento di -day
+    //-- Iniziali Maiuscole
+    function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+      // ---- dichiarazioni globali alla funzione ----
+      const currentDayEl = document.getElementById('day-text');
+      const nextDayEl = document.getElementById('day-next-text');
+    if (timelineMode === 'live') {
+      const currentDayPercent = midnightPercent / 2;
+      const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
+      // Giorno attuale
+      let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
+      currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+      currentDayEl.style.left = `${currentDayPercent * 100}%`;
+      currentDayEl.style.display = "block";
+      currentDayEl.style.transform = "";
+      // Giorno successivo
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(currentDate.getDate() + 1);
+      let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
+      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
+      nextDayEl.style.left = `${(nextDayPercent - 0.10) * 100}%`; // tolgo il 10% per compensare in allineamento la dimensione dei caratteri
+      nextDayEl.style.display = "block";
+      nextDayEl.style.transform = "";
+    } else { 
+    // DAY MODE
+    nextDayEl.style.display = "none";
+    // centra day-text
+    currentDayEl.style.display = "block";
+    currentDayEl.style.left = "50%";
+    currentDayEl.style.transform = "translateX(-50%)";
+    let currentDayName =
+      currentDate.toLocaleDateString(navigator.language, {
+        weekday: 'short'
+      });
+    currentDayName = capitalizeFirst(currentDayName);
+    currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+    }
+  }
+                                                           
+  /* GESTIONE TIMELINE:
+    Determina la modalità della timeline in base alla data selezionata:
+     - past = giorno precedente a oggi 00-24.
+     - live = oggi+domani, timeline inizia dall'ora corrente fino alle 24 più tutta la giornata completa di domani 00-24.
+     - day  = giorno successivo ad oggi, 00-24 */ 
+  function updateTimelineMode() {
+      const currentDay = new Date(currentDate);
+      currentDay.setHours(0,0,0,0);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const diffDays = Math.round((currentDay - today) / 86400000);
+      if (diffDays < 0) {timelineMode = 'past';
+      } else if (diffDays === 0) {timelineMode = 'live';
+      } else {timelineMode = 'day';
+      }
+  }
+
     window.showMessage = function(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";};
 
     window.closeMessage = function () {document.getElementById("messageDialog").style.display = "none";};
@@ -1520,76 +1603,7 @@ oms.addListener('click', function (marker) {
       }
     });
  }
-                                                         
-  /* GESTIONE TIMELINE:
-    Determina la modalità della timeline in base alla data selezionata:
-     - past = giorno precedente a oggi 00-24.
-     - live = oggi+domani, timeline inizia dall'ora corrente fino alle 24 più tutta la giornata completa di domani 00-24.
-     - day  = giorno successivo ad oggi, 00-24 */ 
-  function updateTimelineMode() {
-      const currentDay = new Date(currentDate);
-      currentDay.setHours(0,0,0,0);
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const diffDays = Math.round((currentDay - today) / 86400000);
-      if (diffDays < 0) {
-      timelineMode = 'past';
-      } else if (diffDays === 0) {
-      timelineMode = 'live';
-      } else {
-      timelineMode = 'day';
-      }
-  }
   
-    /* Aggiorna le informazioni testuali della timeline:
-       data, giorno della settimana e posizione dei giorni
-       nella modalità live/day */
-    function updateDateUI() {
-      dayText.innerText = currentDate.getDate();
-      dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
-    // -- Posizionamento di -day
-    //-- Iniziali Maiuscole
-    function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-      // ---- dichiarazioni globali alla funzione ----
-      const currentDayEl = document.getElementById('day-text');
-      const nextDayEl = document.getElementById('day-next-text');
-    if (timelineMode === 'live') {
-      const currentDayPercent = midnightPercent / 2;
-      const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
-      // Giorno attuale
-      let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
-      currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
-      currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
-      currentDayEl.style.left = `${currentDayPercent * 100}%`;
-      currentDayEl.style.display = "block";
-      currentDayEl.style.transform = "";
-      // Giorno successivo
-      const nextDate = new Date(currentDate);
-      nextDate.setDate(currentDate.getDate() + 1);
-      let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
-      nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
-      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
-      nextDayEl.style.left = `${(nextDayPercent - 0.10) * 100}%`; // tolgo il 10% per compensare in allineamento la dimensione dei caratteri
-      nextDayEl.style.display = "block";
-      nextDayEl.style.transform = "";
-    } else { 
-    // DAY MODE
-    nextDayEl.style.display = "none";
-    // centra day-text
-    currentDayEl.style.display = "block";
-    currentDayEl.style.left = "50%";
-    currentDayEl.style.transform = "translateX(-50%)";
-    let currentDayName =
-      currentDate.toLocaleDateString(navigator.language, {
-        weekday: 'short'
-      });
-    currentDayName = capitalizeFirst(currentDayName);
-    currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
-    }
-  }
-
       /* Ricrea lo slider temporale in base alla modalità corrente.
       Azioni: distrugge l'eventuale slider precedente, calcola il range
       temporale, ricrea lo slider e calcola/imposta la posizione
