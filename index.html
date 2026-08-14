@@ -1143,7 +1143,53 @@ document.addEventListener('DOMContentLoaded', async () => {
       setupTimeline();
       renderEvents();
     });
+  
+    document.getElementById("reset-day").addEventListener("click", () => {
+      currentDate = new Date(); // oggi
+      updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+    });
 
+    /* Gestisce la navigazione al giorno precedente.
+       Azioni: in modalità live passa al giorno passato; altrimenti
+       arretra currentDate di un giorno e aggiorna timelineMode.
+       Chiamata da: pulsante prev-day. */
+    function prevDay() {
+      if (timelineMode === 'live') {
+        timelineMode = 'past';
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
+        return;
+      }
+      // Gli altri casi: spostamento effettivo indietro di un giorno
+      currentDate.setDate(currentDate.getDate() - 1);
+      timelineMode = 'past';
+      updateTimelineMode();
+    }
+
+    /* Gestisce la navigazione al giorno successivo.
+       Azioni: da oggi in modalità past passa a live; altrimenti
+       avanza currentDate di un giorno e aggiorna timelineMode.
+       Chiamata da: pulsante next-day. */
+    function nextDay() {
+     const today = new Date();
+      today.setHours(0,0,0,0);
+      const current = new Date(currentDate);
+      current.setHours(0,0,0,0);
+      if (timelineMode === 'past' &&
+        current.getTime() === today.getTime()) {   
+      timelineMode = 'live';
+      /* CANCELLARE ridondante. updateTimelineMode(); */
+      return;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+      timelineMode = 'day';
+      /* CANCELLARE ridondante.  updateTimelineMode(); */
+    }
+  
     window.showMessage = function(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";};
 
     window.closeMessage = function () {document.getElementById("messageDialog").style.display = "none";};
@@ -1651,52 +1697,6 @@ oms.addListener('click', function (marker) {
       }
       return 0;
     }
-
-    /* Gestisce la navigazione al giorno precedente.
-       Azioni: in modalità live passa al giorno passato; altrimenti
-       arretra currentDate di un giorno e aggiorna timelineMode.
-       Chiamata da: pulsante prev-day. */
-    function prevDay() {
-      if (timelineMode === 'live') {
-        timelineMode = 'past';
-        updateDateUI();
-        setupTimeline();
-        renderEvents();
-        return;
-      }
-      // Gli altri casi: spostamento effettivo indietro di un giorno
-      currentDate.setDate(currentDate.getDate() - 1);
-      timelineMode = 'past';
-      updateTimelineMode();
-    }
-
-    /* Gestisce la navigazione al giorno successivo.
-       Azioni: da oggi in modalità past passa a live; altrimenti
-       avanza currentDate di un giorno e aggiorna timelineMode.
-       Chiamata da: pulsante next-day. */
-    function nextDay() {
-     const today = new Date();
-      today.setHours(0,0,0,0);
-      const current = new Date(currentDate);
-      current.setHours(0,0,0,0);
-      if (timelineMode === 'past' &&
-        current.getTime() === today.getTime()) {   
-      timelineMode = 'live';
-      updateTimelineMode();
-      return;
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
-      timelineMode = 'day';
-      updateTimelineMode();
-    }
-  
-    document.getElementById("reset-day").addEventListener("click", () => {
-      currentDate = new Date(); // oggi
-      updateTimelineMode();
-      updateDateUI();
-      setupTimeline();
-      renderEvents();
-    });
 
     /* Converte una data/ora nel formato HH:MM italiano.
        Chiamata da: popup evento; popup dettagli; ticker. */
