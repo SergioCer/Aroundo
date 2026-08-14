@@ -1172,7 +1172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     document.getElementById("reset-day").addEventListener("click", () => {
       currentDate = new Date(); // oggi
-      ();
+      updateTimelineMode();
       updateDateUI();
       setupTimeline();
       renderEvents();
