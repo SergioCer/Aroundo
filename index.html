@@ -1068,15 +1068,16 @@ OK
    map.on('move zoom resize', resizeCanvas);
 
   // Aggiorna lo stato visivo dei marker ogni 2 minuti
-  setInterval(renderEvents, 2 * 60 * 1000);
+  setInterval(() => {renderEvents(); updateMarkerVisibility();}, 2 * 60 * 1000);
 
   // Ricarica gli eventi da Supabase ogni 30 minuti
   setInterval(async () => {const data = await fetchEvents();
-      if (data) {events = data;
+    if (data) { events = data;
       renderEvents();
+      updateMarkerVisibility();
     }
   }, 30 * 60 * 1000);
-
+  
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
   categories = await fetchCategories();
@@ -1086,6 +1087,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   checkGeoStatus();
   setupTimeline();
   renderEvents();
+  updateMarkerVisibility();
   updateDateUI();
   updateTicker();
 });
@@ -1137,6 +1139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateDateUI();
         setupTimeline();
         renderEvents();
+        updateMarkerVisibility();
         return;
       }
       /* Gli altri casi: spostamento effettivo indietro di un giorno */
@@ -1146,6 +1149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateDateUI();
       setupTimeline();
       renderEvents();
+      updateMarkerVisibility();
     });
   
     document.getElementById("next-day").addEventListener("click", () => {
@@ -1163,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateDateUI();
       setupTimeline();
       renderEvents();
+      updateMarkerVisibility();
     });
   
     document.getElementById("reset-day").addEventListener("click", () => {
@@ -1171,6 +1176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateDateUI();
       setupTimeline();
       renderEvents();
+      updateMarkerVisibility();
     });
 
     /* Mette in maiuscolo la prima lettera della stringa: "lun" → "Lun" */  
@@ -1415,7 +1421,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 📦 STORAGE DATI (NO LOGICA)
         markers.push({ marker, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
-        updateMarkerVisibility();
     }
 
     // potenzialmente da CANCELLARE MA ATTENZIONE dovrebbe ordinare i marker per orario per la spiderizzazione ma fino a quando non c'è un filtro dal database non funziona. 
@@ -1715,79 +1720,43 @@ document.addEventListener('DOMContentLoaded', async () => {
        Chiamata da: pulsante "More..." di openBasePopup(). */
     window.openDetailPopup = function(e, latlng) {
       analyticsMore();
-      const content = `
-        <div style="text-align:center;min-width:220px;font-size:12px;">
+      const content = `<div style="text-align:center;min-width:220px;font-size:12px;">
           <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:6px;">
-            ${e.ev_titolo}
-          </div>
+            ${e.ev_titolo}</div>
           <hr>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-            <div style="text-align:left;">
-              <div style="font-weight:600;">
-                ${[
-                  e.luoghi?.comuni?.co_descrizione,
-                  e.luoghi?.lu_location
-                ]
+            <div style="text-align:left;"><div style="font-weight:600;">
+                ${[e.luoghi?.comuni?.co_descrizione, e.luoghi?.lu_location]
                 .filter(Boolean)
                 .join(' • ')}
-              </div>
-              ${
-                e.luoghi?.lu_descrizione
-                ?
-                `
+              </div>${e.luoghi?.lu_descrizione ? `
                 <div style="font-size:12px;color:#555;margin-top:2px;">
                   ${e.luoghi.lu_descrizione}
-                </div>
-                `
-                :
-                ''
-              }
+                </div>`:''}
             </div>
             <a
               href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
               target="_blank"
-              class="action-btn map-btn" onclick="analyticsMap()">
-              Map
-            </a>
+              class="action-btn map-btn" onclick="analyticsMap()">Map</a>
           </div>
-          ${
-            e.ev_copertina
-            ?
-            `
+          ${e.ev_copertina ? `
             <div style="text-align:center;">
               <img
                 src="https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${e.ev_copertina}"
                 style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
             </div>
-            <hr>
-            `
-            :
-            ''
-          }
+            <hr> ` : '' }
           <div style="text-align:left; margin-top:8px; line-height:1.35;">
             ${e.ev_descrizione || ''}
           </div>
         <hr>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-          ${
-            e.ev_costo === null || e.ev_costo === undefined || e.ev_costo === ''
-            ? `
-              <div style="width:100%;text-align:center;color:#6b7280;font-weight:600;font-size:14px;">
-                Price: TBA
-              </div>
-            `
-            : Number(e.ev_costo) === 0
-            ? `
-              <div style="width:100%;text-align:center;color:#16a34a;font-weight:700;font-size:14px;">
-                Free Entry
-              </div>
-            `
-            : `
-              <div>
-                Price: €
-                <span style="font-weight:700;">
-                  ${e.ev_costo}
-                </span>
+          ${e.ev_costo === null || e.ev_costo === undefined || e.ev_costo === '' ? `
+              <div style="width:100%;text-align:center;color:#6b7280;font-weight:600;font-size:14px;">Price: TBA</div>
+            ` : Number(e.ev_costo) === 0 ? `
+              <div style="width:100%;text-align:center;color:#16a34a;font-weight:700;font-size:14px;">Free Entry</div>
+            ` : `
+              <div>Price: €<span style="font-weight:700;">${e.ev_costo}</span>
               </div>
               <a
                 href="#"
@@ -1915,6 +1884,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateDateUI();
         setupTimeline();
         renderEvents();
+        updateMarkerVisibility();
       }
     });
 
