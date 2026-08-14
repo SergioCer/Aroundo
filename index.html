@@ -1131,7 +1131,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href="pages/why-aroundo.html";
       };
 
-  /* Gestione: Prev - Next - Reset, nelle modalità: Live - Past - Day */
     document.getElementById("prev-day").addEventListener("click", () => {
       if (timelineMode === 'live') {
         timelineMode = 'past';
@@ -1140,7 +1139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderEvents();
         return;
       }
-      // Gli altri casi: spostamento effettivo indietro di un giorno
+      /* Gli altri casi: spostamento effettivo indietro di un giorno */
       currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
       updateTimelineMode();
@@ -1150,7 +1149,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   
     document.getElementById("next-day").addEventListener("click", () => {
-      /* nextDay(); */
       const today = new Date();
       today.setHours(0,0,0,0);
       const current = new Date(currentDate);
@@ -1162,30 +1160,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentDate.setDate(currentDate.getDate() + 1);
       timelineMode = 'day';
     }
-      // updateTimelineMode();
       updateDateUI();
       setupTimeline();
       renderEvents();
     });
-  
-    /* Gestisce la navigazione al giorno successivo.
-       Azioni: da oggi in modalità past passa a live; altrimenti
-       avanza currentDate di un giorno e aggiorna timelineMode.
-       Chiamata da: pulsante next-day. 
-    function nextDay() {
-     const today = new Date();
-      today.setHours(0,0,0,0);
-      const current = new Date(currentDate);
-      current.setHours(0,0,0,0);
-      if (timelineMode === 'past' &&
-        current.getTime() === today.getTime()) {   
-      timelineMode = 'live';
-      return;
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
-      timelineMode = 'day';
-    }
-*/
   
     document.getElementById("reset-day").addEventListener("click", () => {
       currentDate = new Date(); // oggi
@@ -1195,18 +1173,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderEvents();
     });
 
-    /* Aggiorna le informazioni testuali della timeline:
-       data, giorno della settimana e posizione dei giorni
-       nella modalità live/day.
-       Richimata da: DOM; visibilitychange; prevday in modalità Live. Listener: prev-day; next-day; reset-day */
+    /* Mette in maiuscolo la prima lettera della stringa: "lun" → "Lun" */  
+      function capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+  
+    /* Aggiorna le informazioni testuali della timeline: data, giorno della settimana e posizione dei giorni nella modalità live/day.
+       Richimata da: DOM; visibilitychange. Listener: prev-day; next-day; reset-day */
     function updateDateUI() {
       dayText.innerText = currentDate.getDate();
       dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
-    // -- Posizionamento di -day
-    //-- Iniziali Maiuscole
-    function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-    }
+      // -- Posizionamento di -day
       // ---- dichiarazioni globali alla funzione ----
       const currentDayEl = document.getElementById('day-text');
       const nextDayEl = document.getElementById('day-next-text');
@@ -1215,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
       // Giorno attuale
       let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
-      currentDayName = capitalizeFirst(currentDayName); // "lun" → "Lun"
+      currentDayName = capitalizeFirst(currentDayName);
       currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
       currentDayEl.style.left = `${currentDayPercent * 100}%`;
       currentDayEl.style.display = "block";
@@ -1224,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const nextDate = new Date(currentDate);
       nextDate.setDate(currentDate.getDate() + 1);
       let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
-      nextDayName = capitalizeFirst(nextDayName); // "mar" → "Mar"
+      nextDayName = capitalizeFirst(nextDayName);
       nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
       nextDayEl.style.left = `${(nextDayPercent - 0.10) * 100}%`; // tolgo il 10% per compensare in allineamento la dimensione dei caratteri
       nextDayEl.style.display = "block";
