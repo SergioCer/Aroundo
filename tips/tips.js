@@ -144,24 +144,24 @@ dv_platform:["Android","iOS","Windows","macOS","Linux","Other"]
 };
 
 /* HELPERS */
-export function getAnalyticsFields() {
-  return Object.entries(ANALYTICS_FIELDS)
-    .map(([value, data]) => ({value,...data}));
+export function getAnalyticsFields(){
+return Object.entries(ANALYTICS_FIELDS)
+.map(([value,data])=>({value,...data}));
 }
 
 export async function getTipOptions(){
-  const {data,error}=await supabase
-    .from("devices")
-    .select("dv_platform,dv_entrance");
-  if(error)throw error;
-  const platforms=[...new Set((data||[]).map(x=>x.dv_platform).filter(Boolean))];
-  const entrances=[...new Set((data||[]).map(x=>x.dv_entrance).filter(Boolean))];
-  return {platforms,entrances};
+const {data,error}=await supabase
+.from("devices")
+.select("dv_platform,dv_entrance");
+if(error)throw error;
+const platforms=[...new Set((data||[]).map(x=>x.dv_platform).filter(Boolean))];
+const entrances=[...new Set((data||[]).map(x=>x.dv_entrance).filter(Boolean))];
+return{platforms,entrances};
 }
 
-export function getTipTypes() {
-  return Object.entries(TIP_TYPES)
-    .map(([value, data]) => ({value,...data}));
+export function getTipTypes(){
+return Object.entries(TIP_TYPES)
+.map(([value,data])=>({value,...data}));
 }
 
 export function getConditions(type){
@@ -172,19 +172,19 @@ return[">",">=","=","<=","<","!="];
 
 /* CONDITION EVALUATION */
 export function evaluateCondition(actual,condition,expected){
-if(actual===null||actual===undefined||actual===""||expected==="")return null;
+if(expected==="")return null;
 if(typeof actual==="boolean"){
 const target=String(expected).toLowerCase();
 if(target!=="true"&&target!=="false")return null;
-if(condition==="=")return actual===(target==="true");
-if(condition==="!=")return actual!==(target==="true");
+return condition==="="?actual===(target==="true"):condition==="!="?actual!==(target==="true"):null;
+}
+if(actual===null||actual===undefined||actual===""){
+if(typeof expected==="string"&&expected.toLowerCase()==="null")
+return condition==="="?actual===null:condition==="!="?actual!==null:null;
 return null;
 }
-if(typeof actual==="string"){
-if(condition==="=")return actual===String(expected);
-if(condition==="!=")return actual!==String(expected);
-return null;
-}
+if(typeof actual==="string")
+return condition==="="?actual===String(expected):condition==="!="?actual!==String(expected):null;
 const a=Number(actual),b=Number(expected);
 if(!Number.isFinite(a)||!Number.isFinite(b))return null;
 if(condition===">")return a>b;
@@ -276,16 +276,18 @@ export async function loadTip(id) {
 }
 
 /* SAVE */
-export async function saveTip(tip) {
-  const {data, error} = await supabase
-    .from("tips")
-    .upsert(tip)
-    .select()
-    .single();
-  if (error)
-    throw error;
-  return data;
+export async function saveTip(tip){
+const impact=await simulateTip(tip);
+const payload={...tip,tp_estimated:impact.involved,tp_build:new Date().toISOString()};
+const {data,error}=await supabase
+.from("tips")
+.upsert(payload)
+.select()
+.single();
+if(error)throw error;
+return data;
 }
+
 export async function simulateTip(tip){
 const {data:analytics,error:analyticsError}=await supabase
 .from("analytics")
@@ -299,13 +301,30 @@ if(devicesError)throw devicesError;
 const deviceMap=new Map(
 (devices||[]).map(device=>[device.id_device,device])
 );
-/* Ultimo record analytics disponibile per dispositivo. */
+/* AGGREGA TUTTA LA STORIA ANALYTICS PER DEVICE */
+const totals=new Map();
 const latest=new Map();
+const numericFields=[
+"an_open","an_login","an_install","an_share",
+"an_more","an_info","an_marker","an_map",
+"an_buy","an_book"
+];
 (analytics||[]).forEach(row=>{
-if(!row.id_device||latest.has(row.id_device))return;
-latest.set(row.id_device,row);
+if(!row.id_device)return;
+if(!totals.has(row.id_device)){
+const total={};
+numericFields.forEach(field=>total[field]=0);
+totals.set(row.id_device,total);
+}
+const total=totals.get(row.id_device);
+numericFields.forEach(field=>{
+total[field]+=Number(row[field]||0);
 });
-/* Costruzione condizioni. */
+if(!latest.has(row.id_device)){
+latest.set(row.id_device,row);
+}
+});
+/* COSTRUZIONE CONDIZIONI */
 const conditions=[];
 for(let i=1;i<=3;i++){
 const analyticsField=tip[`tp_analytics_${i}`];
@@ -314,26 +333,27 @@ const condition=tip[`tp_condition_${i}`];
 const value=tip[`tv_value_${i}`];
 const field=ANALYTICS_FIELDS[analyticsField];
 if(!field)continue;
-conditions.push({
-analytics:analyticsField,
-condition,
-value,
-logic:i>1?tip[`tp_logic_${i-1}`]:""
-});
+conditions.push({analytics:analyticsField,condition,value,logic:i>1?tip[`tp_logic_${i-1}`]:""});
 }
+/* VALUTAZIONE DEVICE */
 let involved=0;
 let excluded=0;
 let missing=0;
 const detail=[];
-latest.forEach(row=>{
-const device=deviceMap.get(row.id_device);
-if(!device)return;
+deviceMap.forEach((device,id)=>{
+const total=totals.get(id)||{};
+const last=latest.get(id);
 let result=null;
 for(let i=0;i<conditions.length;i++){
 const item=conditions[i];
-const actual=item.analytics.startsWith("dv_")
-?device[item.analytics]
-:row[item.analytics];
+let actual;
+if(item.analytics.startsWith("dv_")){
+actual=device[item.analytics];
+}else if(item.analytics==="an_gps"){
+actual=last?last.an_gps:null;
+}else{
+actual=total[item.analytics]??0;
+}
 const current=evaluateCondition(
 actual,
 item.condition,
@@ -346,18 +366,13 @@ if(result===true)involved++;
 else if(result===false)excluded++;
 else missing++;
 });
-/* Testo descrittivo delle condizioni. */
+/* TESTO DESCRITTIVO */
 conditions.forEach((item,index)=>{
 const field=ANALYTICS_FIELDS[item.analytics];
-detail.push({
-logic:index===0?"":item.logic,
-label:field?field.label:item.analytics,
-condition:item.condition,
-value:item.value
+detail.push({logic:index===0?"":item.logic,label:field?field.label:item.analytics,condition:item.condition,value:item.value});
 });
-});
-const total=latest.size;
-return{total, involved, excluded, missing, percent:total?Math.round(involved/total*100):0, detail};
+const total=deviceMap.size;
+return{total,involved,excluded,missing,percent:total?Math.round(involved/total*100):0,detail};
 }
 
 /* RENDER TIP */
