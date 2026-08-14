@@ -1251,16 +1251,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       slider.noUiSlider.on('update', updateHandles);
       // Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
       const midnight = document.getElementById('midnight');
+      // Calcola la posizione della mezzanotte rispetto al range temporale live.
       if (timelineMode === 'live') {
-      midnightPercent = getMidnightPosition(totalHours);
+        const currentHour = new Date().getHours();
+        const remainingToday = 24 - currentHour;
+        midnightPercent = remainingToday / totalHours;
+      // midnightPercent = getMidnightPosition(totalHours);
       midnight.style.display = "block"; 
       midnight.style.left = `${midnightPercent * 100}%`;
       } else {
-      // nascondi barra in day mode
+      // Nasconde l'indicatore di mezzanotte in modalità day/past.
       midnight.style.display = "none";
       }
     }
 
+      /* Calcola la posizione relativa della mezzanotte nella modalità live. 
+       Azioni: determina la percentuale relativa della mezzanotte rispetto al range temporale corrente; restituisce 0 fuori dalla modalità live.
+       Chiamata da: setupTimeline().
+    function getMidnightPosition(totalHours) {
+      if (timelineMode === 'live') {
+        return remainingToday / totalHours;
+      }
+      return 0;
+    }
+*/
+  
     /* Calcola il range temporale della timeline.
        Azioni: determina data/ora di inizio e fine in base a timelineMode: live = ora corrente → fine di domani; past/day = 00:00 → 23:59 del giorno selezionato.
        Chiamata da: setupTimeline(); updateMarkerVisibility(). */
@@ -1600,19 +1615,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
  }
   
-    /* Calcola la posizione relativa della mezzanotte nella modalità live. 
-       Azioni: determina la percentuale relativa della mezzanotte rispetto
-       al range temporale corrente; restituisce 0 fuori dalla modalità live.
-       Chiamata da: setupTimeline().*/
-    function getMidnightPosition(totalHours) {
-      if (timelineMode === 'live') {
-        const currentHour = new Date().getHours();
-        const remainingToday = 24 - currentHour;
-        return remainingToday / totalHours;
-      }
-      return 0;
-    }
-
     /* Converte una data/ora nel formato HH:MM italiano.
        Chiamata da: popup evento; popup dettagli; ticker. */
     function formatTime(dateString) {
