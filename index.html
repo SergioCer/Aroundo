@@ -1145,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       /* Gli altri casi: spostamento effettivo indietro di un giorno */
       currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
-      // CANCELLARE   updateTimelineMode();
+      updateTimelineMode();
       updateDateUI();
       setupTimeline();
       renderEvents();
@@ -1163,6 +1163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      } else {
       currentDate.setDate(currentDate.getDate() + 1);
       timelineMode = 'day';
+      updateTimelineMode(); // prova per vedere se torna a visualizzare due giorni 
     }
       updateDateUI();
       setupTimeline();
