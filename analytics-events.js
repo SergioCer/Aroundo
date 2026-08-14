@@ -18,11 +18,7 @@ function getPlatform(){
 
 function getAppMode(){
   if(window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true
-  ){
-    return true;
-  }
-  return false;
+    window.navigator.standalone === true){ return true;} return false;
 }
 
 function getToday(){
@@ -48,7 +44,7 @@ async function getDevice() {
 
 /* ANALYTICS UPDATE */
 async function updateAnalytics(values){
-  const device = await getDevice();
+  const device = await getOrCreateDevice();
   if (!device) {console.error("Device not found in devices"); return;}
   const deviceId = device.id_device;
   const date = getToday();
@@ -77,7 +73,6 @@ async function updateAnalytics(values){
   if(error){ console.error("Analytics read error:", error.message);
     return;
   }
-
    /* RECORD GIA' ESISTENTE */
   if(data && data.length){
     const current =  data[0];
@@ -104,59 +99,77 @@ async function updateAnalytics(values){
       .eq("id_analytics_info", 1);
     return;
   }
+    /* NUOVO RECORD GIORNALIERO */
+    const insert = {
+      an_date: date,
+      id_device: deviceId,
+      an_install: values.install === true ? 1 : 0,
+      an_login: values.login === true ? 1 : 0,
+      an_gps: values.gps ?? null,
+      an_lat: values.lat ?? null,
+      an_lng: values.lng ?? null,
+      an_open: values.open ? 1 : 0,
+      an_share: values.share ? 1 : 0,
+      an_marker: values.marker ? 1 : 0,
+      an_map: values.map ? 1 : 0,
+      an_buy: values.buy ? 1 : 0,
+      an_book: values.book ? 1 : 0,
+      an_more: values.more ? 1 : 0,
+      an_info: values.info ? 1 : 0
+    };
+    await supabase
+      .from("analytics")
+      .insert(insert);
+    await supabase
+      .from("analytics_info")
+      .update({ ai_last_update: new Date().toISOString()})
+      .eq("id_analytics_info", 1);
+  }
+    /* EVENTS */
+    export function analyticsOpen(){return updateAnalytics({open:true});}
+    export function analyticsShare(){return updateAnalytics({share:true});}
+    export function analyticsMarker(){return updateAnalytics({marker:true});}
+    export function analyticsMap(){return updateAnalytics({map:true});}
+    export function analyticsBuy(){return updateAnalytics({buy:true});}
+    export function analyticsBook(){return updateAnalytics({book:true});}
+    export function analyticsMore(){return updateAnalytics({more:true});}
+    export function analyticsInfo(){return updateAnalytics({info:true});}
+    export function analyticsLogin(){return updateAnalytics({login:true});}
+    export function analyticsInstall(){return updateAnalytics({install:true});}
+    export function analyticsGPS(value, lat = null, lng = null){return updateAnalytics({gps: value,
+        lat: lat !== null ? Number(lat.toFixed(2)) : undefined,
+        lng: lng !== null ? Number(lng.toFixed(2)) : undefined
+      });
+    }
+    /* ENTRANCE */
+    export function analyticsEntrance(source){return updateAnalytics({entrance: source || null});}
 
-  /* NUOVO RECORD GIORNALIERO */
-  const insert = {
-    an_date: date,
-    id_device: deviceId,
-    an_install: values.install === true ? 1 : 0,
-    an_login: values.login === true ? 1 : 0,
-    an_gps: values.gps ?? null,
-    an_lat: values.lat ?? null,
-    an_lng: values.lng ?? null,
-    an_open: values.open ? 1 : 0,
-    an_share: values.share ? 1 : 0,
-    an_marker: values.marker ? 1 : 0,
-    an_map: values.map ? 1 : 0,
-    an_buy: values.buy ? 1 : 0,
-    an_book: values.book ? 1 : 0,
-    an_more: values.more ? 1 : 0,
-    an_info: values.info ? 1 : 0
-  };
-  await supabase
-    .from("analytics")
-    .insert(insert);
-  await supabase
-    .from("analytics_info")
-    .update({ ai_last_update: new Date().toISOString()})
-    .eq("id_analytics_info", 1);
-}
+    /* Identifica o Crea un nuovo device se non presente */ 
+    async function getOrCreateDevice() {
+      const device = getDeviceId();
+      const { data, error } = await supabase
+        .from("devices")
+        .select(`id_device, dv_device, dv_first_access, dv_platform, dv_app, dv_entrance`)
+        .eq("dv_device", device)
+        .maybeSingle();
+      if (error) { console.error("Device lookup error:", error.message);
+        return null;
+      }
+      if (data) {return data;}
+      const date = getToday();
+      const platform = getPlatform();
+      const app = getAppMode();
+      const { data: newDevice, error: insertError } =
+        await supabase
+          .from("devices")
+          .insert({ dv_device: device, dv_first_access: date, dv_platform: platform, dv_app: app, dv_entrance: null})
+          .select(`id_device, dv_device, dv_first_access, dv_platform, dv_app, dv_entrance`)
+          .single();
+      if (insertError) {console.error("Device creation error:", insertError.message); return null;}
+      return newDevice;
+    }
 
-/* EVENTS */
-export function analyticsOpen(){return updateAnalytics({open:true});}
-export function analyticsShare(){return updateAnalytics({share:true});}
-export function analyticsMarker(){return updateAnalytics({marker:true});}
-export function analyticsMap(){return updateAnalytics({map:true});}
-export function analyticsBuy(){return updateAnalytics({buy:true});}
-export function analyticsBook(){return updateAnalytics({book:true});}
-export function analyticsMore(){return updateAnalytics({more:true});}
-export function analyticsInfo(){return updateAnalytics({info:true});}
-export function analyticsLogin(){return updateAnalytics({login:true});}
-export function analyticsInstall(){return updateAnalytics({install:true});}
-export function analyticsGPS(value, lat = null, lng = null){return updateAnalytics({gps: value,
-    lat: lat !== null ? Number(lat.toFixed(2)) : undefined,
-    lng: lng !== null ? Number(lng.toFixed(2)) : undefined
-  });
-}
-
-/* ENTRANCE */
-export function analyticsEntrance(source){return updateAnalytics({entrance: source || null});}
-
-/*
- * ============================================================
- * AROUND0 - ANALYTICS / NOTE ARCHITETTURALI
- * ============================================================
- *
+ /* AROUND0 - ANALYTICS / NOTE ARCHITETTURALI
  * dv_device
  * ------------------------------------------------------------
  * Identificativo tecnico casuale persistente dell'installazione/
