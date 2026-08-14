@@ -29,19 +29,6 @@ function getToday(){
   return `${year}-${month}-${day}`;
 }
 
-async function getDevice() {
-  const device = getDeviceId();
-  const { data, error } = await supabase
-    .from("devices")
-    .select(`id_device, dv_first_access, dv_platform, dv_app, dv_entrance`)
-    .eq("dv_device", device)
-    .single();
-  if (error || !data) {console.error("Device lookup error:", error?.message || "Device not found");
-    return null;
-  }
-  return data;
-}
-
 /* ANALYTICS UPDATE */
 async function updateAnalytics(values){
   const device = await getOrCreateDevice();
