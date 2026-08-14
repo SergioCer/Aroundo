@@ -56,29 +56,53 @@ function getToday(){
   return `${year}-${month}-${day}`;
 }
 
+async function getDevice() {
+  const device = getDeviceId();
+  const { data, error } = await supabase
+    .from("devices")
+    .select(`id_device, dv_first_access, dv_platform, dv_app, dv_entrance`)
+    .eq("dv_device", device)
+    .single();
+  if (error || !data) {
+    console.error("Device lookup error:", error?.message || "Device not found");
+    return null;
+  }
+  return data;
+}
+
 /* ANALYTICS UPDATE */
 async function updateAnalytics(values){
-  const deviceId = await getDeviceDbId();
-  if (!deviceId) {
-      console.error("Device not found in devices");
-      return;
+  const device = await getDevice();
+  if (!device) {console.error("Device not found in devices"); return;}
+  const deviceId = device.id_device;
+  const date = getToday();
+  const platform = getPlatform();
+  const app = getAppMode();
+  const entrance = values.entrance || null;
+  const deviceUpdate = {};
+  if (!device.dv_first_access) {deviceUpdate.dv_first_access = date;}
+  if (device.dv_platform !== platform) {deviceUpdate.dv_platform = platform;}
+  if (device.dv_app !== app) {deviceUpdate.dv_app = app;}
+  if (entrance && device.dv_entrance !== entrance) {deviceUpdate.dv_entrance = entrance;}
+  if (Object.keys(deviceUpdate).length > 0) {
+    const { error: deviceUpdateError } = await supabase
+      .from("devices")
+      .update(deviceUpdate)
+      .eq("id_device", deviceId);
+    if (deviceUpdateError) { console.error("Device update error:", deviceUpdateError.message);
+    }
   }
-  const date =  getToday();
   const { data, error } = await supabase
-      .from("analytics")
-      .select("*")
-      .eq("an_date", date)
-      .eq("id_device", deviceId)
-      .limit(1);
-  if(error){
-    console.error(
-      "Analytics read error:",
-      error.message
-    );
+    .from("analytics")
+    .select("*")
+    .eq("an_date", date)
+    .eq("id_device", deviceId)
+    .limit(1);
+  if(error){ console.error("Analytics read error:", error.message);
     return;
   }
 
-  /* RECORD GIA' ESISTENTE */
+   /* RECORD GIA' ESISTENTE */
   if(
     data &&
     data.length
@@ -114,13 +138,6 @@ async function updateAnalytics(values){
       update.an_lat = values.lat;
       update.an_lng = values.lng;
     }
-    if(values.app !== undefined)
-      update.an_app = values.app;
-    if(values.platform)
-      update.an_platform = values.platform;
-    /* Entrance: durante la giornata viene mantenuta l'ultima provenienza disponibile. */
-    if(values.entrance)
-      update.an_entrance = values.entrance;
     await supabase
       .from("analytics")
       .update(update)
@@ -137,35 +154,9 @@ async function updateAnalytics(values){
   }
 
   /* NUOVO RECORD GIORNALIERO */
-  let firstAccess = date;
-  /* Recuperiamo la prima data storica del dispositivo. an_first_access è già presente nei record storici. */
-  const {
-    data:history,
-    error:historyError
-  } =
-    await supabase
-      .from("analytics")
-      .select("an_first_access")
-      .eq("id_device", deviceId)
-      .not("an_first_access", "is", null)
-      .order("an_first_access", { ascending:true })
-      .limit(1);
-  if(
-    !historyError &&
-    history &&
-    history.length &&
-    history[0].an_first_access
-  ){
-    firstAccess =
-      history[0].an_first_access;
-  }
   const insert = {
     an_date: date,
     id_device: deviceId,
-    an_first_access: firstAccess,
-    an_entrance: values.entrance ?? null,
-    an_platform: getPlatform(),
-    an_app: getAppMode(),
     an_install: values.install === true ? 1 : 0,
     an_login: values.login === true ? 1 : 0,
     an_gps: values.gps ?? null,
@@ -180,12 +171,6 @@ async function updateAnalytics(values){
     an_more: values.more ? 1 : 0,
     an_info: values.info ? 1 : 0
   };
-  if(historyError){
-    console.error(
-      "First access lookup error:",
-      historyError.message
-    );
-  }
   await supabase
     .from("analytics")
     .insert(insert);
@@ -254,19 +239,6 @@ export function analyticsEntrance(source){
   return updateAnalytics({entrance: source || null});
 }
 
-async function getDeviceDbId() {
-    const device = getDeviceId();
-    const { data, error } = await supabase
-        .from("devices")
-        .select("id_device")
-        .eq("dv_device", device)
-        .single();
-    if (error) {
-        console.error("Device lookup error:", error.message);
-        return null;
-    }
-    return data.id_device;
-}
 
 
 
