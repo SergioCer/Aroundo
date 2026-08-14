@@ -88,6 +88,8 @@ async function updateAnalytics(values){
   }
     /* NUOVO RECORD GIORNALIERO */
     const insert = {
+      an_device: device.dv_device,  // vecchio, temporaneo
+      an_app: app,                   // ancora NOT NULL
       an_date: date,
       id_device: deviceId,
       an_install: values.install === true ? 1 : 0,
