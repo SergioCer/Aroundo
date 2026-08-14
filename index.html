@@ -1247,17 +1247,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-/* 
-  // Eventi UI
-    noUiSlider.create(slider, {start: [0, 48], connect: true, step: 1, range: { min: 0, max: 48 } });
-  
-    slider.noUiSlider.on('set', function(values) {
-      const start = Math.round(values[0]);
-      const end = Math.round(values[1]);
-      updateMarkerVisibility(start, end);
-    });
-
-*/
     /* Calcola il range temporale della timeline.
        Azioni: determina data/ora di inizio e fine in base a timelineMode: live = ora corrente → fine di domani; past/day = 00:00 → 23:59 del giorno selezionato.
        Chiamata da: setupTimeline(); updateMarkerVisibility(). */
