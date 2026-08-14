@@ -105,20 +105,9 @@ async function updateAnalytics(values){
       an_info: values.info ? 1 : 0
     };
     
-  
-    /* await supabase
+    await supabase
       .from("analytics")
-      .insert(insert); */
-
-const { error: insertError } = await supabase
-  .from("analytics")
-  .insert(insert);
-
-if (insertError) {
-  console.error("Analytics insert error:", insertError);
-  return;
-}
-
+      .insert(insert);
   
     await supabase
       .from("analytics_info")
