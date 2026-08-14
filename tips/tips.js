@@ -148,8 +148,8 @@ export const TIP_ICONS = [
 /* ANALYTICS */
 export const ANALYTICS_FIELDS={
 an_open:{type:"number",label:"Open",description:"Number of times Aroundo has been opened."},
-an_login:{type:"boolean",label:"Login",description:"Whether the user is logged in."},
-an_install:{type:"boolean",label:"Install",description:"Whether Aroundo has been installed."},
+an_login:{type:"number",label:"Login",description:"Number of logins."},
+an_install:{type:"number",label:"Install",description:"Number of installations."},
 an_share:{type:"number",label:"Share",description:"Number of sharing actions."},
 an_more:{type:"number",label:"More",description:"Number of times the More action has been used."},
 an_info:{type:"number",label:"Info",description:"Number of times event information has been opened."},
@@ -158,12 +158,13 @@ an_map:{type:"number",label:"Map",description:"Number of times the map has been 
 an_buy:{type:"number",label:"Buy",description:"Number of purchase actions."},
 an_book:{type:"number",label:"Book",description:"Number of booking actions."},
 an_gps:{type:"boolean",label:"GPS",description:"Whether location access is enabled."},
-an_platform:{type:"string",label:"Platform",description:"Operating system used by the device."},
-an_app:{type:"boolean",label:"App",description:"Whether Aroundo is running as installed app."}
+dv_platform:{type:"string",label:"Platform",description:"Operating system used by the device."},
+dv_app:{type:"boolean",label:"App",description:"Whether Aroundo is currently running as installed app."},
+dv_entrance:{type:"string",label:"Entrance",description:"First acquisition source of the device."}
 };
 
 export const ANALYTICS_OPTIONS={
-an_platform:["Android","iOS","Windows","macOS","Linux","Other"]
+dv_platform:["Android","iOS","Windows","macOS","Linux","Other"]
 };
 
 /* HELPERS */
@@ -337,123 +338,85 @@ export async function saveTip(tip) {
     throw error;
   return data;
 }
-export async function simulateTip(tip) {
-  const rows = await supabase
-    .from("analytics")
-    .select("*")
-    .order("an_date", {
-      ascending: false
-    });
-  if (rows.error)
-    throw rows.error;
-  const data = rows.data || [];
-  /* Ultimo record disponibile per dispositivo. */
-  const latest =
-    new Map();
-  data.forEach(row => {
-    if (!row.an_device)
-      return;
-    if (!latest.has(row.an_device))
-      latest.set(row.an_device, row);
-  });
-  /* Costruzione condizioni. */
-  const conditions = [];
-  for (let i = 1; i <= 3; i++) {
-    const analytics =
-      tip[`tp_analytics_${i}`];
-    if (!analytics)
-      continue;
-    const condition =
-      tip[`tp_condition_${i}`];
-    const value =
-      tip[`tv_value_${i}`];
-    const field =
-      ANALYTICS_FIELDS[analytics];
-    if (!field)
-      continue;
-    conditions.push({
-      analytics,
-      condition,
-      value,
-      logic:
-        i > 1
-          ? tip[`tp_logic_${i - 1}`]
-          : ""
-    });
-  }
-  let involved = 0;
-  let excluded = 0;
-  let missing = 0;
-  const detail = [];
-  latest.forEach(row => {
-    let result = null;
-    for (
-      let i = 0;
-      i < conditions.length;
-      i++
-    ) {
-      const item =
-        conditions[i];
-      const current =
-        evaluateCondition(
-          row[item.analytics],
-          item.condition,
-          item.value
-        );
-      if (i === 0) {
-        result = current;
-      } else {
-        result =
-          evaluateLogic(
-            result,
-            current,
-            item.logic
-          );
-      }
-    }
-    if (result === true) {
-      involved++;
-    } else if (result === false) {
-      excluded++;
-    } else {
-      missing++;
-    }
-  });
-  const total =
-    latest.size;
-  
-  /* Testo descrittivo delle condizioni. Utile per l'Impact parlante. */
-  conditions.forEach((item, index) => {
-    const field =
-      ANALYTICS_FIELDS[item.analytics];
-    detail.push({
-      logic:
-        index === 0
-          ? ""
-          : item.logic,
-      label:
-        field
-          ? field.label
-          : item.analytics,
-      condition:
-        item.condition,
-      value:
-        item.value
-    });
-  });
-  return {
-    total,
-    involved,
-    excluded,
-    missing,
-    percent:
-      total
-        ? Math.round(
-            involved / total * 100
-          )
-        : 0,
-    detail
-  };
+export async function simulateTip(tip){
+const {data:analytics,error:analyticsError}=await supabase
+.from("analytics")
+.select("*")
+.order("an_date",{ascending:false});
+if(analyticsError)throw analyticsError;
+const {data:devices,error:devicesError}=await supabase
+.from("devices")
+.select("id_device,dv_platform,dv_app,dv_entrance");
+if(devicesError)throw devicesError;
+const deviceMap=new Map(
+(devices||[]).map(device=>[device.id_device,device])
+);
+/* Ultimo record analytics disponibile per dispositivo. */
+const latest=new Map();
+(analytics||[]).forEach(row=>{
+if(!row.id_device||latest.has(row.id_device))return;
+latest.set(row.id_device,row);
+});
+/* Costruzione condizioni. */
+const conditions=[];
+for(let i=1;i<=3;i++){
+const analyticsField=tip[`tp_analytics_${i}`];
+if(!analyticsField)continue;
+const condition=tip[`tp_condition_${i}`];
+const value=tip[`tv_value_${i}`];
+const field=ANALYTICS_FIELDS[analyticsField];
+if(!field)continue;
+conditions.push({
+analytics:analyticsField,
+condition,
+value,
+logic:i>1?tip[`tp_logic_${i-1}`]:""
+});
+}
+let involved=0;
+let excluded=0;
+let missing=0;
+const detail=[];
+latest.forEach(row=>{
+const device=deviceMap.get(row.id_device);
+if(!device)return;
+let result=null;
+for(let i=0;i<conditions.length;i++){
+const item=conditions[i];
+const actual=item.analytics.startsWith("dv_")
+?device[item.analytics]
+:row[item.analytics];
+const current=evaluateCondition(
+actual,
+item.condition,
+item.value
+);
+if(i===0)result=current;
+else result=evaluateLogic(result,current,item.logic);
+}
+if(result===true)involved++;
+else if(result===false)excluded++;
+else missing++;
+});
+/* Testo descrittivo delle condizioni. */
+conditions.forEach((item,index)=>{
+const field=ANALYTICS_FIELDS[item.analytics];
+detail.push({
+logic:index===0?"":item.logic,
+label:field?field.label:item.analytics,
+condition:item.condition,
+value:item.value
+});
+});
+const total=latest.size;
+return{
+total,
+involved,
+excluded,
+missing,
+percent:total?Math.round(involved/total*100):0,
+detail
+};
 }
 
 /* RENDER TIP */
