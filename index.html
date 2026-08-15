@@ -1274,7 +1274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       switch(mode) {case 'startOfDay': time = new Date(day); time.setHours(0,0,0,0); break;
           case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break; // ora reale se siamo in modalità LIVE
           case 'live': time = new Date(); break; // ora corrente entro il giorno logico
-          default: time = new Date(day); time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);}
+          default: const now = new Date(); time = new Date(day); time.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
       return time;
     }
   
@@ -1931,7 +1931,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* Aggiorna il ticker degli eventi imminenti.
        Azioni: recupera gli eventi imminenti, genera l'HTML e lo inserisce nel ticker.
-       Chiamata da: caricamento pagina (DOM). */
+       Chiamata da: DOM; setInterval (fetchEvents) . */
     function updateTicker(){
     const list = getUpcomingEvents(12).slice(0, 20); // Eventi nelle prossime 12 ore, massimo 20 elementi.
     const html = list.map(e => {
@@ -1958,7 +1958,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* Seleziona gli eventi imminenti entro un intervallo temporale.
        Azioni: determina l'ora di riferimento, calcola il limite temporale, filtra gli eventi futuri e li ordina per orario di inizio.
-       Chiamata da: updateTicker(). */
+       Chiamata da: updateTicker().*/
     function getUpcomingEvents(hours = 12) { // 12 ore come valore predefinito; il chiamante può specificare un intervallo diverso.
       const now = timelineMode === 'live'
         ? getAppTime('live')
