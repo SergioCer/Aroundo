@@ -534,7 +534,7 @@ function updateConditionSelect(index) {
   /* VALUE */
   const isBoolean = field.type === "boolean";
   const isString = field.type === "string";
-  const isPlatform = currentAnalytics === "an_platform";
+  const isPlatform = currentAnalytics === "dv_platform";
   if (isBoolean) {
     if (item.value.tagName !== "SELECT") {
       const select = document.createElement("select");
