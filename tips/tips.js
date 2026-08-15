@@ -159,6 +159,7 @@ export async function getTipOptions() {
 
 export function getTipValueOptions(field, options = {}) {
   if (field === "an_gps") {return [{ value: "true", label: "true" },{ value: "false", label: "false" }];}
+  if (field === "dv_app") {return [{ value: "true", label: "True" },{ value: "false", label: "False" }];}
   if (field === "dv_platform") {return [...(options.platforms || []).map(value => ({value, label: value}))];}
   if (field === "dv_entrance") {return [...(options.entrances || []).map(value => ({value, label: value})),{ value: "__NULL__", label: "Other" }];}
   return null;
