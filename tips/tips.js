@@ -155,6 +155,13 @@ const entrances=[...new Set((data||[]).map(x=>x.dv_entrance).filter(Boolean))];
 return{platforms,entrances};
 }
 
+export function getTipValueOptions(field,options={}){
+if(field==="an_gps")return[{value:"true",label:"True"},{value:"false",label:"False"},{value:"null",label:"Not decided"}];
+if(field==="dv_platform")return[...(options.platforms||[]).map(value=>({value,label:value}))];
+if(field==="dv_entrance")return[...(options.entrances||[]).map(value=>({value,label:value}))];
+return null;
+}
+
 export function getTipTypes(){return Object.entries(TIP_TYPES)
 .map(([value,data])=>({value,...data}));
 }
