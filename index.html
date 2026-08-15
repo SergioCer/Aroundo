@@ -1075,6 +1075,7 @@ OK
     if (data) { events = data;
       renderEvents();
       updateMarkerVisibility();
+      updateTicker();
     }
   }, 30 * 60 * 1000);
   
@@ -1284,7 +1285,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     Determina la modalità della timeline in base alla data selezionata:
      - past = giorno precedente a oggi 00-24.
      - live = oggi+domani, timeline inizia dall'ora corrente fino alle 24 più tutta la giornata completa di domani 00-24.
-     - day  = giorno successivo ad oggi, 00-24 */ 
+     - day  = giorno successivo ad oggi, 00-24
+    Chiamata da: 
+     */
     function updateTimelineMode() {
       const currentDay = new Date(currentDate);
       currentDay.setHours(0,0,0,0);
@@ -1345,6 +1348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
   // Preleva gli Eventi ed Organizzatori da supabase
+  // chiamato da: DOM; set interval 30'
   async function fetchEvents() {let query = supabase .from('eventi')
       .select(`*, organizzatori (or_nome), luoghi (lu_lat, lu_lng, lu_location, lu_descrizione, id_comune, comuni (co_descrizione))`)
       .eq('ev_attivo', true);
@@ -1927,10 +1931,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* Aggiorna il ticker degli eventi imminenti.
        Azioni: recupera gli eventi imminenti, genera l'HTML e lo inserisce nel ticker.
-       Chiamata da: caricamento pagina. 
-       Punto da verificare: updateTicker() viene aggiornato al caricamento, ma non nei cicli periodici di renderEvents() / fetchEvents().*/
+       Chiamata da: caricamento pagina (DOM). */
     function updateTicker(){
-    const list = getUpcomingEvents(20); // Numero di News da visualizzare
+    const list = getUpcomingEvents(12).slice(0, 20); // Eventi nelle prossime 12 ore, massimo 20 elementi.
     const html = list.map(e => {
     const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
     return `
@@ -1956,7 +1959,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* Seleziona gli eventi imminenti entro un intervallo temporale.
        Azioni: determina l'ora di riferimento, calcola il limite temporale, filtra gli eventi futuri e li ordina per orario di inizio.
        Chiamata da: updateTicker(). */
-    function getUpcomingEvents(hours = 12) {
+    function getUpcomingEvents(hours = 12) { // 12 ore come valore predefinito; il chiamante può specificare un intervallo diverso.
     const now = timelineMode === 'live'
         ? getAppTime('live')
         : getAppTime('startOfDay');
