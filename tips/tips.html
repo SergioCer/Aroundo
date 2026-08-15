@@ -393,6 +393,7 @@ await requireAuth();
 import { TIP_ICONS, getTipTypes, getAnalyticsFields, getConditions, ANALYTICS_OPTIONS, calculateProgression, 
         defaultTip, loadTip, saveTip, simulateTip, renderTip } from "./tips.js";
 
+let estimatedImpact=0;
 let tip = defaultTip();
 const params = new URLSearchParams(location.search);
 const id = params.get("id");
@@ -783,8 +784,8 @@ impactBtn.onclick =
         tp_condition_3: conditions[3] .condition.value,
         tv_value_3: conditions[3] .value.value
       };
-      const result =
-        await simulateTip(data);
+      const result = await simulateTip(data);
+      estimatedImpact=result.involved;    
       let html = `
         <div class="simulation-title">
           Estimated Impact
@@ -932,96 +933,46 @@ function fill() {
 window.save =
   async () => {
     const data = {
-      id_tips:
-        idTips.value.trim(),
-      tp_type:
-        type.value,
-      tp_icon:
-        icon.value,
-      tp_title:
-        title.value.trim(),
-      tp_text:
-        text.value.trim(),
-      tp_analytics_1:
-        conditions[1]
-          .analytics.value,
-      tp_condition_1:
-        conditions[1]
-          .condition.value,
-      tv_value_1:
-        conditions[1]
-          .value.value,
-      tp_logic_1:
-        logic1.value,
-      tp_analytics_2:
-        conditions[2]
-          .analytics.value,
-      tp_condition_2:
-        conditions[2]
-          .condition.value,
-      tv_value_2:
-        conditions[2]
-          .value.value,
-      tp_logic_2:
-        logic2.value,
-      tp_analytics_3:
-        conditions[3]
-          .analytics.value,
-      tp_condition_3:
-        conditions[3]
-          .condition.value,
-      tv_value_3:
-        conditions[3]
-          .value.value,
-      tp_repeat:
-        Number(
-          repeat.value
-        ),
-      tp_interval:
-        Number(
-          interval.value
-        ),
-      tp_growth:
-        Number(
-          growth.value
-        ),
-      tp_cta_active:
-        document.getElementById(
-          "tp_cta_active"
-        ).value === "true",
-      tp_cta_label:
-        document.getElementById(
-          "tp_cta_label"
-        ).value.trim(),
-      tp_cta_url:
-        document.getElementById(
-          "tp_cta_url"
-        ).value.trim(),
-      tp_active:
-        tip.tp_active === true
+      id_tips: idTips.value.trim(),
+      tp_type: type.value,
+      tp_icon: icon.value,
+      tp_title: title.value.trim(),
+      tp_text: text.value.trim(),
+      tp_analytics_1: conditions[1] .analytics.value,
+      tp_condition_1: conditions[1] .condition.value,
+      tv_value_1: conditions[1] .value.value,
+      tp_logic_1: logic1.value,
+      tp_analytics_2: conditions[2] .analytics.value,
+      tp_condition_2: conditions[2] .condition.value,
+      tv_value_2: conditions[2] .value.value,
+      tp_logic_2: logic2.value,
+      tp_analytics_3: conditions[3] .analytics.value,
+      tp_condition_3: conditions[3] .condition.value,
+      tv_value_3: conditions[3] .value.value,
+      tp_repeat: Number(repeat.value),
+      tp_interval: Number(interval.value),
+      tp_growth: Number(growth.value),
+      tp_cta_active: document.getElementById("tp_cta_active").value === "true",
+      tp_cta_label: document.getElementById("tp_cta_label").value.trim(),
+      tp_cta_url: document.getElementById("tp_cta_url").value.trim(),
+      tp_active: tip.tp_active === true,
+      tp_estimated:estimatedImpact   
     };
-    if (!data.id_tips) {
-      alert(
-        "Enter the Tip ID."
-      );
+    if (!data.id_tips) {alert("Enter the Tip ID.");
       return;
     }
-    if (!data.tp_text) {
-      alert(
-        "Enter the Tip text."
-      );
+    if (!data.tp_text) {alert("Enter the Tip text.");
       return;
     }
-    try {
+      try{
+      const result=await simulateTip(data);
+      data.tp_estimated=result.involved;
       await saveTip(data);
-      location.href =
-        "tips_overview.html";
-    } catch (error) {
+      location.href="tips_overview.html";
+      }catch(error){
       console.error(error);
-      alert(
-        "Error while saving."
-      );
-    }
+      alert("Error while saving.");
+      }
   };
 
 /* =========================================================
