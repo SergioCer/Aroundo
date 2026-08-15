@@ -146,13 +146,33 @@ export function getAnalyticsFields(){return Object.entries(ANALYTICS_FIELDS)
 .map(([value,data])=>({value,...data}));
 }
 
-export async function getTipOptions(){const {data,error}=await supabase
-.from("devices")
-.select("dv_platform,dv_entrance");
-if(error)throw error;
-const platforms=[...new Set((data||[]).map(x=>x.dv_platform).filter(Boolean))];
-const entrances=[...new Set((data||[]).map(x=>x.dv_entrance).filter(Boolean))];
-return{platforms,entrances};
+export async function getTipOptions() {
+  const { data, error } =
+    await supabase
+      .from("devices")
+      .select("dv_platform,dv_entrance");
+  if (error) throw error;
+  const platforms = [
+    ...new Set(
+      (data || [])
+        .map(x => x.dv_platform)
+        .filter(Boolean)
+    )
+  ];
+  const entrances = [
+    ...new Set(
+      (data || [])
+        .map(x => x.dv_entrance)
+        .filter(Boolean)
+    )
+  ];
+  if (!platforms.includes("Other")) {
+    platforms.push("Other");
+  }
+  return {
+    platforms,
+    entrances
+  };
 }
 
 export function getTipValueOptions(field, options = {}) {
@@ -174,31 +194,111 @@ return[">",">=","=","<=","<","!="];
 }
 
 /* CONDITION EVALUATION */
-export function evaluateCondition(actual,condition,expected){
-if(condition==="IS NULL")return actual===null||actual===undefined;
-if(condition==="IS NOT NULL")return actual!==null&&actual!==undefined;
-if(actual===null||actual===undefined||actual===""||expected==="")return null;
-if(typeof actual==="boolean"){
-const target=String(expected).toLowerCase();
-if(target!=="true"&&target!=="false")return null;
-if(condition==="=")return actual===(target==="true");
-if(condition==="!=")return actual!==(target==="true");
-return null;
-}
-if(typeof actual==="string"){
-if(condition==="=")return actual===String(expected);
-if(condition==="!=")return actual!==String(expected);
-return null;
-}
-const a=Number(actual),b=Number(expected);
-if(!Number.isFinite(a)||!Number.isFinite(b))return null;
-if(condition===">")return a>b;
-if(condition===">=")return a>=b;
-if(condition==="=")return a===b;
-if(condition==="<=")return a<=b;
-if(condition==="<")return a<b;
-if(condition==="!=")return a!==b;
-return null;
+export function evaluateCondition(actual, condition, expected) {
+  /*
+   * =====================================================
+   * NULL CONDITIONS
+   * =====================================================
+   */
+  if (condition === "IS NULL") {
+    return actual === null ||
+           actual === undefined;
+  }
+  if (condition === "IS NOT NULL") {
+    return actual !== null &&
+           actual !== undefined;
+  }
+  /*
+   * =====================================================
+   * ENTRANCE: OTHER = NULL
+   * =====================================================
+   */
+  if (expected === "__NULL__") {
+    const isNull =
+      actual === null ||
+      actual === undefined ||
+      actual === "";
+    if (condition === "=") {
+      return isNull;
+    }
+    if (condition === "!=") {
+      return !isNull;
+    }
+    return null;
+  }
+  /*
+   * =====================================================
+   * NORMAL MISSING DATA
+   * =====================================================
+   */
+  if (
+    actual === null ||
+    actual === undefined ||
+    actual === "" ||
+    expected === ""
+  ) {
+    return null;
+  }
+  /*
+   * =====================================================
+   * BOOLEAN
+   * =====================================================
+   */
+  if (typeof actual === "boolean") {
+    const target =
+      String(expected).toLowerCase();
+    if (
+      target !== "true" &&
+      target !== "false"
+    ) {
+      return null;
+    }
+    if (condition === "=") {
+      return actual ===
+        (target === "true");
+    }
+    if (condition === "!=") {
+      return actual !==
+        (target === "true");
+    }
+    return null;
+  }
+  /*
+   * =====================================================
+   * STRING
+   * =====================================================
+   */
+  if (typeof actual === "string") {
+    if (condition === "=") {
+      return actual ===
+        String(expected);
+    }
+    if (condition === "!=") {
+      return actual !==
+        String(expected);
+    }
+    return null;
+  }
+  /*
+   * =====================================================
+   * NUMBER
+   * =====================================================
+   */
+  const a = Number(actual);
+  const b = Number(expected);
+  if (
+    !Number.isFinite(a) ||
+    !Number.isFinite(b)
+  ) {
+    return null;
+  }
+  if (condition === ">") return a > b;
+  if (condition === ">=") return a >= b;
+  if (condition === "=") return a === b;
+  if (condition === "<=") return a <= b;
+  if (condition === "<") return a < b;
+  if (condition === "!=") return a !== b;
+  return null;
 }
 
 /* LOGIC
