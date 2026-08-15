@@ -474,139 +474,132 @@ Object.values(conditions)
   .forEach(item => {populateAnalytics(item.analytics);
   });
 
+let tipOptions={platforms:[],entrances:[]};
 
+async function loadTipOptions(){
+  tipOptions=await getTipOptions();
+}
+      
 /* CONDITION SELECT */
-function updateConditionSelect(index) {
-  const item = conditions[index];
-  if (!item)
-    return;
-  /*
-   * IMPORTANT:
-   * salviamo i valori attualmente presenti nel DOM.
-   * In questo modo update() non sovrascrive
-   * la scelta appena fatta dall'utente.
-   */
-  const currentAnalytics = item.analytics.value;
-  const currentCondition = item.condition.value;
-  const currentValue = item.value.value;
-  const field = getAnalyticsFields()
-      .find(x => x.value === currentAnalytics
-      );
-  /* ANALYTICS NON SELEZIONATO */
-  if (!field) {
-    item.condition.innerHTML = "";
-    item.condition.disabled = true;
-    item.value.disabled = true;
-    return;
-  }
-  item.condition.disabled = false;
-  item.value.disabled = false;
-/* CONDITIONS */
-  const availableConditions = getConditions(field.type);
-  item.condition.innerHTML = "";
-  availableConditions.forEach(operator => {
-    const option = document.createElement("option");
-    option.value = operator;
-    option.textContent = operator;
-    item.condition.appendChild(option);
-  });
-  /*
-   * Prima proviamo a mantenere la scelta
-   * attuale dell'utente.
-   *
-   * Se non è valida per il nuovo tipo
-   * di analytics, usiamo quella salvata
-   * nel tip oppure la prima disponibile.
-   */
-  if (
-    availableConditions.includes(
-      currentCondition
-    )
-  ) {
-    item.condition.value = currentCondition;
-  } else if (
-    availableConditions.includes(tip[`tp_condition_${index}`])
-  ) {
-    item.condition.value = tip[`tp_condition_${index}`];
-  } else {
-    item.condition.value = availableConditions[0];
-  }
-  /* VALUE */
-  const isBoolean = field.type === "boolean";
-  const isString = field.type === "string";
-  const isPlatform = currentAnalytics === "dv_platform";
-  if (isBoolean) {
-    if (item.value.tagName !== "SELECT") {
-      const select = document.createElement("select");
-      select.id = `tv_value_${index}`;
-      item.value.replaceWith(select);
-      item.value = select;
-      item.value.addEventListener("change", update);
-    }
-    item.value.innerHTML = "";
-    ["true","false"].forEach(value => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = value;
-      item.value.appendChild(option);
-    });
-    item.value.value = currentValue === "false" ? "false" : "true";
-  } else if (isPlatform) {
-    if (item.value.tagName !== "SELECT") {
-      const select = document.createElement("select");
-      select.id = `tv_value_${index}`;
-      item.value.replaceWith(select);
-      item.value = select;
-      item.value.addEventListener("change", update);
-    }
-    item.value.innerHTML = "";
-    const empty = document.createElement("option");
-    empty.value = "";
-    empty.textContent = "--";
-    item.value.appendChild(empty);
-    ANALYTICS_OPTIONS[currentAnalytics].forEach(value => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = value;
-      item.value.appendChild(option);
-    });
-    item.value.value = currentValue;
-  } else {
-    if (item.value.tagName !== "INPUT") {
-      const input = document.createElement("input");
-      input.id = `tv_value_${index}`;
-      item.value.replaceWith(input);
-      item.value = input;
-      item.value.addEventListener("input", update);
-    }
-    item.value.type = isString ? "text" : "number";
-    item.value.placeholder = "Value";
-    item.value.value = currentValue;
-  }
-  item.value.title = field.description;
+function updateConditionSelect(index){
+const item=conditions[index];
+if(!item)return;
+const currentAnalytics=item.analytics.value;
+const currentCondition=item.condition.value;
+const currentValue=item.value.value;
+const field=getAnalyticsFields().find(x=>x.value===currentAnalytics);
+if(!field){
+item.condition.innerHTML="";
+item.condition.disabled=true;
+item.value.disabled=true;
+return;
+}
+item.condition.disabled=false;
+const availableConditions=getConditions(field.type,currentAnalytics);
+item.condition.innerHTML="";
+availableConditions.forEach(operator=>{
+const option=document.createElement("option");
+option.value=operator;
+option.textContent=operator;
+item.condition.appendChild(option);
+});
+if(availableConditions.includes(currentCondition))
+item.condition.value=currentCondition;
+else if(availableConditions.includes(tip[`tp_condition_${index}`]))
+item.condition.value=tip[`tp_condition_${index}`];
+else
+item.condition.value=availableConditions[0];
+const isBoolean=field.type==="boolean";
+const isPlatform=currentAnalytics==="dv_platform";
+const isEntrance=currentAnalytics==="dv_entrance";
+const isNullCondition=item.condition.value==="IS NULL"||item.condition.value==="IS NOT NULL";
+if(isNullCondition){
+if(item.value.tagName!=="INPUT"){
+const input=document.createElement("input");
+input.id=`tv_value_${index}`;
+item.value.replaceWith(input);
+item.value=input;
+}
+item.value.type="text";
+item.value.value="";
+item.value.disabled=true;
+item.value.placeholder="";
+}
+else if(isBoolean){
+if(item.value.tagName!=="SELECT"){
+const select=document.createElement("select");
+select.id=`tv_value_${index}`;
+item.value.replaceWith(select);
+item.value=select;
+item.value.addEventListener("change",update);
+}
+item.value.innerHTML="";
+["true","false"].forEach(value=>{
+const option=document.createElement("option");
+option.value=value;
+option.textContent=value;
+item.value.appendChild(option);
+});
+item.value.value=currentValue==="false"?"false":"true";
+item.value.disabled=false;
+}
+else if(isPlatform||isEntrance){
+if(item.value.tagName!=="SELECT"){
+const select=document.createElement("select");
+select.id=`tv_value_${index}`;
+item.value.replaceWith(select);
+item.value=select;
+item.value.addEventListener("change",update);
+}
+item.value.innerHTML="";
+const empty=document.createElement("option");
+empty.value="";
+empty.textContent="--";
+item.value.appendChild(empty);
+const values=isPlatform?tipOptions.platforms:tipOptions.entrances;
+values.forEach(value=>{
+const option=document.createElement("option");
+option.value=value;
+option.textContent=value;
+item.value.appendChild(option);
+});
+item.value.value=currentValue;
+item.value.disabled=false;
+}
+else{
+if(item.value.tagName!=="INPUT"){
+const input=document.createElement("input");
+input.id=`tv_value_${index}`;
+item.value.replaceWith(input);
+item.value=input;
+item.value.addEventListener("input",update);
+}
+item.value.type=field.type==="string"?"text":"number";
+item.value.placeholder="Value";
+item.value.value=currentValue;
+item.value.disabled=false;
+}
+item.value.title=field.description;
 }
 
 /* CONDITION ROW VISIBILITY */
-
-function updateLogicRows() {
-  const has1 = !!conditions[1] .analytics.value;
-  const logic1Value = logic1.value;
-  const has2 = has1 && !!logic1Value;
-  document.getElementById("logicRow1").hidden = !has1;
-  document.getElementById("conditionRow2").hidden = !has2;
-  if (!has2) {
-    logic2.value = "";
-    document.getElementById("logicRow2").hidden = true;
-    document.getElementById("conditionRow3").hidden = true;
-    return;
-  }
-  document.getElementById("logicRow2").hidden = false;
-  const has3 = !!conditions[2] analytics.value && !!logic2.value;
-  document.getElementById("conditionRow3").hidden = !has3;
+function updateLogicRows(){
+const has1=!!conditions[1].analytics.value;
+const has2=has1&&!!logic1.value;
+document.getElementById("logicRow1").hidden=!has1;
+document.getElementById("conditionRow2").hidden=!has2;
+if(!has2){
+logic2.value="";
+document.getElementById("logicRow2").hidden=true;
+document.getElementById("conditionRow3").hidden=true;
+return;
+}
+document.getElementById("logicRow2").hidden=false;
+const has3=!!conditions[2].analytics.value&&!!logic2.value;
+document.getElementById("conditionRow3").hidden=!has3;
 }
 
 /* ACTIVE */
-
 function updateActive() {
   const on = tip.tp_active === true;
   activeBtn.className = "tool-btn " +
@@ -1034,25 +1027,16 @@ window.save =
 /* =========================================================
    INIT
    ========================================================= */
-async function init() {
-  if (
-    id &&
-    !isNew
-  ) {
-    tip =
-      await loadTip(id);
-    document
-      .getElementById(
-        "pageTitle"
-      )
-      .textContent =
-      "Edit Tip";
+async function init(){
+  await loadTipOptions();
+  if(id&&!isNew){tip=await loadTip(id);
+    document.getElementById("pageTitle").textContent="Edit Tip";
   }
-fill();
-update();
+  fill();
+  update();
 }
-
 init();
+      
 </script>
 </body>
 </html>
