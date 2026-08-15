@@ -1129,7 +1129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       /* Gli altri casi: spostamento effettivo indietro di un giorno */
       currentDate.setDate(currentDate.getDate() - 1);
       timelineMode = 'past';
-      updateTimelineMode();
+      updateTimelineMode(); // Necessario: riallinea timelineMode a currentDate prima di ricostruire la timeline.
       updateDateUI();
       setupTimeline();
       renderEvents();
@@ -1147,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      } else {
       currentDate.setDate(currentDate.getDate() + 1);
       timelineMode = 'day';
-      updateTimelineMode(); // prova per vedere se torna a visualizzare due giorni 
+      updateTimelineMode(); // Necessario: riallinea timelineMode a currentDate prima di ricostruire la timeline.
     }
       updateDateUI();
       setupTimeline();
@@ -1272,12 +1272,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const day = new Date(currentDate);
       let time = new Date();
       switch(mode) {case 'startOfDay': time = new Date(day); time.setHours(0,0,0,0); break;
-          case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break;
-          // ora reale se siamo in modalità LIVE
-          case 'live': time = new Date(); break;
-          // ora corrente entro il giorno logico
-          default: time = new Date(day); time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);
-        }
+          case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break; // ora reale se siamo in modalità LIVE
+          case 'live': time = new Date(); break; // ora corrente entro il giorno logico
+          default: time = new Date(day); time.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds(), 0);}
       return time;
     }
   
@@ -1286,7 +1283,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      - past = giorno precedente a oggi 00-24.
      - live = oggi+domani, timeline inizia dall'ora corrente fino alle 24 più tutta la giornata completa di domani 00-24.
      - day  = giorno successivo ad oggi, 00-24
-    Chiamata da: 
+    Chiamata da: prev-day (mode=past); next-day (mode=day); reset-day (mode=today); visibilitychange; 
      */
     function updateTimelineMode() {
       const currentDay = new Date(currentDate);
@@ -1858,7 +1855,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         checkGeoStatus();
-        updateTimelineMode();
+        ();
         updateDateUI();
         setupTimeline();
         renderEvents();
@@ -2143,33 +2140,27 @@ requestAnimationFrame(animateFX);
 animateFX();
 
     /* Aggiorna lo stato visivo e i fireworks del marker.
-       Azioni: imposta lo stato, verifica se l'evento è terminato, avvia/interrompe i fireworks in base allo stato.
-       Chiamata da: renderEvents(). 
-       Possibile duplicazione: getEventState() determina già finished, 
-       mentre updateMarkerState() contiene una seconda verifica di fine evento tramite evFine, che però attualmente non riceve il parametro.*/
-function updateMarkerState(marker, state, latLng, evFine) {
+       Azioni: imposta lo stato e avvia/interrompe i fireworks in base allo stato ricevuto.
+       Chiamata da: renderEvents().*/
+function updateMarkerState(marker, state, latLng) {
   marker.state = state;
+ 
+  /* CANCELLARE, viene già riportata la fine dell'evento 
   // Calcola se l'evento è finito
   const now = new Date();
   const eventoFinito = evFine && now >= new Date(evFine);
+  // Evento Finito → pulisci intervallo fuochi e imposta stato a 'finished'
   if (eventoFinito) {
-    // Evento Finito → pulisci intervallo fuochi e imposta stato a 'finished'
-    if (marker.fireworkInterval) {
-      clearInterval(marker.fireworkInterval);
-      marker.fireworkInterval = null;
-    }
+    if (marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
     marker.state = 'finished';
     return;
   }
-  // Evento attuale, fuochi solo se in countdown
-  if (state === 'countdown' && !marker.fireworkInterval) {
-  triggerFirework(latLng);
+*/
+  
+  if (state === 'countdown' && !marker.fireworkInterval) {triggerFirework(latLng);   // Evento attuale, fuochi solo se in countdown
   marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2500); // Un fuoco ogni X secondi 1''=1000
 }
-if (state !== 'countdown' && marker.fireworkInterval) {
-  clearInterval(marker.fireworkInterval);
-  marker.fireworkInterval = null;
-}
+if (state !== 'countdown' && marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
   return;
 }
 
