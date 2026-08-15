@@ -1359,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* RICOSTRUISCE I MARKER — ricrea la rappresentazione grafica di tutti gli eventi.
        Azioni: rimuove i marker esistenti, calcola lo stato degli eventi, crea e registra i nuovi marker, 
        collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
-       Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchevents 30'; setinterval updateMarkerVisibility 2' . */
+       Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchEvents 30'; setinterval updateMarkerVisibility 2' . */
     function renderEvents() {
       // pulizia markers precedenti
       markers.forEach(m => {
@@ -1931,7 +1931,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* Aggiorna il ticker degli eventi imminenti.
        Azioni: recupera gli eventi imminenti, genera l'HTML e lo inserisce nel ticker.
-       Chiamata da: DOM; setInterval (fetchEvents) . */
+       Chiamata da: DOM; setInterval fetchEvents 30'. */
     function updateTicker(){
     const list = getUpcomingEvents(12).slice(0, 20); // Eventi nelle prossime 12 ore, massimo 20 elementi.
     const html = list.map(e => {
