@@ -139,18 +139,14 @@ dv_app:{type:"boolean",label:"App",description:"Whether Aroundo is currently run
 dv_entrance:{type:"string",label:"Entrance",description:"First acquisition source of the device."}
 };
 
-export const ANALYTICS_OPTIONS={
-dv_platform:["Android","iOS","Windows","macOS","Linux","Other"]
-};
+export const ANALYTICS_OPTIONS = {dv_platform:["Android","iOS","Windows","macOS","Linux","Other"]};
 
 /* HELPERS */
-export function getAnalyticsFields(){
-return Object.entries(ANALYTICS_FIELDS)
+export function getAnalyticsFields(){return Object.entries(ANALYTICS_FIELDS)
 .map(([value,data])=>({value,...data}));
 }
 
-export async function getTipOptions(){
-const {data,error}=await supabase
+export async function getTipOptions(){const {data,error}=await supabase
 .from("devices")
 .select("dv_platform,dv_entrance");
 if(error)throw error;
@@ -159,8 +155,7 @@ const entrances=[...new Set((data||[]).map(x=>x.dv_entrance).filter(Boolean))];
 return{platforms,entrances};
 }
 
-export function getTipTypes(){
-return Object.entries(TIP_TYPES)
+export function getTipTypes(){return Object.entries(TIP_TYPES)
 .map(([value,data])=>({value,...data}));
 }
 
@@ -173,8 +168,7 @@ return[">",">=","=","<=","<","!="];
 /* CONDITION EVALUATION */
 export function evaluateCondition(actual,condition,expected){
 if(expected==="")return null;
-if(typeof actual==="boolean"){
-const target=String(expected).toLowerCase();
+if(typeof actual==="boolean"){const target=String(expected).toLowerCase();
 if(target!=="true"&&target!=="false")return null;
 return condition==="="?actual===(target==="true"):condition==="!="?actual!==(target==="true"):null;
 }
@@ -203,15 +197,10 @@ OR: at least one must be true
 NOT: the current condition is negated
 */
 export function evaluateLogic(previous, current, logic) {
-  if (previous === null || current === null) {
-    return null;
-  }
-  if (logic === "AND")
-    return previous && current;
-  if (logic === "OR")
-    return previous || current;
-  if (logic === "NOT")
-    return previous && !current;
+  if (previous === null || current === null) {return null;}
+  if (logic === "AND") return previous && current;
+  if (logic === "OR") return previous || current;
+  if (logic === "NOT") return previous && !current;
   return current;
 }
 
@@ -270,8 +259,7 @@ export async function loadTip(id) {
     .select("*")
     .eq("id_tips", id)
     .single();
-  if (error)
-    throw error;
+  if (error) throw error;
   return data;
 }
 
@@ -347,18 +335,11 @@ let result=null;
 for(let i=0;i<conditions.length;i++){
 const item=conditions[i];
 let actual;
-if(item.analytics.startsWith("dv_")){
-actual=device[item.analytics];
-}else if(item.analytics==="an_gps"){
-actual=last?last.an_gps:null;
-}else{
-actual=total[item.analytics]??0;
+if(item.analytics.startsWith("dv_")){actual=device[item.analytics];
+}else if(item.analytics==="an_gps"){actual=last?last.an_gps:null;
+}else{actual=total[item.analytics]??0;
 }
-const current=evaluateCondition(
-actual,
-item.condition,
-item.value
-);
+const current=evaluateCondition(actual,item.condition,item.value);
 if(i===0)result=current;
 else result=evaluateLogic(result,current,item.logic);
 }
@@ -391,15 +372,8 @@ export function renderTip(tip) {
   /* BOX */
   const box = document.createElement("div");
   box.style.cssText = `width:${model.width}; max-width:calc(100vw - 40px); box-sizing:border-box; padding:${model.padding}; background:${model.background};
-    color:${model.color}; border:${model.border}; ${model.borderBottom
-      ? `border-bottom:${model.borderBottom};`: ""}
-    border-radius:${model.radius};
-    box-shadow:${model.shadow};
-    font-family:${model.fontFamily};
-    position:relative;
-    pointer-events:auto;
-    overflow:hidden;
-  `;
+    color:${model.color}; border:${model.border}; ${model.borderBottom ? `border-bottom:${model.borderBottom};`: ""}
+    border-radius:${model.radius}; box-shadow:${model.shadow}; font-family:${model.fontFamily}; position:relative; pointer-events:auto; overflow:hidden;`;
 
   /* BUBBLE TAIL */
   if (model.shape === "bubble") {
@@ -445,8 +419,7 @@ export function renderTip(tip) {
   if (tip.tp_text) {
     const content = document.createElement("div");
     content.textContent = tip.tp_text; content.style.cssText = `font-size:${model.textSize}; line-height: ${model.shape === "toast" ? "1.35" : "1.55"};
-      white-space:pre-wrap; ${model.shape === "modal" ? "text-align:center;" : ""}
-      ${model.shape === "banner" ? "max-width:1100px;flex:1;min-width:0;" : ""}`;
+      white-space:pre-wrap; ${model.shape === "modal" ? "text-align:center;" : ""} ${model.shape === "banner" ? "max-width:1100px;flex:1;min-width:0;" : ""}`;
     box.appendChild(content);
   }
 
@@ -502,41 +475,24 @@ if (model.shape === "banner") {
   box.style.borderRadius = "0";
   const children = [...box.children];
   children.forEach(child => {
-    if (child.style && child.style.marginBottom) {
-      child.style.marginBottom = "0";
-    }
+    if (child.style && child.style.marginBottom) {child.style.marginBottom = "0";}
   });
   const header = children.find(x => x.style && x.style.display === "flex");
   const content = children.find(x => x.style && x.style.whiteSpace === "pre-wrap");
   const actions = children[children.length - 1];
-  if (header) {
-    header.style.width = "100%";
-    header.style.flex = "none";
-    header.style.marginBottom = "10px";
-  }
-  if (content) {
-    content.style.width = "100%";
-    content.style.maxWidth = "1100px";
-    content.style.flex = "none";
-  }
-  if (actions) {
-    actions.style.width = "100%";
-    actions.style.flex = "none";
-    actions.style.marginTop = "20px";
-  }
+  if (header) {header.style.width = "100%"; header.style.flex = "none"; header.style.marginBottom = "10px";}
+  if (content) {content.style.width = "100%"; content.style.maxWidth = "1100px"; content.style.flex = "none";}
+  if (actions) {actions.style.width = "100%"; actions.style.flex = "none"; actions.style.marginTop = "20px";}
 }
  
   overlay.appendChild(box);
-  document.body.appendChild(
-    overlay
-  );
+  document.body.appendChild(overlay);
 
   /* ANIMATION */
   if ( !document.getElementById("aroundo-tip-animation")
   ) {
     const style = document.createElement("style"); style.id = "aroundo-tip-animation";
-    style.textContent = `@keyframes aroundoTipIn { from { opacity:0; transform: translateY(8px) scale(.98); }
-        to { opacity:1; transform: translateY(0) scale(1); } }`;
+    style.textContent = `@keyframes aroundoTipIn { from { opacity:0; transform: translateY(8px) scale(.98); } to { opacity:1; transform: translateY(0) scale(1); } }`;
     document.head.appendChild(style);
   }
   return overlay;
