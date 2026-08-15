@@ -287,11 +287,11 @@ if(error)throw error;
 return data;
 }
 
+/* SIMULAZIONE */
 export async function simulateTip(tip){
 const {data:analytics,error:analyticsError}=await supabase
 .from("analytics")
-.select("*")
-.order("an_date",{ascending:false});
+.select("*");
 if(analyticsError)throw analyticsError;
 const {data:devices,error:devicesError}=await supabase
 .from("devices")
@@ -300,30 +300,19 @@ if(devicesError)throw devicesError;
 const deviceMap=new Map(
 (devices||[]).map(device=>[device.id_device,device])
 );
-/* AGGREGA TUTTA LA STORIA ANALYTICS PER DEVICE */
-const totals=new Map();
-const latest=new Map();
-const numericFields=[
-"an_open","an_login","an_install","an_share",
-"an_more","an_info","an_marker","an_map",
-"an_buy","an_book"
-];
+const deviceAnalytics=new Map();
 (analytics||[]).forEach(row=>{
 if(!row.id_device)return;
-if(!totals.has(row.id_device)){
-const total={};
-numericFields.forEach(field=>total[field]=0);
-totals.set(row.id_device,total);
-}
-const total=totals.get(row.id_device);
-numericFields.forEach(field=>{
-total[field]+=Number(row[field]||0);
+if(!deviceAnalytics.has(row.id_device))deviceAnalytics.set(row.id_device,{});
+const totals=deviceAnalytics.get(row.id_device);
+Object.entries(row).forEach(([key,value])=>{
+if(key==="id_device"||key==="an_date")return;
+if(typeof value==="number"&&Number.isFinite(value))
+totals[key]=(totals[key]||0)+value;
+else if(value!==null&&value!==undefined)
+totals[key]=value;
 });
-if(!latest.has(row.id_device)){
-latest.set(row.id_device,row);
-}
 });
-/* COSTRUZIONE CONDIZIONI */
 const conditions=[];
 for(let i=1;i<=3;i++){
 const analyticsField=tip[`tp_analytics_${i}`];
@@ -332,25 +321,30 @@ const condition=tip[`tp_condition_${i}`];
 const value=tip[`tv_value_${i}`];
 const field=ANALYTICS_FIELDS[analyticsField];
 if(!field)continue;
-conditions.push({analytics:analyticsField,condition,value,logic:i>1?tip[`tp_logic_${i-1}`]:""});
+conditions.push({
+analytics:analyticsField,
+condition,
+value,
+logic:i>1?tip[`tp_logic_${i-1}`]:""
+});
 }
-/* VALUTAZIONE DEVICE */
 let involved=0;
 let excluded=0;
 let missing=0;
 const detail=[];
-deviceMap.forEach((device,id)=>{
-const total=totals.get(id)||{};
-const last=latest.get(id);
+deviceMap.forEach((device,id_device)=>{
+const totals=deviceAnalytics.get(id_device)||{};
 let result=null;
 for(let i=0;i<conditions.length;i++){
 const item=conditions[i];
-let actual;
-if(item.analytics.startsWith("dv_")){actual=device[item.analytics];
-}else if(item.analytics==="an_gps"){actual=last?last.an_gps:null;
-}else{actual=total[item.analytics]??0;
-}
-const current=evaluateCondition(actual,item.condition,item.value);
+const actual=item.analytics.startsWith("dv_")
+?device[item.analytics]
+:totals[item.analytics];
+const current=evaluateCondition(
+actual,
+item.condition,
+item.value
+);
 if(i===0)result=current;
 else result=evaluateLogic(result,current,item.logic);
 }
@@ -358,10 +352,14 @@ if(result===true)involved++;
 else if(result===false)excluded++;
 else missing++;
 });
-/* TESTO DESCRITTIVO */
 conditions.forEach((item,index)=>{
 const field=ANALYTICS_FIELDS[item.analytics];
-detail.push({logic:index===0?"":item.logic,label:field?field.label:item.analytics,condition:item.condition,value:item.value});
+detail.push({
+logic:index===0?"":item.logic,
+label:field?field.label:item.analytics,
+condition:item.condition,
+value:item.value
+});
 });
 const total=deviceMap.size;
 return{total,involved,excluded,missing,percent:total?Math.round(involved/total*100):0,detail};
