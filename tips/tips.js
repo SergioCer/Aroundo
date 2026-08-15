@@ -291,7 +291,8 @@ return data;
 export async function simulateTip(tip){
 const {data:analytics,error:analyticsError}=await supabase
 .from("analytics")
-.select("*");
+.select("*")
+.order("an_date",{ascending:false});
 if(analyticsError)throw analyticsError;
 const {data:devices,error:devicesError}=await supabase
 .from("devices")
@@ -303,14 +304,16 @@ const deviceMap=new Map(
 const deviceAnalytics=new Map();
 (analytics||[]).forEach(row=>{
 if(!row.id_device)return;
-if(!deviceAnalytics.has(row.id_device))deviceAnalytics.set(row.id_device,{});
-const totals=deviceAnalytics.get(row.id_device);
+if(!deviceAnalytics.has(row.id_device))
+deviceAnalytics.set(row.id_device,{totals:{},latest:{}});
+const data=deviceAnalytics.get(row.id_device);
 Object.entries(row).forEach(([key,value])=>{
 if(key==="id_device"||key==="an_date")return;
-if(typeof value==="number"&&Number.isFinite(value))
-totals[key]=(totals[key]||0)+value;
-else if(value!==null&&value!==undefined)
-totals[key]=value;
+if(typeof value==="number"&&Number.isFinite(value)){
+data.totals[key]=(data.totals[key]||0)+value;
+}else if(!(key in data.latest)){
+data.latest[key]=value;
+}
 });
 });
 const conditions=[];
@@ -333,13 +336,15 @@ let excluded=0;
 let missing=0;
 const detail=[];
 deviceMap.forEach((device,id_device)=>{
-const totals=deviceAnalytics.get(id_device)||{};
+const data=deviceAnalytics.get(id_device)||{totals:{},latest:{}};
 let result=null;
 for(let i=0;i<conditions.length;i++){
 const item=conditions[i];
 const actual=item.analytics.startsWith("dv_")
 ?device[item.analytics]
-:totals[item.analytics];
+:ANALYTICS_FIELDS[item.analytics]?.type==="number"
+?data.totals[item.analytics]
+:data.latest[item.analytics];
 const current=evaluateCondition(
 actual,
 item.condition,
