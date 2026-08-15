@@ -166,7 +166,8 @@ export function getTipTypes(){return Object.entries(TIP_TYPES)
 .map(([value,data])=>({value,...data}));
 }
 
-export function getConditions(type){
+export function getConditions(type,field){
+if(field==="an_gps")return["=","!=","IS NULL","IS NOT NULL"];
 if(type==="boolean")return["=","!="];
 if(type==="string")return["=","!="];
 return[">",">=","=","<=","<","!="];
@@ -174,18 +175,21 @@ return[">",">=","=","<=","<","!="];
 
 /* CONDITION EVALUATION */
 export function evaluateCondition(actual,condition,expected){
-if(expected==="")return null;
-if(typeof actual==="boolean"){const target=String(expected).toLowerCase();
+if(condition==="IS NULL")return actual===null||actual===undefined;
+if(condition==="IS NOT NULL")return actual!==null&&actual!==undefined;
+if(actual===null||actual===undefined||actual===""||expected==="")return null;
+if(typeof actual==="boolean"){
+const target=String(expected).toLowerCase();
 if(target!=="true"&&target!=="false")return null;
-return condition==="="?actual===(target==="true"):condition==="!="?actual!==(target==="true"):null;
-}
-if(actual===null||actual===undefined||actual===""){
-if(typeof expected==="string"&&expected.toLowerCase()==="null")
-return condition==="="?actual===null:condition==="!="?actual!==null:null;
+if(condition==="=")return actual===(target==="true");
+if(condition==="!=")return actual!==(target==="true");
 return null;
 }
-if(typeof actual==="string")
-return condition==="="?actual===String(expected):condition==="!="?actual!==String(expected):null;
+if(typeof actual==="string"){
+if(condition==="=")return actual===String(expected);
+if(condition==="!=")return actual!==String(expected);
+return null;
+}
 const a=Number(actual),b=Number(expected);
 if(!Number.isFinite(a)||!Number.isFinite(b))return null;
 if(condition===">")return a>b;
