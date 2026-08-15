@@ -1275,6 +1275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break; // ora reale se siamo in modalità LIVE
           case 'live': time = new Date(); break; // ora corrente entro il giorno logico
           default: const now = new Date(); time = new Date(day); time.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+          }
       return time;
     }
   
