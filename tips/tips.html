@@ -495,8 +495,7 @@ function updateConditionSelect(index) {
     return;
   }
   /* CONDITIONS */
-  const availableConditions =
-    getConditions(field.type, currentAnalytics);
+  const availableConditions = getConditions(field.type, currentAnalytics);
   item.condition.innerHTML = "";
   availableConditions.forEach(operator => {
     const option = document.createElement("option");
@@ -504,37 +503,15 @@ function updateConditionSelect(index) {
     option.textContent = operator;
     item.condition.appendChild(option);
   });
-  if (availableConditions.includes(currentCondition)) {
-    item.condition.value = currentCondition;
-  }
-  else if (
-    availableConditions.includes(
-      tip[`tp_condition_${index}`]
-    )
-  ) {
-    item.condition.value =
-      tip[`tp_condition_${index}`];
-  }
-  else {
-    item.condition.value =
-      availableConditions[0];
-  }
-  const selectedCondition =
-    item.condition.value;
-  /*
-   * =====================================================
-   * NULL CONDITIONS
-   * =====================================================
-   *
-   * IS NULL / IS NOT NULL non hanno bisogno
-   * di un valore.
-   */
-  if (
-    selectedCondition === "IS NULL" ||
-    selectedCondition === "IS NOT NULL"
-  ) {
-    if (item.value.tagName !== "INPUT") {
-      const input = document.createElement("input");
+  if (availableConditions.includes(currentCondition)) {item.condition.value = currentCondition;}
+  else if (availableConditions.includes(tip[`tp_condition_${index}`])
+  ) {item.condition.value = tip[`tp_condition_${index}`];}
+  else {item.condition.value = availableConditions[0];}
+  const selectedCondition = item.condition.value;
+  /* NULL CONDITIONS
+      IS NULL / IS NOT NULL non hanno bisogno di un valore. */
+  if (selectedCondition === "IS NULL" || selectedCondition === "IS NOT NULL") {
+    if (item.value.tagName !== "INPUT") {const input = document.createElement("input");
       input.id = `tv_value_${index}`;
       item.value.replaceWith(input);
       item.value = input;
@@ -545,87 +522,47 @@ function updateConditionSelect(index) {
     item.value.disabled = true;
     return;
   }
-  /*
-   * =====================================================
-   * VALUE OPTIONS
-   * =====================================================
-   */
-  const valueOptions =
-    getTipValueOptions(
-      currentAnalytics,
-      tipOptions
-    );
+  /* VALUE OPTIONS */
+  const valueOptions = getTipValueOptions(currentAnalytics, tipOptions);
   if (valueOptions) {
     if (item.value.tagName !== "SELECT") {
       const select = document.createElement("select");
       select.id = `tv_value_${index}`;
       item.value.replaceWith(select);
       item.value = select;
-      item.value.addEventListener(
-        "change",
-        update
-      );
+      item.value.addEventListener("change", update);
     }
     item.value.innerHTML = "";
-    const empty =
-      document.createElement("option");
+    const empty = document.createElement("option");
     empty.value = "";
     empty.textContent = "--";
     item.value.appendChild(empty);
     valueOptions.forEach(optionData => {
-      const option =
-        document.createElement("option");
-      option.value =
-        optionData.value;
-      option.textContent =
-        optionData.label;
+      const option = document.createElement("option");
+      option.value = optionData.value;
+      option.textContent = optionData.label;
       item.value.appendChild(option);
     });
-    if (
-      [...item.value.options]
-        .some(option =>
-          option.value === currentValue
-        )
-    ) {
-      item.value.value =
-        currentValue;
-    }
-    else {
-      item.value.value = "";
-    }
+    if ([...item.value.options] .some(option => option.value === currentValue)
+    ) {item.value.value = currentValue;}
+    else {item.value.value = "";}
     item.value.disabled = false;
-    item.value.title =
-      field.description;
+    item.value.title = field.description;
     return;
   }
-  /*
-   * =====================================================
-   * GENERIC VALUE
-   * =====================================================
-   */
+  /* GENERIC VALUE */
   if (item.value.tagName !== "INPUT") {
-    const input =
-      document.createElement("input");
-    input.id =
-      `tv_value_${index}`;
+    const input = document.createElement("input");
+    input.id = `tv_value_${index}`;
     item.value.replaceWith(input);
     item.value = input;
-    item.value.addEventListener(
-      "input",
-      update
-    );
+    item.value.addEventListener("input", update);
   }
-  item.value.type =
-    field.type === "string"
-      ? "text"
-      : "number";
-  item.value.placeholder =
-    "Value";
-  item.value.value =
-    currentValue;
+  item.value.type = field.type === "string" ? "text" : "number";
+  item.value.placeholder = "Value";
+  item.value.value = currentValue;
   item.value.disabled = false;
-  item.value.title =
-    field.description;
+  item.value.title = field.description;
 }
 
 /* CONDITION ROW VISIBILITY */
@@ -663,8 +600,7 @@ function updateProgression() {
   const first = conditions[1];
   const field = getAnalyticsFields()
       .find(x => x.value === first.analytics.value);
-  if (!field) {
-    progression.hidden = true;
+  if (!field) {progression.hidden = true;
     return;
   }
   progression.hidden = false;
@@ -672,8 +608,7 @@ function updateProgression() {
   if (field.type === "number") {
     const values = calculateProgression(interval.value, growth.value, repeat.value);
     values.forEach(
-      (value, index) => {
-        const el = document.createElement("div");
+      (value, index) => {const el = document.createElement("div");
         el.className = "step";
         el.textContent = `${index + 1}ª → ${value}`;
         progression
@@ -684,29 +619,25 @@ function updateProgression() {
       const el = document.createElement("div");
       el.className = "step";
       el.textContent = "∞ → ...";
-      progression
-        .appendChild(el);
+      progression .appendChild(el);
     } else if (
       repeatValue > 10
     ) {
       const el = document.createElement("div");
       el.className = "step";
       el.textContent = "11ª → ...";
-      progression
-        .appendChild(el);
+      progression .appendChild(el);
     }
   } else {
     const el = document.createElement("div");
     el.className = "step";
     el.textContent = "1ª → visualizzazione";
-    progression
-      .appendChild(el);
+    progression .appendChild(el);
     if (repeatValue === 0) {
       const el2 = document.createElement("div");
       el2.className = "step";
       el2.textContent = "∞ → ...";
-      progression
-        .appendChild(el2);
+      progression .appendChild(el2);
     } else if (
       repeatValue > 1
     ) {
@@ -716,8 +647,7 @@ function updateProgression() {
       el2.textContent = repeatValue > 10
           ? "11ª → ..."
           : `${repeatValue}ª → ...`;
-      progression
-        .appendChild(el2);
+      progression .appendChild(el2);
     }
   }
 }
@@ -733,88 +663,36 @@ function update() {
 
 /* EVENTS */
 Object.values(conditions)
-  .forEach(item => {
-    item.analytics
-      .addEventListener(
-        "change",
-        () => {
-          /*
-           * Quando cambia Analytics:
-           * - aggiorniamo gli operatori
-           * - aggiorniamo il campo Value
-           * - aggiorniamo la visibilità delle righe
-           */
-          updateConditionSelect(
-            Number(
-              item.analytics.id
-                .split("_")
-                .pop()
-            )
-          );
+  .forEach(item => {item.analytics
+      .addEventListener("change", () => {
+      /* Quando cambia Analytics:
+      - aggiorniamo gli operatori
+      - aggiorniamo il campo Value
+      - aggiorniamo la visibilità delle righe */
+          updateConditionSelect(Number(item.analytics.id .split("_") .pop()));
           updateLogicRows();
           updateProgression();
         }
       );
-    item.condition
-      .addEventListener(
-        "change",
-        update
-      );
-    item.value
-      .addEventListener(
-        "input",
-        update
-      );
-    item.value
-      .addEventListener(
-        "change",
-        update
-      );
+    item.condition .addEventListener("change", update);
+    item.value .addEventListener("input", update);
+    item.value .addEventListener("change", update);
   });
-logic1.addEventListener(
-  "change",
-  update
-);
-logic2.addEventListener(
-  "change",
-  update
-);
-repeat.addEventListener(
-  "input",
-  updateProgression
-);
-interval.addEventListener(
-  "input",
-  updateProgression
-);
-growth.addEventListener(
-  "input",
-  updateProgression
-);
+logic1.addEventListener("change", update);
+logic2.addEventListener("change", update);
+repeat.addEventListener("input", updateProgression);
+interval.addEventListener("input", updateProgression);
+growth.addEventListener("input", updateProgression);
 
-/* =========================================================
-   PREVIEW
-   ========================================================= */
-previewBtn.onclick = () => {
-  renderTip({
-    tp_type: type.value,
-    tp_icon: icon.value,
-    tp_title: title.value,
-    tp_text: text.value,
-    tp_repeat: Number(repeat.value),
-    tp_cta_active: document.getElementById("tp_cta_active").value === "true",
-    tp_cta_label: document.getElementById("tp_cta_label").value,
-    tp_cta_url: document.getElementById("tp_cta_url").value
-  });
+/* PREVIEW */
+previewBtn.onclick = () => {renderTip({tp_type: type.value, tp_icon: icon.value, tp_title: title.value, tp_text: text.value, tp_repeat: Number(repeat.value),
+    tp_cta_active: document.getElementById("tp_cta_active").value === "true", tp_cta_label: document.getElementById("tp_cta_label").value,
+    tp_cta_url: document.getElementById("tp_cta_url").value});
 };
 
-/* =========================================================
-   IMPACT
-   ========================================================= */
+/* IMPACT */
 impactBtn.onclick =
-  async () => {
-    simulation.innerHTML =
-      "Calculating...";
+  async () => {simulation.innerHTML = "Calculating...";
     try {
       const data = {
         tp_analytics_1: conditions[1] .analytics.value,
@@ -832,16 +710,9 @@ impactBtn.onclick =
       const result = await simulateTip(data);
       estimatedImpact=result.involved;    
       let html = `
-        <div class="simulation-title">
-          Estimated Impact
-        </div>
-        <div class="simulation-row">
-          <span>
-            Devices analyzed
-          </span>
-          <span class="simulation-value">
-            ${result.total}
-          </span>
+        <div class="simulation-title">Estimated Impact</div>
+        <div class="simulation-row"><span>Devices analyzed</span>
+          <span class="simulation-value">${result.total}</span>
         </div>
       `;
       result.detail
@@ -849,13 +720,7 @@ impactBtn.onclick =
           html += `
             <div class="simulation-row simulation-condition">
               <span>
-                ${
-                  item.logic
-                    ? `<span class="simulation-logic">
-                         (${item.logic})
-                       </span>`
-                    : ""
-                }
+                ${item.logic ? `<span class="simulation-logic">(${item.logic})</span>` : ""}
                 ${item.label}
                 ${item.condition}
                 ${item.value}
@@ -865,43 +730,32 @@ impactBtn.onclick =
         });
       html += `
         <div class="simulation-row simulation-main">
-          <span>
-            Potentially involved
-          </span>
+          <span>Potentially involved</span>
           <span class="simulation-value">
             ${result.involved}
             (${result.percent}%)
           </span>
         </div>
         <div class="simulation-row">
-          <span>
-            Excluded
-          </span>
+          <span>Excluded</span>
           <span class="simulation-value">
             ${result.excluded}
           </span>
         </div>
         <div class="simulation-row">
-          <span>
-            Missing data
-          </span>
+          <span>Missing data</span>
           <span class="simulation-value">
             ${result.missing}
           </span>
         </div>
       `;
-      simulation.innerHTML =
-        html;
-    } catch (error) {
-      console.error(error);
-      simulation.innerHTML =
-        "Simulation error.";
+      simulation.innerHTML = html;
+    } catch (error) { console.error(error);
+      simulation.innerHTML = "Simulation error.";
     }
   };
 
-/* =========================================================
-   FILL
-   ========================================================= */
+/* FILL */
 function fill() {
   idTips.value =
     tip.id_tips || "";
@@ -972,9 +826,7 @@ function fill() {
   updateActive();
 }
 
-/* =========================================================
-   SAVE
-   ========================================================= */
+/* SAVE */
 window.save =
   async () => {
     const data = {
@@ -1020,9 +872,7 @@ window.save =
       }
   };
 
-/* =========================================================
-   INIT
-   ========================================================= */
+/* INIT */
 async function init(){
   await loadTipOptions();
   if(id&&!isNew){tip=await loadTip(id);
