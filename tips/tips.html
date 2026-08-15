@@ -390,7 +390,7 @@ textarea {
 
 import {requireAuth} from "../pages/auth-check.js";
 await requireAuth();
-import { TIP_ICONS, getTipTypes, getAnalyticsFields, getConditions, ANALYTICS_OPTIONS, calculateProgression, 
+import { TIP_ICONS, getTipTypes, getAnalyticsFields, getConditions, getTipOptions, ANALYTICS_OPTIONS, calculateProgression, 
         defaultTip, loadTip, saveTip, simulateTip, renderTip } from "./tips.js";
 
 let estimatedImpact=0;
@@ -478,7 +478,7 @@ Object.values(conditions)
 let tipOptions={platforms:[],entrances:[]};
 
 async function loadTipOptions(){
-  tipOptions=await getTipOptions();
+tipOptions=await getTipOptions();
 }
       
 /* CONDITION SELECT */
