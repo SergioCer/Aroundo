@@ -2178,6 +2178,7 @@ function minimizeOverlay() {
   overlay.classList.add('minimized');
   toggle.style.display = 'flex';
 }
+      
 /* Apre l'overlay principale.
    Azioni: rimuove lo stato minimizzato e nasconde il pulsante di riapertura.
    Chiamata da: click sul pulsante toggle. */
@@ -2187,19 +2188,16 @@ function openOverlay() {
 }
 // click fuori → chiude
 document.addEventListener('click', (e) => {
-  if (!overlay.contains(e.target) && !toggle.contains(e.target) && !overlay.classList.contains('minimized')) {
-    minimizeOverlay();
+  if (!overlay.contains(e.target) && !toggle.contains(e.target) && !overlay.classList.contains('minimized')) {minimizeOverlay();
   }
 });
 // evita chiusura cliccando dentro
-overlay.addEventListener('click', (e) => {
-  e.stopPropagation();
+overlay.addEventListener('click', (e) => {e.stopPropagation();
 });
 // click icona → riapre
 toggle.addEventListener('click', openOverlay);
 // Minimizza l'overlay dopo 3 secondi
 setTimeout(() => { minimizeOverlay(); }, timeout);
-
 /* Registra il Service Worker dell'app, se supportato dal browser. */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js');
