@@ -440,12 +440,27 @@ const {data:views,error:viewsError}=await supabase
 .select("id_tips,tv_show,tv_date,tv_disabled,tv_cta")
 .eq("id_device",id_device);
 if(viewsError)throw viewsError;
+const {data:device,error:deviceError}=await supabase
+.from("devices")
+.select("id_device,dv_platform,dv_app,dv_entrance")
+.eq("id_device",id_device)
+.single();
+if(deviceError)throw deviceError;
+const {data:analytics,error:analyticsError}=await supabase
+.from("analytics")
+.select("*")
+.eq("id_device",id_device)
+.order("an_date",{ascending:false});
+if(analyticsError)throw analyticsError;
+const profiles=buildTipProfiles([device],analytics);
+const profile=profiles.get(id_device);
 const viewsMap=new Map((views||[]).map(view=>[view.id_tips,view]));
 const candidates=[];
 for(const tip of tips){
 const view=viewsMap.get(tip.id_tips);
 if(view?.tv_disabled)continue;
-candidates.push({tip,view:view||null});
+const result=evaluateTip(tip,profile);
+candidates.push({tip,view:view||null,condition:result});
 }
 return candidates;
 }
