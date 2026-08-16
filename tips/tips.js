@@ -309,25 +309,12 @@ if(error)throw error;
 return data;
 }
 
-/* SIMULAZIONE */
-export async function simulateTip(tip){
-const {data:analytics,error:analyticsError}=await supabase
-.from("analytics")
-.select("*")
-.order("an_date",{ascending:false});
-if(analyticsError)throw analyticsError;
-const {data:devices,error:devicesError}=await supabase
-.from("devices")
-.select("id_device,dv_platform,dv_app,dv_entrance");
-if(devicesError)throw devicesError;
-const deviceMap=new Map(
-(devices||[]).map(device=>[device.id_device,device])
-);
+/* TIP PROFILE */
+export function buildTipProfiles(devices,analytics){
 const deviceAnalytics=new Map();
 (analytics||[]).forEach(row=>{
 if(!row.id_device)return;
-if(!deviceAnalytics.has(row.id_device))
-deviceAnalytics.set(row.id_device,{totals:{},latest:{}});
+if(!deviceAnalytics.has(row.id_device))deviceAnalytics.set(row.id_device,{totals:{},latest:{}});
 const data=deviceAnalytics.get(row.id_device);
 Object.entries(row).forEach(([key,value])=>{
 if(key==="id_device"||key==="an_date")return;
@@ -338,6 +325,16 @@ data.latest[key]=value;
 }
 });
 });
+const profiles=new Map();
+(devices||[]).forEach(device=>{
+const data=deviceAnalytics.get(device.id_device)||{totals:{},latest:{}};
+profiles.set(device.id_device,{device,totals:data.totals,latest:data.latest});
+});
+return profiles;
+}
+
+/* TIP CONDITIONS */
+export function buildTipConditions(tip){
 const conditions=[];
 for(let i=1;i<=3;i++){
 const analyticsField=tip[`tp_analytics_${i}`];
@@ -353,32 +350,51 @@ value,
 logic:i>1?tip[`tp_logic_${i-1}`]:""
 });
 }
-let involved=0;
-let excluded=0;
-let missing=0;
-const detail=[];
-deviceMap.forEach((device,id_device)=>{
-const data=deviceAnalytics.get(id_device)||{totals:{},latest:{}};
+return conditions;
+}
+
+/* TIP EVALUATION */
+export function evaluateTip(tip,profile){
+const conditions=buildTipConditions(tip);
+if(!conditions.length)return null;
 let result=null;
 for(let i=0;i<conditions.length;i++){
 const item=conditions[i];
 const actual=item.analytics.startsWith("dv_")
-?device[item.analytics]
+?profile.device[item.analytics]
 :ANALYTICS_FIELDS[item.analytics]?.type==="number"
-?data.totals[item.analytics]
-:data.latest[item.analytics];
-const current=evaluateCondition(
-actual,
-item.condition,
-item.value
-);
+?profile.totals[item.analytics]
+:profile.latest[item.analytics];
+const current=evaluateCondition(actual,item.condition,item.value);
 if(i===0)result=current;
 else result=evaluateLogic(result,current,item.logic);
 }
+return result;
+}
+
+/* TIP SIMULATION */
+export async function simulateTip(tip){
+const {data:analytics,error:analyticsError}=await supabase
+.from("analytics")
+.select("*")
+.order("an_date",{ascending:false});
+if(analyticsError)throw analyticsError;
+const {data:devices,error:devicesError}=await supabase
+.from("devices")
+.select("id_device,dv_platform,dv_app,dv_entrance");
+if(devicesError)throw devicesError;
+const profiles=buildTipProfiles(devices,analytics);
+const conditions=buildTipConditions(tip);
+let involved=0;
+let excluded=0;
+let missing=0;
+profiles.forEach(profile=>{
+const result=evaluateTip(tip,profile);
 if(result===true)involved++;
 else if(result===false)excluded++;
 else missing++;
 });
+const detail=[];
 conditions.forEach((item,index)=>{
 const field=ANALYTICS_FIELDS[item.analytics];
 detail.push({
@@ -388,8 +404,27 @@ condition:item.condition,
 value:item.value
 });
 });
-const total=deviceMap.size;
+const total=profiles.size;
 return{total,involved,excluded,missing,percent:total?Math.round(involved/total*100):0,detail};
+}
+
+/* TIP EVALUATION FOR DEVICE */
+export async function evaluateTipForDevice(tip,id_device){
+const {data:device,error:deviceError}=await supabase
+.from("devices")
+.select("id_device,dv_platform,dv_app,dv_entrance")
+.eq("id_device",id_device)
+.single();
+if(deviceError)throw deviceError;
+const {data:analytics,error:analyticsError}=await supabase
+.from("analytics")
+.select("*")
+.eq("id_device",id_device)
+.order("an_date",{ascending:false});
+if(analyticsError)throw analyticsError;
+const profiles=buildTipProfiles([device],analytics);
+const profile=profiles.get(id_device);
+return evaluateTip(tip,profile);
 }
 
 /* RENDER TIP */
