@@ -1,10 +1,5 @@
 import { supabase } from "../supabase.js";
-import { getOrCreateDevice } from "../analytics-events.js";
 
-const device = await getOrCreateDevice();
-if (!device) return;
-const idDevice = device.id_device;
-  
 /* TIP TYPES: Visual design is intentionally hardcoded. These values are NOT stored in the database. */
 export const TIP_TYPES = {
   bubble: {
@@ -314,15 +309,7 @@ if(error)throw error;
 return data;
 }
 
-async function getDeviceProfile(idDevice){const {data:analytics,error:analyticsError}=await supabase.from("analytics").select("*").eq("id_device",idDevice)
-  .order("an_date",{ascending:true});if(analyticsError)throw analyticsError;const {data:device,error:deviceError}=await supabase.from("devices")
-  .select("id_device,dv_platform,dv_app,dv_entrance").eq("id_device",idDevice).single();if(deviceError)throw deviceError;const totals={},latest={};(analytics||[])
-  .forEach(row=>{Object.entries(row).forEach(([key,value])=>{if(key==="id_device"||key==="an_date")return;if(typeof value==="number"&&Number
-  .isFinite(value))totals[key]=(totals[key]||0)+value;else if(value!==null&&value!==undefined)latest[key]=value;else if(!(key in latest))latest[key]=null;});});
-  return{device,totals,latest};}
-
 /* SIMULAZIONE */
-/* VECCHIA VERSIONE CANCELLARE   
 export async function simulateTip(tip){
 const {data:analytics,error:analyticsError}=await supabase
 .from("analytics")
@@ -351,19 +338,6 @@ data.latest[key]=value;
 }
 });
 });
-*/
-
-/* NUOVA */  
-export async function simulateTip(tip){
-const {data:devices,error:devicesError}=await supabase
-.from("devices").select("id_device,dv_platform,dv_app,dv_entrance");
-if(devicesError)throw devicesError;
-const deviceMap=new Map((devices||[]).map(device=>[device.id_device,device]));
-const deviceAnalytics=new Map();for(const device of devices||[]){
-const profile=await getDeviceProfile(device.id_device);
-deviceAnalytics.set(device.id_device,{totals:profile.totals,latest:profile.latest});}
-/* NUOVA */  
-  
 const conditions=[];
 for(let i=1;i<=3;i++){
 const analyticsField=tip[`tp_analytics_${i}`];
@@ -417,33 +391,6 @@ value:item.value
 const total=deviceMap.size;
 return{total,involved,excluded,missing,percent:total?Math.round(involved/total*100):0,detail};
 }
-
-function evaluateTipForProfile(tip,profile){const conditions=[];for(let i=1;i<=3;i++){
-const analyticsField=tip[`tp_analytics_${i}`];if(!analyticsField)continue;
-conditions.push({analytics:analyticsField,condition:tip[`tp_condition_${i}`],value:tip[`tv_value_${i}`],logic:i>1?tip[`tp_logic_${i-1}`]:""});}
-let result=null;for(let i=0;i<conditions.length;i++){const item=conditions[i];
-const actual=item.analytics.startsWith("dv_")?profile.device[item.analytics]:
-ANALYTICS_FIELDS[item.analytics]?.type==="number"?profile.totals[item.analytics]:profile.latest[item.analytics];
-const current=evaluateCondition(actual,item.condition,item.value);if(i===0)result=current;else result=evaluateLogic(result,current,item.logic);}return result;}
-
-function getTipMetricValue(tip,profile){const field=tip.tp_analytics_1;if(!field)return 0;if(ANALYTICS_FIELDS[field]?.type==="number")
-return Number(profile.totals[field]||0);return 1;}
-
-export async function initTips(){
-try{const deviceKey=localStorage.getItem("aroundo_device_id");if(!deviceKey)return;
-const {data:device,error:deviceError}=await supabase.from("devices").select("id_device,dv_device,dv_platform,dv_app,dv_entrance").eq("dv_device",deviceKey).maybeSingle();
-if(deviceError||!device)return;const {data:tips,error:tipsError}=
-await supabase.from("tips").select("*").eq("tp_active",true);if(tipsError)throw tipsError;
-const profile=await getDeviceProfile(device.id_device);for(const tip of tips||[]){
-const result=evaluateTipForProfile(tip,profile);if(result!==true)continue;const {data:view,error:viewError}=
-await supabase.from("tips_views").select("*").eq("id_tips",tip.id_tips).eq("id_device",device.id_device).maybeSingle();if(viewError)throw viewError;
-if(view?.tv_disabled)continue;const showCount=view?.tv_show||0;const progression=calculateProgression(tip.tp_interval,tip.tp_growth,tip.tp_repeat);
-const next=showCount===0?0:(progression[showCount-1]??Infinity);if(showCount>0&&tip.tp_repeat!==0&&showCount>=tip.tp_repeat)continue;
-const currentMetric=getTipMetricValue(tip,profile);if(showCount>0&&currentMetric<next)continue;renderTip(tip);
-const payload={id_tips:tip.id_tips,id_device:device.id_device,tv_date:new Date().toISOString(),tv_show:showCount+1,tv_disabled:view?.tv_disabled??null,tv_cta:view?.tv_cta||0};
-const {error:saveError}=await supabase.from("tips_views").upsert(payload,{onConflict:"id_tips,id_device"});if(saveError)throw saveError;break;}}
-catch(error){console.error("Tips initialization error:",error);}}
-
 
 /* RENDER TIP */
 export function renderTip(tip) {
