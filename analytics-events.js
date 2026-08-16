@@ -134,7 +134,7 @@ async function updateAnalytics(values){
     export function analyticsEntrance(source){return updateAnalytics({entrance: source || null});}
 
     /* Identifica o Crea un nuovo device se non presente */ 
-    async function getOrCreateDevice() {
+    export async function getOrCreateDevice() {
       const device = getDeviceId();
       const { data, error } = await supabase
         .from("devices")
