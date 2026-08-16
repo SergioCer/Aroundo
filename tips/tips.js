@@ -427,6 +427,30 @@ const profile=profiles.get(id_device);
 return evaluateTip(tip,profile);
 }
 
+/* LOAD ACTIVE TIPS FOR DEVICE */
+export async function initTips(id_device){
+const {data:tips,error:tipsError}=await supabase
+.from("tips")
+.select("*")
+.eq("tp_active",true);
+if(tipsError)throw tipsError;
+if(!tips||!tips.length)return null;
+const {data:views,error:viewsError}=await supabase
+.from("tips_views")
+.select("id_tips,tv_show,tv_date,tv_disabled,tv_cta")
+.eq("id_device",id_device);
+if(viewsError)throw viewsError;
+const viewsMap=new Map((views||[]).map(view=>[view.id_tips,view]));
+const candidates=[];
+for(const tip of tips){
+const view=viewsMap.get(tip.id_tips);
+if(view?.tv_disabled)continue;
+candidates.push({tip,view:view||null});
+}
+return candidates;
+}
+
+
 /* RENDER TIP */
 export function renderTip(tip) {
   const model = TIP_TYPES[tip.tp_type] || TIP_TYPES.bubble;
