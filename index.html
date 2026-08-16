@@ -1272,7 +1272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const day = new Date(currentDate);
       let time = new Date();
       switch(mode) {case 'startOfDay': time = new Date(day); time.setHours(0,0,0,0); break;
-          case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break; // ora reale se siamo in modalità LIVE
+          case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break; // fine della giornata logica.
           case 'live': time = new Date(); break; // ora corrente entro il giorno logico
           default: const now = new Date(); time = new Date(day); time.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
           }
@@ -1300,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* Aggiorna le etichette delle maniglie e il filtro temporale dei marker.
        Azioni: converte gli offset dello slider in date/ore reali, aggiorna le etichette e applica il range alla visibilità dei marker.
-       Chiamata da: setupTimeLine come callback dell'evento 'update' dello 'slider'. */
+       Chiamata da: setupTimeLine() come callback dell'evento 'update' dello 'slider'. */
     function updateHandles(values) {
       // Offset
       const startOffset = Math.round(values[0]);
