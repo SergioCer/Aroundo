@@ -450,11 +450,92 @@ candidates.push({tip,view:view||null});
 return candidates;
 }
 
+/* TIP CONDITIONS */
+export function buildTipConditions(tip){
+const conditions=[];
+for(let i=1;i<=3;i++){
+const analyticsField=tip[`tp_analytics_${i}`];
+if(!analyticsField)continue;
+const condition=tip[`tp_condition_${i}`];
+const value=tip[`tv_value_${i}`];
+const field=ANALYTICS_FIELDS[analyticsField];
+if(!field)continue;
+conditions.push({analytics:analyticsField,condition,value,logic:i>1?tip[`tp_logic_${i-1}`]:""});
+}
+return conditions;
+}
+
+/* DEVICE PROFILE */
+export function buildDeviceProfile(device,analyticsRows=[]){
+const totals={};
+const latest={};
+(analyticsRows||[]).forEach(row=>{
+Object.entries(row).forEach(([key,value])=>{
+if(key==="id_device"||key==="an_date")return;
+if(typeof value==="number"&&Number.isFinite(value)){totals[key]=(totals[key]||0)+value;}
+else if(!(key in latest)){latest[key]=value;}
+});
+});
+return{device,totals,latest};
+}
+
+/* TIP EVALUATION */
+export function evaluateTipForDevice(profile,conditions){
+let result=null;
+for(let i=0;i<conditions.length;i++){
+const item=conditions[i];
+const actual=item.analytics.startsWith("dv_")
+?profile.device[item.analytics]
+:ANALYTICS_FIELDS[item.analytics]?.type==="number"
+?profile.totals[item.analytics]
+:profile.latest[item.analytics];
+const current=evaluateCondition(actual,item.condition,item.value);
+if(i===0)result=current;
+else result=evaluateLogic(result,current,item.logic);
+}
+return result;
+}
+
+/* SIMULAZIONE */
+export async function simulateTip(tip){
+const {data:analytics,error:analyticsError}=await supabase
+.from("analytics")
+.select("*")
+.order("an_date",{ascending:false});
+if(analyticsError)throw analyticsError;
+const {data:devices,error:devicesError}=await supabase
+.from("devices")
+.select("id_device,dv_platform,dv_app,dv_entrance");
+if(devicesError)throw devicesError;
+const analyticsMap=new Map();
+(analytics||[]).forEach(row=>{
+if(!row.id_device)return;
+if(!analyticsMap.has(row.id_device))analyticsMap.set(row.id_device,[]);
+analyticsMap.get(row.id_device).push(row);
+});
+const conditions=buildTipConditions(tip);
+let involved=0;
+let excluded=0;
+let missing=0;
+const detail=[];
+(devices||[]).forEach(device=>{
+const profile=buildDeviceProfile(device,analyticsMap.get(device.id_device)||[]);
+const result=evaluateTipForDevice(profile,conditions);
+if(result===true)involved++;
+else if(result===false)excluded++;
+else missing++;
+});
+conditions.forEach((item,index)=>{
+const field=ANALYTICS_FIELDS[item.analytics];
+detail.push({logic:index===0?"":item.logic,label:field?field.label:item.analytics,condition:item.condition,value:item.value});
+});
+const total=(devices||[]).length;
+return{total,involved,excluded,missing,percent:total?Math.round(involved/total*100):0,detail};
+}
 
 /* RENDER TIP */
 export function renderTip(tip) {
   const model = TIP_TYPES[tip.tp_type] || TIP_TYPES.bubble;
-
   /* OVERLAY */
   const overlay = document.createElement("div");
   const vertical = model.position.includes("top") ? "flex-start" : model.position.includes("bottom") ? "flex-end" : "center";
@@ -463,13 +544,11 @@ export function renderTip(tip) {
     padding:${model.shape === "banner" ? "0" : "20px"}; box-sizing:border-box; pointer-events:none; background:${model.overlay ? "rgba(15,23,42,.48)" : "transparent"};
     animation:aroundoTipIn .22s ease-out;
   `;
-
   /* BOX */
   const box = document.createElement("div");
   box.style.cssText = `width:${model.width}; max-width:calc(100vw - 40px); box-sizing:border-box; padding:${model.padding}; background:${model.background};
     color:${model.color}; border:${model.border}; ${model.borderBottom ? `border-bottom:${model.borderBottom};`: ""}
     border-radius:${model.radius}; box-shadow:${model.shadow}; font-family:${model.fontFamily}; position:relative; pointer-events:auto; overflow:hidden;`;
-
   /* BUBBLE TAIL */
   if (model.shape === "bubble") {
     const tail = document.createElement("div");
@@ -477,7 +556,6 @@ export function renderTip(tip) {
       border-left:${model.border}; border-bottom:${model.border}; transform:skewY(-35deg); transform-origin:bottom left;`;
     box.appendChild(tail);
   }
-
   /* FLOATING DECORATION */
   if (model.shape === "floating") {
     const glow = document.createElement("div");
@@ -485,14 +563,12 @@ export function renderTip(tip) {
       opacity:.45; pointer-events:none;`;
     box.appendChild(glow);
   }
-
   /* CARD ACCENT */
   if (model.shape === "card") {
     const accent = document.createElement("div"); accent.style.cssText = ` position:absolute; left:0; top:0; bottom:0; width:5px; background:#6366f1;`;
     box.appendChild(accent);
   }
-  
-  /* HEADER */
+    /* HEADER */
   if (tip.tp_icon || tip.tp_title) {
     const header = document.createElement("div"); header.style.cssText = ` display:flex; align-items:center; gap:${model.shape === "modal" ? "14px" : "10px"};
       margin-bottom: ${tip.tp_text ? "13px" : "0"};`;
@@ -509,7 +585,6 @@ export function renderTip(tip) {
     }
     box.appendChild(header);
   }
-
   /* TEXT */
   if (tip.tp_text) {
     const content = document.createElement("div");
@@ -517,12 +592,10 @@ export function renderTip(tip) {
       white-space:pre-wrap; ${model.shape === "modal" ? "text-align:center;" : ""} ${model.shape === "banner" ? "max-width:1100px;flex:1;min-width:0;" : ""}`;
     box.appendChild(content);
   }
-
 /* ACTIONS */
 if (model.acknowledge) {
 const actions = document.createElement("div");
 actions.style.cssText = `display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:20px;${model.shape === "modal" ? "justify-content:center;" : ""}`;
-
 /* GOT IT / DON'T REMIND ME */
 if (Number(tip.tp_repeat) !== 1) {
 const remind = document.createElement("button");
@@ -535,7 +608,6 @@ remind.onmouseleave = () => { remind.style.opacity = dontRemind ? "1" : ".82"; r
 remind.onclick = () => { dontRemind = !dontRemind; const label = remind.querySelector(".aroundo-remind-label"); label.style.textDecoration = dontRemind ? "line-through" : "none"; remind.style.opacity = dontRemind ? "1" : ".82"; };
 actions.appendChild(remind);
 }
-
 /* CTA */
 if (tip.tp_cta_active && tip.tp_cta_label) {
 const cta = document.createElement("a");
@@ -548,7 +620,6 @@ cta.onmouseenter = () => { cta.style.background = "#7e22ce"; cta.style.transform
 cta.onmouseleave = () => { cta.style.background = "#9333ea"; cta.style.transform = "translateY(0)"; };
 actions.appendChild(cta);
 }
-
 /* OK */
 const ok = document.createElement("button");
 ok.type = "button";
@@ -560,7 +631,6 @@ ok.onclick = () => { overlay.remove(); };
 actions.appendChild(ok);
 box.appendChild(actions);
 }
-
 /* BANNER LAYOUT */
 if (model.shape === "banner") {
   box.style.display = "flex";
@@ -579,14 +649,11 @@ if (model.shape === "banner") {
   if (content) {content.style.width = "100%"; content.style.maxWidth = "1100px"; content.style.flex = "none";}
   if (actions) {actions.style.width = "100%"; actions.style.flex = "none"; actions.style.marginTop = "20px";}
 }
- 
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-
   /* ANIMATION */
   if ( !document.getElementById("aroundo-tip-animation")
-  ) {
-    const style = document.createElement("style"); style.id = "aroundo-tip-animation";
+  ) {const style = document.createElement("style"); style.id = "aroundo-tip-animation";
     style.textContent = `@keyframes aroundoTipIn { from { opacity:0; transform: translateY(8px) scale(.98); } to { opacity:1; transform: translateY(0) scale(1); } }`;
     document.head.appendChild(style);
   }
