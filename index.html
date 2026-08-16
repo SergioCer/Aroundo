@@ -1769,9 +1769,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ***** INSTALLAZIONE APP ***** //
     // Gestisce la disponibilità e l'avvio dell'installazione PWA.
-    // Azioni: intercetta la richiesta di installazione, mostra il pulsante,
-    // avvia il prompt al click, registra l'avvenuta installazione e
-    // nasconde il pulsante.
+    // Azioni: intercetta l'evento beforeinstallprompt, conserva il prompt,
+    // mostra il pulsante di installazione.
+    // Chiamata da: browser tramite evento beforeinstallprompt.
     // Gestisce separatamente l'installazione manuale su iOS.
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -1779,7 +1779,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("installBtn").style.display = "block";
   });
 
-  // Click su Installazione
+  // Click su Installazione.
+  // Chiamata da: click su installBtn; usa deferredPrompt impostato da beforeinstallprompt.
   document.getElementById("installBtn").onclick = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
@@ -1788,13 +1789,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("installBtn").style.display = "none";
   };
 
-  // Quando viene installata
+  // Quando l'app viene effettivamente installata.
+  // Azioni: registra l'installazione e nasconde il pulsante.
+  // Chiamata da: browser tramite evento appinstalled.
   window.addEventListener('appinstalled', () => {
     analyticsInstall();
     document.getElementById("installBtn").style.display = "none";
   });
  
-  // Installazione iOS Safari
+  // Installazione iOS Safari.
+  // Azioni: rileva i dispositivi iOS non ancora installati come PWA,
+  // mostra il pulsante Install e fornisce le istruzioni manuali.
+  // Chiamata da: inizializzazione dello script.
   const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
   const isStandalone = window.navigator.standalone === true;
     if (isIOS && !isStandalone) {
@@ -1836,7 +1842,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    /* rappresenta lo stato di errore della geolocalizzazione. */
+    /* Rappresenta lo stato di errore della geolocalizzazione.
+       Azioni: imposta colore, testo e stile dell'indicatore GPS in caso di errore.
+       Chiamata da: checkGeoStatus(); requestUserLocation(). */
     function updateGeoError() {
       geoDot.style.background = "#dc2626";
       geoText.textContent = "Check Location Settings";
@@ -1845,26 +1853,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       geoText.style.cursor = "pointer";
       geoText.style.fontSize = "10px";
     }
-  
+
+    /* Gestisce il click sull'indicatore GPS.
+       Azioni: se la geolocalizzazione non è attiva o presenta un errore,
+       avvia la richiesta della posizione dell'utente.
+       Chiamata da: evento click su geoStatus. */  
     geoStatus.addEventListener("click", () => {
       if (
         geoText.textContent === "Enable location..." ||
         geoText.textContent === "Check Location Settings"
-      ) {
-        requestUserLocation();
-      }
-    });
-
-    // aggiornamento al rientro sulla piattaforma.
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        checkGeoStatus();
-        updateTimelineMode();
-        updateDateUI();
-        setupTimeline();
-        renderEvents();
-        updateMarkerVisibility();
-      }
+      ) {requestUserLocation();}
     });
 
     /* Verifica se la geolocalizzazione è disponibile.
@@ -1879,8 +1877,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* Acquisisce la posizione dell'utente e aggiorna la mappa.
        Azioni: richiede il GPS, registra l'esito, aggiorna lo stato GPS, calcola la densità degli eventi vicini e centra/scala la mappa.
-       Chiamata da: click su "Enable location..." / errore GPS. */
-    function requestUserLocation() {
+       Chiamata da: click su geoStatus quando la posizione non è disponibile. */
+  function requestUserLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
           (pos) => {
@@ -1914,11 +1912,26 @@ document.addEventListener('DOMContentLoaded', async () => {
           map.setView([defaultLat, defaultLng], defaultZoom);
         }
       }
+
+    /* Aggiornamento al rientro sulla piattaforma.
+       Azioni: verifica nuovamente la geolocalizzazione, riallinea la modalità e la data della timeline, ricrea lo slider e aggiorna marker e relativa visibilità.
+       Chiamata da: evento visibilitychange quando la pagina torna visibile. */
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        checkGeoStatus();
+        updateTimelineMode();
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
+        updateMarkerVisibility();
+      }
+    });
   
-     /* Determina il colore del testo in base al colore di sfondo.
-       Azioni: calcola la luminosità del colore e restituisce nero o bianco per garantire il contrasto.
-       Chiamata da: buildCategoryMenu(). */
-    function getContrastColor(hex) {
+    /* Determina il colore del testo in base al colore di sfondo.
+       Azioni: calcola la luminosità del colore e restituisce nero o bianco
+       per garantire un contrasto leggibile.
+       Chiamata da: buildCategoryMenu(), per ogni categoria. */
+  function getContrastColor(hex) {
       hex = hex.replace('#', '');
       const r = parseInt(hex.substr(0,2),16);
       const g = parseInt(hex.substr(2,2),16);
@@ -2128,17 +2141,10 @@ class Firework {
   /* Esegue il ciclo di animazione dei fireworks.
      Azioni: pulisce il canvas, aggiorna e disegna tutti i fireworks, elimina quelli terminati e richiede il frame successivo.
      Chiamata da: avvio dello script; richiama sé stessa tramite requestAnimationFrame(). */
-function animateFX() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  fireworks.forEach(fw => {
-    fw.update();
-    fw.draw(ctx);
-  });
+function animateFX() {ctx.clearRect(0, 0, canvas.width, canvas.height);
+  fireworks.forEach(fw => {fw.update(); fw.draw(ctx);});
     // elimina fuochi terminati
-  for (let i = fireworks.length - 1; i >= 0; i--) {
-    if (fireworks[i].isDead()) {
-      fireworks.splice(i, 1);
-    }
+  for (let i = fireworks.length - 1; i >= 0; i--) {if (fireworks[i].isDead()) {fireworks.splice(i, 1);}
   }
 requestAnimationFrame(animateFX);
 }
@@ -2149,18 +2155,7 @@ animateFX();
        Chiamata da: renderEvents().*/
     function updateMarkerState(marker, state, latLng) {
       marker.state = state;
-      /* CANCELLARE, viene già riportata la fine dell'evento 
-      // Calcola se l'evento è finito
-      const now = new Date();
-      const eventoFinito = evFine && now >= new Date(evFine);
-      // Evento Finito → pulisci intervallo fuochi e imposta stato a 'finished'
-      if (eventoFinito) {
-        if (marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
-        marker.state = 'finished';
-        return;
-      }
-      */
-      if (state === 'countdown' && !marker.fireworkInterval) {triggerFirework(latLng);   // Evento attuale, fuochi solo se in countdown
+      if (state === 'countdown' && !marker.fireworkInterval) {triggerFirework(latLng); // Evento in countdown: avvia subito un firework e poi uno ogni 2,5 secondi
       marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2500); // Un fuoco ogni X secondi 1''=1000
     }
     if (state !== 'countdown' && marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
