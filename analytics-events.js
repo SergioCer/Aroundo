@@ -30,8 +30,7 @@ function getToday(){
 }
 
 /* ANALYTICS UPDATE */
-async function updateAnalytics(values){
-  const device = await getOrCreateDevice();
+async function updateAnalytics(values,device){
   if (!device) {console.error("Device not found in devices"); return;}
   const deviceId = device.id_device;
   const date = getToday();
@@ -114,20 +113,19 @@ async function updateAnalytics(values){
   }
 
     /* EVENTS */
-    export function analyticsOpen(){return updateAnalytics({open:true});}
-    export function analyticsShare(){return updateAnalytics({share:true});}
-    export function analyticsMarker(){return updateAnalytics({marker:true});}
-    export function analyticsMap(){return updateAnalytics({map:true});}
-    export function analyticsBuy(){return updateAnalytics({buy:true});}
-    export function analyticsBook(){return updateAnalytics({book:true});}
-    export function analyticsMore(){return updateAnalytics({more:true});}
-    export function analyticsInfo(){return updateAnalytics({info:true});}
-    export function analyticsLogin(){return updateAnalytics({login:true});}
-    export function analyticsInstall(){return updateAnalytics({install:true});}
-    export function analyticsGPS(value, lat = null, lng = null){return updateAnalytics({gps: value,
-        lat: lat !== null ? Number(lat.toFixed(2)) : undefined, lng: lng !== null ? Number(lng.toFixed(2)) : undefined});}
-    /* ENTRANCE */
-    export function analyticsEntrance(source){return updateAnalytics({entrance: source || null});}
+    export function analyticsOpen(device){return updateAnalytics({open:true},device);}
+    export function analyticsShare(device){return updateAnalytics({share:true},device);}
+    export function analyticsMarker(device){return updateAnalytics({marker:true},device);}
+    export function analyticsMap(device){return updateAnalytics({map:true},device);}
+    export function analyticsBuy(device){return updateAnalytics({buy:true},device);}
+    export function analyticsBook(device){return updateAnalytics({book:true},device);}
+    export function analyticsMore(device){return updateAnalytics({more:true},device);}
+    export function analyticsInfo(device){return updateAnalytics({info:true},device);}
+    export function analyticsLogin(device){return updateAnalytics({login:true},device);}
+    export function analyticsInstall(device){return updateAnalytics({install:true},device);}
+    export function analyticsGPS(value,lat=null,lng=null,device){return updateAnalytics({gps:value,lat:lat!==null?Number(lat.toFixed(2)):
+                    undefined,lng:lng!==null?Number(lng.toFixed(2)):undefined},device);}
+    export function analyticsEntrance(source,device){return updateAnalytics({entrance:source||null},device);}
 
     /* Identifica o Crea un nuovo device se non presente */ 
     export async function getOrCreateDevice() {
