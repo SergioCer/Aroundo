@@ -956,8 +956,9 @@ OK
   
 <script type="module">
   import { supabase } from './supabase.js';
-  import { analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin, analyticsMore, analyticsInfo, analyticsMarker, 
-          analyticsMap, analyticsBuy, analyticsBook,analyticsEntrance} from './analytics-events.js';
+  import { getOrCreateDevice, analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin, analyticsMore, analyticsInfo, analyticsMarker,
+          analyticsMap, analyticsBuy, analyticsBook, analyticsEntrance } from './analytics-events.js';
+  import { initTips } from './tips.js';
   window.analyticsMap = analyticsMap;
   window.analyticsBuy = analyticsBuy;
   window.analyticsBook = analyticsBook;
@@ -1084,10 +1085,14 @@ OK
   
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
+  const device = await getOrCreateDevice();
+  if (device) {
+    await analyticsOpen(device);
+    await initTips(device.id_device);
+  }
   categories = await fetchCategories();
   events = await fetchEvents();
   buildCategoryMenu();
-  analyticsOpen();
   checkGeoStatus();
   setupTimeline();
   renderEvents();
