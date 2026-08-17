@@ -104,16 +104,15 @@ async function updateAnalytics(values){
       an_more: values.more ? 1 : 0,
       an_info: values.info ? 1 : 0
     };
-    
     await supabase
       .from("analytics")
       .insert(insert);
-  
     await supabase
       .from("analytics_info")
       .update({ ai_last_update: new Date().toISOString()})
       .eq("id_analytics_info", 1);
   }
+
     /* EVENTS */
     export function analyticsOpen(){return updateAnalytics({open:true});}
     export function analyticsShare(){return updateAnalytics({share:true});}
@@ -126,10 +125,7 @@ async function updateAnalytics(values){
     export function analyticsLogin(){return updateAnalytics({login:true});}
     export function analyticsInstall(){return updateAnalytics({install:true});}
     export function analyticsGPS(value, lat = null, lng = null){return updateAnalytics({gps: value,
-        lat: lat !== null ? Number(lat.toFixed(2)) : undefined,
-        lng: lng !== null ? Number(lng.toFixed(2)) : undefined
-      });
-    }
+        lat: lat !== null ? Number(lat.toFixed(2)) : undefined, lng: lng !== null ? Number(lng.toFixed(2)) : undefined});}
     /* ENTRANCE */
     export function analyticsEntrance(source){return updateAnalytics({entrance: source || null});}
 
@@ -159,55 +155,24 @@ async function updateAnalytics(values){
     }
 
  /* AROUND0 - ANALYTICS / NOTE ARCHITETTURALI
- * dv_device
- * ------------------------------------------------------------
- * Identificativo tecnico casuale persistente dell'installazione/
- * browser di Aroundo.
- *
- * Non identifica necessariamente una persona fisica o un
- * dispositivo fisico.
- *
- *
- * an_first_access
- * ------------------------------------------------------------
+ * dv_device:
+ * Identificativo tecnico casuale persistente dell'installazione/browser di Aroundo.
+ * Non identifica necessariamente una persona fisica o un dispositivo fisico.
+
+ * an_first_access:
  * Data del primo accesso storico associato ad dv_device.
- *
- * Viene mantenuta anche nei record successivi dello stesso
- * dispositivo e permette di distinguere utenti nuovi e già
- * presenti senza ricostruire ogni volta lo storico completo.
- *
- *
- * an_entrance
- * ------------------------------------------------------------
- * Provenienza dell'accesso.
- *
- * Esempi:
- *
- *   share
- *   qr
- *   sticker
- *   magazine
- *   ecc.
- *
+ * Viene mantenuta anche nei record successivi dello stesso dispositivo e permette di distinguere utenti nuovi e già presenti senza ricostruire ogni volta lo storico completo.
+ 
+ * an_entrance:
+ * Provenienza dell'accesso, esempi: share, qr, sticker, magazine, ecc.
  * Il valore è testuale per permettere future nuove sorgenti.
- *
- * Essendo analytics giornalieri, se nella stessa giornata viene
- * rilevata una nuova provenienza viene mantenuta l'ultima.
- *
- *
- * GEOLOCALIZZAZIONE
- * ------------------------------------------------------------
+ * Essendo analytics giornalieri, se nella stessa giornata viene rilevata una nuova provenienza viene mantenuta l'ultima.
+ 
+ * GEOLOCALIZZAZIONE:
  * La posizione viene registrata esclusivamente quando autorizzata.
- *
  * Latitudine e longitudine sono arrotondate a 2 decimali.
- *
  * Viene conservata l'ultima posizione disponibile della giornata.
- *
- *
- * PRINCIPIO DI MINIMIZZAZIONE
- * ------------------------------------------------------------
- * Gli analytics devono raccogliere esclusivamente i dati
- * necessari alle funzionalità e alle finalità dichiarate.
- *
- * ============================================================
+ 
+ * PRINCIPIO DI MINIMIZZAZIONE:
+ * Gli analytics devono raccogliere esclusivamente i dati necessari alle funzionalità e alle finalità dichiarate.
  */
