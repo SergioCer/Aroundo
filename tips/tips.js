@@ -244,7 +244,7 @@ export function calculateProgression(interval, growth, repeat) {
   repeat = Number(repeat);
   if (!Number.isFinite(interval)) interval = 1;
   if (!Number.isFinite(growth)) growth = 1;
-  const limit = repeat === 0 ? 10 : Math.min(repeat, 10);
+  const limit = repeat === 0 ? 50 : Math.min(repeat, 50); // Numero massimo di ripetizioni dello stesso tip. 
   const result = [];
   let total = 0;
   for (let show = 0; show < limit; show++) {
@@ -437,13 +437,14 @@ const profiles=buildTipProfiles([device],analytics);
 const profile=profiles.get(id_device);
 return evaluateTip(tip,profile);
 }
-
+  
 /* LOAD ACTIVE TIPS FOR DEVICE */
 export async function initTips(id_device){
 const {data:tips,error:tipsError}=await supabase
 .from("tips")
 .select("*")
-.eq("tp_active",true);
+.eq("tp_active",true)
+.order("tp_build",{ascending:false});
 if(tipsError)throw tipsError;
 if(!tips||!tips.length)return null;
 const {data:views,error:viewsError}=await supabase
@@ -471,13 +472,54 @@ for(const tip of tips){
 const view=viewsMap.get(tip.id_tips);
 if(view?.tv_disabled)continue;
 const result=evaluateTip(tip,profile);
-candidates.push({tip,view:view||null,condition:result});
+const openCount=Number(profile.totals.an_open||0);
+const showCount=Number(view?.tv_show||0);
+const progression=calculateProgression(tip.tp_interval,tip.tp_growth,tip.tp_repeat);
+const eligible=result===true&&showCount<progression.length&&progression[showCount]===openCount;
+candidates.push({tip,view:view||null,condition:result,eligible});
 }
 return candidates;
 }
 
+/* SELECT FIRST ELIGIBLE TIP */
+export function selectTip(candidates){
+if(!candidates||!candidates.length)return null;
+const candidate=candidates.find(item=>item.eligible===true);
+return candidate||null;
+}
+
+/* INIT AND SELECT TIP */
+export async function getTipForDevice(id_device){
+const candidates=await initTips(id_device);
+return selectTip(candidates);
+}
+
+/* UPDATE TIP VIEW */
+export async function updateTipView(id_tips,id_device,values={}){
+const {data:current,error:readError}=await supabase
+.from("tips_views")
+.select("id_tips,id_device,tv_show,tv_date,tv_disabled,tv_cta")
+.eq("id_tips",id_tips)
+.eq("id_device",id_device)
+.maybeSingle();
+if(readError)throw readError;
+const payload={
+tv_show:Number(current?.tv_show||0)+1,
+tv_date:new Date().toISOString()
+};
+if(values.disabled)payload.tv_disabled=new Date().toISOString();
+if(values.cta)payload.tv_cta=Number(current?.tv_cta||0)+1;
+const {data,error}=await supabase
+.from("tips_views")
+.upsert({id_tips,id_device,...payload})
+.select()
+.single();
+if(error)throw error;
+return data;
+}
+
 /* RENDER TIP */
-export function renderTip(tip) {
+export function renderTip(tip,id_device){
   const model = TIP_TYPES[tip.tp_type] || TIP_TYPES.bubble;
   /* OVERLAY */
   const overlay = document.createElement("div");
@@ -561,6 +603,9 @@ cta.rel = "noopener";
 cta.style.cssText = `display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:18px;background:#9333ea;color:#ffffff;text-decoration:none;font-weight:600;font-size:13px;transition:transform .15s ease,background .15s ease;`;
 cta.onmouseenter = () => { cta.style.background = "#7e22ce"; cta.style.transform = "translateY(-1px)"; };
 cta.onmouseleave = () => { cta.style.background = "#9333ea"; cta.style.transform = "translateY(0)"; };
+cta.onclick = async () => {
+await updateTipView(tip.id_tips,id_device,{cta:true});
+};  
 actions.appendChild(cta);
 }
 /* OK */
@@ -570,7 +615,9 @@ ok.textContent = "OK";
 ok.style.cssText = `border:none;border-radius:18px;padding:9px 20px;background:#22c55e;color:white;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:transform .15s ease,background .15s ease;`;
 ok.onmouseenter = () => { ok.style.background = "#16a34a"; ok.style.transform = "translateY(-1px)"; };
 ok.onmouseleave = () => { ok.style.background = "#22c55e"; ok.style.transform = "translateY(0)"; };
-ok.onclick = () => { overlay.remove(); };
+ok.onclick = async () => {overlay.remove();
+await updateTipView(tip.id_tips,id_device,{disabled:dontRemind});
+};
 actions.appendChild(ok);
 box.appendChild(actions);
 }
