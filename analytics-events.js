@@ -30,8 +30,8 @@ function getToday(){
 }
 
 /* ANALYTICS UPDATE */
-async function updateAnalytics(values){
-  const device = await getOrCreateDevice();
+async function updateAnalytics(values,device=null){
+  if (!device) {device = await getOrCreateDevice();}
   if (!device) {console.error("Device not found in devices"); return;}
   const deviceId = device.id_device;
   const date = getToday();
@@ -114,7 +114,7 @@ async function updateAnalytics(values){
   }
 
     /* EVENTS */
-    export function analyticsOpen(){return updateAnalytics({open:true});}
+    export function analyticsOpen(device){return updateAnalytics({open:true},device);}
     export function analyticsShare(){return updateAnalytics({share:true});}
     export function analyticsMarker(){return updateAnalytics({marker:true});}
     export function analyticsMap(){return updateAnalytics({map:true});}
