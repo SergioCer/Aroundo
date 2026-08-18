@@ -1467,9 +1467,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       const inTimeRange = eventStart <= end &&  eventEnd >= start;
       // disattiva il timeriterval del marker per i fireworks
         const visible = categoryVisible && inTimeRange;
-          if (visible) {
-            markersCluster.addLayer(marker.marker);
-            // opzionale: riattiva se serve
+          if (visible) {markersCluster.addLayer(marker.marker);
+            updateMarkerState(
+              marker.marker,
+              marker.marker.state,
+              marker.marker.getLatLng()
+              );
           } else {
             markersCluster.removeLayer(marker.marker);
             if (marker.marker.fireworkInterval) {
