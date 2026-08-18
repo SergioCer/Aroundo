@@ -1472,9 +1472,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // opzionale: riattiva se serve
           } else {
             markersCluster.removeLayer(marker.marker);
-            if (marker.fireworkInterval) {
-              clearInterval(marker.fireworkInterval);
-              marker.fireworkInterval = null;
+            if (marker.marker.fireworkInterval) {
+              clearInterval(marker.marker.fireworkInterval);
+              marker.marker.fireworkInterval = null;
             }
           }
         });
