@@ -2070,7 +2070,7 @@ class Firework {
     this.particles = []; // perticelle dopo esplosione
     this.exploded = false; // esploso si/no
     this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    this.vy = -8 - Math.random() * 4; // velocità verticale
+    this.vy = -8 - Math.random() * 3; // velocità verticale
     this.vx = (Math.random() - 0.5) * 2; // deriva laterale
     this.currentY = y; // quota corrente
     this.trail = []; // punti della scia
@@ -2168,7 +2168,7 @@ animateFX();
     function updateMarkerState(marker, state, latLng) {
       marker.state = state;
       if (state === 'countdown' && !marker.fireworkInterval) {triggerFirework(latLng); // Evento in countdown: avvia subito un firework e poi uno ogni 2,5 secondi
-      marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2500); // Un fuoco ogni X secondi 1''=1000
+      marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2000); // Un fuoco ogni X secondi 1''=1000
     }
     if (state !== 'countdown' && marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
       return;
