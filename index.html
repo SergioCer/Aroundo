@@ -958,7 +958,7 @@ OK
   import { supabase } from './supabase.js';
   import { getOrCreateDevice, analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin, analyticsMore, analyticsInfo, analyticsMarker,
           analyticsMap, analyticsBuy, analyticsBook, analyticsEntrance } from './analytics-events.js';
-  import { getTipForDevice,updateTipView,renderTip } from '../tips/tips.js';
+  import { getTipForDevice,renderTip } from '../tips/tips.js';
   window.analyticsMap = analyticsMap;
   window.analyticsBuy = analyticsBuy;
   window.analyticsBook = analyticsBook;
@@ -1086,13 +1086,9 @@ OK
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
   const device = await getOrCreateDevice();
-  if (device) {
-    await analyticsOpen();
-    const tip = await getTipForDevice(device.id_device);
-    if (tip) {
-      await updateTipView(tip.id_tips,device.id_device);
-      renderTip(tip,device.id_device);
-    }
+  if (device) {await analyticsOpen();
+    const selectedTip = await getTipForDevice(device.id_device);
+    if (selectedTip) {renderTip(selectedTip.tip, device.id_device);}
   }
   categories = await fetchCategories();
   events = await fetchEvents();
