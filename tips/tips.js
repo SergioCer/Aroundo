@@ -256,17 +256,6 @@ export function calculateProgression(interval, growth, repeat) {
   return result;
 }
 
-/* TIP PROGRESSION */
-export function evaluateTipProgression(tip,view,openCount){
-const show=Number(view?.tv_show||0);
-const repeat=Number(tip.tp_repeat);
-if(repeat>0&&show>=repeat)return false;
-const progression=calculateProgression(tip.tp_interval,tip.tp_growth,repeat);
-const next=progression[show];
-if(next===undefined)return false;
-return Number(openCount)>=next;
-}
-
 /* DEFAULT TIP */
 export function defaultTip() {
   return {
