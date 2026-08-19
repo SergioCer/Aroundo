@@ -308,16 +308,21 @@ export async function loadTip(id) {
 }
 
 /* SAVE */
-export async function saveTip(tip){
-const impact=await simulateTip(tip);
-const payload={...tip,tp_estimated:impact.involved,tp_build:new Date().toISOString()};
-const {data,error}=await supabase
-.from("tips")
-.upsert(payload)
-.select()
-.single();
-if(error)throw error;
-return data;
+export async function saveTip(tip) {
+  const impact = await simulateTip(tip);
+  const payload = {...tip, tp_estimated: impact.involved, tp_estimated_date: new Date().toISOString()};
+  /*
+   * tp_build viene assegnato SOLO alla creazione.
+   * Se il tip esiste già, viene mantenuto quello presente.
+   */
+  if (!tip.tp_build) {payload.tp_build = new Date().toISOString();}
+  const { data, error } = await supabase
+    .from("tips")
+    .upsert(payload)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
 }
 
 /* TIP PROFILE */
@@ -439,53 +444,102 @@ return evaluateTip(tip,profile);
 }
   
 /* LOAD ACTIVE TIPS FOR DEVICE */
-export async function initTips(id_device){
-const {data:tips,error:tipsError}=await supabase
-.from("tips")
-.select("*")
-.eq("tp_active",true)
-.order("tp_build",{ascending:false});
-if(tipsError)throw tipsError;
-if(!tips||!tips.length)return null;
-const {data:views,error:viewsError}=await supabase
-.from("tips_views")
-.select("id_tips,tv_show,tv_date,tv_disabled,tv_cta")
-.eq("id_device",id_device);
-if(viewsError)throw viewsError;
-const {data:device,error:deviceError}=await supabase
-.from("devices")
-.select("id_device,dv_platform,dv_app,dv_entrance")
-.eq("id_device",id_device)
-.single();
-if(deviceError)throw deviceError;
-const {data:analytics,error:analyticsError}=await supabase
-.from("analytics")
-.select("*")
-.eq("id_device",id_device)
-.order("an_date",{ascending:false});
-if(analyticsError)throw analyticsError;
-const profiles=buildTipProfiles([device],analytics);
-const profile=profiles.get(id_device);
-const viewsMap=new Map((views||[]).map(view=>[view.id_tips,view]));
-const candidates=[];
-for(const tip of tips){
-const view=viewsMap.get(tip.id_tips);
-if(view?.tv_disabled)continue;
-const result=evaluateTip(tip,profile);
-const openCount=Number(profile.totals.an_open||0);
-const showCount=Number(view?.tv_show||0);
-const progression=calculateProgression(tip.tp_interval,tip.tp_growth,tip.tp_repeat);
-const eligible=result===true&&showCount<progression.length&&progression[showCount]===openCount;
-candidates.push({tip,view:view||null,condition:result,eligible});
-}
-return candidates;
+export async function initTips(id_device) {
+  const { data: tips, error: tipsError } = await supabase
+    .from("tips")
+    .select("*")
+    .eq("tp_active", true)
+    .order("tp_build", { ascending: true });
+  if (tipsError) throw tipsError;
+  if (!tips || !tips.length) return null;
+  const { data: views, error: viewsError } = await supabase
+    .from("tips_views")
+    .select("id_tips,tv_show,tv_date,tv_disabled,tv_cta")
+    .eq("id_device", id_device);
+  if (viewsError) throw viewsError;
+  const { data: device, error: deviceError } = await supabase
+    .from("devices")
+    .select("id_device,dv_platform,dv_app,dv_entrance")
+    .eq("id_device", id_device)
+    .single();
+  if (deviceError) throw deviceError;
+  const { data: analytics, error: analyticsError } = await supabase
+    .from("analytics")
+    .select("*")
+    .eq("id_device", id_device)
+    .order("an_date", { ascending: true });
+  if (analyticsError) throw analyticsError;
+  const profiles = buildTipProfiles([device], analytics);
+  const profile = profiles.get(id_device);
+  const viewsMap = new Map(
+    (views || []).map(view => [view.id_tips, view])
+  );
+  const candidates = [];
+  for (const tip of tips) {
+    const view = viewsMap.get(tip.id_tips);
+    /* TIP DISABLED */
+    if (view?.tv_disabled) continue;
+    /* MAX ONE TIP PER DAY */
+    if (
+      view?.tv_date &&
+      new Date(view.tv_date).toDateString() === new Date().toDateString()
+    ) {
+      continue;
+    }
+    /* ANALYTICS CONDITIONS */
+    const result = evaluateTip(tip, profile);
+    if (result !== true) continue;
+    /* ACCESS COUNT SINCE TIP CREATION */
+    const buildDay = new Date(tip.tp_build)
+      .toISOString()
+      .slice(0, 10);
+    const accessDates = [
+      ...new Set(
+        (analytics || [])
+          .map(row => row.an_date)
+          .filter(date => date > buildDay)
+      )
+    ];
+    const accessCount = accessDates.length;
+    /* PROGRESSION */
+    const showCount = Number(view?.tv_show || 0);
+    const progression = calculateProgression(
+      tip.tp_interval,
+      tip.tp_growth,
+      tip.tp_repeat
+    );
+    const nextPosition = progression[showCount];
+    const eligible =
+      nextPosition !== undefined &&
+      accessCount >= nextPosition;
+    candidates.push({
+      tip,
+      view: view || null,
+      condition: result,
+      eligible,
+      accessCount
+    });
+  }
+  return candidates;
 }
 
 /* SELECT FIRST ELIGIBLE TIP */
 export function selectTip(candidates){
 if(!candidates||!candidates.length)return null;
-const candidate=candidates.find(item=>item.eligible===true);
-return candidate||null;
+const eligible=candidates.filter(item=>item.eligible===true);
+if(!eligible.length)return null;
+eligible.sort((a,b)=>{
+const showA=Number(a.view?.tv_show||0);
+const showB=Number(b.view?.tv_show||0);
+if(showA!==showB)return showA-showB;
+const buildA=new Date(a.tip.tp_build).getTime();
+const buildB=new Date(b.tip.tp_build).getTime();
+if(buildA!==buildB)return buildA-buildB;
+const dateA=a.view?.tv_date?new Date(a.view.tv_date).getTime():0;
+const dateB=b.view?.tv_date?new Date(b.view.tv_date).getTime():0;
+return dateA-dateB;
+});
+return eligible[0];
 }
 
 /* INIT AND SELECT TIP */
