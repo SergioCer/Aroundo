@@ -309,13 +309,14 @@ export async function loadTip(id) {
 
 /* SAVE */
 export async function saveTip(tip) {
-  const impact = await simulateTip(tip);
-  const payload = {...tip, tp_estimated: impact.involved, tp_estimated_date: new Date().toISOString()};
-  /*
-   * tp_build viene assegnato SOLO alla creazione.
-   * Se il tip esiste già, viene mantenuto quello presente.
-   */
-  if (!tip.tp_build) {payload.tp_build = new Date().toISOString();}
+  const now = new Date().toISOString();
+  const payload = {...tip, tp_estimated_date: now};
+  /* tp_build viene creato una sola volta. */
+  if (!tip.tp_build) {payload.tp_build = now;}
+  /* L'impact deve essere calcolato
+     utilizzando il tp_build definitivo. */
+  const impact = await simulateTip(payload);
+  payload.tp_estimated = impact.involved;
   const { data, error } = await supabase
     .from("tips")
     .upsert(payload)
@@ -389,39 +390,58 @@ return result;
 }
 
 /* TIP SIMULATION */
-export async function simulateTip(tip){
-const {data:analytics,error:analyticsError}=await supabase
-.from("analytics")
-.select("*")
-.order("an_date",{ascending:false});
-if(analyticsError)throw analyticsError;
-const {data:devices,error:devicesError}=await supabase
-.from("devices")
-.select("id_device,dv_platform,dv_app,dv_entrance");
-if(devicesError)throw devicesError;
-const profiles=buildTipProfiles(devices,analytics);
-const conditions=buildTipConditions(tip);
-let involved=0;
-let excluded=0;
-let missing=0;
-profiles.forEach(profile=>{
-const result=evaluateTip(tip,profile);
-if(result===true)involved++;
-else if(result===false)excluded++;
-else missing++;
-});
-const detail=[];
-conditions.forEach((item,index)=>{
-const field=ANALYTICS_FIELDS[item.analytics];
-detail.push({
-logic:index===0?"":item.logic,
-label:field?field.label:item.analytics,
-condition:item.condition,
-value:item.value
-});
-});
-const total=profiles.size;
-return{total,involved,excluded,missing,percent:total?Math.round(involved/total*100):0,detail};
+export async function simulateTip(tip) {
+  const { data: analytics, error: analyticsError } = await supabase
+    .from("analytics")
+    .select("*")
+    .order("an_date", { ascending: true });
+  if (analyticsError) throw analyticsError;
+  const { data: devices, error: devicesError } = await supabase
+    .from("devices")
+    .select("id_device,dv_platform,dv_app,dv_entrance");
+  if (devicesError) throw devicesError;
+  const { data: views, error: viewsError } = await supabase
+    .from("tips_views")
+    .select("id_tips,id_device,tv_show,tv_date,tv_disabled")
+    .eq("id_tips", tip.id_tips);
+  if (viewsError) throw viewsError;
+  const profiles = buildTipProfiles(devices, analytics);
+  const viewsMap = new Map((views || []).map(view => [view.id_device, view]));
+  const buildDay = tip.tp_build
+    ? new Date(tip.tp_build).toISOString().slice(0, 10)
+    : new Date().toISOString().slice(0, 10);
+  const progression = calculateProgression(tip.tp_interval, tip.tp_growth, tip.tp_repeat);
+  let involved = 0;
+  let excluded = 0;
+  let missing = 0;
+  profiles.forEach(profile => {
+    /* ANALYTICS CONDITIONS */
+    const result = evaluateTip(tip, profile);
+    if (result === null) {missing++; return;}
+    if (result === false) {excluded++;return;}
+    /* DEVICE HAS ALREADY DISABLED THIS TIP */
+    const view = viewsMap.get(profile.device.id_device);
+    if (view?.tv_disabled) {excluded++;return;}
+    /* COUNT UNIQUE ACCESS DAYS AFTER TIP CREATION */
+    const accessDates = [...new Set((analytics || []).filter(row => row.id_device === profile.device.id_device && row.an_date > buildDay).map(row => row.an_date))];
+    const accessCount = accessDates.length;
+    /* ESTIMATED FIRST VISUALIZATION
+     * A new tip has tv_show = 0,
+     * therefore we evaluate progression[0]. */
+    const showCount = Number(view?.tv_show || 0);
+    const nextPosition = progression[showCount];
+    if (nextPosition !== undefined &&
+      accessCount >= nextPosition
+    ) {involved++;
+    } else {excluded++;
+    }
+  });
+  const conditions = buildTipConditions(tip);
+  const detail = [];
+  conditions.forEach((item, index) => {const field = ANALYTICS_FIELDS[item.analytics];
+    detail.push({logic: index === 0 ? "" : item.logic, label: field ? field.label : item.analytics, condition: item.condition, value: item.value});});
+  const total = profiles.size;
+  return {total, involved, excluded, missing, percent: total ? Math.round(involved / total * 100) : 0, detail};
 }
 
 /* TIP EVALUATION FOR DEVICE */
