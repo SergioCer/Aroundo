@@ -299,13 +299,31 @@ export async function loadTip(id) {
 /* SAVE */
 export async function saveTip(tip) {
   const now = new Date().toISOString();
-  const payload = {...tip, tp_estimated_date: now};
-  /* tp_build viene creato una sola volta. */
-  if (!tip.tp_build) {payload.tp_build = now;}
-  /* L'impact deve essere calcolato
-     utilizzando il tp_build definitivo. */
-  const impact = await simulateTip(payload);
-  payload.tp_estimated = impact.involved;
+  /* NUOVO TIP */
+  const isNew = !tip.id_tips;
+  let buildDate;
+  let previousEstimated = 0;
+  let previousEstimatedDate = null;
+  if (isNew) {buildDate = now;
+  } else {const { data: current, error: readError } = await supabase
+      .from("tips")
+      .select("id_tips,tp_build,tp_estimated,tp_estimated_date")
+      .eq("id_tips", tip.id_tips)
+      .single();
+    if (readError) throw readError;
+    /* tp_build NON CAMBIA MAI */
+    buildDate = current.tp_build;
+    /* Valori già accumulati */
+    previousEstimated = Number(current.tp_estimated || 0);
+    previousEstimatedDate = current.tp_estimated_date;
+  }
+  const payload = {...tip, tp_build: buildDate, tp_estimated_date: now};
+  /* Per un nuovo tip l'impact parte da zero e viene calcolato sulla situazione attuale.
+     Per un tip esistente simulateTip() dovrà restituire solamente i nuovi device non ancora conteggiati. */
+  const impact = await simulateTip(payload, previousEstimatedDate);
+  payload.tp_estimated = previousEstimated + impact.involved;
+  /* Per un nuovo tip il DB deve generare automaticamente id_tips. Non inviamo id_tips vuoto. */
+  if (isNew) {delete payload.id_tips;}
   const { data, error } = await supabase
     .from("tips")
     .upsert(payload)
@@ -379,53 +397,28 @@ return result;
 }
 
 /* TIP SIMULATION */
-export async function simulateTip(tip) {
+export async function simulateTip(tip, fromDate = null) {
   const { data: analytics, error: analyticsError } = await supabase
     .from("analytics")
     .select("*")
-    .order("an_date", { ascending: true });
+    .order("an_date", { ascending: false });
   if (analyticsError) throw analyticsError;
   const { data: devices, error: devicesError } = await supabase
     .from("devices")
     .select("id_device,dv_platform,dv_app,dv_entrance");
   if (devicesError) throw devicesError;
-  const { data: views, error: viewsError } = await supabase
-    .from("tips_views")
-    .select("id_tips,id_device,tv_show,tv_date,tv_disabled")
-    .eq("id_tips", tip.id_tips);
-  if (viewsError) throw viewsError;
   const profiles = buildTipProfiles(devices, analytics);
-  const viewsMap = new Map((views || []).map(view => [view.id_device, view]));
-  const buildDay = tip.tp_build
-    ? new Date(tip.tp_build).toISOString().slice(0, 10)
-    : new Date().toISOString().slice(0, 10);
-  const progression = calculateProgression(tip.tp_interval, tip.tp_growth, tip.tp_repeat);
+  const conditions = buildTipConditions(tip);
   let involved = 0;
   let excluded = 0;
   let missing = 0;
-  profiles.forEach(profile => {
-    /* ANALYTICS CONDITIONS */
-    const result = evaluateTip(tip, profile);
-    if (result === null) {missing++; return;}
-    if (result === false) {excluded++;return;}
-    /* DEVICE HAS ALREADY DISABLED THIS TIP */
-    const view = viewsMap.get(profile.device.id_device);
-    if (view?.tv_disabled) {excluded++;return;}
-    /* COUNT UNIQUE ACCESS DAYS AFTER TIP CREATION */
-    const accessDates = [...new Set((analytics || []).filter(row => row.id_device === profile.device.id_device && row.an_date > buildDay).map(row => row.an_date))];
-    const accessCount = accessDates.length;
-    /* ESTIMATED FIRST VISUALIZATION
-     * A new tip has tv_show = 0,
-     * therefore we evaluate progression[0]. */
-    const showCount = Number(view?.tv_show || 0);
-    const nextPosition = progression[showCount];
-    if (nextPosition !== undefined &&
-      accessCount >= nextPosition
-    ) {involved++;
-    } else {excluded++;
-    }
-  });
-  const conditions = buildTipConditions(tip);
+  profiles.forEach(profile => {const result = evaluateTip(tip, profile);
+    if (result !== true) {if (result === false) excluded++; else missing++; return;}
+    /* NUOVO TIP: tutti i device che soddisfano le condizioni. */
+    if (!fromDate) {involved++; return;}
+    /* TIP ESISTENTE: consideriamo solo i device che hanno avuto attività a partire dalla precedente tp_estimated_date. */
+    const deviceAnalytics = (analytics || []).filter(row => row.id_device === profile.device.id_device && new Date(row.an_date) >= new Date(fromDate));
+    if (deviceAnalytics.length > 0) {involved++;}});
   const detail = [];
   conditions.forEach((item, index) => {const field = ANALYTICS_FIELDS[item.analytics];
     detail.push({logic: index === 0 ? "" : item.logic, label: field ? field.label : item.analytics, condition: item.condition, value: item.value});});
