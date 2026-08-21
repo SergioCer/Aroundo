@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0"/>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Tips Admin</title>
-
 <style>
 
 body {
@@ -282,81 +277,43 @@ td {
 </table>
 
 <script type="module">
-import { requireAuth }
-  from "../pages/auth-check.js";
+import { requireAuth } from "../pages/auth-check.js";
 
 await requireAuth();
 
-import { supabase }
-  from "../supabase.js";
+import { supabase } from "../supabase.js";
 
-import {
-  getTipTypes,
-  getAnalyticsFields
-} from "./tips.js";
+import {getTipTypes, getAnalyticsFields} from "./tips.js";
 
 let data = [];
-let state = {
-  filters: {},
-  sortField: null,
-  sortDir: "asc",
-  active: "all"
-};
+let state = {filters: {}, sortField: null, sortDir: "asc", active: "all"};
 
 /* LOAD */
 async function load() {
-  const { data: rows, error } =
-    await supabase
-      .from("tips")
-      .select("*");
-  if (error) {
-    console.error(error);
-    return;
-  }
+  const { data: rows, error } = await supabase .from("tips") .select("*");
+  if (error) {console.error(error); return;}
   data = rows || [];
   render();
 }
 
 /* SORT */
-window.sort = field => {
-  if (state.sortField !== field) {
-    state.sortField = field;
-    state.sortDir = "asc";
-  } else {
-    state.sortDir =
-      state.sortDir === "asc"
-        ? "desc"
-        : "asc";
-  }
+window.sort = field => {if (state.sortField !== field) {state.sortField = field; state.sortDir = "asc";
+  } else {state.sortDir = state.sortDir === "asc" ? "desc" : "asc";}
   render();
 };
 
 /* FILTER */
-window.setFilter = (field,value) => {
-  state.filters[field] = value;
-  render();
-};
+window.setFilter = (field,value) => {state.filters[field] = value; render();};
 
 /* RESET */
-window.resetAll = () => {
-  state.filters = {};
-  state.sortField = null;
-  state.sortDir = "asc";
-  state.active = "all";
-  document
-    .querySelectorAll(".filter")
-    .forEach(x => x.value = "");
+window.resetAll = () => {state.filters = {}; state.sortField = null; state.sortDir = "asc"; state.active = "all"; document .querySelectorAll(".filter") .forEach(x => x.value = "");
   render();
 };
 
 /* ACTIVE */
-window.toggleActive = () => {
-  if (state.active === "all")
-    state.active = "true";
-  else if (state.active === "true")
-    state.active = "false";
-  else
-    state.active = "all";
+window.toggleActive = () => {if (state.active === "all") state.active = "true";
+  else if (state.active === "true") state.active = "false";
+  else state.active = "all";
   render();
 };
 
@@ -364,52 +321,27 @@ window.toggleActive = () => {
 function render() {
   let filtered = [...data];
   if (state.active === "true")
-    filtered =
-      filtered.filter(x => x.tp_active === true);
+    filtered = filtered.filter(x => x.tp_active === true);
   if (state.active === "false")
-    filtered =
-      filtered.filter(x => x.tp_active === false);
+    filtered = filtered.filter(x => x.tp_active === false);
   Object.entries(state.filters)
-    .forEach(([key,value]) => {
-      const v =
-        String(value || "").toLowerCase();
-      if (!v) return;
-      filtered =
-        filtered.filter(row =>
-          String(row[key] ?? "")
-            .toLowerCase()
-            .includes(v)
-        );
+    .forEach(([key,value]) => {const v = String(value || "").toLowerCase(); if (!v) return;
+      filtered = filtered.filter(row => String(row[key] ?? "") .toLowerCase() .includes(v));
     });
   if (state.sortField) {
     filtered.sort((a,b) => {
       const va = a[state.sortField];
       const vb = b[state.sortField];
       if (va === vb) return 0;
-      const result =
-        va > vb ? 1 : -1;
-      return state.sortDir === "asc"
-        ? result
-        : -result;
-    });
+      const result = va > vb ? 1 : -1;
+      return state.sortDir === "asc" ? result : -result;});
   }
-
-  const tbody =
-    document.getElementById("tbody");
+  const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
-  filtered.forEach(row => {
-    const tr =
-      document.createElement("tr");
-    tr.onclick = () =>
-      location.href =
-        `tips.html?id=${encodeURIComponent(row.id_tips)}`;
-    const type =
-      getTipTypes()
-        .find(x => x.value === row.tp_type);
-    const active =
-      row.tp_active
-        ? '<span class="status-ok">✔</span>'
-        : '<span class="status-no">✖</span>';
+  filtered.forEach(row => {const tr = document.createElement("tr");
+    tr.onclick = () => location.href = `tips.html?id=${encodeURIComponent(row.id_tips)}`;
+    const type = getTipTypes() .find(x => x.value === row.tp_type);
+    const active = row.tp_active ? '<span class="status-ok">✔</span>' : '<span class="status-no">✖</span>';
     tr.innerHTML = `
       <td>${row.id_tips || ""}</td>
       <td>${row.tp_text || ""}</td>
@@ -420,33 +352,18 @@ function render() {
       <td>${row.tp_growth ?? ""}</td>
       <td style="text-align:center">
         ${active}
-      </td>
-    `;
+      </td>`;
     tbody.appendChild(tr);
   });
-
   document.getElementById("activeBtn").textContent =
-    state.active === "all"
-      ? "●"
-      : state.active === "true"
-        ? "✔"
-        : "✖";
-
-  const reset =
-    document.getElementById("resetBtn");
-  const hasFilters =
-    Object.values(state.filters)
-      .some(Boolean)
-    ||
-    state.active !== "all"
-    ||
+    state.active === "all" ? "●" : state.active === "true" ? "✔" : "✖";
+  const reset = document.getElementById("resetBtn");
+  const hasFilters = Object.values(state.filters)
+      .some(Boolean) ||
+    state.active !== "all" ||
     state.sortField !== null;
-  reset.classList.toggle(
-    "active",
-    hasFilters
-  );
-  reset.textContent =
-    hasFilters ? "↺" : "•";
+  reset.classList.toggle("active", hasFilters);
+  reset.textContent = hasFilters ? "↺" : "•";
 }
 
 load();
