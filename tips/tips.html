@@ -428,7 +428,7 @@ const id = params.get("id");
 const isNew = params.get("new") === "1";
 
 /* ELEMENTS */
-const idTips = document.getElementById("id_tips");
+// const idTips = document.getElementById("id_tips"); CANCELLARE : ormai ID è automatico. 
 const type = document.getElementById("tp_type");
 const icon = document.getElementById("tp_icon");
 const title = document.getElementById("tp_title");
@@ -802,8 +802,6 @@ function updateEstimatedSummary() {
       
 /* FILL */
 function fill() {
-  idTips.value =
-    tip.id_tips || "";
   type.value =
     tip.tp_type ||
     "bubble";
@@ -877,6 +875,7 @@ window.save =
   async () => {
     const data = {
       // id_tips: idTips.value.trim(), CANCELLARE: l'ID viene generato automaticamente.
+      id_tips: tip.id_tips || null,          
       tp_type: type.value,
       tp_icon: icon.value,
       tp_title: title.value.trim(),
