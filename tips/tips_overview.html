@@ -26,6 +26,21 @@ body {
   align-items: center;
 }
 
+.title-header {
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-header .reset-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+  
 .add-btn,
 .bck-btn {
   width: 34px;
@@ -59,17 +74,6 @@ table {
   table-layout: fixed;
 }
 
-.table-wrapper {
-  position: relative;
-}
-
-.table-reset {
-  position: absolute;
-  left: 10px;
-  top: 31px;
-  z-index: 2;
-}
-  
 th,
 td {
   padding: 6px 10px;
@@ -123,19 +127,6 @@ td {
   min-width: 0;
 }  
   
-.col-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.col-title {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  font-size: 14px;
-}
-
 .filter {
   width: 100%;
   font-size: 12px;
@@ -214,14 +205,6 @@ td {
     </button>
   </div>
 </div>
-<div class="table-wrapper">
-  <button
-    class="reset-btn table-reset"
-    onclick="resetAll()"
-    id="resetBtn">
-    •
-  </button>  
-</div>
 <table>
 <colgroup>
   <col style="width:480px">
@@ -234,9 +217,30 @@ td {
 <thead>
 <tr>
   <!-- TITLE -->
-  <th>
-    <div class="header-title">
-      Title
+  <th rowspan="2">
+    <div class="title-header">
+      <button
+        class="reset-btn"
+        onclick="resetAll()"
+        id="resetBtn">
+        •
+      </button>
+      <div class="header-title">
+        Title
+      </div>
+    </div>
+    <div class="header-controls">
+      <div class="search-sort">
+        <input
+          class="filter"
+          id="filterText"
+          oninput="setFilter('tp_text',this.value)">
+        <button
+          class="sort-btn"
+          onclick="sort('tp_text')">
+          ↕
+        </button>
+      </div>
     </div>
   </th>
   <!-- TYPE -->
@@ -271,22 +275,6 @@ td {
   </th>
 </tr>
 <tr>
-  <!-- TITLE FILTER + SORT -->
-  <th>
-    <div class="header-controls">
-      <div class="search-sort">
-        <input
-          class="filter"
-          id="filterText"
-          oninput="setFilter('tp_text',this.value)">
-        <button
-          class="sort-btn"
-          onclick="sort('tp_text')">
-          ↕
-        </button>
-      </div>
-    </div>
-  </th>
   <!-- TYPE FILTER + SORT -->
   <th>
     <div class="header-controls">
