@@ -627,56 +627,66 @@ function updateProgression() {
   progression.innerHTML = "";
   const first = conditions[1];
   const field = getAnalyticsFields()
-      .find(x => x.value === first.analytics.value);
-  if (!field) {progression.hidden = true;
-    return;
-  }
+    .find(x => x.value === first.analytics.value);
+  if (!field) {progression.hidden = true;return;}
   progression.hidden = false;
   const repeatValue = Number(repeat.value);
-  if (field.type === "number") {
-    const values = calculateProgression(interval.value, growth.value, repeat.value);
-    values.forEach(
-      (value, index) => {const el = document.createElement("div");
+  /* REPEAT = 0 → infinite */
+  if (repeatValue === 0) {
+    if (field.type === "number") {
+      const values = calculateProgression(
+        interval.value,
+        growth.value,
+        10
+      );
+      values.forEach((value, index) => {
+        const el = document.createElement("div");
         el.className = "step";
         el.textContent = `${index + 1}ª → ${value}`;
-        progression
-          .appendChild(el);
+        progression.appendChild(el);
+      });
+    } else {
+      for (let i = 1; i <= 10; i++) {
+        const el = document.createElement("div");
+        el.className = "step";
+        el.textContent = `${i}ª → vis.`;
+        progression.appendChild(el);
       }
+    }
+    const more = document.createElement("div");
+    more.className = "step";
+    more.textContent = "∞ → ...";
+    progression.appendChild(more);
+    return;
+  }
+  /* REPEAT > 0 → mostra tutte le progressioni fino a 10 */
+  const visibleSteps = Math.min(repeatValue, 10);
+  if (field.type === "number") {
+    const values = calculateProgression(
+      interval.value,
+      growth.value,
+      visibleSteps
     );
-    if (repeatValue === 0) {
+    values.forEach((value, index) => {
       const el = document.createElement("div");
       el.className = "step";
-      el.textContent = "∞ → ...";
-      progression .appendChild(el);
-    } else if (
-      repeatValue > 10
-    ) {
-      const el = document.createElement("div");
-      el.className = "step";
-      el.textContent = "11ª → ...";
-      progression .appendChild(el);
-    }
+      el.textContent = `${index + 1}ª → ${value}`;
+      progression.appendChild(el);
+    });
   } else {
-    const el = document.createElement("div");
-    el.className = "step";
-    el.textContent = "1ª → visualizzazione";
-    progression .appendChild(el);
-    if (repeatValue === 0) {
-      const el2 = document.createElement("div");
-      el2.className = "step";
-      el2.textContent = "∞ → ...";
-      progression .appendChild(el2);
-    } else if (
-      repeatValue > 1
-    ) {
-      const el2 =
-        document.createElement("div");
-      el2.className = "step";
-      el2.textContent = repeatValue > 10
-          ? "11ª → ..."
-          : `${repeatValue}ª → ...`;
-      progression .appendChild(el2);
+    for (let i = 1; i <= visibleSteps; i++) {
+      const el = document.createElement("div");
+      el.className = "step";
+      el.textContent = `${i}ª → vis.`;
+      progression.appendChild(el);
     }
+  }
+  /* Se le ripetizioni sono > 10, mostra More... */
+  if (repeatValue > 10) {
+    const more = document.createElement("div");
+    more.className = "step";
+    more.textContent = "More...";
+    progression.appendChild(more);
   }
 }
 
@@ -738,7 +748,6 @@ impactBtn.onclick =
       const result = await simulateTip(data);
       // estimatedImpact=result.involved; CANCELLARE: il salvataggio è nel save
       let html = `
-        <div class="simulation-title">Estimated Impact</div>
         <div class="simulation-row"><span>Devices analyzed</span>
           <span class="simulation-value">${result.total}</span>
         </div>
