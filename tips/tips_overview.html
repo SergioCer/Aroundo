@@ -61,11 +61,16 @@ table {
 
 th,
 td {
-  padding: 6px;
+  padding: 6px 10px;
   border-bottom: 1px solid #e5e7eb;
   overflow: hidden;
 }
 
+th {
+  font-weight: normal;
+  vertical-align: middle;
+}
+  
 tr:hover {
   background: #eef6ff;
   cursor: pointer;
@@ -77,6 +82,36 @@ td {
   border-right: 2px solid #f1f5f9;
 }
 
+/* Header a due righe */
+.header-title {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.header-controls {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ricerca + sort */
+.search-sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.search-sort .filter {
+  flex: 1;
+  min-width: 0;
+}  
+  
 .col-header {
   display: flex;
   flex-direction: column;
@@ -100,6 +135,7 @@ td {
 }
 
 .sort-btn {
+  flex: 0 0 28px;
   width: 28px;
   height: 28px;
   border-radius: 14px;
@@ -111,6 +147,11 @@ td {
   color: #1e3a8a;
 }
 
+/* Celle numeriche */
+.numeric {
+  text-align: right;
+}
+  
 .reset-btn,
 .status-filter {
   width: 28px;
@@ -164,113 +205,136 @@ td {
 </div>
 <table>
 <colgroup>
-  <col style="width:60px">
-  <col style="width:280px">
+  <col style="width:50px">
+  <col style="width:380px">
+  <col style="width:180px">
   <col style="width:100px">
-  <col style="width:120px">
-  <col style="width:80px">
-  <col style="width:80px">
-  <col style="width:80px">
-  <col style="width:60px">
+  <col style="width:110px">
+  <col style="width:110px">
+  <col style="width:90px">
 </colgroup>
 <thead>
 <tr>
-<th>
-  <div class="col-header">
-    <div class="col-title"
-         style="justify-content:center">
-      ID
-    </div>
+  <!-- RESET -->
+  <th rowspan="2">
     <button
       class="reset-btn"
       onclick="resetAll()"
       id="resetBtn">
       •
     </button>
-  </div>
-</th>
-<th>
-  <div class="col-header">
-    <div class="col-title">
-      Testo
+  </th>
+  <!-- TITLE -->
+  <th>
+    <div class="header-title">
+      Title
+    </div>
+  </th>
+  <!-- TYPE -->
+  <th>
+    <div class="header-title">
+      Type
+    </div>
+  </th>
+  <!-- REPEAT -->
+  <th>
+    <div class="header-title">
+      Repeat
+    </div>
+  </th>
+  <!-- INTERVAL -->
+  <th>
+    <div class="header-title">
+      Interval
+    </div>
+  </th>
+  <!-- GROWTH -->
+  <th>
+    <div class="header-title">
+      Growth
+    </div>
+  </th>
+  <!-- ACTIVE -->
+  <th>
+    <div class="header-title">
+      Active
+    </div>
+  </th>
+</tr>
+<tr>
+  <!-- TITLE FILTER + SORT -->
+  <th>
+    <div class="header-controls">
+      <div class="search-sort">
+        <input
+          class="filter"
+          id="filterText"
+          oninput="setFilter('tp_text',this.value)">
+        <button
+          class="sort-btn"
+          onclick="sort('tp_text')">
+          ↕
+        </button>
+      </div>
+    </div>
+  </th>
+  <!-- TYPE FILTER + SORT -->
+  <th>
+    <div class="header-controls">
+      <div class="search-sort">
+        <input
+          class="filter"
+          id="filterType"
+          oninput="setFilter('tp_type',this.value)">
+        <button
+          class="sort-btn"
+          onclick="sort('tp_type')">
+          ↕
+        </button>
+      </div>
+    </div>
+  </th>
+  <!-- REPEAT SORT -->
+  <th>
+    <div class="header-controls">
       <button
         class="sort-btn"
-        onclick="sort('tp_text')">
+        onclick="sort('tp_repeat')">
         ↕
       </button>
     </div>
-    <input
-      class="filter"
-      id="filterText"
-      oninput="setFilter('tp_text',this.value)">
-  </div>
-</th>
-<th>
-  <div class="col-header">
-    <div class="col-title">
-      Tipo
+  </th>
+  <!-- INTERVAL SORT -->
+  <th>
+    <div class="header-controls">
+      <button
+        class="sort-btn"
+        onclick="sort('tp_interval')">
+        ↕
+      </button>
     </div>
-    <input
-      class="filter"
-      id="filterType"
-      oninput="setFilter('tp_type',this.value)">
-  </div>
-</th>
-<th>
-  <div class="col-header">
-    <div class="col-title">
-      Analytics
+  </th>
+  <!-- GROWTH SORT -->
+  <th>
+    <div class="header-controls">
+      <button
+        class="sort-btn"
+        onclick="sort('tp_growth')">
+        ↕
+      </button>
     </div>
-    <input
-      class="filter"
-      id="filterAnalytics"
-      oninput="setFilter('tp_analytics',this.value)">
-  </div>
-</th>
-<th>
-  <div class="col-title">
-    Repeat
-    <button
-      class="sort-btn"
-      onclick="sort('tp_repeat')">
-      ↕
-    </button>
-  </div>
-</th>
-<th>
-  <div class="col-title">
-    Interval
-    <button
-      class="sort-btn"
-      onclick="sort('tp_interval')">
-      ↕
-    </button>
-  </div>
-</th>
-<th>
-  <div class="col-title">
-    Growth
-    <button
-      class="sort-btn"
-      onclick="sort('tp_growth')">
-      ↕
-    </button>
-  </div>
-</th>
-<th>
-  <div class="col-header">
-    <div class="col-title"
-         style="justify-content:center">
-      Stato
+  </th>
+  <!-- ACTIVE FILTER -->
+  <th>
+    <div class="header-controls">
+      <button
+        class="status-filter"
+        onclick="toggleActive()"
+        id="activeBtn">
+        ●
+      </button>
     </div>
-    <button
-      class="status-filter"
-      onclick="toggleActive()"
-      id="activeBtn">
-      ●
-    </button>
-  </div>
-</th>
+  </th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -343,13 +407,11 @@ function render() {
     const type = getTipTypes() .find(x => x.value === row.tp_type);
     const active = row.tp_active ? '<span class="status-ok">✔</span>' : '<span class="status-no">✖</span>';
     tr.innerHTML = `
-      <td>${row.id_tips || ""}</td>
       <td>${row.tp_text || ""}</td>
       <td>${type?.label || row.tp_type || ""}</td>
-      <td>${row.tp_analytics || ""}</td>
-      <td>${row.tp_repeat ?? ""}</td>
-      <td>${row.tp_interval ?? ""}</td>
-      <td>${row.tp_growth ?? ""}</td>
+      <td class="numeric">${row.tp_repeat ?? ""}</td>
+      <td class="numeric">${row.tp_interval ?? ""}</td>
+      <td class="numeric">${row.tp_growth ?? ""}</td>
       <td style="text-align:center">
         ${active}
       </td>`;
