@@ -22,7 +22,7 @@ body {
   font-size: 24px;
   font-weight: bold;
   display: flex;
-  gap: 20px;
+  gap: 40px;
   align-items: center;
 }
 
@@ -58,6 +58,17 @@ table {
   background: white;
   table-layout: fixed;
 }
+
+.table-wrapper {
+  position: relative;
+}
+
+.table-reset {
+  position: absolute;
+  left: 10px;
+  top: 31px;
+  z-index: 2;
+}  
 
 th,
 td {
@@ -203,27 +214,24 @@ td {
     </button>
   </div>
 </div>
+<div class="table-wrapper">
+  <button
+    class="reset-btn table-reset"
+    onclick="resetAll()"
+    id="resetBtn">
+    •
+  </button>  
 <table>
 <colgroup>
-  <col style="width:50px">
   <col style="width:380px">
-  <col style="width:180px">
+  <col style="width:160px">
   <col style="width:100px">
-  <col style="width:110px">
-  <col style="width:110px">
-  <col style="width:90px">
+  <col style="width:100px">
+  <col style="width:100px">
+  <col style="width:70px">
 </colgroup>
 <thead>
 <tr>
-  <!-- RESET -->
-  <th rowspan="2">
-    <button
-      class="reset-btn"
-      onclick="resetAll()"
-      id="resetBtn">
-      •
-    </button>
-  </th>
   <!-- TITLE -->
   <th>
     <div class="header-title">
