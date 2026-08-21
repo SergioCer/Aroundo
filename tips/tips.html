@@ -88,8 +88,7 @@ body {
       
 label {
   display: block;
-  font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
   margin-bottom: 5px;
 }
 
@@ -127,8 +126,7 @@ textarea {
 
 .logic-inline-field label {
   display: block;
-  font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
   margin-bottom: 5px;
 }
       
@@ -151,11 +149,6 @@ textarea {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.step.more {
-  background: #f3f4f6;
-  color: #6b7280;
 }
 
 .tip-tools {
@@ -264,10 +257,6 @@ textarea {
   color: #9333ea;
   font-weight: bold;
   margin-right: 6px;
-}
-
-.cta-preview {
-  display: none;
 }
 
 </style>
@@ -419,16 +408,12 @@ import {requireAuth} from "../pages/auth-check.js";
 await requireAuth();
 import { TIP_ICONS, getTipTypes, getAnalyticsFields, getConditions, getTipOptions, getTipValueOptions, ANALYTICS_OPTIONS, calculateProgression, 
         defaultTip, loadTip, saveTip, simulateTip, renderTip } from "./tips.js";
-// TODO: DA CANCELLARE
-// Non serve più per il salvataggio: la stima definitiva viene gestita da saveTip().
-let estimatedImpact=0;
 let tip = defaultTip();
 const params = new URLSearchParams(location.search);
 const id = params.get("id");
 const isNew = params.get("new") === "1";
 
 /* ELEMENTS */
-// const idTips = document.getElementById("id_tips"); CANCELLARE : ormai ID è automatico. 
 const type = document.getElementById("tp_type");
 const icon = document.getElementById("tp_icon");
 const title = document.getElementById("tp_title");
@@ -460,7 +445,6 @@ const conditions = {
     value: document.getElementById("tv_value_3")
   }
 };
-
 
 const logic1 = document.getElementById("tp_logic_1");
 const logic2 = document.getElementById("tp_logic_2");
@@ -746,7 +730,6 @@ impactBtn.onclick =
         tv_value_3: conditions[3] .value.value
       };
       const result = await simulateTip(data);
-      // estimatedImpact=result.involved; CANCELLARE: il salvataggio è nel save
       let html = `
         <div class="simulation-row"><span>Devices analyzed</span>
           <span class="simulation-value">${result.total}</span>
@@ -811,70 +794,22 @@ function updateEstimatedSummary() {
       
 /* FILL */
 function fill() {
-  type.value =
-    tip.tp_type ||
-    "bubble";
-  icon.value =
-    tip.tp_icon ||
-    TIP_ICONS[0];
-  title.value =
-    tip.tp_title ||
-    "";
-  text.value =
-    tip.tp_text ||
-    "";
-  for (
-    let i = 1;
-    i <= 3;
-    i++
-  ) {
-    conditions[i]
-      .analytics.value =
-      tip[
-        `tp_analytics_${i}`
-      ] || "";
-    conditions[i]
-      .condition.value =
-      tip[
-        `tp_condition_${i}`
-      ] || ">=";
-    conditions[i]
-      .value.value =
-      tip[
-        `tv_value_${i}`
-      ] || "";
-  }
-  logic1.value =
-    tip.tp_logic_1 ||
-    "";
-  logic2.value =
-    tip.tp_logic_2 ||
-    "";
-  repeat.value =
-    tip.tp_repeat ??
-    1;
-  interval.value =
-    tip.tp_interval ??
-    1;
-  growth.value =
-    tip.tp_growth ??
-    1;
-  document.getElementById(
-    "tp_cta_active"
-  ).value =
-    tip.tp_cta_active
-      ? "true"
-      : "false";
-  document.getElementById(
-    "tp_cta_label"
-  ).value =
-    tip.tp_cta_label ||
-    "";
-  document.getElementById(
-    "tp_cta_url"
-  ).value =
-    tip.tp_cta_url ||
-    "";
+  type.value = tip.tp_type || "bubble";
+  icon.value = tip.tp_icon || TIP_ICONS[0];
+  title.value = tip.tp_title || "";
+  text.value = tip.tp_text || "";
+  for (let i = 1; i <= 3; i++
+  ) {conditions[i] .analytics.value = tip[`tp_analytics_${i}`] || "";
+    conditions[i] .condition.value = tip[`tp_condition_${i}`] || ">=";
+    conditions[i] .value.value = tip[`tv_value_${i}`] || "";}
+  logic1.value = tip.tp_logic_1 ||"";
+  logic2.value = tip.tp_logic_2 ||"";
+  repeat.value = tip.tp_repeat ?? 1;
+  interval.value = tip.tp_interval ?? 1;
+  growth.value = tip.tp_growth ?? 1;
+  document.getElementById("tp_cta_active").value = tip.tp_cta_active ? "true" : "false";
+  document.getElementById("tp_cta_label").value = tip.tp_cta_label || "";
+  document.getElementById("tp_cta_url").value = tip.tp_cta_url || "";
   updateActive();
   updateEstimatedSummary();
 }
@@ -883,7 +818,6 @@ function fill() {
 window.save =
   async () => {
     const data = {
-      // id_tips: idTips.value.trim(), CANCELLARE: l'ID viene generato automaticamente.
       id_tips: tip.id_tips || null,          
       tp_type: type.value,
       tp_icon: icon.value,
@@ -909,12 +843,16 @@ window.save =
       tp_active: tip.tp_active === true,
       // tp_estimated:estimatedImpact   : 
     };
-    // if (!data.id_tips) {alert("Enter the Tip ID."); return;} // CANCELLARE: l'ID viene generato automaticamente.
     if (!data.tp_text) {alert("Enter the Tip text.");return;}
       try{
-      const result=await simulateTip(data);
-      data.tp_estimated=result.involved;
-      await saveTip(data);
+      // CANCELLARE ??? const result=await simulateTip(data);
+      // CANCELLARE ??? data.tp_estimated=result.involved;
+      // CANCELLARE ??? await saveTip(data);
+      try {await saveTip(data);
+            location.href = "tips_overview.html";
+            } catch (error) {console.error(error);
+              alert("Error while saving.");
+            }            
       location.href="tips_overview.html";
       }catch(error){
       console.error(error);
