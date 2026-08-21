@@ -70,6 +70,22 @@ body {
   min-width: 0;
 }
 
+.tip-main-row {
+  align-items: flex-end;
+}
+
+.tip-title-field {
+  flex: 3;
+}
+
+.tip-icon-field {
+  flex: 0 0 90px;
+}
+
+.tip-type-field {
+  flex: 0 0 180px;
+}
+      
 label {
   display: block;
   font-weight: bold;
@@ -100,43 +116,53 @@ textarea {
   resize: vertical;
 }
 
-.logic-row {
-  display: flex;
-  justify-content: center;
-  margin: -5px 0 10px;
+.condition-row {
+  align-items: flex-end;
 }
 
-.logic-field {
-  width: 180px;
+.logic-inline-field {
+  flex: 0 0 120px;
+  min-width: 0;
 }
 
-.logic-field label {
-  text-align: center;
-  color: #6b7280;
-  font-size: 12px;
+.logic-inline-field label {
+  display: block;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
 }
-
+      
 .progression {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
   gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: 20px;
 }
 
 .step {
+  min-width: 0;
+  box-sizing: border-box;
   background: #dbeafe;
   color: #1e3a8a;
-  padding: 7px 12px;
+  padding: 7px 6px;
   border-radius: 15px;
   font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.step.more {
+  background: #f3f4f6;
+  color: #6b7280;
 }
 
 .tip-tools {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 28px;
   margin-top: 25px;
 }
 
@@ -186,6 +212,19 @@ textarea {
   background: #dc2626;
 }
 
+.estimated-summary {
+  margin-top: 18px;
+  padding: 9px 12px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.estimated-summary:empty {
+  display: none;
+}      
+      
 .simulation {
   margin-top: 18px;
   display: grid;
@@ -242,103 +281,90 @@ textarea {
   </div>
 </div>
 <div class="container">
-  <!-- ID / TYPE -->
-  <div class="row">
-<div class="field">
-  <label>Tip ID</label>
-  <input id="id_tips" placeholder="e.g. 20260809 Welcome">
-</div>
-<div class="field">
-  <label>Type</label>
-  <select id="tp_type"></select>
-</div>
+<!-- TITLE / ICON / TYPE -->
+<div class="row tip-main-row">
+  <div class="field tip-title-field">
+    <label>Title</label>
+    <input id="tp_title" placeholder="Tip title">
   </div>
-  <!-- ICON / TITLE -->
-  <div class="row">
-<div class="field">
-  <label>Icon</label>
-  <select id="tp_icon"></select>
-</div>
-<div class="field">
-  <label>Title</label>
-  <input id="tp_title" placeholder="Tip title">
-</div>
+  <div class="field tip-icon-field">
+    <label>Icon</label>
+    <select id="tp_icon"></select>
   </div>
+  <div class="field tip-type-field">
+    <label>Type</label>
+    <select id="tp_type"></select>
+  </div>
+</div>
   <!-- TEXT -->
   <div class="field">
 <label>Text</label>
 <textarea id="tp_text" placeholder="Message text..."></textarea>
   </div>
   <br>
-  <!-- CONDITION 1 -->
-  <div class="row">
-<div class="field">
-  <label>Analytics</label>
-  <select id="tp_analytics_1"></select>
-</div>
-<div class="field">
-  <label>Condition</label>
-  <select id="tp_condition_1"></select>
-</div>
-<div class="field">
-  <label>Value</label>
-  <input id="tv_value_1" placeholder="Value">
-</div>
+<!-- CONDITION 1 -->
+<div class="row condition-row">
+  <div class="field">
+    <label>Analytics</label>
+    <select id="tp_analytics_1"></select>
   </div>
-  <!-- LOGIC 1 -->
-  <div id="logicRow1" class="logic-row" hidden>
-<div class="logic-field">
-  <label>Logic</label>
-  <select id="tp_logic_1">
-    <option value="">--</option>
-    <option value="AND">AND</option>
-    <option value="OR">OR</option>
-    <option value="NOT">NOT</option>
-  </select>
-</div>
+  <div class="field">
+    <label>Condition</label>
+    <select id="tp_condition_1"></select>
   </div>
-  <!-- CONDITION 2 -->
-  <div id="conditionRow2" class="row" hidden>
-<div class="field">
-  <label>Analytics</label>
-  <select id="tp_analytics_2"></select>
-</div>
-<div class="field">
-  <label>Condition</label>
-  <select id="tp_condition_2"></select>
-</div>
-<div class="field">
-  <label>Value</label>
-  <input id="tv_value_2" placeholder="Value">
-</div>
+  <div class="field">
+    <label>Value</label>
+    <input id="tv_value_1" placeholder="Value">
   </div>
-  <!-- LOGIC 2 -->
-  <div id="logicRow2" class="logic-row" hidden>
-<div class="logic-field">
-  <label>Logic</label>
-  <select id="tp_logic_2">
-    <option value="">--</option>
-    <option value="AND">AND</option>
-    <option value="OR">OR</option>
-    <option value="NOT">NOT</option>
-  </select>
-</div>
+  <div class="logic-inline-field" id="logicRow1" hidden>
+    <label>Logic</label>
+    <select id="tp_logic_1">
+      <option value="">--</option>
+      <option value="AND">AND</option>
+      <option value="OR">OR</option>
+      <option value="NOT">NOT</option>
+    </select>
   </div>
-  <!-- CONDITION 3 -->
-  <div id="conditionRow3" class="row" hidden>
-<div class="field">
-  <label>Analytics</label>
-  <select id="tp_analytics_3"></select>
 </div>
-<div class="field">
-  <label>Condition</label>
-  <select id="tp_condition_3"></select>
-</div>
-<div class="field">
-  <label>Value</label>
-  <input id="tv_value_3" placeholder="Value">
-</div>
+<!-- CONDITION 2 -->
+<div id="conditionRow2" class="row condition-row" hidden>
+  <div class="field">
+    <label>Analytics</label>
+    <select id="tp_analytics_2"></select>
   </div>
+  <div class="field">
+    <label>Condition</label>
+    <select id="tp_condition_2"></select>
+  </div>
+  <div class="field">
+    <label>Value</label>
+    <input id="tv_value_2" placeholder="Value">
+  </div>
+  <div class="logic-inline-field" id="logicRow2" hidden>
+    <label>Logic</label>
+    <select id="tp_logic_2">
+      <option value="">--</option>
+      <option value="AND">AND</option>
+      <option value="OR">OR</option>
+      <option value="NOT">NOT</option>
+    </select>
+  </div>
+</div>
+<!-- CONDITION 3 -->
+<div id="conditionRow3" class="row condition-row" hidden>
+  <div class="field">
+    <label>Analytics</label>
+    <select id="tp_analytics_3"></select>
+  </div>
+  <div class="field">
+    <label>Condition</label>
+    <select id="tp_condition_3"></select>
+  </div>
+  <div class="field">
+    <label>Value</label>
+    <input id="tv_value_3" placeholder="Value">
+  </div>
+</div>
   <!-- REPEAT / INTERVAL / GROWTH -->
   <div class="row">
 <div class="field">
@@ -382,6 +408,7 @@ textarea {
   <div id="progression" class="progression">
   </div>
   <!-- IMPACT -->
+  <div id="estimatedSummary" class="estimated-summary"></div>    
   <div id="simulation" class="simulation">
   </div>
 </div>
@@ -392,7 +419,8 @@ import {requireAuth} from "../pages/auth-check.js";
 await requireAuth();
 import { TIP_ICONS, getTipTypes, getAnalyticsFields, getConditions, getTipOptions, getTipValueOptions, ANALYTICS_OPTIONS, calculateProgression, 
         defaultTip, loadTip, saveTip, simulateTip, renderTip } from "./tips.js";
-
+// TODO: DA CANCELLARE
+// Non serve più per il salvataggio: la stima definitiva viene gestita da saveTip().
 let estimatedImpact=0;
 let tip = defaultTip();
 const params = new URLSearchParams(location.search);
@@ -708,7 +736,7 @@ impactBtn.onclick =
         tv_value_3: conditions[3] .value.value
       };
       const result = await simulateTip(data);
-      estimatedImpact=result.involved;    
+      // estimatedImpact=result.involved; CANCELLARE: il salvataggio è nel save
       let html = `
         <div class="simulation-title">Estimated Impact</div>
         <div class="simulation-row"><span>Devices analyzed</span>
@@ -755,6 +783,23 @@ impactBtn.onclick =
     }
   };
 
+function updateEstimatedSummary() {
+  const summary = document.getElementById("estimatedSummary");
+  if (!tip.tp_estimated_date || tip.tp_estimated === null || tip.tp_estimated === undefined) {
+    summary.textContent = "";
+    return;
+  }
+  const date = new Date(tip.tp_estimated_date + "T00:00:00");
+  if (Number.isNaN(date.getTime())) {
+    summary.textContent = "";
+    return;
+  }
+  const formattedDate = date.toLocaleDateString("it-IT");
+  summary.textContent =
+    `Estimated Impact: ${formattedDate} = ${Number(tip.tp_estimated || 0)}`;
+}
+
+      
 /* FILL */
 function fill() {
   idTips.value =
@@ -824,13 +869,14 @@ function fill() {
     tip.tp_cta_url ||
     "";
   updateActive();
+  updateEstimatedSummary();
 }
 
 /* SAVE */
 window.save =
   async () => {
     const data = {
-      id_tips: idTips.value.trim(),
+      // id_tips: idTips.value.trim(), CANCELLARE: l'ID viene generato automaticamente.
       tp_type: type.value,
       tp_icon: icon.value,
       tp_title: title.value.trim(),
@@ -853,14 +899,10 @@ window.save =
       tp_cta_label: document.getElementById("tp_cta_label").value.trim(),
       tp_cta_url: document.getElementById("tp_cta_url").value.trim(),
       tp_active: tip.tp_active === true,
-      tp_estimated:estimatedImpact   
+      // tp_estimated:estimatedImpact   : 
     };
-    if (!data.id_tips) {alert("Enter the Tip ID.");
-      return;
-    }
-    if (!data.tp_text) {alert("Enter the Tip text.");
-      return;
-    }
+    // if (!data.id_tips) {alert("Enter the Tip ID."); return;} // CANCELLARE: l'ID viene generato automaticamente.
+    if (!data.tp_text) {alert("Enter the Tip text.");return;}
       try{
       const result=await simulateTip(data);
       data.tp_estimated=result.involved;
