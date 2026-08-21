@@ -347,9 +347,7 @@ Object.entries(row).forEach(([key,value])=>{
 if(key==="id_device"||key==="an_date")return;
 if(typeof value==="number"&&Number.isFinite(value)){
 data.totals[key]=(data.totals[key]||0)+value;
-}else if(!(key in data.latest)){
-data.latest[key]=value;
-}
+}else if(!(key in data.latest)){data.latest[key]=value;}
 });
 });
 const profiles=new Map();
@@ -370,13 +368,7 @@ const condition=tip[`tp_condition_${i}`];
 const value=tip[`tv_value_${i}`];
 const field=ANALYTICS_FIELDS[analyticsField];
 if(!field)continue;
-conditions.push({
-analytics:analyticsField,
-condition,
-value,
-logic:i>1?tip[`tp_logic_${i-1}`]:""
-});
-}
+conditions.push({analytics:analyticsField,condition,value,logic:i>1?tip[`tp_logic_${i-1}`]:""});}
 return conditions;
 }
 
@@ -417,36 +409,18 @@ export async function simulateTip(tip,fromDate=null){
     const result=evaluateTip(tip,profile);
     if(result===false){excluded++;return;}
     if(result!==true){missing++;return;}
-    if(!fromDate){
-      involved++;
-      return;
-    }
+    if(!fromDate){involved++;return;}
     const deviceId=profile.device.id_device;
-    const hasNewActivity=(analytics||[]).some(row=>
-      row.id_device===deviceId &&
-      new Date(row.an_date)>=new Date(fromDate)
-    );
+    /* CANCELLARE VECCHIA LOGICA DATA 
+    const hasNewActivity=(analytics||[]).some(row=> row.id_device===deviceId && new Date(row.an_date)>=new Date(fromDate)); */
+    const hasNewActivity=(analytics||[]).some(row=> row.id_device===deviceId && row.an_date>=fromDate);
     if(hasNewActivity)involved++;
   });
   const detail=[];
-  conditions.forEach((item,index)=>{
-    const field=ANALYTICS_FIELDS[item.analytics];
-    detail.push({
-      logic:index===0?"":item.logic,
-      label:field?field.label:item.analytics,
-      condition:item.condition,
-      value:item.value
-    });
-  });
+  conditions.forEach((item,index)=>{const field=ANALYTICS_FIELDS[item.analytics];
+    detail.push({logic:index===0?"":item.logic, label:field?field.label:item.analytics, condition:item.condition, value:item.value});});
   const total=profiles.size;
-  return {
-    total,
-    involved,
-    excluded,
-    missing,
-    percent:total?Math.round(involved/total*100):0,
-    detail
-  };
+  return { total, involved, excluded, missing, percent:total?Math.round(involved/total*100):0, detail};
 }
 
 /* TIP EVALUATION FOR DEVICE */
@@ -510,8 +484,10 @@ export async function initTips(id_device) {
     const result = evaluateTip(tip, profile);
     if (result !== true) continue;
     /* ACCESS COUNT SINCE TIP CREATION */
-    const buildDay=new Date(tip.tp_build).toISOString().slice(0,10);
-    const accessDates=[...new Set((analytics||[]) .map(row=>new Date(row.an_date).toISOString().slice(0,10)) .filter(date=>date>=buildDay))];
+    /* CANCELLARE VECCHIA LOGICA DATE const buildDay=new Date(tip.tp_build).toISOString().slice(0,10);
+    const accessDates=[...new Set((analytics||[]) .map(row=>new Date(row.an_date).toISOString().slice(0,10)) .filter(date=>date>=buildDay))]; */
+    const buildDay=tip.tp_build;
+    const accessDates=[...new Set((analytics||[]) .map(row=>row.an_date) .filter(date=>date>=buildDay))];
     const accessCount=accessDates.length;
     /* PROGRESSION */
     const showCount = Number(view?.tv_show || 0);
@@ -522,30 +498,30 @@ export async function initTips(id_device) {
   return candidates;
 }
 
-/* SELECT FIRST ELIGIBLE TIP */
-export function selectTip(candidates){
-if(!candidates||!candidates.length)return null;
-const eligible=candidates.filter(item=>item.eligible===true);
-if(!eligible.length)return null;
-eligible.sort((a,b)=>{
-const showA=Number(a.view?.tv_show||0);
-const showB=Number(b.view?.tv_show||0);
-if(showA!==showB)return showA-showB;
-const buildA=new Date(a.tip.tp_build).getTime();
-const buildB=new Date(b.tip.tp_build).getTime();
-if(buildA!==buildB)return buildA-buildB;
-const dateA=a.view?.tv_date?new Date(a.view.tv_date).getTime():0;
-const dateB=b.view?.tv_date?new Date(b.view.tv_date).getTime():0;
-return dateA-dateB;
-});
-return eligible[0];
-}
+    /* SELECT FIRST ELIGIBLE TIP */
+    export function selectTip(candidates){
+    if(!candidates||!candidates.length)return null;
+    const eligible=candidates.filter(item=>item.eligible===true);
+    if(!eligible.length)return null;
+    eligible.sort((a,b)=>{
+    const showA=Number(a.view?.tv_show||0);
+    const showB=Number(b.view?.tv_show||0);
+    if(showA!==showB)return showA-showB;
+    const buildA=new Date(a.tip.tp_build).getTime();
+    const buildB=new Date(b.tip.tp_build).getTime();
+    if(buildA!==buildB)return buildA-buildB;
+    const dateA=a.view?.tv_date?new Date(a.view.tv_date).getTime():0;
+    const dateB=b.view?.tv_date?new Date(b.view.tv_date).getTime():0;
+    return dateA-dateB;
+    });
+    return eligible[0];
+    }
 
-/* INIT AND SELECT TIP */
-export async function getTipForDevice(id_device){
-const candidates=await initTips(id_device);
-return selectTip(candidates);
-}
+    /* INIT AND SELECT TIP */
+    export async function getTipForDevice(id_device){
+    const candidates=await initTips(id_device);
+    return selectTip(candidates);
+    }
 
 /* UPDATE TIP VIEW */
 export async function updateTipView(id_tips,id_device,values={}){
