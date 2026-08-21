@@ -259,29 +259,28 @@ export function calculateProgression(interval, growth, repeat) {
 /* DEFAULT TIP */
 export function defaultTip() {
   return {
-    id_tips: "",
-    tp_type: "bubble",
-    tp_icon: "⭐",
-    tp_title: "",
-    tp_text: "",
-    tp_analytics_1: "an_open",
-    tp_condition_1: ">=",
-    tv_value_1: "",
-    tp_logic_1: "",
-    tp_analytics_2: "",
-    tp_condition_2: ">=",
-    tv_value_2: "",
-    tp_logic_2: "",
-    tp_analytics_3: "",
-    tp_condition_3: ">=",
-    tv_value_3: "",
-    tp_repeat: 1,
-    tp_interval: 1,
-    tp_growth: 1,
-    tp_cta_active: false,
-    tp_cta_label: "",
-    tp_cta_url: "",
-    tp_active: false
+    tp_type:"bubble",
+    tp_icon:"⭐",
+    tp_title:"",
+    tp_text:"",
+    tp_analytics_1:"an_open",
+    tp_condition_1:">=",
+    tv_value_1:"",
+    tp_logic_1:"",
+    tp_analytics_2:"",
+    tp_condition_2:">=",
+    tv_value_2:"",
+    tp_logic_2:"",
+    tp_analytics_3:"",
+    tp_condition_3:">=",
+    tv_value_3:"",
+    tp_repeat:1,
+    tp_interval:1,
+    tp_growth:1,
+    tp_cta_active:false,
+    tp_cta_label:"",
+    tp_cta_url:"",
+    tp_active:false
   };
 }
 
@@ -297,40 +296,44 @@ export async function loadTip(id) {
 }
 
 /* SAVE */
-export async function saveTip(tip) {
-  const now = new Date().toISOString();
-  /* NUOVO TIP */
-  const isNew = !tip.id_tips;
-  let buildDate;
-  let previousEstimated = 0;
-  let previousEstimatedDate = null;
-  if (isNew) {buildDate = now;
-  } else {const { data: current, error: readError } = await supabase
+export async function saveTip(tip){
+  const now=new Date().toISOString().slice(0,10);
+  const isNew=!tip.id_tips;
+  let buildDate=now;
+  let previousEstimated=0;
+  let previousEstimatedDate=null;
+  if(!isNew){const {data:current,error}=await supabase
       .from("tips")
       .select("id_tips,tp_build,tp_estimated,tp_estimated_date")
-      .eq("id_tips", tip.id_tips)
+      .eq("id_tips",tip.id_tips)
       .single();
-    if (readError) throw readError;
-    /* tp_build NON CAMBIA MAI */
-    buildDate = current.tp_build;
-    /* Valori già accumulati */
-    previousEstimated = Number(current.tp_estimated || 0);
-    previousEstimatedDate = current.tp_estimated_date;
+    if(error)throw error;
+    buildDate=current.tp_build;
+    previousEstimated=Number(current.tp_estimated||0);
+    previousEstimatedDate=current.tp_estimated_date;
   }
-  const payload = {...tip, tp_build: buildDate, tp_estimated_date: now};
-  /* Per un nuovo tip l'impact parte da zero e viene calcolato sulla situazione attuale.
-     Per un tip esistente simulateTip() dovrà restituire solamente i nuovi device non ancora conteggiati. */
-  const impact = await simulateTip(payload, previousEstimatedDate);
-  payload.tp_estimated = previousEstimated + impact.involved;
-  /* Per un nuovo tip il DB deve generare automaticamente id_tips. Non inviamo id_tips vuoto. */
-  if (isNew) {delete payload.id_tips;}
-  const { data, error } = await supabase
-    .from("tips")
-    .upsert(payload)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  const payload={...tip,tp_build:buildDate,tp_estimated_date:now};
+  const impact=await simulateTip(payload,previousEstimatedDate);
+  payload.tp_estimated=previousEstimated+impact.involved;
+  let result;
+  if(isNew){delete payload.id_tips;
+    const {data,error}=await supabase
+      .from("tips")
+      .insert(payload)
+      .select()
+      .single();
+    if(error)throw error;
+    result=data;
+  }else{const {data,error}=await supabase
+      .from("tips")
+      .update(payload)
+      .eq("id_tips",tip.id_tips)
+      .select()
+      .single();
+    if(error)throw error;
+    result=data;
+  }
+  return result;
 }
 
 /* TIP PROFILE */
@@ -397,33 +400,53 @@ return result;
 }
 
 /* TIP SIMULATION */
-export async function simulateTip(tip, fromDate = null) {
-  const { data: analytics, error: analyticsError } = await supabase
+export async function simulateTip(tip,fromDate=null){
+  const {data:analytics,error:analyticsError}=await supabase
     .from("analytics")
     .select("*")
-    .order("an_date", { ascending: false });
-  if (analyticsError) throw analyticsError;
-  const { data: devices, error: devicesError } = await supabase
+    .order("an_date",{ascending:false});
+  if(analyticsError)throw analyticsError;
+  const {data:devices,error:devicesError}=await supabase
     .from("devices")
     .select("id_device,dv_platform,dv_app,dv_entrance");
-  if (devicesError) throw devicesError;
-  const profiles = buildTipProfiles(devices, analytics);
-  const conditions = buildTipConditions(tip);
-  let involved = 0;
-  let excluded = 0;
-  let missing = 0;
-  profiles.forEach(profile => {const result = evaluateTip(tip, profile);
-    if (result !== true) {if (result === false) excluded++; else missing++; return;}
-    /* NUOVO TIP: tutti i device che soddisfano le condizioni. */
-    if (!fromDate) {involved++; return;}
-    /* TIP ESISTENTE: consideriamo solo i device che hanno avuto attività a partire dalla precedente tp_estimated_date. */
-    const deviceAnalytics = (analytics || []).filter(row => row.id_device === profile.device.id_device && new Date(row.an_date) >= new Date(fromDate));
-    if (deviceAnalytics.length > 0) {involved++;}});
-  const detail = [];
-  conditions.forEach((item, index) => {const field = ANALYTICS_FIELDS[item.analytics];
-    detail.push({logic: index === 0 ? "" : item.logic, label: field ? field.label : item.analytics, condition: item.condition, value: item.value});});
-  const total = profiles.size;
-  return {total, involved, excluded, missing, percent: total ? Math.round(involved / total * 100) : 0, detail};
+  if(devicesError)throw devicesError;
+  const profiles=buildTipProfiles(devices,analytics);
+  const conditions=buildTipConditions(tip);
+  let involved=0,excluded=0,missing=0;
+  profiles.forEach(profile=>{
+    const result=evaluateTip(tip,profile);
+    if(result===false){excluded++;return;}
+    if(result!==true){missing++;return;}
+    if(!fromDate){
+      involved++;
+      return;
+    }
+    const deviceId=profile.device.id_device;
+    const hasNewActivity=(analytics||[]).some(row=>
+      row.id_device===deviceId &&
+      new Date(row.an_date)>=new Date(fromDate)
+    );
+    if(hasNewActivity)involved++;
+  });
+  const detail=[];
+  conditions.forEach((item,index)=>{
+    const field=ANALYTICS_FIELDS[item.analytics];
+    detail.push({
+      logic:index===0?"":item.logic,
+      label:field?field.label:item.analytics,
+      condition:item.condition,
+      value:item.value
+    });
+  });
+  const total=profiles.size;
+  return {
+    total,
+    involved,
+    excluded,
+    missing,
+    percent:total?Math.round(involved/total*100):0,
+    detail
+  };
 }
 
 /* TIP EVALUATION FOR DEVICE */
@@ -473,55 +496,29 @@ export async function initTips(id_device) {
   if (analyticsError) throw analyticsError;
   const profiles = buildTipProfiles([device], analytics);
   const profile = profiles.get(id_device);
-  const viewsMap = new Map(
-    (views || []).map(view => [view.id_tips, view])
-  );
+  const viewsMap = new Map((views || []).map(view => [view.id_tips, view]));
   const candidates = [];
   for (const tip of tips) {
     const view = viewsMap.get(tip.id_tips);
     /* TIP DISABLED */
     if (view?.tv_disabled) continue;
     /* MAX ONE TIP PER DAY */
-    if (
-      view?.tv_date &&
-      new Date(view.tv_date).toDateString() === new Date().toDateString()
-    ) {
+    if (view?.tv_date && new Date(view.tv_date).toDateString() === new Date().toDateString()) {
       continue;
     }
     /* ANALYTICS CONDITIONS */
     const result = evaluateTip(tip, profile);
     if (result !== true) continue;
     /* ACCESS COUNT SINCE TIP CREATION */
-    const buildDay = new Date(tip.tp_build)
-      .toISOString()
-      .slice(0, 10);
-    const accessDates = [
-      ...new Set(
-        (analytics || [])
-          .map(row => row.an_date)
-          .filter(date => date > buildDay)
-      )
-    ];
-    const accessCount = accessDates.length;
+    const buildDay=new Date(tip.tp_build).toISOString().slice(0,10);
+    const accessDates=[...new Set((analytics||[]) .map(row=>new Date(row.an_date).toISOString().slice(0,10)) .filter(date=>date>=buildDay))];
+    const accessCount=accessDates.length;
     /* PROGRESSION */
     const showCount = Number(view?.tv_show || 0);
-    const progression = calculateProgression(
-      tip.tp_interval,
-      tip.tp_growth,
-      tip.tp_repeat
-    );
+    const progression = calculateProgression(tip.tp_interval, tip.tp_growth, tip.tp_repeat);
     const nextPosition = progression[showCount];
-    const eligible =
-      nextPosition !== undefined &&
-      accessCount >= nextPosition;
-    candidates.push({
-      tip,
-      view: view || null,
-      condition: result,
-      eligible,
-      accessCount
-    });
-  }
+    const eligible = nextPosition !== undefined && accessCount >= nextPosition;
+    candidates.push({tip, view: view || null, condition: result, eligible, accessCount});}
   return candidates;
 }
 
@@ -552,26 +549,26 @@ return selectTip(candidates);
 
 /* UPDATE TIP VIEW */
 export async function updateTipView(id_tips,id_device,values={}){
-const {data:current,error:readError}=await supabase
-.from("tips_views")
-.select("id_tips,id_device,tv_show,tv_date,tv_disabled,tv_cta")
-.eq("id_tips",id_tips)
-.eq("id_device",id_device)
-.maybeSingle();
-if(readError)throw readError;
-const payload={
-tv_show:Number(current?.tv_show||0)+1,
-tv_date:new Date().toISOString()
-};
-if(values.disabled)payload.tv_disabled=new Date().toISOString();
-if(values.cta)payload.tv_cta=Number(current?.tv_cta||0)+1;
-const {data,error}=await supabase
-.from("tips_views")
-.upsert({id_tips,id_device,...payload})
-.select()
-.single();
-if(error)throw error;
-return data;
+  const {data:current,error:readError}=await supabase
+    .from("tips_views")
+    .select("id_tips,id_device,tv_show,tv_date,tv_disabled,tv_cta")
+    .eq("id_tips",id_tips)
+    .eq("id_device",id_device)
+    .maybeSingle();
+  if(readError)throw readError;
+  const payload={
+    tv_show:Number(current?.tv_show||0)+1,
+    tv_date:new Date().toISOString(),
+    tv_cta:Number(current?.tv_cta||0)+Number(values.cta||0)
+  };
+  if(values.disabled)payload.tv_disabled=new Date().toISOString();
+  const {data,error}=await supabase
+    .from("tips_views")
+    .upsert({id_tips,id_device,...payload})
+    .select()
+    .single();
+  if(error)throw error;
+  return data;
 }
 
 /* RENDER TIP */
@@ -634,48 +631,81 @@ export function renderTip(tip,id_device){
     box.appendChild(content);
   }
 /* ACTIONS */
-if (model.acknowledge) {
-const actions = document.createElement("div");
-actions.style.cssText = `display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:20px;${model.shape === "modal" ? "justify-content:center;" : ""}`;
-/* GOT IT / DON'T REMIND ME */
-if (Number(tip.tp_repeat) !== 1) {
-const remind = document.createElement("button");
-remind.type = "button";
-remind.innerHTML = `<span style="display:block;line-height:1.1;">Got it</span><span class="aroundo-remind-label" style="display:block;margin-top:3px;font-size:11px;text-decoration:none;">Don't remind me</span>`;
-remind.style.cssText = `border:1px solid ${model.color};border-radius:8px;background:transparent;color:${model.color};padding:6px 10px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;text-align:center;opacity:.82;transition:opacity .15s ease,transform .15s ease,background .15s ease;`;
-let dontRemind = false;
-remind.onmouseenter = () => { if (!dontRemind) remind.style.opacity = "1"; remind.style.transform = "translateY(-1px)"; };
-remind.onmouseleave = () => { remind.style.opacity = dontRemind ? "1" : ".82"; remind.style.transform = "translateY(0)"; };
-remind.onclick = () => { dontRemind = !dontRemind; const label = remind.querySelector(".aroundo-remind-label"); label.style.textDecoration = dontRemind ? "line-through" : "none"; remind.style.opacity = dontRemind ? "1" : ".82"; };
-actions.appendChild(remind);
-}
-/* CTA */
-if (tip.tp_cta_active && tip.tp_cta_label) {
-const cta = document.createElement("a");
-cta.textContent = tip.tp_cta_label;
-cta.href = tip.tp_cta_url || "#";
-cta.target = "_blank";
-cta.rel = "noopener";
-cta.style.cssText = `display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:18px;background:#9333ea;color:#ffffff;text-decoration:none;font-weight:600;font-size:13px;transition:transform .15s ease,background .15s ease;`;
-cta.onmouseenter = () => { cta.style.background = "#7e22ce"; cta.style.transform = "translateY(-1px)"; };
-cta.onmouseleave = () => { cta.style.background = "#9333ea"; cta.style.transform = "translateY(0)"; };
-cta.onclick = async () => {
-await updateTipView(tip.id_tips,id_device,{cta:true});
-};  
-actions.appendChild(cta);
-}
-/* OK */
-const ok = document.createElement("button");
-ok.type = "button";
-ok.textContent = "OK";
-ok.style.cssText = `border:none;border-radius:18px;padding:9px 20px;background:#22c55e;color:white;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:transform .15s ease,background .15s ease;`;
-ok.onmouseenter = () => { ok.style.background = "#16a34a"; ok.style.transform = "translateY(-1px)"; };
-ok.onmouseleave = () => { ok.style.background = "#22c55e"; ok.style.transform = "translateY(0)"; };
-ok.onclick = async () => {overlay.remove();
-await updateTipView(tip.id_tips,id_device,{disabled:dontRemind});
-};
-actions.appendChild(ok);
-box.appendChild(actions);
+if(model.acknowledge){
+  const actions=document.createElement("div");
+  actions.style.cssText=`display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:20px;${model.shape==="modal"?"justify-content:center;":""}`;
+  let dontRemind=false;
+  let ctaClicks=0;
+  /* GOT IT / DON'T REMIND ME */
+  if(Number(tip.tp_repeat)!==1){
+    const remind=document.createElement("button");
+    remind.type="button";
+    remind.innerHTML=`<span style="display:block;line-height:1.1;">Got it</span><span class="aroundo-remind-label" style="display:block;margin-top:3px;font-size:11px;text-decoration:none;">Don't remind me</span>`;
+    remind.style.cssText=`border:1px solid ${model.color};border-radius:8px;background:transparent;color:${model.color};padding:6px 10px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;text-align:center;opacity:.82;transition:opacity .15s ease,transform .15s ease,background .15s ease;`;
+    remind.onmouseenter=()=>{
+      if(!dontRemind)remind.style.opacity="1";
+      remind.style.transform="translateY(-1px)";
+    };
+    remind.onmouseleave=()=>{
+      remind.style.opacity=dontRemind?"1":".82";
+      remind.style.transform="translateY(0)";
+    };
+    remind.onclick=()=>{
+      dontRemind=!dontRemind;
+      const label=remind.querySelector(".aroundo-remind-label");
+      label.style.textDecoration=dontRemind?"line-through":"none";
+      remind.style.opacity=dontRemind?"1":".82";
+    };
+    actions.appendChild(remind);
+  }
+  /* CTA */
+  if(tip.tp_cta_active&&tip.tp_cta_label){
+    const cta=document.createElement("a");
+    cta.textContent=tip.tp_cta_label;
+    cta.href=tip.tp_cta_url||"#";
+    cta.target="_blank";
+    cta.rel="noopener";
+    cta.style.cssText=`display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:18px;background:#9333ea;color:#ffffff;text-decoration:none;font-weight:600;font-size:13px;transition:transform .15s ease,background .15s ease;`;
+    cta.onmouseenter=()=>{
+      cta.style.background="#7e22ce";
+      cta.style.transform="translateY(-1px)";
+    };
+    cta.onmouseleave=()=>{
+      cta.style.background="#9333ea";
+      cta.style.transform="translateY(0)";
+    };
+    cta.onclick=()=>{
+      ctaClicks++;
+    };
+    actions.appendChild(cta);
+  }
+  /* OK */
+  const ok=document.createElement("button");
+  ok.type="button";
+  ok.textContent="OK";
+  ok.style.cssText=`border:none;border-radius:18px;padding:9px 20px;background:#22c55e;color:white;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:transform .15s ease,background .15s ease;`;
+  ok.onmouseenter=()=>{
+    ok.style.background="#16a34a";
+    ok.style.transform="translateY(-1px)";
+  };
+  ok.onmouseleave=()=>{
+    ok.style.background="#22c55e";
+    ok.style.transform="translateY(0)";
+  };
+  ok.onclick=async()=>{
+    ok.disabled=true;
+    overlay.remove();
+    await updateTipView(
+      tip.id_tips,
+      id_device,
+      {
+        disabled:dontRemind,
+        cta:ctaClicks
+      }
+    );
+  };
+  actions.appendChild(ok);
+  box.appendChild(actions);
 }
 /* BANNER LAYOUT */
 if (model.shape === "banner") {
