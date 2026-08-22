@@ -105,28 +105,13 @@ textarea {
 }
 
 input:disabled,
-select:disabled {
-  background: #f3f4f6;
-  color: #9ca3af;
-}
-
-textarea:disabled {
-  background: #f3f4f6;
-  color: #9ca3af;
-}
-
-input:disabled,
 select:disabled,
 textarea:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
   cursor: not-allowed;
 }
 
-input:disabled:hover,
-select:disabled:hover,
-textarea:disabled:hover {
-  cursor: not-allowed;
-}
-      
 textarea {
   min-height: 100px;
   resize: vertical;
@@ -167,18 +152,6 @@ textarea {
   visibility: hidden;
 }
 
-.condition-row select:disabled,
-.condition-row input:disabled {
-  background: #f3f4f6;
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.logic-inline-field {
-  flex: 0 0 120px;
-  min-width: 0;
-}
-
 .progression {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
@@ -198,7 +171,7 @@ textarea {
 }
 
 .progression-field label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   margin-bottom: 6px;
 }
@@ -209,6 +182,7 @@ textarea {
   font-weight: bold;
   text-align: center;
   padding: 7px 8px;
+  margin-bottom: 10px;    
 }
 
 .progression-settings .estimated-summary {
@@ -302,11 +276,6 @@ textarea {
   margin-top: 10px;
   display: grid;
   gap: 4px;
-}
-
-.simulation-title {
-  font-weight: bold;
-  margin-bottom: 5px;
 }
 
 .simulation-row {
@@ -478,7 +447,6 @@ textarea {
   <div id="progression" class="progression">
   </div>
   <!-- IMPACT -->
-  <div id="estimatedSummary" class="estimated-summary"></div>    
   <div id="simulation" class="simulation">
   </div>
 </div>
@@ -671,41 +639,33 @@ function updateConditionSelect(index) {
   item.value.title = field.description;
 }
 
-function updateLogicRows() {
-  const hasLogic1 = !!logic1.value;
-  const hasLogic2 = !!logic2.value;
-  /* CONDITION 1: sempre abilitata. */
-  /* CONDITION 2: attiva solo se CONDITION 1 ha una Logic. */
-  const condition2Enabled = hasLogic1;
-  /* CONDITION 3: attiva solo se CONDITION 2 ha una Logic. */
-  const condition3Enabled = hasLogic2;
-  setConditionEnabled(2, condition2Enabled);
-  setConditionEnabled(3, condition3Enabled);
-}
-
 function setConditionEnabled(index, enabled) {
   const item = conditions[index];
   if (!item) return;
   item.analytics.disabled = !enabled;
   item.condition.disabled = !enabled;
   item.value.disabled = !enabled;
-  const logic = index === 1
-    ? logic1
-    : index === 2
-      ? logic2
-      : null;
-  if (logic) {logic.disabled = !enabled;}
-  /* Quando una condition viene disattivata, viene completamente azzerata. */
+  const logic =
+    index === 1 ? logic1 :
+    index === 2 ? logic2 :
+    null;
+  if (logic) {
+    logic.disabled = !enabled;
+  }
+  // Quando una condition viene disattivata,
+  // azzera completamente tutti i suoi valori.
   if (!enabled) {
     item.analytics.value = "";
     item.condition.innerHTML = "";
     item.condition.disabled = true;
-    if (item.value.tagName === "SELECT") {item.value.innerHTML = "";}
     item.value.value = "";
     item.value.disabled = true;
-    if (logic) {logic.value = ""; logic.disabled = true;}
+    if (logic) {
+      logic.value = "";
+      logic.disabled = true;
+    }
   }
-}      
+}     
 
 /* ACTIVE */
 function updateActive() {
@@ -789,21 +749,25 @@ function updateProgression() {
 
 /* UPDATE */
 function update() {
+  // CONDITION 1: sempre attiva
+  setConditionEnabled(1, true);
   updateConditionSelect(1);
+  // CONDITION 2: attiva solo se Logic 1 è valorizzata
   if (!logic1.value) {
-    (2, false);
-    (3, false);
+    setConditionEnabled(2, false);
+    setConditionEnabled(3, false);
     updateProgression();
     return;
   }
-  (2, true);
+  setConditionEnabled(2, true);
   updateConditionSelect(2);
+  // CONDITION 3: attiva solo se Logic 2 è valorizzata
   if (!logic2.value) {
-    (3, false);
+    setConditionEnabled(3, false);
     updateProgression();
     return;
   }
-  (3, true);
+  setConditionEnabled(3, true);
   updateConditionSelect(3);
   updateProgression();
 }
@@ -817,7 +781,6 @@ Object.values(conditions)
       - aggiorniamo il campo Value
       - aggiorniamo la visibilità delle righe */
           updateConditionSelect(Number(item.analytics.id .split("_") .pop()));
-          updateLogicRows();
           updateProgression();
         }
       );
