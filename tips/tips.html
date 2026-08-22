@@ -671,28 +671,6 @@ function updateConditionSelect(index) {
   item.value.title = field.description;
 }
 
-/* CONDITION ROW VISIBILITY */
-function setConditionEnabled(index, enabled) {
-  const item = conditions[index];
-  item.analytics.disabled = !enabled;
-  item.condition.disabled = !enabled;
-  item.value.disabled = !enabled;
-  if (index === 1) {
-    logic1.disabled = !enabled;
-  }
-  if (index === 2) {
-    logic2.disabled = !enabled;
-  }
-  if (!enabled) {
-    item.analytics.value = "";
-    item.condition.value = "";
-    item.value.value = "";
-    if (index === 2) {
-      logic2.value = "";
-    }
-  }
-}
-
 function updateLogicRows() {
   const hasLogic1 = !!logic1.value;
   const hasLogic2 = !!logic2.value;
@@ -813,19 +791,19 @@ function updateProgression() {
 function update() {
   updateConditionSelect(1);
   if (!logic1.value) {
-    setConditionEnabled(2, false);
-    setConditionEnabled(3, false);
+    (2, false);
+    (3, false);
     updateProgression();
     return;
   }
-  setConditionEnabled(2, true);
+  (2, true);
   updateConditionSelect(2);
   if (!logic2.value) {
-    setConditionEnabled(3, false);
+    (3, false);
     updateProgression();
     return;
   }
-  setConditionEnabled(3, true);
+  (3, true);
   updateConditionSelect(3);
   updateProgression();
 }
