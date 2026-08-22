@@ -1610,8 +1610,9 @@ function renderEvents() {
     // Dimensione dei Markers  
     function createIcon(color, state) {
       const size = markerSizes[state] || 10;
-      return L.divIcon({ className: '', html: `<div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div>`,
-      iconSize: [size, size]
+      return L.divIcon({className: '', html: `<div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div>`,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2]
       });
     }
 
