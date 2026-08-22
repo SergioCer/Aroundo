@@ -564,11 +564,11 @@ function updateConditionSelect(index) {
   const field = getAnalyticsFields()
     .find(x => x.value === currentAnalytics);
 
-  /* ANALYTICS NON SELEZIONATO */
+  // Analytics vuoto:
+  // NON decidiamo qui se la riga è abilitata/disabilitata.
+  // Lo stato della riga è gestito esclusivamente da Logic 1 / Logic 2.
   if (!field) {
     item.condition.innerHTML = "";
-    item.condition.disabled = true;
-    item.value.disabled = true;
     return;
   }
 
@@ -591,20 +591,15 @@ function updateConditionSelect(index) {
     item.condition.value = currentCondition;
   }
   else if (
-    availableConditions.includes(
-      tip[`tp_condition_${index}`]
-    )
+    availableConditions.includes(tip[`tp_condition_${index}`])
   ) {
-    item.condition.value =
-      tip[`tp_condition_${index}`];
+    item.condition.value = tip[`tp_condition_${index}`];
   }
   else {
-    item.condition.value =
-      availableConditions[0];
+    item.condition.value = availableConditions[0];
   }
 
-  const selectedCondition =
-    item.condition.value;
+  const selectedCondition = item.condition.value;
 
   /* NULL CONDITIONS */
   if (
@@ -612,9 +607,7 @@ function updateConditionSelect(index) {
     selectedCondition === "IS NOT NULL"
   ) {
     if (item.value.tagName !== "INPUT") {
-      const input =
-        document.createElement("input");
-
+      const input = document.createElement("input");
       input.id = `tv_value_${index}`;
       item.value.replaceWith(input);
       item.value = input;
@@ -623,58 +616,43 @@ function updateConditionSelect(index) {
     item.value.type = "text";
     item.value.value = "";
     item.value.placeholder = "";
+    item.value.disabled = false;
     return;
   }
 
   /* VALUE OPTIONS */
-  const valueOptions =
-    getTipValueOptions(
-      currentAnalytics,
-      tipOptions
-    );
+  const valueOptions = getTipValueOptions(
+    currentAnalytics,
+    tipOptions
+  );
 
   if (valueOptions) {
-
     if (item.value.tagName !== "SELECT") {
-      const select =
-        document.createElement("select");
-
+      const select = document.createElement("select");
       select.id = `tv_value_${index}`;
       item.value.replaceWith(select);
       item.value = select;
 
-      item.value.addEventListener(
-        "change",
-        update
-      );
+      item.value.addEventListener("change", update);
     }
 
     item.value.innerHTML = "";
 
-    const empty =
-      document.createElement("option");
-
+    const empty = document.createElement("option");
     empty.value = "";
     empty.textContent = "--";
-
     item.value.appendChild(empty);
 
     valueOptions.forEach(optionData => {
-      const option =
-        document.createElement("option");
-
+      const option = document.createElement("option");
       option.value = optionData.value;
       option.textContent = optionData.label;
-
       item.value.appendChild(option);
     });
 
     if (
       [...item.value.options]
-        .some(
-          option =>
-            option.value === currentValue
-        )
+        .some(option => option.value === currentValue)
     ) {
       item.value.value = currentValue;
     }
@@ -682,40 +660,26 @@ function updateConditionSelect(index) {
       item.value.value = "";
     }
 
-    item.value.title =
-      field.description;
-
+    item.value.title = field.description;
     return;
   }
 
   /* GENERIC VALUE */
-
   if (item.value.tagName !== "INPUT") {
-
-    const input =
-      document.createElement("input");
-
+    const input = document.createElement("input");
     input.id = `tv_value_${index}`;
-
     item.value.replaceWith(input);
-
     item.value = input;
 
-    item.value.addEventListener(
-      "input",
-      update
-    );
+    item.value.addEventListener("input", update);
   }
 
   item.value.type =
-    field.type === "string"
-      ? "text"
-      : "number";
+    field.type === "string" ? "text" : "number";
 
   item.value.placeholder = "Value";
   item.value.value = currentValue;
-  item.value.title =
-    field.description;
+  item.value.title = field.description;
 }
 
 function setConditionEnabled(index, enabled) {
@@ -726,22 +690,22 @@ function setConditionEnabled(index, enabled) {
   item.condition.disabled = !enabled;
   item.value.disabled = !enabled;
 
-  /* Logic esiste solo sulla Condition 2 */
   if (index === 2) {
     logic2.disabled = !enabled;
   }
 
   if (!enabled) {
-
     item.analytics.value = "";
 
     item.condition.innerHTML = "";
     item.condition.value = "";
 
     item.value.value = "";
+    item.value.disabled = true;
 
     if (index === 2) {
       logic2.value = "";
+      logic2.disabled = true;
     }
   }
 }
