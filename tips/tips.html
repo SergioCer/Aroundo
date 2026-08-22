@@ -110,6 +110,23 @@ select:disabled {
   color: #9ca3af;
 }
 
+textarea:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+input:disabled:hover,
+select:disabled:hover,
+textarea:disabled:hover {
+  cursor: not-allowed;
+}
+      
 textarea {
   min-height: 100px;
   resize: vertical;
@@ -303,7 +320,7 @@ textarea {
     <label>Value</label>
     <input id="tv_value_1" placeholder="Value">
   </div>
-  <div class="logic-inline-field" id="logicRow1" hidden>
+  <div class="logic-inline-field" id="logicRow1">
     <label>Logic</label>
     <select id="tp_logic_1">
       <option value="">--</option>
@@ -314,7 +331,7 @@ textarea {
   </div>
 </div>
 <!-- CONDITION 2 -->
-<div id="conditionRow2" class="row condition-row" hidden>
+<div id="conditionRow2" class="row condition-row">
   <div class="field">
     <label>Analytics</label>
     <select id="tp_analytics_2"></select>
@@ -327,7 +344,7 @@ textarea {
     <label>Value</label>
     <input id="tv_value_2" placeholder="Value">
   </div>
-  <div class="logic-inline-field" id="logicRow2" hidden>
+  <div class="logic-inline-field" id="logicRow2">
     <label>Logic</label>
     <select id="tp_logic_2">
       <option value="">--</option>
@@ -338,7 +355,7 @@ textarea {
   </div>
 </div>
 <!-- CONDITION 3 -->
-<div id="conditionRow3" class="row condition-row" hidden>
+<div id="conditionRow3" class="row condition-row">
   <div class="field">
     <label>Analytics</label>
     <select id="tp_analytics_3"></select>
@@ -576,20 +593,48 @@ function updateConditionSelect(index) {
 }
 
 /* CONDITION ROW VISIBILITY */
-function updateLogicRows(){
-const has1=!!conditions[1].analytics.value;
-const has2=has1&&!!logic1.value;
-document.getElementById("logicRow1").hidden=!has1;
-document.getElementById("conditionRow2").hidden=!has2;
-if(!has2){
-logic2.value="";
-document.getElementById("logicRow2").hidden=true;
-document.getElementById("conditionRow3").hidden=true;
-return;
+function setConditionEnabled(index, enabled) {
+  const item = conditions[index];
+  item.analytics.disabled = !enabled;
+  item.condition.disabled = !enabled;
+  item.value.disabled = !enabled;
+  if (index === 1) {
+    logic1.disabled = !enabled;
+  }
+  if (index === 2) {
+    logic2.disabled = !enabled;
+  }
+  if (!enabled) {
+    item.analytics.value = "";
+    item.condition.value = "";
+    item.value.value = "";
+    if (index === 2) {
+      logic2.value = "";
+    }
+  }
 }
-document.getElementById("logicRow2").hidden=false;
-const has3=!!conditions[2].analytics.value&&!!logic2.value;
-document.getElementById("conditionRow3").hidden=!has3;
+
+function updateLogicRows() {
+  /* CONDITION 1
+     Sempre completamente attiva. */
+  setConditionEnabled(1, true);
+  /* LOGIC 1
+     Sempre disponibile perché appartiene alla Condition 1. */
+  logic1.disabled = false;
+  /* CONDITION 2
+     Attiva solo se Logic 1 è valorizzata. */
+  const condition2Enabled = !!logic1.value;
+  setConditionEnabled(2, condition2Enabled);
+  if (!condition2Enabled) {
+    /* Se Condition 2 viene disattivata,
+       anche Condition 3 deve essere azzerata. */
+    setConditionEnabled(3, false);
+    return;
+  }
+  /* CONDITION 3
+     Attiva solo se Logic 2 è valorizzata. */
+  const condition3Enabled = !!logic2.value;
+  setConditionEnabled(3, condition3Enabled);
 }
 
 /* ACTIVE */
