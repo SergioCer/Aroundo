@@ -645,27 +645,21 @@ function setConditionEnabled(index, enabled) {
   item.analytics.disabled = !enabled;
   item.condition.disabled = !enabled;
   item.value.disabled = !enabled;
-  const logic =
-    index === 1 ? logic1 :
-    index === 2 ? logic2 :
-    null;
-  if (logic) {
-    logic.disabled = !enabled;
+  if (index === 2) {
+    logic2.disabled = !enabled;
   }
-  // Quando una condition viene disattivata,
-  // azzera completamente tutti i suoi valori.
   if (!enabled) {
     item.analytics.value = "";
     item.condition.innerHTML = "";
     item.condition.disabled = true;
     item.value.value = "";
     item.value.disabled = true;
-    if (logic) {
-      logic.value = "";
-      logic.disabled = true;
+    if (index === 2) {
+      logic2.value = "";
+      logic2.disabled = true;
     }
   }
-}     
+}  
 
 /* ACTIVE */
 function updateActive() {
@@ -749,10 +743,9 @@ function updateProgression() {
 
 /* UPDATE */
 function update() {
-  // CONDITION 1: sempre attiva
-  setConditionEnabled(1, true);
+  // Condition 1 è sempre attiva
   updateConditionSelect(1);
-  // CONDITION 2: attiva solo se Logic 1 è valorizzata
+  // Condition 2 dipende SOLO da Logic 1
   if (!logic1.value) {
     setConditionEnabled(2, false);
     setConditionEnabled(3, false);
@@ -761,7 +754,7 @@ function update() {
   }
   setConditionEnabled(2, true);
   updateConditionSelect(2);
-  // CONDITION 3: attiva solo se Logic 2 è valorizzata
+  // Condition 3 dipende SOLO da Logic 2
   if (!logic2.value) {
     setConditionEnabled(3, false);
     updateProgression();
