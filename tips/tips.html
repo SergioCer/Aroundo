@@ -132,8 +132,30 @@ textarea {
   resize: vertical;
 }
 
+.conditions-block {
+  margin-bottom: 15px;
+}
+
+.conditions-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 120px;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+
+.conditions-header div {
+  font-size: 12px;
+  font-weight: bold;
+}
+
 .condition-row {
   align-items: flex-end;
+  margin-bottom: 8px;
+}
+
+.condition-row .field,
+.condition-row .logic-inline-field {
+  min-width: 0;
 }
 
 .logic-inline-field {
@@ -141,12 +163,22 @@ textarea {
   min-width: 0;
 }
 
-.logic-inline-field label {
-  display: block;
-  font-size: 12px;
-  margin-bottom: 5px;
+.logic-placeholder {
+  visibility: hidden;
 }
-      
+
+.condition-row select:disabled,
+.condition-row input:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.logic-inline-field {
+  flex: 0 0 120px;
+  min-width: 0;
+}
+
 .progression {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
@@ -154,6 +186,38 @@ textarea {
   margin-top: 12px;
 }
 
+.progression-settings {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.progression-field {
+  flex: 0 0 120px;
+}
+
+.progression-field label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.progression-field input {
+  width: 90px;
+  font-size: 17px;
+  font-weight: bold;
+  text-align: center;
+  padding: 7px 8px;
+}
+
+.progression-settings .estimated-summary {
+  flex: 1;
+  margin-top: 0;
+  margin-bottom: 0;
+  min-width: 0;
+}
+      
 .step {
   min-width: 0;
   box-sizing: border-box;
@@ -306,84 +370,86 @@ textarea {
 <label>Text</label>
 <textarea id="tp_text" placeholder="Message text..."></textarea>
   </div>
-<!-- CONDITION 1 -->
-<div class="row condition-row">
-  <div class="field">
-    <label>Analytics</label>
-    <select id="tp_analytics_1"></select>
+<!-- CONDITIONS -->
+<div class="conditions-block">
+  <!-- HEADER -->
+  <div class="conditions-header">
+    <div>Analytics</div>
+    <div>Condition</div>
+    <div>Value</div>
+    <div>Logic</div>
   </div>
-  <div class="field">
-    <label>Condition</label>
-    <select id="tp_condition_1"></select>
+  <!-- CONDITION 1 -->
+  <div class="row condition-row">
+    <div class="field">
+      <select id="tp_analytics_1"></select>
+    </div>
+    <div class="field">
+      <select id="tp_condition_1"></select>
+    </div>
+    <div class="field">
+      <input id="tv_value_1" placeholder="Value">
+    </div>
+    <div class="logic-inline-field">
+      <select id="tp_logic_1">
+        <option value="">--</option>
+        <option value="AND">AND</option>
+        <option value="OR">OR</option>
+        <option value="NOT">NOT</option>
+      </select>
+    </div>
   </div>
-  <div class="field">
-    <label>Value</label>
-    <input id="tv_value_1" placeholder="Value">
+  <!-- CONDITION 2 -->
+  <div id="conditionRow2" class="row condition-row">
+    <div class="field">
+      <select id="tp_analytics_2"></select>
+    </div>
+    <div class="field">
+      <select id="tp_condition_2"></select>
+    </div>
+    <div class="field">
+      <input id="tv_value_2" placeholder="Value">
+    </div>
+    <div class="logic-inline-field">
+      <select id="tp_logic_2">
+        <option value="">--</option>
+        <option value="AND">AND</option>
+        <option value="OR">OR</option>
+        <option value="NOT">NOT</option>
+      </select>
+    </div>
   </div>
-  <div class="logic-inline-field" id="logicRow1">
-    <label>Logic</label>
-    <select id="tp_logic_1">
-      <option value="">--</option>
-      <option value="AND">AND</option>
-      <option value="OR">OR</option>
-      <option value="NOT">NOT</option>
-    </select>
+  <!-- CONDITION 3 -->
+  <div id="conditionRow3" class="row condition-row">
+    <div class="field">
+      <select id="tp_analytics_3"></select>
+    </div>
+    <div class="field">
+      <select id="tp_condition_3"></select>
+    </div>
+    <div class="field">
+      <input id="tv_value_3" placeholder="Value">
+    </div>
+    <!-- spazio vuoto equivalente a Logic -->
+    <div class="logic-inline-field logic-placeholder"></div>
   </div>
 </div>
-<!-- CONDITION 2 -->
-<div id="conditionRow2" class="row condition-row">
-  <div class="field">
-    <label>Analytics</label>
-    <select id="tp_analytics_2"></select>
+<!-- REPEAT / INTERVAL / GROWTH / ESTIMATED -->
+<div class="progression-settings">
+  <div class="progression-field">
+    <label>Repeat</label>
+    <input id="tp_repeat" type="number" min="0" max="999" value="1">
   </div>
-  <div class="field">
-    <label>Condition</label>
-    <select id="tp_condition_2"></select>
+  <div class="progression-field">
+    <label>Interval</label>
+    <input id="tp_interval" type="number" min="1" max="999" value="1">
   </div>
-  <div class="field">
-    <label>Value</label>
-    <input id="tv_value_2" placeholder="Value">
+  <div class="progression-field">
+    <label>Growth</label>
+    <input id="tp_growth" type="number" min="0" max="999" step="0.1" value="1">
   </div>
-  <div class="logic-inline-field" id="logicRow2">
-    <label>Logic</label>
-    <select id="tp_logic_2">
-      <option value="">--</option>
-      <option value="AND">AND</option>
-      <option value="OR">OR</option>
-      <option value="NOT">NOT</option>
-    </select>
-  </div>
+  <div id="estimatedSummary" class="estimated-summary"></div>
 </div>
-<!-- CONDITION 3 -->
-<div id="conditionRow3" class="row condition-row">
-  <div class="field">
-    <label>Analytics</label>
-    <select id="tp_analytics_3"></select>
-  </div>
-  <div class="field">
-    <label>Condition</label>
-    <select id="tp_condition_3"></select>
-  </div>
-  <div class="field">
-    <label>Value</label>
-    <input id="tv_value_3" placeholder="Value">
-  </div>
-</div>
-  <!-- REPEAT / INTERVAL / GROWTH -->
-  <div class="row">
-<div class="field">
-  <label>Repeat</label>
-  <input id="tp_repeat" type="number" min="0" value="1">
-</div>
-<div class="field">
-  <label>Interval</label>
-  <input id="tp_interval" type="number" min="1" value="1">
-</div>
-<div class="field">
-  <label>Growth</label>
-  <input id="tp_growth" type="number" step="0.1" value="1">
-</div>
-  </div>
   <!-- CTA -->
   <div class="row">
 <div class="field">
@@ -441,6 +507,19 @@ const interval = document.getElementById("tp_interval");
 const growth = document.getElementById("tp_growth");
 const progression = document.getElementById("progression");
 const simulation = document.getElementById("simulation");
+const ctaActive = document.getElementById("tp_cta_active");
+const ctaLabel = document.getElementById("tp_cta_label");
+const ctaUrl = document.getElementById("tp_cta_url");
+
+function updateCtaFields() {
+  const enabled = ctaActive.value === "true";
+  ctaLabel.disabled = !enabled;
+  ctaUrl.disabled = !enabled;
+  if (!enabled) {
+    ctaLabel.value = "";
+    ctaUrl.value = "";
+  }
+}      
 
 /* CONDITION ELEMENTS */
 const conditions = {
@@ -615,27 +694,40 @@ function setConditionEnabled(index, enabled) {
 }
 
 function updateLogicRows() {
-  /* CONDITION 1
-     Sempre completamente attiva. */
-  setConditionEnabled(1, true);
-  /* LOGIC 1
-     Sempre disponibile perché appartiene alla Condition 1. */
-  logic1.disabled = false;
-  /* CONDITION 2
-     Attiva solo se Logic 1 è valorizzata. */
-  const condition2Enabled = !!logic1.value;
+  const hasLogic1 = !!logic1.value;
+  const hasLogic2 = !!logic2.value;
+  /* CONDITION 1: sempre abilitata. */
+  /* CONDITION 2: attiva solo se CONDITION 1 ha una Logic. */
+  const condition2Enabled = hasLogic1;
+  /* CONDITION 3: attiva solo se CONDITION 2 ha una Logic. */
+  const condition3Enabled = hasLogic2;
   setConditionEnabled(2, condition2Enabled);
-  if (!condition2Enabled) {
-    /* Se Condition 2 viene disattivata,
-       anche Condition 3 deve essere azzerata. */
-    setConditionEnabled(3, false);
-    return;
-  }
-  /* CONDITION 3
-     Attiva solo se Logic 2 è valorizzata. */
-  const condition3Enabled = !!logic2.value;
   setConditionEnabled(3, condition3Enabled);
 }
+
+function setConditionEnabled(index, enabled) {
+  const item = conditions[index];
+  if (!item) return;
+  item.analytics.disabled = !enabled;
+  item.condition.disabled = !enabled;
+  item.value.disabled = !enabled;
+  const logic = index === 1
+    ? logic1
+    : index === 2
+      ? logic2
+      : null;
+  if (logic) {logic.disabled = !enabled;}
+  /* Quando una condition viene disattivata, viene completamente azzerata. */
+  if (!enabled) {
+    item.analytics.value = "";
+    item.condition.innerHTML = "";
+    item.condition.disabled = true;
+    if (item.value.tagName === "SELECT") {item.value.innerHTML = "";}
+    item.value.value = "";
+    item.value.disabled = true;
+    if (logic) {logic.value = ""; logic.disabled = true;}
+  }
+}      
 
 /* ACTIVE */
 function updateActive() {
@@ -720,9 +812,21 @@ function updateProgression() {
 /* UPDATE */
 function update() {
   updateConditionSelect(1);
+  if (!logic1.value) {
+    setConditionEnabled(2, false);
+    setConditionEnabled(3, false);
+    updateProgression();
+    return;
+  }
+  setConditionEnabled(2, true);
   updateConditionSelect(2);
+  if (!logic2.value) {
+    setConditionEnabled(3, false);
+    updateProgression();
+    return;
+  }
+  setConditionEnabled(3, true);
   updateConditionSelect(3);
-  updateLogicRows();
   updateProgression();
 }
 
@@ -748,6 +852,8 @@ logic2.addEventListener("change", update);
 repeat.addEventListener("input", updateProgression);
 interval.addEventListener("input", updateProgression);
 growth.addEventListener("input", updateProgression);
+
+ctaActive.addEventListener("change", updateCtaFields);      
 
 /* PREVIEW */
 previewBtn.onclick = () => {renderTip({tp_type: type.value, tp_icon: icon.value, tp_title: title.value, tp_text: text.value, tp_repeat: Number(repeat.value),
@@ -837,25 +943,26 @@ function updateEstimatedSummary() {
       
 /* FILL */
 function fill() {
-  type.value = tip.tp_type || "bubble";
-  icon.value = tip.tp_icon || TIP_ICONS[0];
-  title.value = tip.tp_title || "";
-  text.value = tip.tp_text || "";
-  for (let i = 1; i <= 3; i++
-  ) {conditions[i] .analytics.value = tip[`tp_analytics_${i}`] || "";
-    conditions[i] .condition.value = tip[`tp_condition_${i}`] || ">=";
-    conditions[i] .value.value = tip[`tv_value_${i}`] || "";}
-  logic1.value = tip.tp_logic_1 ||"";
-  logic2.value = tip.tp_logic_2 ||"";
-  repeat.value = tip.tp_repeat ?? 1;
-  interval.value = tip.tp_interval ?? 1;
-  growth.value = tip.tp_growth ?? 1;
-  document.getElementById("tp_cta_active").value = tip.tp_cta_active ? "true" : "false";
-  document.getElementById("tp_cta_label").value = tip.tp_cta_label || "";
-  document.getElementById("tp_cta_url").value = tip.tp_cta_url || "";
-  updateActive();
-  updateEstimatedSummary();
-}
+      type.value = tip.tp_type || "bubble";
+      icon.value = tip.tp_icon || TIP_ICONS[0];
+      title.value = tip.tp_title || "";
+      text.value = tip.tp_text || "";
+      for (let i = 1; i <= 3; i++
+      ) {conditions[i] .analytics.value = tip[`tp_analytics_${i}`] || "";
+      conditions[i] .condition.value = tip[`tp_condition_${i}`] || ">=";
+      conditions[i] .value.value = tip[`tv_value_${i}`] || "";}
+      logic1.value = tip.tp_logic_1 ||"";
+      logic2.value = tip.tp_logic_2 ||"";
+      repeat.value = tip.tp_repeat ?? 1;
+      interval.value = tip.tp_interval ?? 1;
+      growth.value = tip.tp_growth ?? 1;
+      ctaActive.value = tip.tp_cta_active ? "true" : "false";
+      ctaLabel.value = tip.tp_cta_label || "";
+      ctaUrl.value = tip.tp_cta_url || "";
+      updateCtaFields();
+      updateActive();
+      updateEstimatedSummary();
+      }
 
 /* SAVE */
 window.save =
