@@ -1362,188 +1362,117 @@ document.addEventListener('DOMContentLoaded', async () => {
     return data;
   }
 
-  // ============================================================
 // DISPONE I MARKER DI UNA SERIE ATTORNO AL MARKER A
 // A = evento più prossimo temporalmente → centro reale
-// B = ore 12
-// C, D, E... = senso orario
-// Prima corona: massimo 6 marker oltre A
-// Seconda corona: massimo 12 marker
-// ============================================================
+// B = ore 12 C, D, E... = senso orario
+// Prima corona: massimo 6 marker oltre A Seconda corona: massimo 12 marker
+// CANCELLARE NON DOVREBBE SERVIRE 
 function arrangeMarkerSeries(group) {
-
   if (!group || group.length <= 1) {
     return;
   }
-
-  // ==========================================================
-  // A = primo evento temporalmente più vicino.
-  // A NON viene mai spostato.
-  // ==========================================================
-
+  // A = primo evento temporalmente più vicino. A NON viene mai spostato.
   const centerMarker = group[0];
-
   const centerLatLng = centerMarker.__baseLatLng;
-
   centerMarker.setLatLng(centerLatLng);
-
   // Tutti gli altri eventi della serie
   // sono disposti esclusivamente attorno ad A.
   const others = group.slice(1);
 
-  // ==========================================================
-  // DIMENSIONE REALE DEL MARKER
-  //
-  // NON leggiamo il DOM.
-  // Usiamo direttamente lo stato temporale del marker.
-  // ==========================================================
-
+  // DIMENSIONE REALE DEL MARKER NON leggiamo il DOM. Usiamo direttamente lo stato temporale del marker.
   function getMarkerDiameter(marker) {
-
     const size = markerSizes[marker.state];
-
     return Number.isFinite(size) ? size : 10;
   }
-
+  
   function getMarkerRadius(marker) {
     return getMarkerDiameter(marker) / 2;
   }
 
-  // ==========================================================
   // DISTRIBUZIONE DI UNA CORONA
-  //
-  // IMPORTANTISSIMO:
-  //
-  // l'angolo dipende dal NUMERO REALE di marker presenti
-  // nella corona, non dalla capacità massima della corona.
-  //
-  // index 0 = ore 12
-  // poi senso ORARIO.
-  // ==========================================================
-
+  // IMPORTANTISSIMO: l'angolo dipende dal NUMERO REALE di marker presenti nella corona, non dalla capacità massima della corona. index 0 = ore 12 poi senso ORARIO.
   function placeRing(ring, radiusFromCenter) {
-
     const count = ring.length;
-
     if (!count) {
       return;
     }
-
     const angleStep = 360 / count;
-
     ring.forEach((marker, index) => {
-
       const angle =
         markerLayout.startAngle +
         (angleStep * index);
-
       const radians =
         angle * Math.PI / 180;
-
       const centerPoint =
         map.latLngToLayerPoint(centerLatLng);
-
       const targetPoint = L.point(
         centerPoint.x +
           Math.cos(radians) * radiusFromCenter,
-
         centerPoint.y +
           Math.sin(radians) * radiusFromCenter
       );
-
       const targetLatLng =
         map.layerPointToLatLng(targetPoint);
-
       marker.setLatLng(targetLatLng);
     });
   }
 
-  // ==========================================================
   // PRIMA CORONA
-  //
   // massimo 6 marker oltre A.
-  // ==========================================================
-
   const firstRing =
     others.slice(
       0,
       markerLayout.firstRingCapacity
     );
-
-  // ==========================================================
   // DISTANZA DELLA PRIMA CORONA
-  //
   // A + gap + raggio del marker più grande della corona.
-  //
-  // Tutti i centri della corona hanno la STESSA distanza
-  // da A.
-  // ==========================================================
-
+  // Tutti i centri della corona hanno la STESSA distanza da A.
   let firstRingRadius = 0;
-
   firstRing.forEach(marker => {
-
     const requiredRadius =
       getMarkerRadius(centerMarker) +
       markerLayout.gap +
       getMarkerRadius(marker);
-
     firstRingRadius =
       Math.max(
         firstRingRadius,
         requiredRadius
       );
   });
-
   // Se la corona contiene marker, disponiamoli.
   placeRing(
     firstRing,
     firstRingRadius
   );
-
-  // ==========================================================
   // SECONDA CORONA
-  //
   // massimo 12 marker.
-  // ==========================================================
-
   const secondRing =
     others.slice(
       markerLayout.firstRingCapacity,
       markerLayout.firstRingCapacity +
         markerLayout.secondRingCapacity
     );
-
   if (secondRing.length) {
-
     // Troviamo il raggio esterno effettivo
     // della prima corona.
     let firstRingOuterRadius =
       firstRingRadius;
-
     firstRing.forEach(marker => {
-
       const outerRadius =
         firstRingRadius +
         getMarkerRadius(marker);
-
       firstRingOuterRadius =
         Math.max(
           firstRingOuterRadius,
           outerRadius
         );
     });
-
-    // Il centro della seconda corona deve stare
-    // oltre il bordo più esterno della prima.
+    // Il centro della seconda corona deve stare oltre il bordo più esterno della prima.
     let secondRingRadius =
       firstRingOuterRadius +
       markerLayout.gap;
-
-    // Aggiungiamo il raggio del marker più grande
-    // della seconda corona.
+    // Aggiungiamo il raggio del marker più grande della seconda corona.
     secondRing.forEach(marker => {
-
       secondRingRadius =
         Math.max(
           secondRingRadius,
@@ -1552,97 +1481,51 @@ function arrangeMarkerSeries(group) {
             getMarkerRadius(marker)
         );
     });
-
     placeRing(
       secondRing,
       secondRingRadius
     );
   }
-
-  // ==========================================================
-  // OLTRE LA SECONDA CORONA
-  //
-  // Per ora NON tocchiamo questi marker.
-  // Rimangono nella loro posizione reale.
-  //
-  // Li gestiremo quando introdurremo le corone successive.
-  // ==========================================================
-
-  others.slice(
+  // OLTRE LA SECONDA CORONA Per ora NON tocchiamo questi marker. Rimangono nella loro posizione reale. Li gestiremo quando introdurremo le corone successive.
+    others.slice(
     markerLayout.firstRingCapacity +
     markerLayout.secondRingCapacity
   ).forEach(marker => {
-
     marker.setLatLng(
       marker.__baseLatLng
     );
-
   });
 }
 
-// ============================================================
 // RAGGRUPPA I MARKER CHE HANNO LO STESSO PUNTO GEOGRAFICO
-// ============================================================
+// CANCELLARE NON DOVREBBE SERVIRE  
 function arrangeSameLocationSeries() {
-
   const groups = new Map();
-
-  // ==========================================================
-  // CREAZIONE DEI GRUPPI
-  //
-  // Usiamo SEMPRE la coordinata geografica originale.
+  // CREAZIONE DEI GRUPPI Usiamo SEMPRE la coordinata geografica originale.
   // Non quella eventualmente già spostata.
-  // ==========================================================
-
   markers.forEach(item => {
-
     const marker = item.marker;
-
     const lat = marker.__baseLatLng.lat;
     const lng = marker.__baseLatLng.lng;
-
     const key = `${lat},${lng}`;
-
     if (!groups.has(key)) {
       groups.set(key, []);
     }
-
     groups.get(key).push(marker);
   });
-
-  // ==========================================================
   // DISPOSIZIONE DELLE SERIE
-  // ==========================================================
-
   groups.forEach(group => {
-
-    // --------------------------------------------------------
-    // EVENTO SINGOLO
-    //
-    // NON deve essere modificato in alcun modo.
-    // --------------------------------------------------------
-
+    // EVENTO SINGOLO NON deve essere modificato in alcun modo.
     if (group.length === 1) {
-
       group[0].setLatLng(
         group[0].__baseLatLng
       );
-
       return;
     }
-
-    // --------------------------------------------------------
-    // ORDINE TEMPORALE
-    //
-    // A = evento più prossimo
-    // B = secondo
-    // C = terzo...
-    // --------------------------------------------------------
-
+    // ORDINE TEMPORALE A = evento più prossimo B = secondo C = terzo...
     group.sort(
       (a, b) => a.evTime - b.evTime
     );
-
     arrangeMarkerSeries(group);
   });
 }
@@ -1651,74 +1534,78 @@ function arrangeSameLocationSeries() {
        Azioni: rimuove i marker esistenti, calcola lo stato degli eventi, crea e registra i nuovi marker, 
        collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
        Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchEvents 30'; setinterval updateMarkerVisibility 2' . */
-    function renderEvents() {
-      // pulizia markers precedenti
-      markers.forEach(m => {
-      // ferma eventuali fireworks attivi
-      if (m.marker.fireworkInterval) {
-        clearInterval(m.marker.fireworkInterval);
-        m.marker.fireworkInterval = null;
-      }
-      markersCluster.removeLayer(m.marker);
-      });
-      markers = [];
-      events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
-      events.forEach(e => {
-        const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
-        const stateClass = stateData.state;
-        // 🎨 ICONA
-        const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
-          icon: createIcon(
-            categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999',
-            stateClass
-          )
-        });
-        marker.__baseLatLng = L.latLng(
-          e.luoghi.lu_lat,
-          e.luoghi.lu_lng
-        );
-        marker.evTime = new Date(e.ev_inizio).getTime();
-        marker.state = stateClass;
-        marker.__eventData = e;
-        marker.evInizio = e.ev_inizio;
-        markersCluster.addLayer(marker);
-        updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
-        // Visualizza i dettagli dell'evento selezionato con Popup //
-            const startDate = new Date(e.ev_inizio);
-            const now = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(now.getDate() + 1);
-            tomorrow.setHours(0,0,0,0);
-            const isToday = startDate.toDateString() === now.toDateString();
-            const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
-            // DA VERIFICARE: color, align e dayLabel risultano attualmente non utilizzati.
-            // Potrebbero essere residui della precedente gestione del popup.
-            // Non eliminare finché non viene verificato che non servano altrove.
-            const color = isToday ? '#3b82f6' : (isTomorrow ? '#dc3545' : '#666');
-            const align = isToday ? 'flex-start' : (isTomorrow ? 'flex-end' : 'center');
-            // Formatta la data per il popup
-            let dayLabel;
-            if (isToday) { dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-            } else if (isTomorrow) { dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-            } else { dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
-            }
-        /* Richiama il POPUP */
-        marker.on('click', function () {
-        analyticsMarker();
-        window.openBasePopup(e, this.getLatLng());
-        });
-        // 📦 STORAGE DATI (NO LOGICA)
-        markers.push({ marker, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
-      });
-      // Dopo aver creato tutti i marker, disponiamo le serie che condividono esattamente lo stesso punto geografico.
-// ==========================================================
-// DISPONE LE SERIE CONDIVIDENDO LO STESSO PUNTO
-// ==========================================================
-requestAnimationFrame(() => {
-  arrangeSameLocationSeries();
-  markersCluster.refreshClusters();
-});
+function renderEvents() {
+  markers.forEach(m => { if (m.marker.fireworkInterval) { clearInterval(m.marker.fireworkInterval); m.marker.fireworkInterval = null; } markersCluster.removeLayer(m.marker); });
+  markers = [];
+  events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
+  // Raggruppa gli eventi che hanno esattamente le stesse coordinate reali.
+  const groups = new Map();
+  events.forEach(e => {
+    const key = `${e.luoghi.lu_lat},${e.luoghi.lu_lng}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(e);
+  });
+  // Calcola le coordinate finali prima di creare i marker.
+  const positionedEvents = [];
+  groups.forEach(group => {
+    group.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
+    const center = L.latLng(group[0].luoghi.lu_lat, group[0].luoghi.lu_lng);
+    if (group.length === 1) {
+      positionedEvents.push({ e: group[0], latLng: center });
+      return;
     }
+    const firstRing = group.slice(1, 7);
+    const secondRing = group.slice(7, 19);
+    const centerState = getEventState(new Date(group[0].ev_inizio), group[0].ev_fine ? new Date(group[0].ev_fine) : null).state;
+    const centerRadius = (markerSizes[centerState] || 10) / 2;
+    const placeRing = (ring, baseRadius) => {
+      if (!ring.length) return;
+      const step = 360 / ring.length;
+      ring.forEach((e, i) => {
+        const state = getEventState(new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null).state;
+        const radius = (markerSizes[state] || 10) / 2;
+        const distance = baseRadius + markerLayout.gap + radius;
+        const angle = (markerLayout.startAngle + step * i) * Math.PI / 180;
+        const p = map.latLngToLayerPoint(center);
+        const target = L.point(p.x + Math.cos(angle) * distance, p.y + Math.sin(angle) * distance);
+        positionedEvents.push({ e, latLng: map.layerPointToLatLng(target) });
+      });
+    };
+    let firstRadius = 0;
+    firstRing.forEach(e => {
+      const state = getEventState(new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null).state;
+      firstRadius = Math.max(firstRadius, centerRadius + markerLayout.gap + (markerSizes[state] || 10) / 2);
+    });
+    positionedEvents.push({ e: group[0], latLng: center });
+    placeRing(firstRing, firstRadius);
+    if (secondRing.length) {
+      let secondBase = firstRadius;
+      firstRing.forEach(e => {
+        const state = getEventState(new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null).state;
+        secondBase = Math.max(secondBase, firstRadius + (markerSizes[state] || 10) / 2 + markerLayout.gap);
+      });
+      placeRing(secondRing, secondBase);
+    }
+    // Oltre 19 eventi: per ora restano sulla posizione reale.
+    group.slice(19).forEach(e => positionedEvents.push({ e, latLng: L.latLng(e.luoghi.lu_lat, e.luoghi.lu_lng) }));
+  });
+  positionedEvents.forEach(({ e, latLng }) => {
+    const stateData = getEventState(new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
+    const stateClass = stateData.state;
+    const marker = L.marker(latLng, {
+      icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)
+    });
+    marker.__baseLatLng = L.latLng(e.luoghi.lu_lat, e.luoghi.lu_lng);
+    marker.evTime = new Date(e.ev_inizio).getTime();
+    marker.state = stateClass;
+    marker.__eventData = e;
+    marker.evInizio = e.ev_inizio;
+    marker.on('click', function () { analyticsMarker(); window.openBasePopup(e, this.getLatLng()); });
+    markersCluster.addLayer(marker);
+    updateMarkerState(marker, stateClass, { lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng });
+    markers.push({ marker, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null });
+  });
+}
 
     // Dimensione dei Markers  
     function createIcon(color, state) {
