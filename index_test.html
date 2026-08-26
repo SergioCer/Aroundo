@@ -1357,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* RICOSTRUISCE I MARKER — ricrea la rappresentazione grafica di tutti gli eventi.
        Azioni: rimuove i marker esistenti, calcola lo stato degli eventi, crea e registra i nuovi marker, 
        collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
-       Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchEvents 30'; setinterval updateMarkerVisibility 2' . */
+       Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchEvents 30'; setinterval updateMarkerVisibility 2'.*/
     function renderEvents() {
       // pulizia markers precedenti
       markers.forEach(m => {
@@ -1377,36 +1377,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
           icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)
         })
-        marker.evTime = new Date(e.ev_inizio).getTime();
-        marker.__eventData = e; // sempre per spiderizza
-        marker.evInizio = e.ev_inizio; // prede ora inizio del marker per il spiderizza
-        markersCluster.addLayer(marker);
-        updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Fuochi d'artificio
-        // Visualizza i dettagli dell'evento selezionato con Popup //
-            const startDate = new Date(e.ev_inizio);
-            const now = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(now.getDate() + 1);
-            tomorrow.setHours(0,0,0,0);
-            const isToday = startDate.toDateString() === now.toDateString();
-            const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
-            // DA VERIFICARE: color, align e dayLabel risultano attualmente non utilizzati.
-            // Potrebbero essere residui della precedente gestione del popup.
-            // Non eliminare finché non viene verificato che non servano altrove.
-            const color = isToday ? '#3b82f6' : (isTomorrow ? '#dc3545' : '#666');
-            const align = isToday ? 'flex-start' : (isTomorrow ? 'flex-end' : 'center');
-            // Formatta la data per il popup
-            let dayLabel;
-            if (isToday) { dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-            } else if (isTomorrow) { dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
-            } else { dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
-            }
-        /* Richiama il POPUP */
-        marker.on('click', function () {
-        analyticsMarker();
-        window.openBasePopup(e, this.getLatLng());
-        });
-        // 📦 STORAGE DATI (NO LOGICA)
+        markersCluster.addLayer(marker); // Visualizzazione/Gestione dei marker
+        updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Effetti grafici e Fuochi d'artificio
+        marker.on('click', function () {analyticsMarker();
+        window.openBasePopup(e, this.getLatLng());});
         markers.push({ marker, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
     }
