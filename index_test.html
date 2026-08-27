@@ -1013,7 +1013,6 @@ OK
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 30, // 0 nessun cluster ; 150 tutto raggruppato
   disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster    
-  spiderfyOnMaxZoom: true,
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
   });
@@ -1385,7 +1384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Dimensione dei Markers  
+    // Dimensione, Classe e Colore dei Markers  
     function createIcon(color, state) {
       const size = markerSizes[state] || 10;
       return L.divIcon({ className: '', html: `<div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div>`,
@@ -1545,7 +1544,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       // evento terminato 
       if (endDate && now > endDate) return {state: 'finished' };
       /* evento partito */
-      let state;
       if (minutesFromStart > 0) {
       if (durationMinutes) {
         const progress = minutesFromStart / durationMinutes;
