@@ -1012,7 +1012,7 @@ OK
 
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 30, // 0 nessun cluster ; 150 tutto raggruppato
-  disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster    
+  disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster./* Funzione prevista da CANCELLARE con la nuova logica */    
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
   });
@@ -1059,7 +1059,7 @@ OK
    window.addEventListener('resize', resizeCanvas);
    map.on('move zoom resize', resizeCanvas);
 
-  // Aggiorna lo stato visivo dei marker ogni 2 minuti
+  // Aggiorna lo stato visivo dei marker ogni 2 minuti 
   setInterval(() => {renderEvents(); updateMarkerVisibility();}, 2 * 60 * 1000);
 
   // Ricarica gli eventi da Supabase ogni 30 minuti
@@ -1353,6 +1353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return data;
   }
 
+    /* Funzione prevista da MODIFICARE con la nuova logica */
     /* RICOSTRUISCE I MARKER — ricrea la rappresentazione grafica di tutti gli eventi.
        Azioni: rimuove i marker esistenti, calcola lo stato degli eventi, crea e registra i nuovi marker, 
        collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
@@ -1384,6 +1385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
+    /* Funzione prevista da CANCELLARE con la nuova logica */
     // Dimensione, Classe e Colore dei Markers  
     function createIcon(color, state) {
       const size = markerSizes[state] || 10;
@@ -1392,6 +1394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
+    /* Funzione prevista da MODIFICARE con la nuova logica */
     /* FILTRA I MARKER — determina quali marker devono essere visibili.
        Azioni: ricava categorie attive, verifica sovrapposizione temporale
        e aggiunge/rimuove i marker dal cluster; arresta eventuali fireworks
@@ -1533,6 +1536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
   }
 
+    /* Funzione prevista da CANCELLARE con la nuova logica */
     /* Determina lo stato temporale di un evento rispetto all'ora attuale.
        Azioni: calcola distanza dall'inizio e durata; assegna lo stato del marker (futuro, countdown, in corso o terminato).
        Chiamata da: renderEvents(). */
@@ -2084,6 +2088,7 @@ requestAnimationFrame(animateFX);
 }
 animateFX();
 
+    /* Funzione prevista da CANCELLARE con la nuova logica */
     /* Aggiorna lo stato visivo e i fireworks del marker.
        Azioni: imposta lo stato e avvia/interrompe i fireworks in base allo stato ricevuto.
        Chiamata da: renderEvents().*/
