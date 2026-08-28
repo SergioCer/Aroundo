@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <title>Aroundo - Territory Map</title>
+  <!--  per usarla come APP -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <!-- meta name="theme-color" content="#22c55e"-->
+  <meta name="theme-color" content="#3b82f6">
+  
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+  <style>
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+      background: #f4f1ea;
+    }
+
+    #map {
+      height: 100dvh;
+      width: 100%;
+    }
+
+    /* Riduce attributi Leaflet riferito ad OpenStreetMap */
+    .leaflet-control-attribution {
+      font-size: 8px;               /* più piccolo */
+      opacity: 0.5;                 /* meno invadente */
+      background: rgba(255,255,255,0.3);     /* leggermente trasparente */
+      padding: 2px 2px;
+    }
+
+    /* Stile Popup Informativi leaflet */
+    .leaflet-popup-content-wrapper {
+      padding: 2px 0;
+    }
+
+    .leaflet-popup-content {
+      margin: 4px 6px;
+    }
+
+    #fx-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100dvh;
+      width: 100%;
+      pointer-events: none;     /* Non blocca i click sulla mappa */
+      z-index: 9999;
+    }
+    
+    /* Titolo */
+    .title {
+      font-size: 22px;
+      color: #3b82f6;
+      letter-spacing: 1px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 1px;
+      height: 35px;
+    }
+
+    .title span {
+      display: inline-block;
+    }
+
+    .title span:nth-child(1) { transform: translateY(8px) rotate(-18deg); }
+    .title span:nth-child(2) { transform: translateY(4px) rotate(-12deg); }
+    .title span:nth-child(3) { transform: translateY(1px) rotate(-6deg); }
+    .title span:nth-child(4) { transform: translateY(0px); }
+    .title span:nth-child(5) { transform: translateY(1px) rotate(6deg); }
+    .title span:nth-child(6) { transform: translateY(4px) rotate(12deg); }
+    .title span:nth-child(7) { transform: translateY(8px) rotate(18deg); }
+
+    .map-overlay,
+    .map-overlay2,
+    .top-timebar,
+    .copyright,
+    #eventTicker {
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Sotto titolo */
+    .subtitle {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 18px;
+      margin-top: 2px;
+      font-size: 12px;
+      color: #6b6b6b;
+    }
+
+    /* -- Rettangolo Aroundo trasparente */
+    .map-overlay {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      padding: 20px;
+      border-radius: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);     /* Velocità */ 
+    }
+
+    /* stato “mini” in alto a destra */
+    .map-overlay.minimized {
+      top: 18px;
+      right: 2px;
+      left: auto;
+      transform: none;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    /* icona toggle */
+    #overlayToggle {
+      position: fixed;
+      top: 18px;
+      right: 2px;
+      z-index: 1000;
+      width: 32px;
+      height: 32px;
+      display: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* -- Rettangolo filtro categorie */
+    .map-overlay2 {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      z-index: 999;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+      padding: 2px 2px;     /* Contenitore */
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      min-width: 140px;
+      width: fit-content;
+      max-width: 200px;
+      max-height: 60vh;     /* limita altezza della sezione in verticale */
+      overflow-y: auto;     /* scroll verticale se tante categorie */
+    }
+      
+    /* -- Rettangolo barra temporale */
+    .top-timebar {
+      position: absolute;
+      top: 2px;
+      left: 50%;
+      transform: translateX(-50%);   /* centraggio reale */
+      z-index: 998;
+      display: flex;
+      flex-direction: row;           /* elementi in riga su desktop */
+      align-items: center;
+      justify-content: center;       /* centrare internamente */
+      gap: 10px;
+      width: 310px;
+      height: 90px;
+      padding: 2px 2px;
+      border-radius: 50px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    /* Pallino torna alla data di oggi */
+    .reset-btn {
+      border: none;
+      background: transparent;
+      font-size: 32px;
+      cursor: pointer;
+      color: #3b82f6;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .reset-btn:hover {
+      background: rgba(59, 130, 246, 0.08);
+      transform: translateY(-2px) scale(1.12);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .reset-btn:active {
+      transform: translateY(0px) scale(0.96);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    /* --- MENU & FILTRI --- */
+    /* -- Menù a discesa */
+    .menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      margin-bottom: 4px;
+      width: 130px;       /* larghezza */
+    }
+
+    /* Elementi del menu */ 
+    #menu-items {
+      max-height: 72vh;
+      overflow-y: auto;
+    }
+
+    /* elementi in verticale */
+    .vertical-toggles {
+      display: flex;
+      flex-direction: column;
+      width: 140px;     /* largezza massima della riga */
+      gap: 3px;         /* Distanzia le singole categorie in verticale */
+    }
+    
+    /* checkbox Seleziona Categorie */
+    .toggle-pill {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 28px;
+        min-height: 28px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .toggle-pill::before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: white;
+      box-shadow: inset 0 0 0 3px #0d6efd;
+    }
+
+    .toggle-pill:has(.toggle-checkbox:checked)::after {
+      content:"";
+      position:absolute;
+      width:12px;
+      height:12px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius:50%;
+      background:#0d6efd;
+    }
+
+    .toggle-pill.partial::after {
+      content:"";
+      position:absolute;
+      width:4px;
+      height:4px;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      border-radius:50%;
+      background:#0d6efd;
+    }
+    
+    /* Checkbox Categorie */
+    .category-checkbox {
+      position: absolute;
+      background: transparent;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-checkbox {
+      display: none;
+    }
+    
+    /* Label delle categorie */
+    .category-label {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;          /* icona e testo allineati in alto */
+      justify-content: flex-start;  /* testo a sinistra */
+      margin: 2px;                  /* distanza verticale compatta */
+      cursor: pointer;
+      border-radius: 50px;
+      padding: 1px 4px;     /* leggero padding */
+      flex-grow: 1;         /* permette all'hover di utilizzare tutta la larghezza */ 
+      font-size: 12px;
+      color: #fff;
+      font-weight: 500;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+
+    /* Cerchietto prima del testo */
+    .category-label::before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px; /* impedisce lo schiacciamento */
+      border-radius: 50%;
+      margin-right: 2px;
+      border: 2px solid white;
+      box-sizing: border-box;
+      background: transparent;
+      transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    /* Categoria disattiva */
+    .category-checkbox:not(:checked) + .category-label {
+      opacity: 0.75;
+    }
+
+    /* Pallino categoria disattiva */
+    .category-checkbox:not(:checked) + .category-label::before {
+      background: white;
+     }
+      
+    /* PULSAZIONI dei Marker */
+    /* Marker pulsazioni base */
+    .pulse { border-radius: 50%; position: relative; z-index: 990; }
+    .pulse::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--c); z-index: 990; }
+    .pulse::after { content: ""; position: absolute; inset: -30%; border-radius: 50%; background: var(--c); z-index: 991; opacity: 0.25; transform: scale(0.6); }
+    /* Marker pulsazioni in funzione del tempo */
+    .pulse.distant { animation: none; }
+    .pulse.distant::after { animation: none; opacity: 0; }    
+    .pulse.future-deep { animation: none; }
+    .pulse.future-deep::after { animation: none; opacity: 0; }    
+    .pulse.future-far { animation: hopSlow 3s infinite; }
+    .pulse.future-medium { animation: hopMedium 2s infinite; }
+    .pulse.future-near { animation: hopFast 1s infinite; }
+    .pulse.imminent { animation: hopCrazy 0.5s infinite; }
+    .pulse.imminent::after { animation: pulse 0.5s infinite ease-out; }
+    .pulse.countdown { animation: hopCrazy 0.3s infinite; }
+    .pulse.countdown::after { animation: pulse 0.3s infinite ease-out; }
+    .pulse.started { animation: hopLive 2s infinite; }    
+    .pulse.started::after { animation: pulseLive 0.3s infinite; }
+    .pulse.running-strong { animation: running-strong 2s infinite ease-in-out;}
+    .pulse.running-strong::after { animation: pulse 2s infinite ease-out; }
+    .pulse.running-medium { animation: running-medium 2.5s infinite ease-in-out;}
+    .pulse.running-medium::after { animation: hopSlow 2.5s infinite; opacity: 0.12;}
+    .pulse.running-soft { animation: running-soft 3s infinite ease-in-out;}
+    .pulse.running-soft::after { animation: none; opacity: 0;}
+    .pulse.running { animation: none; }
+    .pulse.running::after { animation: pulse 2.5s infinite ease-out; }
+    .pulse.finished { animation: finished 0.5s ease forwards; }    
+    /* Inserisce un piccolo puntino bianco sui markers conclusi */
+    .pulse.finished::after { content: ""; position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffffff; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; opacity: 0.9;}
+
+    /* SALTI dei Marker correlati alle Pulsazioni */
+    @keyframes pulse { 0% { transform: scale(0.6);opacity: 0.5; } 70% { transform: scale(1.6); opacity: 0; } 100% { opacity: 0; }}
+    @keyframes hopSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); }}
+    @keyframes hopMedium { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); }}
+    @keyframes hopFast { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); }}
+    @keyframes hopCrazy { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); }}
+    @keyframes pulseLive { 0% { transform: scale(1) translateY(0); opacity: 0.7; } 70% { transform: scale(1.5) translateY(-5px); opacity: 0.3; } 100% { transform: scale(2) translateY(-10px); opacity: 0; }}
+    @keyframes running-strong { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-8px,0); } /* X = -8px, Y = 0 */}
+    @keyframes running-medium { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-6px,0); } /* X = -8px, Y = 0 */}
+    @keyframes running-soft { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-4px,0); } /* X = -8px, Y = 0 */}
+    @keyframes finished { 0%,100% { transform: translateY(0); }}
+    
+    #menu-toggle {
+      display: inline-flex;
+      vertical-align: middle;
+      align-items: center;
+      justify-content: center;
+      width: 140px; /* larghezza */
+      padding: 6px 10px;
+      border-radius: 999px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      color: white;
+      border: none;
+      margin-right: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(59,130,246,0.25);
+      transition:
+        background 0.15s ease,
+        transform 0.15s ease,
+        opacity 0.15s ease;
+    }  
+
+    #menu-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.35);
+    }
+    
+    .date-box {
+      text-align: center;
+      min-width: 0px;
+    }
+    
+    .date-day {
+      font-size: 18px;
+      font-weight: 500;
+      text-align: center;
+      color: #3b82f6;
+    }
+    
+    .date-full {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      font-size: 50px;
+      cursor: pointer;
+      color: #3b82f6;
+      padding: 2px 12px;
+      font-weight: bold;
+    }
+    
+    .nav-btn:hover {
+      background: rgba(0,0,0,0.05);
+    }
+  
+      /* Timeline Slider */
+    .time-slider {
+      position: relative;
+      width: 200px;
+      padding-top: 2px;
+    }
+    
+    /* indicatore mezzanotte */
+    #midnight {
+      position: absolute;
+      top: -8px;
+      width: 4px;
+      height: 24px;
+      background: #3b82f6;
+      border-radius: 2px;
+      z-index: 997;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    #midnight::after {
+      content: "24";
+      position: absolute;
+      display: block;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: bold;
+      color: #3b82f6;
+      pointer-events: none;
+    }
+    
+    /* SLIDER */
+    #time-range { width: 100%; margin-top: 2px; }    
+      
+    .noUi-target {
+      background: rgba(255,255,255,0.18);
+      border: none;
+      backdrop-filter: blur(6px);
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.08);
+    }
+    
+    .noUi-base { background: transparent; }
+    .noUi-connect {
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      opacity: 0.85;box-shadow: 0 0 10px rgba(59,130,246,0.35);
+    }
+
+    .handle-label {
+      position: absolute;
+      top: 27px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #444;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .noUi-horizontal .noUi-handle {
+      width: 22px;
+      height: 22px;
+      right: -9px;
+      top: -7px;
+      border-radius: 50%;
+      background: #3b82f6;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      cursor: grab;
+      }
+    
+    .noUi-handle::before,
+    .noUi-handle::after { display: none; }    
+    .noUi-handle:hover { transform: scale(1.08); transition: transform 0.15s ease; }    
+    .noUi-horizontal { height: 6px; }    
+
+    /* NUOVO MENU checkbox integrata */
+    /* Contenitore checkbox + pulsante in una riga */
+    .filter-all-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    /* Mantieni il checkbox rotondo come gli altri */
+    .filter-all-container .toggle-pill {
+      width: 28px;           /* piccolo quadrato per il pallino */
+      min-height: 28px;
+      padding: 0;            /* nessun padding extra */
+      border-radius: 50%;    /* cerchio perfetto */
+      justify-content: center;
+    }
+
+    /* Su Categorie crea un effetto passando il mouse */    
+    #menu-items label.category-label {
+      display: flex;
+      align-items: center;
+      padding: 2px 4px;
+      border-radius: 999px;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    #menu-items label.category-label:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(2px);
+    }
+
+    #timeline-wrapper {
+      position: relative;     /* serve per posizionare prev/next/day/full */
+    }
+
+    #prev-day {
+      position: absolute;
+      top: 8px;           /* regolabile */
+      left: 8px;      /* leggermente a sinistra della maniglia */
+    }
+
+    #next-day {
+      position: absolute;
+      top: 8px;
+      right: 8px;     /* leggermente a destra della maniglia */
+    }
+
+    #day-text,
+    #day-next-text {
+      position: absolute;
+      top: 12px;       /* sopra lo slider */
+    }
+
+    #date-text {
+      position: absolute;
+      top: -2px;        /* sotto lo slider */
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    #reset-day {
+      position: absolute;
+      top: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: transform 0.15s ease;
+    }    
+
+    #eventTicker{
+    position:fixed;
+    bottom:0px;
+    left:0;
+    width:100%;
+    height:28px;
+    background:transparent;
+    color:black;
+    overflow:hidden;
+    z-index:9999;
+  }
+
+    #eventTickerContent{
+      white-space:nowrap;
+      display:inline-block;
+      padding-left: 100%;     /* parte fuori dallo schermo a destra */
+      animation:tickerScroll 120s linear infinite;     /* Velocità di scrolling */
+    }
+
+    /* Pulsante base */
+    .action-btn {
+      min-width: 48px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white !important;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+      display: inline-block;
+      cursor: pointer;
+      margin-left: 4px;     /* piccolo spazio tra pulsanti */
+    }
+
+    .action-btn:hover {opacity: 0.85;}
+
+    /* colori */
+    .buy-btn  { background:#16a34a; }    /* verde moderno */
+    .book-btn { background:#f97316; }    /* arancione */
+    .map-btn  { background:#3b82f6; }    /* blu standard */
+    
+    .copyright {
+      position: fixed;
+      text-align: center;
+      font-size: 9px;
+      color: rgba(0,0,255,1);
+      bottom: 26px;
+      left: 0;
+      right: 0;
+      white-space: nowrap;
+      width: 100%;
+      z-index: 3000;
+    }
+
+    .copyright a {
+      color: inherit;
+      text-decoration: none;
+      font-size: 12px;
+      margin-left: 2px;
+    }
+
+    .geo-status {
+      margin-top: 2px;
+      margin-bottom: 4px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #geoDot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 0px;
+    }
+    
+    @keyframes tickerScroll{
+      from{
+        transform:translateX(0%);
+      }
+      to{
+        transform:translateX(-100%);
+      }
+    }
+
+    .category-label svg {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 6px;     /* distanza tra icona e testo */
+    }    
+
+    /* MOBILE */
+    @media (max-width: 520px) {
+  
+    #prev-day {
+    left: 0px;      /* leggermente a sinistra della maniglia */
+    font-weight: bold;
+    }
+  
+    #next-day {
+    right: 0px;      /* leggermente a sinistra della maniglia */
+    font-weight: bold;
+    }
+  
+    .subtitle {
+      font-size: 12px;
+    }
+
+    .map-overlay {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;          /* quasi tutta la larghezza dello schermo */
+      padding: 10px;       /* padding ridotto */
+      font-size: 14px;     /* testi più piccoli */
+    }
+
+    .map-overlay.minimized {
+      top: 18px;
+      right: 2px;
+      width: 32px;
+      height: 32px;
+    }
+
+    #overlayToggle {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;      /* icona leggibile */
+    }
+  
+    .map-overlay2 {
+      top: 74px;
+      left: 2px;
+      padding: 0px 0px;
+      min-width: 134px;
+      max-width: 70%;
+      max-height: 90vh;    /* leggermente più alta rispetto a desktop */
+      overflow-y: auto;    /* scroll verticale se tanti elementi */
+    }
+  
+    .menu-header {
+      width: 125px;
+    }
+
+    .top-timebar {
+      top: 0px;
+      flex-direction: column;  /* impila elementi verticalmente */
+      align-items: center;
+      gap: 2px;
+      width: 196px;     /* Larghezza */
+      height: 66px;     /* Altezza */
+      padding: 2px 12px;
+      font-size: 12px;
+    }
+
+    .nav-btn {
+      font-size: 50px;
+      padding: 2px 4px;
+    }
+
+    #reset-day {
+    top: 32px;
+    }    
+
+    .date-day {
+      font-size: 12px;
+      text-align: center;
+      top: 12px;
+    }
+
+    .date-full {
+      font-size: 14px;
+    }
+
+    #menu-toggle {
+      font-size: 14px;
+      width: auto;
+      padding: 2px 2px;
+    }
+
+    #menu-arrow {
+      margin-left: 8px;
+    }
+      
+    .time-slider {
+      width: 75%;
+    }
+
+    .toggle-pill {
+      min-height: 26px;
+      font-size: 11px;
+      padding: 2px 6px;
+    }
+
+    .category-label {
+      font-size: 11px;
+    }
+
+    #eventTicker {
+      height: 24px;
+      font-size: 14px;
+      }
+    }
+
+  .qr-container{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
+
+  #QR{
+    width:80px;
+    height:80px;
+  }
+
+  .qr-side-btn{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    color:white;
+    cursor:pointer;
+    font-size:20px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .share-btn{
+    background:#6366F1;
+  }
+
+  .info-btn{
+    background:#06B6D4;
+  }    
+
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+</head>
+<body>
+
+<div class="map-overlay" id="mapOverlay">
+  <div class="title">
+    <span>A</span><span>R</span><span>O</span><span>U</span><span>N</span><span>D</span><span>O</span>
+  </div>
+  <div class="subtitle">Discover what's Around•you</div>
+  <div class="date-day" id="loginBtn" style="cursor:pointer; color:#3b82f6; text-decoration:underline;margin-bottom:4px;"></div>
+  <div id="installBtn" class="date-day" style="display:none;cursor:pointer;color:#10B981;text-decoration:underline;margin-top:2px;margin-bottom:4px;">
+    📲 Install Aroundo
+  </div>
+    <div class="qr-container">
+      <button id="shareBtn" class="qr-side-btn share-btn"><span class="material-symbols-outlined">share</span></button>
+      <img id="QR" src="qr.png">
+      <button id="infoBtn" class="qr-side-btn info-btn"><span class="material-symbols-outlined">info</span></button>
+    </div>
+    <div id="geoStatus" class="geo-status">
+      <span id="geoDot"></span>
+      <span id="geoText"></span>
+    </div>
+  
+  </div>
+<div id="overlayToggle">🔓</div>
+  
+<div class="map-overlay2" id="category-menu">
+<div class="menu-header filter-all-container">
+  <label class="toggle-pill" title="Select all categories">
+    <input type="checkbox" id="select-all-toggle" class="toggle-checkbox" checked>
+  </label>
+  <button id="menu-toggle" title="Open/close category filter">
+    <span id="menu-label">Categories</span>
+    <span id="menu-arrow">▼</span></button>
+</div>
+  <div id="menu-items" style="display:none; margin-top:4px;"></div>
+</div>
+<div class="top-timebar">
+  <!-- Sinistra -->
+  <button class="nav-btn" id="prev-day">‹</button>
+  <!-- Date -->
+    <div class="date-day" id="day-text"></div>
+    <div class="date-day" id="day-next-text"></div>
+    <div class="date-full" id="date-text"></div>
+    <button class="reset-btn" id="reset-day">•</button>
+  <!-- Destra -->
+  <button class="nav-btn" id="next-day">›</button>
+  <!-- SLIDER ORARIO -->
+<div class="time-slider">
+<div id="timeline-wrapper">
+  <div id="midnight"></div>
+  <div id="time-range"></div>
+</div>
+</div>
+</div>
+<div id="map"></div>
+<canvas id="fx-canvas"></canvas>  
+    <div class="copyright">
+      © 2026 Aroundo™ · Concept, design & development by Sergio Cernigliaro · 
+      <a href="mailto:contact@aroundo.it" title="Contact Aroundo">Contact</a>
+    </div>    
+  <div id="eventTicker">
+  <div id="eventTickerContent"></div>
+</div>  
+
+<!-- MESSAGE DIALOG -->
+<div id="messageDialog" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+z-index:99999;
+align-items:center;
+justify-content:center;
+">
+<div style="
+background:white;
+padding:22px;
+border-radius:12px;
+width:300px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+">
+<div id="messageText" style="
+margin-bottom:18px;
+font-weight:600;
+">
+</div>
+
+<button onclick="closeMessage()" style="
+width:100%;
+background:#3b82f6;
+color:white;
+border:none;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+">
+OK
+</button>
+</div>
+</div>
+  
+<script type="module">
+  import { supabase } from './supabase.js';
+  import { getOrCreateDevice, analyticsOpen, analyticsShare, analyticsInstall, analyticsGPS, analyticsLogin, analyticsMore, analyticsInfo, analyticsMarker,
+          analyticsMap, analyticsBuy, analyticsBook, analyticsEntrance } from './analytics-events.js';
+  import { getTipForDevice,renderTip } from '../tips/tips.js';
+  window.analyticsMap = analyticsMap;
+  window.analyticsBuy = analyticsBuy;
+  window.analyticsBook = analyticsBook;
+
+  /* ENTRANCE */
+  const entrance = new URLSearchParams(location.search).get("src");
+    if (entrance) {analyticsEntrance(entrance);}
+  
+  let categories = [];
+  let events = [];
+  let markers = [];
+  let timelineMode = 'live'; // Modalità della timeline 'past' | 'live' | 'day'
+  let currentDate = new Date(); // Data odierna di riferimento
+  let midnightPercent = 0; // Posizione barra della Mezzanotte
+  let totalHours; // Ore totali della Slidebar
+  let deferredPrompt = null; // Verifica se è stata installata l'APP sui sistemi che accedono
+
+  window.APP_VERSION = "1.0.0";
+  // Coordinate di default (Centro provincia Trapani / Sicilia occidentale)
+  const defaultLat = 37.87; /* 37.55 */
+  const defaultLng = 12.69; /* 14.1 */
+  const defaultZoom = 10; /* 9 */
+  const dayText = document.getElementById("day-text");
+  const dateText = document.getElementById("date-text");
+  const slider = document.getElementById('time-range');
+  const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+  // NON USATO const daysShort = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const daysLong  = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+  const fireworks = [];
+  // Dimensione dei Markers
+  const markerSizes = {
+  'distant': 10,
+  'future-deep': 14,
+  'future-far': 16,
+  'future-medium': 20,
+  'future-near': 25,
+  'imminent': 30,
+  'countdown': 32,
+  'started': 28,
+  'running-strong': 25,
+  'running-medium': 21,
+  'running-soft': 17,
+  'running': 13,
+  'finished': 10
+  };
+  const map = L.map('map', {
+    zoomControl: false, // Visualizza o nasconde i controlli dello ZOOM integrati
+    minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
+    maxZoom: 19, // evita zoom troppo vicino, il massimo zoom è 18 - 19
+    attributionControl: true // default true
+    }).setView([defaultLat, defaultLng], defaultZoom);
+
+  const markersCluster = L.markerClusterGroup({
+  maxClusterRadius: 30, // 0 nessun cluster ; 150 tutto raggruppato
+  disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster    
+  showCoverageOnHover: false,
+  zoomToBoundsOnClick: true
+  });
+
+  map.addLayer(markersCluster);
+
+  map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
+  map.attributionControl.setPrefix(''); // rimuove "Leaflet"
+  
+  // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
+  // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
+  
+  // 🌿 Base Mappa NEUTRA BUONA
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+
+    // Seleziona il div Login
+    const loginBtn = document.getElementById('loginBtn');
+    const { data } = await supabase.auth.getSession();
+      if(data.session){
+        loginBtn.textContent="Dashboard";
+        loginBtn.style.color="#3b82f6";
+        loginBtn.onclick=()=>{
+            window.location.href="pages/dashboard.html";
+        };
+    } else {
+        loginBtn.textContent = "Login";
+        loginBtn.style.color="";
+        loginBtn.onclick = async function() {
+            await analyticsLogin();
+            window.location.href = 'pages/login.html';
+        };
+    }
+    
+  const canvas = document.getElementById('fx-canvas');
+   const ctx = canvas.getContext('2d');
+   function resizeCanvas() {
+     const rect = map.getContainer().getBoundingClientRect();
+     canvas.width = rect.width;
+     canvas.height = rect.height;
+     canvas.style.width = rect.width + 'px';
+     canvas.style.height = rect.height + 'px';
+   }
+   resizeCanvas();
+   window.addEventListener('resize', resizeCanvas);
+   map.on('move zoom resize', resizeCanvas);
+
+  // Aggiorna lo stato visivo dei marker ogni 2 minuti
+  setInterval(() => {renderEvents(); updateMarkerVisibility();}, 2 * 60 * 1000);
+
+  // Ricarica gli eventi da Supabase ogni 30 minuti
+  setInterval(async () => {const data = await fetchEvents();
+    if (data) { events = data;
+      renderEvents();
+      updateMarkerVisibility();
+      updateTicker();
+    }
+  }, 30 * 60 * 1000);
+  
+// DOM  
+document.addEventListener('DOMContentLoaded', async () => {
+  const device = await getOrCreateDevice();
+  if (device) {await analyticsOpen();
+    const selectedTip = await getTipForDevice(device.id_device);
+    if (selectedTip) {renderTip(selectedTip.tip, device.id_device);}
+  }
+  categories = await fetchCategories();
+  events = await fetchEvents();
+  buildCategoryMenu();
+  checkGeoStatus();
+  setupTimeline();
+  renderEvents();
+  updateMarkerVisibility();
+  updateDateUI();
+  updateTicker();
+});
+      
+    const SHARE_URL = "https://aroundo.it/?src=share";
+    document.getElementById("shareBtn").onclick = async () => {
+      await analyticsShare();
+      try{
+        if(navigator.share){
+          await navigator.share({
+            title:"Aroundo",
+            text:"Discover what's Around•you",
+            url:SHARE_URL
+          });
+        }else{
+          await navigator.clipboard.writeText(SHARE_URL);
+        }
+      }catch(e){
+        console.log("Share cancelled");
+      }
+    };
+
+    /* Richiama la pagina Info */
+      document.getElementById("infoBtn").onclick=function(){
+        analyticsInfo();
+        window.location.href="pages/why-aroundo.html";
+      };
+
+    document.getElementById("prev-day").addEventListener("click", () => {
+      if (timelineMode === 'live') {
+        timelineMode = 'past';
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
+        updateMarkerVisibility();
+        return;
+      }
+      /* Gli altri casi: spostamento effettivo indietro di un giorno */
+      currentDate.setDate(currentDate.getDate() - 1);
+      timelineMode = 'past';
+      updateTimelineMode(); // Necessario: riallinea timelineMode a currentDate prima di ricostruire la timeline.
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+      updateMarkerVisibility();
+    });
+  
+    document.getElementById("next-day").addEventListener("click", () => {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const current = new Date(currentDate);
+      current.setHours(0,0,0,0);
+      if (timelineMode === 'past' && current.getTime() === today.getTime()
+      ) { 
+        timelineMode = 'live';
+     } else {
+      currentDate.setDate(currentDate.getDate() + 1);
+      timelineMode = 'day';
+      updateTimelineMode(); // Necessario: riallinea timelineMode a currentDate prima di ricostruire la timeline.
+    }
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+      updateMarkerVisibility();
+    });
+  
+    document.getElementById("reset-day").addEventListener("click", () => {
+      currentDate = new Date(); // oggi
+      updateTimelineMode();
+      updateDateUI();
+      setupTimeline();
+      renderEvents();
+      updateMarkerVisibility();
+    });
+
+    /* Mette in maiuscolo la prima lettera della stringa: "lun" → "Lun" */  
+      function capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+  
+    /* Aggiorna le informazioni testuali della timeline: data, giorno della settimana e posizione dei giorni nella modalità live/day.
+       Richimata da: DOM; visibilitychange. Listener: prev-day; next-day; reset-day */
+    function updateDateUI() {
+      dayText.innerText = currentDate.getDate();
+      dateText.innerText = monthNames[currentDate.getMonth()] + " " + currentDate.getFullYear();
+      // -- Posizionamento di -day
+      // ---- dichiarazioni globali alla funzione ----
+      const currentDayEl = document.getElementById('day-text');
+      const nextDayEl = document.getElementById('day-next-text');
+    if (timelineMode === 'live') {
+      const currentDayPercent = midnightPercent / 2;
+      const nextDayPercent = midnightPercent + (1 - midnightPercent) / 2;
+      // Giorno attuale
+      let currentDayName = currentDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      currentDayName = capitalizeFirst(currentDayName);
+      currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+      currentDayEl.style.left = `${currentDayPercent * 100}%`;
+      currentDayEl.style.display = "block";
+      currentDayEl.style.transform = "";
+      // Giorno successivo
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(currentDate.getDate() + 1);
+      let nextDayName = nextDate.toLocaleDateString(navigator.language, { weekday: 'short' });
+      nextDayName = capitalizeFirst(nextDayName);
+      nextDayEl.innerText = `${nextDayName} ${nextDate.getDate()}`;
+      nextDayEl.style.left = `${(nextDayPercent - 0.10) * 100}%`; // tolgo il 10% per compensare in allineamento la dimensione dei caratteri
+      nextDayEl.style.display = "block";
+      nextDayEl.style.transform = "";
+    } else { 
+    // DAY MODE
+    nextDayEl.style.display = "none";
+    // centra day-text
+    currentDayEl.style.display = "block";
+    currentDayEl.style.left = "50%";
+    currentDayEl.style.transform = "translateX(-50%)";
+    let currentDayName =
+      currentDate.toLocaleDateString(navigator.language, {
+        weekday: 'short'
+      });
+    currentDayName = capitalizeFirst(currentDayName);
+    currentDayEl.innerText = `${currentDayName} ${currentDate.getDate()}`;
+    }
+  }
+
+    /* Ricrea lo slider temporale in base alla modalità corrente.
+      Azioni: distrugge l'eventuale slider precedente, calcola il range temporale, ricrea lo slider e calcola/imposta la posizione dell'indicatore di mezzanotte o lo nasconde.
+      Chiamata da: inizializzazione; navigazione giorno (prev/next); reset giorno; rientro nella pagina. */
+    function setupTimeline() {
+      // distrugge vecchio slider per ricrearlo da zero
+      if (slider.noUiSlider) {
+      slider.noUiSlider.destroy();
+      slider.noUiSlider = null;
+      }
+      const { start, end } = getTimelineRange();
+      // ore totali reali del range
+      totalHours = Math.ceil((end - start) / 3600000);
+      // Controllo di sicurezza per evitare errori.
+      if (!totalHours || isNaN(totalHours)) {console.error("Invalid timeline range", totalHours);
+      return;
+      }
+      // Crea lo slider con doppia maniglia
+      noUiSlider.create(slider, {start: [0, totalHours], connect: true, step: 1, range: { min: 0, max: totalHours }});
+      // Ad ogni movimento dello slider agiorna la mappa
+      slider.noUiSlider.on('update', updateHandles);
+      // Calcola posizione mezzanotte (0.0 Sinistra ; 0.5 Centro ; 1.0 Destra) e la trasforma in Percentuale (0%; 50%; 100%)
+      const midnight = document.getElementById('midnight');
+      // Calcola la posizione della mezzanotte rispetto al range temporale live.
+      if (timelineMode === 'live') {
+        const currentHour = new Date().getHours();
+        const remainingToday = 24 - currentHour;
+        midnightPercent = remainingToday / totalHours;
+      midnight.style.display = "block"; 
+      midnight.style.left = `${midnightPercent * 100}%`;
+      } else {
+      // Nasconde l'indicatore di mezzanotte in modalità day/past.
+      midnight.style.display = "none";
+      }
+    }
+
+    /* Calcola il range temporale della timeline.
+       Azioni: determina data/ora di inizio e fine in base a timelineMode: live = ora corrente → fine di domani; past/day = 00:00 → 23:59 del giorno selezionato.
+       Chiamata da: setupTimeline(); updateMarkerVisibility(). */
+    function getTimelineRange () {
+      let start, end;
+      if (timelineMode === 'live') {
+        start = getAppTime('live'); // Ora corrente
+        end = new Date(start);
+        end.setDate(end.getDate() + 1) ; // Domani
+        end.setHours(23, 59, 59, 999);  // fine giornata domani
+        } else {
+        start = getAppTime('startOfDay'); // Inizio Giorno
+        end = getAppTime('endOfDay'); // Fine Giorno
+        }
+        return { start, end };
+    }
+  
+    /* Restituisce una data/ora di riferimento.
+       Modalità: startOfDay, endOfDay, live o ora corrente sul giorno logico.
+       Chiamata da: getTimelineRange(), updateHandles(), getUpcomingEvents(). */
+    function getAppTime(mode = 'now') {
+      const day = new Date(currentDate);
+      let time = new Date();
+      switch(mode) {case 'startOfDay': time = new Date(day); time.setHours(0,0,0,0); break;
+          case 'endOfDay': time = new Date(day); time.setHours(23,59,59,999); break; // fine della giornata logica.
+          case 'live': time = new Date(); break; // ora corrente entro il giorno logico
+          default: const now = new Date(); time = new Date(day); time.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+          }
+      return time;
+    }
+  
+    /* GESTIONE TIMELINE:
+    Determina la modalità della timeline in base alla data selezionata:
+     - past = giorno precedente a oggi 00-24.
+     - live = oggi+domani, timeline inizia dall'ora corrente fino alle 24 più tutta la giornata completa di domani 00-24.
+     - day  = giorno successivo ad oggi, 00-24
+    Chiamata da: prev-day (mode=past); next-day (mode=day); reset-day (mode=today); visibilitychange; 
+     */
+    function updateTimelineMode() {
+      const currentDay = new Date(currentDate);
+      currentDay.setHours(0,0,0,0);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const diffDays = Math.round((currentDay - today) / 86400000);
+      if (diffDays < 0) {timelineMode = 'past';
+      } else if (diffDays === 0) {timelineMode = 'live';
+      } else {timelineMode = 'day';
+      }
+    }
+
+    /* Aggiorna le etichette delle maniglie e il filtro temporale dei marker.
+       Azioni: converte gli offset dello slider in date/ore reali, aggiorna le etichette e applica il range alla visibilità dei marker.
+       Chiamata da: setupTimeLine() come callback dell'evento 'update' dello 'slider'. */
+    function updateHandles(values) {
+      // Offset
+      const startOffset = Math.round(values[0]);
+      const endOffset = Math.round(values[1]);
+      // baseTime coerente con la modalità timeline
+      const baseTime = getAppTime(timelineMode === 'live' ? 'live' : 'startOfDay');
+      const startDate = new Date(baseTime.getTime() + startOffset * 3600000);
+      const endDate = new Date(baseTime.getTime() + endOffset * 3600000);
+      // Crea le etichette delle maniglie
+      const formatTime = (date) =>
+      date.getHours().toString().padStart(2,'0'); // + ':' + date.getMinutes().toString().padStart(2,'0');
+      const startLabel = formatTime(startDate);
+      const endLabel   = formatTime(endDate);
+      const handles = slider.querySelectorAll('.noUi-handle');
+      handles.forEach((h, i) => {let label = h.querySelector('.handle-label');
+        if (!label) {
+          label = document.createElement('div');
+          label.className = 'handle-label';
+          h.appendChild(label);
+        }
+      // Inserisce ora di inizio e di fine
+      label.innerText = i === 0 ? startLabel : endLabel;
+    });
+    updateMarkerVisibility(startDate,endDate);
+  }
+  
+    window.showMessage = function(text) {document.getElementById("messageText").textContent = text; document.getElementById("messageDialog").style.display = "flex";};
+
+    window.closeMessage = function () {document.getElementById("messageDialog").style.display = "none";};
+  
+  // Preleva le Categorie da supabase
+  async function fetchCategories() {
+    const { data, error } = await supabase
+      .from('categorie')
+      .select('*')
+      .eq('mc_attiva', true)
+      .order('mc_ordine', { ascending: true });
+      if (error) {
+      console.error("Errore caricamento categorie:", error);
+      return [];
+      }
+      return data;
+      }
+
+  // Preleva gli Eventi ed Organizzatori da supabase
+  // chiamato da: DOM; set interval 30'
+  async function fetchEvents() {let query = supabase .from('eventi')
+      .select(`*, organizzatori (or_nome), luoghi (lu_lat, lu_lng, lu_location, lu_descrizione, id_comune, comuni (co_descrizione))`)
+      .eq('ev_attivo', true);
+    const { data, error } = await query;
+    if (error) {console.error("Errore caricamento eventi:", error);
+    return [];
+    }
+    return data;
+  }
+
+    /* RICOSTRUISCE I MARKER — ricrea la rappresentazione grafica di tutti gli eventi.
+       Azioni: rimuove i marker esistenti, calcola lo stato degli eventi, crea e registra i nuovi marker, 
+       collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
+       Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchEvents 30'; setinterval updateMarkerVisibility 2'.*/
+    function renderEvents() {
+      // pulizia markers precedenti
+      markers.forEach(m => {
+      // ferma eventuali fireworks attivi
+      if (m.marker.fireworkInterval) {
+        clearInterval(m.marker.fireworkInterval);
+        m.marker.fireworkInterval = null;
+      }
+      markersCluster.removeLayer(m.marker);
+      });
+      markers = [];
+      events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
+      events.forEach(e => {
+        const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
+        const stateClass = stateData.state;
+        // 🎨 ICONA
+        const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
+          icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)
+        })
+        markersCluster.addLayer(marker); // Visualizzazione/Gestione dei marker
+        updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Effetti grafici e Fuochi d'artificio
+        marker.on('click', function () {analyticsMarker();
+        window.openBasePopup(e, this.getLatLng());});
+        markers.push({ marker, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
+      });
+    }
+
+    // Dimensione, Classe e Colore dei Markers  
+    function createIcon(color, state) {
+      const size = markerSizes[state] || 10;
+      return L.divIcon({ className: '', html: `<div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div>`,
+      iconSize: [size, size]
+      });
+    }
+
+    /* FILTRA I MARKER — determina quali marker devono essere visibili.
+       Azioni: ricava categorie attive, verifica sovrapposizione temporale
+       e aggiunge/rimuove i marker dal cluster; arresta eventuali fireworks
+       dei marker nascosti.
+       Chiamata da: updateHandles(), renderEvents(), filtro categorie. */
+    function updateMarkerVisibility(start, end) {
+      // Se non vengono passati parametri, usa il range corrente della timeline
+      if (!start || !end) {
+      const range = getTimelineRange();
+      start = range.start;
+      end = range.end;
+      }
+      const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+      const activeCategories = [];
+      checkboxes.forEach(cb => {const catId = parseInt(cb.id.replace('cat-', ''));
+      if (cb.checked) { activeCategories.push(catId); }});
+      // Preleva eventStart ed eventEnd dai markers      
+      markers.forEach(marker => {
+      const categoryVisible = activeCategories.includes(marker.category);
+      const eventStart = new Date(marker.start);
+      const eventEnd = marker.end ? new Date(marker.end) : eventStart;
+      // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
+      const inTimeRange = eventStart <= end &&  eventEnd >= start;
+      // disattiva il timeriterval del marker per i fireworks
+        const visible = categoryVisible && inTimeRange;
+          if (visible) {markersCluster.addLayer(marker.marker);
+            updateMarkerState(
+              marker.marker,
+              marker.marker.state,
+              marker.marker.getLatLng()
+              );
+          } else {
+            markersCluster.removeLayer(marker.marker);
+            if (marker.marker.fireworkInterval) {
+              clearInterval(marker.marker.fireworkInterval);
+              marker.marker.fireworkInterval = null;
+            }
+          }
+        });
+    }
+
+    /* Costruisce e inizializza il menu categorie.
+       Azioni: crea le checkbox, le seleziona tutte, configura toggle e listener. */
+    function buildCategoryMenu() {
+      const menuItemsDiv = document.getElementById('menu-items');
+      // checkbox per ogni categoria
+      categories.forEach(cat => {
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.id = `cat-${cat.id_categoria}`;
+        cb.checked = true;
+        cb.className = 'category-checkbox';
+        const label = document.createElement('label');
+        label.htmlFor = `cat-${cat.id_categoria}`;
+        label.className = 'category-label';
+        label.innerHTML = `${cat.mc_icona} ${cat.mc_descrizione}`; 
+        // Applichiamo il colore dell’evento
+        label.style.backgroundColor = cat.mc_colore;
+        label.style.color = getContrastColor(cat.mc_colore);
+        label.style.setProperty('--cat-color', cat.mc_colore);
+        menuItemsDiv.appendChild(cb);
+        menuItemsDiv.appendChild(label);
+        });
+        // toggle menu
+         const toggleBtn = document.getElementById('menu-toggle');
+         const arrow = document.getElementById('menu-arrow');
+          toggleBtn.addEventListener('click', () => {
+          menuItemsDiv.classList.toggle('open');
+         const isOpen = menuItemsDiv.classList.contains('open');
+          menuItemsDiv.style.display = isOpen ? 'block' : 'none';
+          arrow.textContent = isOpen ? '▲' : '▼';
+          // Apertura Menu: Se Tutte le categorie sono selezionate, le deseleziona tutte, altrimenti lascia la selezione corrente.
+          if (isOpen && selectAllToggle.checked) {
+            const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            selectAllToggle.checked = false;
+            updateMarkerVisibility();
+          }            
+          // Chiusura menu: Se Nessuna categoria è selezionata, le seleziona tutte, altrimenti lascia la selezione corrente
+          if (!isOpen) {
+            const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+              if (checkedCount === 0) {
+              checkboxes.forEach(cb => cb.checked = true);
+              selectAllToggle.checked = true;
+              updateSelectAllToggle();
+              updateMarkerVisibility();
+              }
+            }
+        });
+        // Checkbox Singola Categoria
+        menuItemsDiv.addEventListener('change', () => updateMarkerVisibility());
+        const selectAllToggle = document.getElementById('select-all-toggle');
+        selectAllToggle.checked = true;
+        // Checkbox Globale Seleziona/Deseleziona
+        selectAllToggle.addEventListener('change', () => {
+        const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = selectAllToggle.checked);
+        updateSelectAllToggle();
+        updateMarkerVisibility();
+        });
+        // aggiorna lo stato del checkbox
+        function updateSelectAllToggle() {
+        const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        const allChecked = checkedCount === checkboxes.length;
+        const partialChecked = checkedCount > 0 && checkedCount < checkboxes.length;  
+        selectAllToggle.checked = allChecked;
+        selectAllToggle.parentElement.classList.toggle('partial', partialChecked);  
+        }
+        menuItemsDiv.addEventListener('change', updateSelectAllToggle);
+      // Chiude l'elenco delle categorie facendo un click fuori. 
+      document.addEventListener('click', (event) => {
+      if (
+        menuItemsDiv.classList.contains('open') &&
+        !menuItemsDiv.contains(event.target) &&
+        !toggleBtn.contains(event.target)
+      ) {
+        menuItemsDiv.classList.remove('open');
+        menuItemsDiv.style.display = 'none';
+        arrow.textContent = '▼';
+        // Mantiene la tua logica di chiusura
+        const checkboxes = menuItemsDiv.querySelectorAll('input[type="checkbox"]');
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        if (checkedCount === 0) {
+          checkboxes.forEach(cb => cb.checked = true);
+          selectAllToggle.checked = true;
+          updateSelectAllToggle();
+          updateMarkerVisibility();
+        }
+      }
+    });
+ }
+  
+    /* Converte una data/ora nel formato HH:MM italiano.
+       Chiamata da: popup evento; popup dettagli; ticker. */
+    function formatTime(dateString) {
+      const d = new Date(dateString);
+      return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+  }
+
+    /* Determina lo stato temporale di un evento rispetto all'ora attuale.
+       Azioni: calcola distanza dall'inizio e durata; assegna lo stato del marker (futuro, countdown, in corso o terminato).
+       Chiamata da: renderEvents(). */
+    function getEventState(startDate, endDate) {
+      const now = new Date();
+      const diffMinutes = (startDate - now) / 1000 / 60;
+      const minutesFromStart =  (now - startDate) / 1000 / 60;
+      const durationMinutes = endDate ? (endDate - startDate) / 1000 / 60 : null; // calcola durata dell'evento
+      // evento terminato 
+      if (endDate && now > endDate) return {state: 'finished' };
+      /* evento partito */
+      if (minutesFromStart > 0) {
+      if (durationMinutes) {
+        const progress = minutesFromStart / durationMinutes;
+          if (progress < 0.125) return { state: 'running-strong' };
+          if (progress < 0.25)  return { state: 'running-medium' };
+          if (progress < 0.5)   return { state: 'running' };
+        }
+        return { state: 'running-soft' };
+      }
+      // Inizia tra +12 - 8 - 4 - 2 - 1h - 30' - 0' - Started 
+      if (diffMinutes > 720) return { state: 'distant' };
+      if (diffMinutes > 480) return { state: 'future-deep' };
+      if (diffMinutes > 240) return { state: 'future-far' };
+      if (diffMinutes > 120) return { state: 'future-medium' };
+      if (diffMinutes > 60) return { state: 'future-near' };
+      if (diffMinutes > 30) return { state: 'imminent' };
+      if (diffMinutes > 0) return { state: 'countdown' };
+      return { state: 'started' };
+  }
+
+    /* Costruisce e apre il popup base dell'evento.
+       Azioni: determina/formatta la data, prepara contenuto e dati per "More...", posiziona e apre il popup sulla mappa.
+       Chiamata da: click sul marker in renderEvents(). */
+    window.openBasePopup = function(e, latlng) {
+          const startDate = new Date(e.ev_inizio);
+          const now = new Date();
+          const tomorrow = new Date();
+          tomorrow.setDate(now.getDate() + 1);
+          tomorrow.setHours(0,0,0,0);
+          const isToday = startDate.toDateString() === now.toDateString();
+          const isTomorrow = startDate.toDateString() === tomorrow.toDateString();
+          const color = isToday ? '#3b82f6'
+                 : isTomorrow ? '#dc3545'
+                 : '#666';
+          const align = isToday ? 'flex-start'
+                 : isTomorrow ? 'flex-end'
+                 : 'center';
+          let dayLabel;
+          if (isToday)
+              dayLabel = `Oggi ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+          else if (isTomorrow)
+              dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
+          else
+              dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
+      const content = `
+        <div style="min-width:180px; font-size:12px; line-height:1.3;">
+        <!-- DATA -->
+        <div style="text-align:center; font-weight:700; margin-bottom:6px; color:${color};">
+        ${dayLabel}
+        </div>
+        <!-- ORARIO -->
+        <div style="display:flex; flex-direction:column; align-items:${align}; color:${color}; font-weight:600; margin-bottom:6px;">
+          ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
+        </div>
+        <!-- TITOLO -->
+        <div style="text-align:center; font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
+        <!-- DESCRIZIONE -->
+        <!-- Organizzatore -->
+        <div style="font-size: 12px; color:#555; line-height:1.35;">
+          By:
+          <a class="organizzatore-link"
+              style="color:#3b82f6; font-weight:600;"
+              href="pages/organizzatore.html?id=${e.id_organizzatore}">
+            ${e.organizzatori?.or_nome || ''}
+          </a>
+        </div>
+        <!-- BOTTONE DETTAGLI e relativo POPUP -->
+        <button onclick="window.openDetailPopup(window.currentEvent, window.currentLatLng)"
+          style="margin-top:6px; background:#3b82f6; color:white; border:none; border-radius:6px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer;">
+          More...</button>
+        </div>
+       `;
+        window.currentEvent = e;  // passa evento e coordinate al POPUP More...
+        window.currentLatLng = latlng;
+      const markerPoint = map.latLngToContainerPoint(latlng);
+        markerPoint.x += 0;
+        markerPoint.y -= 20;
+      const popupLatLng = map.containerPointToLatLng(markerPoint);
+    L.popup()
+      .setLatLng(popupLatLng)
+      .setContent(content)
+      .openOn(map);
+    };
+
+    /* Costruisce e apre il popup dettagli dell'evento.
+       Azioni: prepara informazioni su luogo, immagine, descrizione, prezzo e azioni disponibili; apre il popup sulla mappa.
+       Chiamata da: pulsante "More..." di openBasePopup(). */
+    window.openDetailPopup = function(e, latlng) {
+      analyticsMore();
+      const content = `<div style="text-align:center;min-width:220px;font-size:12px;">
+          <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:6px;">
+            ${e.ev_titolo}</div>
+          <hr>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+            <div style="text-align:left;"><div style="font-weight:600;">
+                ${[e.luoghi?.comuni?.co_descrizione, e.luoghi?.lu_location]
+                .filter(Boolean)
+                .join(' • ')}
+              </div>${e.luoghi?.lu_descrizione ? `
+                <div style="font-size:12px;color:#555;margin-top:2px;">
+                  ${e.luoghi.lu_descrizione}
+                </div>`:''}
+            </div>
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
+              target="_blank"
+              class="action-btn map-btn" onclick="analyticsMap()">Map</a>
+          </div>
+          ${e.ev_copertina ? `
+            <div style="text-align:center;">
+              <img
+                src="https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${e.ev_copertina}"
+                style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
+            </div>
+            <hr> ` : '' }
+          <div style="text-align:left; margin-top:8px; line-height:1.35;">
+            ${e.ev_descrizione || ''}
+          </div>
+        <hr>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+          ${e.ev_costo === null || e.ev_costo === undefined || e.ev_costo === '' ? `
+              <div style="width:100%;text-align:center;color:#6b7280;font-weight:600;font-size:14px;">Price: TBA</div>
+            ` : Number(e.ev_costo) === 0 ? `
+              <div style="width:100%;text-align:center;color:#16a34a;font-weight:700;font-size:14px;">Free Entry</div>
+            ` : `
+              <div>Price: €<span style="font-weight:700;">${e.ev_costo}</span>
+              </div>
+              <a
+                href="#"
+                class="action-btn buy-btn"
+                onclick="analyticsBuy(); showMessage('In Progress!'); return false;">
+                Buy
+              </a>
+            `
+          }          
+        </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+            <div>I'll be there!</div>
+            <a
+              href="#"
+              class="action-btn book-btn"
+              onclick="analyticsBook(); showMessage('In Progress!'); return false;">
+              Book
+            </a>
+          </div>
+        </div>
+      `;
+      const markerPoint = map.latLngToContainerPoint(latlng);
+        markerPoint.x += 0;
+        markerPoint.y -= 20;
+      const popupLatLng = map.containerPointToLatLng(markerPoint);
+    L.popup()
+      .setLatLng(popupLatLng)
+      .setContent(content)
+      .openOn(map);
+    };
+
+    // ***** INSTALLAZIONE APP ***** //
+    // Gestisce la disponibilità e l'avvio dell'installazione PWA.
+    // Azioni: intercetta l'evento beforeinstallprompt, conserva il prompt,
+    // mostra il pulsante di installazione.
+    // Chiamata da: browser tramite evento beforeinstallprompt.
+    // Gestisce separatamente l'installazione manuale su iOS.
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById("installBtn").style.display = "block";
+  });
+
+  // Click su Installazione.
+  // Chiamata da: click su installBtn; usa deferredPrompt impostato da beforeinstallprompt.
+  document.getElementById("installBtn").onclick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById("installBtn").style.display = "none";
+  };
+
+  // Quando l'app viene effettivamente installata.
+  // Azioni: registra l'installazione e nasconde il pulsante.
+  // Chiamata da: browser tramite evento appinstalled.
+  window.addEventListener('appinstalled', () => {
+    analyticsInstall();
+    document.getElementById("installBtn").style.display = "none";
+  });
+ 
+  // Installazione iOS Safari.
+  // Azioni: rileva i dispositivi iOS non ancora installati come PWA,
+  // mostra il pulsante Install e fornisce le istruzioni manuali.
+  // Chiamata da: inizializzazione dello script.
+  const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+    if (isIOS && !isStandalone) {
+      const installBtn = document.getElementById("installBtn");
+    if (installBtn) {
+      installBtn.style.display = "block";
+      installBtn.onclick = () => {
+        alert(
+          "Per installare Aroundo:\n\n" +
+          "1. Premi il pulsante Condividi ⬆️\n" +
+          "2. Seleziona 'Aggiungi alla schermata Home'\n\n" +
+          "Aroundo sarà disponibile come App."
+        );
+      };
+    }
+  }
+
+    /* Aggiorna lo stato visivo della geolocalizzazione.
+       Azioni: modifica colore, testo e stile dell'indicatore GPS in base allo stato attivo/non attivo.
+       Chiamata da: checkGeoStatus(); requestUserLocation(). */
+    const geoStatus = document.getElementById("geoStatus");
+    const geoDot = document.getElementById("geoDot");
+    const geoText = document.getElementById("geoText");
+    function updateGeoStatus(active) {
+      if (active) {
+        geoDot.style.background = "#22c55e";
+        geoText.textContent = "Location enabled";
+        geoText.style.color = "#22c55e";
+        geoText.style.textDecoration = "none";
+        geoText.style.cursor = "default";
+        geoText.style.fontSize = "12px";
+      } else {
+        geoDot.style.background = "#f59e0b";
+        geoText.textContent = "Enable location...";
+        geoText.style.color = "#f59e0b";
+        geoText.style.textDecoration = "underline";
+        geoText.style.cursor = "pointer";
+        geoText.style.fontSize = "12px";
+      }
+    }
+
+    /* Rappresenta lo stato di errore della geolocalizzazione.
+       Azioni: imposta colore, testo e stile dell'indicatore GPS in caso di errore.
+       Chiamata da: checkGeoStatus(); requestUserLocation(). */
+    function updateGeoError() {
+      geoDot.style.background = "#dc2626";
+      geoText.textContent = "Check Location Settings";
+      geoText.style.color = "#dc2626";
+      geoText.style.textDecoration = "underline";
+      geoText.style.cursor = "pointer";
+      geoText.style.fontSize = "10px";
+    }
+
+    /* Gestisce il click sull'indicatore GPS.
+       Azioni: se la geolocalizzazione non è attiva o presenta un errore,
+       avvia la richiesta della posizione dell'utente.
+       Chiamata da: evento click su geoStatus. */  
+    geoStatus.addEventListener("click", () => {
+      if (
+        geoText.textContent === "Enable location..." ||
+        geoText.textContent === "Check Location Settings"
+      ) {requestUserLocation();}
+    });
+
+    /* Verifica se la geolocalizzazione è disponibile.
+       Azioni: richiede una posizione GPS; aggiorna lo stato visivo in base all'esito.
+       Chiamata da: caricamento pagina; rientro nella pagina. */
+    function checkGeoStatus() {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {updateGeoStatus(true);},
+        () => {updateGeoStatus(false);},
+        { timeout: 5000 });
+    }
+
+    /* Acquisisce la posizione dell'utente e aggiorna la mappa.
+       Azioni: richiede il GPS, registra l'esito, aggiorna lo stato GPS, calcola la densità degli eventi vicini e centra/scala la mappa.
+       Chiamata da: click su geoStatus quando la posizione non è disponibile. */
+  function requestUserLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+          (pos) => {
+          const userLat = pos.coords.latitude;
+          const userLng = pos.coords.longitude;
+          analyticsGPS(true, userLat, userLng);
+          updateGeoStatus(true);
+          // Calcolo approssimativo dello zoom in base agli eventi vicini
+          const nearbyEvents = events.filter(e => {
+          const distance = map.distance([userLat, userLng], [e.luoghi.lu_lat, e.luoghi.lu_lng]);
+          return distance <= 25000; // 25 km
+          });
+          let zoomLevel = 10; // Provincia
+          if (nearbyEvents.length > 100) zoomLevel = 11; // Comune
+          else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
+          else zoomLevel = 9; // Regione
+          map.setView([userLat, userLng], zoomLevel);
+          },
+          (err) => {
+            if(err.code === 1){
+              analyticsGPS(false); // Utente ha rifiutato
+            }else{
+              analyticsGPS(null); // Stato non determinabile
+            }
+            updateGeoError();
+            map.setView([defaultLat, defaultLng], defaultZoom);
+            });
+        } else {
+          analyticsGPS(null); // Geolocalizzazione non disponibile
+          updateGeoError();
+          map.setView([defaultLat, defaultLng], defaultZoom);
+        }
+      }
+
+    /* Aggiornamento al rientro sulla piattaforma.
+       Azioni: verifica nuovamente la geolocalizzazione, riallinea la modalità e la data della timeline, ricrea lo slider e aggiorna marker e relativa visibilità.
+       Chiamata da: evento visibilitychange quando la pagina torna visibile. */
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        checkGeoStatus();
+        updateTimelineMode();
+        updateDateUI();
+        setupTimeline();
+        renderEvents();
+        updateMarkerVisibility();
+      }
+    });
+  
+    /* Determina il colore del testo in base al colore di sfondo.
+       Azioni: calcola la luminosità del colore e restituisce nero o bianco
+       per garantire un contrasto leggibile.
+       Chiamata da: buildCategoryMenu(), per ogni categoria. */
+  function getContrastColor(hex) {
+      hex = hex.replace('#', '');
+      const r = parseInt(hex.substr(0,2),16);
+      const g = parseInt(hex.substr(2,2),16);
+      const b = parseInt(hex.substr(4,2),16);
+      const brightness =
+      (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 150
+      ? '#111'
+      : '#fff';
+    }
+
+    /* Aggiorna il ticker degli eventi imminenti.
+       Azioni: recupera gli eventi imminenti, genera l'HTML e lo inserisce nel ticker.
+       Chiamata da: DOM; setInterval fetchEvents 30'. */
+    function updateTicker(){
+    const list = getUpcomingEvents(12).slice(0, 20); // Eventi nelle prossime 12 ore, massimo 20 elementi.
+    const html = list.map(e => {
+    const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
+    return `
+        <span style="margin-right:20px;
+            padding:2px 8px;
+            border-radius:12px;
+            background:${color}33;
+            border:0px solid ${color}66;
+            border-left:4px solid ${color};
+            white-space:nowrap;
+        ">
+          ⏰ ${formatTime(e.ev_inizio)}
+          • ${e.luoghi?.comuni?.co_descrizione || ''}
+          • ${e.luoghi.lu_location}
+          • ${e.ev_titolo}
+          • ${e.ev_descrizione}
+        </span>
+      `;
+    }).join('');
+    document.getElementById('eventTickerContent').innerHTML = html;
+  }
+
+    /* Seleziona gli eventi imminenti entro un intervallo temporale.
+       Azioni: determina l'ora di riferimento, calcola il limite temporale, filtra gli eventi futuri e li ordina per orario di inizio.
+       Chiamata da: updateTicker().*/
+    function getUpcomingEvents(hours = 12) { // 12 ore come valore predefinito; il chiamante può specificare un intervallo diverso.
+      const now = timelineMode === 'live'
+        ? getAppTime('live')
+        : getAppTime('startOfDay');
+      const limit = new Date(now);
+      limit.setHours(limit.getHours() + hours);    
+      return events.filter(e => {
+        const start = new Date(e.ev_inizio);
+        return start > now && start <= limit;
+      }).sort((a,b)=>
+        new Date(a.ev_inizio) - new Date(b.ev_inizio)
+      );
+    }
+
+    /* Converte coordinate geografiche in coordinate del canvas.
+       Azioni: converte lat/lng nelle coordinate x/y relative alla mappa.
+       Chiamata da: triggerFirework(). */
+    function latLngToCanvasXY(lat, lng) {
+      const point = map.latLngToContainerPoint([lat, lng]);
+      return { x: point.x, y: point.y };
+    }
+
+    /* Inizializza una particella del fuoco d'artificio.
+       Azioni: memorizza posizione, colore, velocità e durata e inizializza i parametri grafici della particella.
+       Chiamata da: Firework.createParticles(). */
+    class Particle {
+      constructor(x, y, color, vx, vy, life) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.vx = vx;
+        this.vy = vy;
+        this.life = life;
+        this.alpha = 1;
+        this.radiusOuter = 4; // dimensione stellina
+        this.radiusInner = 2;
+        this.spikes = 5; // punte della stella
+      }
+
+    /* Aggiorna lo stato fisico della particella.
+       Azioni: aggiorna posizione, gravità, durata e trasparenza.
+       Chiamata da: Firework.update(). */
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vy += 0.05; // gravità
+      this.life -= 1;
+      this.alpha = Math.max(0, this.life / 60);
+    }
+
+  /* Disegna la particella sul canvas.
+     Azioni: applica trasparenza/colore e disegna la stella.
+     Chiamata da: Firework.draw(). */
+    draw(ctx) {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = this.color;
+      ctx.translate(this.x, this.y);
+      ctx.beginPath();
+      for (let i = 0; i < this.spikes * 2; i++) {
+        const r = i % 2 === 0 ? this.radiusOuter : this.radiusInner;
+        const angle = (Math.PI / this.spikes) * i;
+        const px = Math.cos(angle) * r;
+        const py = Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }  
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+    /* Inizializza un fuoco d'artificio.
+       Azioni: imposta posizione, traiettoria, stato di esplosione, particelle e parametri grafici.
+       Chiamata da: triggerFirework(). */
+class Firework {
+  constructor(x, y) {
+    this.x = x; // coordinata orizzontale
+    this.y = y; // posizione iniziale
+    this.startY = y; // quota di partenza
+    this.maxHeight = 26; // quota massima raggiungibile
+    this.particles = []; // perticelle dopo esplosione
+    this.exploded = false; // esploso si/no
+    this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    this.vy = -8 - Math.random() * 3; // velocità verticale
+    this.vx = (Math.random() - 0.5) * 2; // deriva laterale
+    this.currentY = y; // quota corrente
+    this.trail = []; // punti della scia
+  }
+
+  /* Verifica se il fuoco d'artificio è terminato.
+     Azioni: restituisce true quando è esploso e non ha più particelle.
+     Chiamata da: animateFX(). */
+  isDead() { return this.exploded && this.particles.length === 0;}
+
+  /* Aggiorna lo stato del fuoco d'artificio.
+     Azioni: aggiorna il razzo durante la salita, gestisce l'esplosione, aggiorna le particelle e rimuove quelle terminate.
+     Chiamata da: animateFX(). */
+  update() {
+    if (!this.exploded) {
+      this.x += this.vx; 
+      this.currentY += this.vy; // Salita del razzo
+      this.vy += 0.35; // gravità
+      this.trail.push({ x: this.x, y: this.currentY }); 
+      if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
+      // esplode quando raggiunge maxHeight o inizia la discesa
+      if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } 
+    }
+    this.particles.forEach(p => p.update()); // aggiorna le particelle esplose
+    this.particles = this.particles.filter(p => p.life > 0); // elimina particelle morte
+  }
+
+  /* Crea le particelle dell'esplosione.
+     Azioni: genera particelle con direzione, velocità, colore e durata casuali.
+     Chiamata da: Firework.update(). */
+  createParticles() {
+    const count = 10 + Math.floor(Math.random() * 10); // Numero di stelline che esplodono
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * 2 * Math.PI;
+      const speed = Math.random() * 4 + 2;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      this.particles.push(
+        new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20) // Quanti frame vive una particella
+      );
+    }
+  }
+
+  /* Disegna il fuoco d'artificio sul canvas.
+     Azioni: disegna scia, razzo e particelle esplose.
+     Chiamata da: animateFX(). */
+  draw(ctx) {
+    ctx.save();
+    for (let i = 0; i < this.trail.length; i++) {
+      const p = this.trail[i];
+      ctx.globalAlpha = i / this.trail.length * 0.25; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
+      ctx.fillStyle = this.color; // colore della scia
+      ctx.beginPath(); // disegna punto luminoso
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+    // Razzo prima dell’esplosione
+    if (!this.exploded) {
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.currentY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Stelline esplose
+    this.particles.forEach(p => p.draw(ctx));
+  }
+  }
+  
+  /* Avvia un nuovo fuoco d'artificio nella posizione indicata.
+     Azioni: converte la posizione geografica in coordinate canvas e crea un nuovo Firework.
+     Chiamata da: updateMarkerState(). */
+  function triggerFirework(latLng) {
+  const { x, y } = latLngToCanvasXY(latLng.lat, latLng.lng);
+  fireworks.push(new Firework(x, y));
+}
+
+  /* Esegue il ciclo di animazione dei fireworks.
+     Azioni: pulisce il canvas, aggiorna e disegna tutti i fireworks, elimina quelli terminati e richiede il frame successivo.
+     Chiamata da: avvio dello script; richiama sé stessa tramite requestAnimationFrame(). */
+function animateFX() {ctx.clearRect(0, 0, canvas.width, canvas.height);
+  fireworks.forEach(fw => {fw.update(); fw.draw(ctx);});
+    // elimina fuochi terminati
+  for (let i = fireworks.length - 1; i >= 0; i--) {if (fireworks[i].isDead()) {fireworks.splice(i, 1);}
+  }
+requestAnimationFrame(animateFX);
+}
+animateFX();
+
+    /* Aggiorna lo stato visivo e i fireworks del marker.
+       Azioni: imposta lo stato e avvia/interrompe i fireworks in base allo stato ricevuto.
+       Chiamata da: renderEvents().*/
+    function updateMarkerState(marker, state, latLng) {
+      marker.state = state;
+      if (state === 'countdown' && !marker.fireworkInterval) {triggerFirework(latLng); // Evento in countdown: avvia subito un firework e poi uno ogni 2,5 secondi
+      marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2000); // Un fuoco ogni X secondi 1''=1000
+    }
+    if (state !== 'countdown' && marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
+      return;
+    }
+
+/* Gestione Overlay */
+const overlay = document.getElementById('mapOverlay');
+const toggle = document.getElementById('overlayToggle');
+let timeout = 3 * 1000; // dopo 3 secondi minimizza l'Overlay 'minimizeOverlay()'
+
+/* Minimizza l'overlay principale.
+   Azioni: applica lo stato CSS minimizzato e mostra il pulsante di riapertura.
+   Chiamata da: click esterno; timer iniziale. */  
+function minimizeOverlay() {
+  overlay.classList.add('minimized');
+  toggle.style.display = 'flex';
+}
+      
+/* Apre l'overlay principale.
+   Azioni: rimuove lo stato minimizzato e nasconde il pulsante di riapertura.
+   Chiamata da: click sul pulsante toggle. */
+function openOverlay() {
+  overlay.classList.remove('minimized');
+  toggle.style.display = 'none';
+}
+// click fuori → chiude
+document.addEventListener('click', (e) => {
+  if (!overlay.contains(e.target) && !toggle.contains(e.target) && !overlay.classList.contains('minimized')) {minimizeOverlay();
+  }
+});
+// evita chiusura cliccando dentro
+overlay.addEventListener('click', (e) => {e.stopPropagation();
+});
+// click icona → riapre
+toggle.addEventListener('click', openOverlay);
+// Minimizza l'overlay dopo 3 secondi
+setTimeout(() => { minimizeOverlay(); }, timeout);
+/* Registra il Service Worker dell'app, se supportato dal browser. */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js');
+}
+  
+</script>
+</body>
+</html>
