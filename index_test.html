@@ -1023,8 +1023,9 @@ OK
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
-  
+  // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
+  // Carto Positron
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution: '&copy; OpenStreetMap contributors &copy; CARTO',subdomains: 'abcd',maxZoom: 19}).addTo(map);
   // 🌿 Base Mappa NEUTRA BUONA
   // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
 
