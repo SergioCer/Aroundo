@@ -1363,12 +1363,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       let query = supabase .from('eventi')
         .select(`*, organizzatori (or_nome), luoghi (lu_lat,lu_lng,lu_location,lu_descrizione,id_comune,comuni (co_descrizione))`)
         .eq('ev_attivo', true);
-      if (filters.start && filters.end) {query = query .lte('ev_inizio', filters.end) .gte('ev_fine', filters.start);}
+      if (filters.start && filters.end) {
+        const start = formatDatabaseDate(filters.start);
+        const end = formatDatabaseDate(filters.end);
+        query = query
+          .lte('ev_inizio', end)
+          .gte('ev_fine', start);
+      }
       const { data, error } = await query;
       if (error) {console.error("Errore caricamento eventi:", error); return [];}
       return data;
     }
 
+    function formatDatabaseDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const h = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const s = String(date.getSeconds()).padStart(2, '0');
+      return `${y}-${m}-${d} ${h}:${min}:${s}`;
+    }
+  
     async function loadEvents() {const range = getTimelineRange(); 
       events = await selectEvents({start: range.start, end: range.end});}
 
