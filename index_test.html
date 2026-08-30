@@ -1120,6 +1120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         timelineMode = 'past';
         updateDateUI();
         setupTimeline();
+        await loadEvents();
         renderEvents();
         updateMarkerVisibility();
         return;
@@ -1130,7 +1131,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateTimelineMode(); // Necessario: riallinea timelineMode a currentDate prima di ricostruire la timeline.
       updateDateUI();
       setupTimeline();
-      await loadEvents();
       renderEvents();
       updateMarkerVisibility();
     });
