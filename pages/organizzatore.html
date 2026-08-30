@@ -279,9 +279,10 @@ input, textarea {
 </div>
 </div>
 
-  
-  <!-- CREATO -->
-  <div class="footer" id="or_creato"></div>
+  <div class="footer">
+    Created: <span id="or_created"></span>
+    Updated: <span id="or_updated"></span>
+  </div>
   
 <!-- SI - NO - ANNULLA -->
 <div id="saveDialog" style="
@@ -402,9 +403,8 @@ async function load() {
   or_note.value = data.or_note || '';
   updateStatus(data.or_attivo);
   updatePreview();
-  or_creato.textContent = data.or_creato
-    ? new Date(data.or_creato).toLocaleString()
-    : '';
+  or_created.textContent = data.or_created ? new Date(data.or_created).toLocaleString() : 'New';
+  or_updated.textContent = data.or_updated ? new Date(data.or_updated).toLocaleString() : 'Never';
 eventiOpen = false;
 luoghiOpen = false;
 document.getElementById("eventiArrow").textContent = "▶";
