@@ -1115,7 +1115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href="pages/why-aroundo.html";
       };
 
-    document.getElementById("prev-day").addEventListener("click", () => {
+    document.getElementById("prev-day").addEventListener("click", async () => {
       if (timelineMode === 'live') {
         timelineMode = 'past';
         updateDateUI();
@@ -1131,11 +1131,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateTimelineMode(); // Necessario: riallinea timelineMode a currentDate prima di ricostruire la timeline.
       updateDateUI();
       setupTimeline();
+      await loadEvents();
       renderEvents();
       updateMarkerVisibility();
     });
   
-    document.getElementById("next-day").addEventListener("click", () => {
+    document.getElementById("next-day").addEventListener("click", async () => {
       const today = new Date();
       today.setHours(0,0,0,0);
       const current = new Date(currentDate);
@@ -1155,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateMarkerVisibility();
     });
   
-    document.getElementById("reset-day").addEventListener("click", () => {
+    document.getElementById("reset-day").addEventListener("click", async () => {
       currentDate = new Date(); // oggi
       updateTimelineMode();
       updateDateUI();
