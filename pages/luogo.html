@@ -300,7 +300,10 @@ textarea:disabled {
   </div>
   </div>
 
-  <div class="footer" id="lu_created"></div>
+  <div class="footer">
+    Created: <span id="lu_created"></span>
+    Updated: <span id="lu_updated"></span>
+  </div>
 
   <!-- SI - NO - ANNULLA -->
 <div id="saveDialog" style="
@@ -627,7 +630,8 @@ if (com.data) {
   lu_lng.value = data.lu_lng || '';
   lu_capienza.value = data.lu_capienza || '';
   environmentValue = data.lu_environment;
-  document.getElementById('lu_created').textContent = data.lu_created ? new Date(data.lu_created).toLocaleString() : '';
+  document.getElementById('lu_created').textContent = data.lu_created ? new Date(data.lu_created).toLocaleString() : 'New';
+  document.getElementById('lu_updated').textContent = data.lu_updated ? new Date(data.lu_updated).toLocaleString() : 'Never';
   updatePageState();
   updateEnvironmentUI();
 }
