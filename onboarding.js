@@ -55,6 +55,30 @@
     welcome.remove();
   }
 
+   /* Introduzione — Why Aroundo? */
+   async function showWhyAroundo() {
+     const why = document.createElement('div');
+     why.className = 'onboarding-card onboarding-welcome';
+     why.innerHTML = `
+       <div class="onboarding-title">
+         Why Aroundo?
+       </div>
+       <div class="onboarding-subtitle">
+         A map of events happening around you.<br>
+         Explore what's happening in your territory.
+       </div>
+     `;
+     layer.appendChild(why);
+     requestAnimationFrame(() => {
+       why.classList.add('visible');
+     });
+     await wait(3000);
+     why.classList.remove('visible');
+     why.classList.add('hide');
+     await wait(1000);
+     why.remove();
+   }
+   
   /* Evidenzia marker */
   function showMarkerHighlight(marker, mapInstance) {
     const latlng = marker.getLatLng();
@@ -139,41 +163,36 @@ function openRealPopup(markerData) {
 
    window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
    
-  /* Sequenza principale */
-  async function start(markerData, mapInstance) {
-    createLayer();
-    onboardingOriginalCenter = mapInstance.getCenter();
-    onboardingOriginalZoom = mapInstance.getZoom();
-    /* Lascia terminare la finestra iniziale di Aroundo */
-    await wait(ONBOARDING_START_DELAY); 
-    /* 1 — Welcome */
-    await showWelcome();
-    /* Nessun evento disponibile:
-     * non blocchiamo Aroundo. */
-    if (!markerData || !markerData.marker) {
-      console.log(
-        'Aroundo Onboarding: nessun evento disponibile.'
-      );
+   /* Sequenza principale */
+   async function start(markerData, mapInstance) {
+      createLayer();
+      onboardingOriginalCenter = mapInstance.getCenter();
+      onboardingOriginalZoom = mapInstance.getZoom();
+      /* Lascia terminare la finestra iniziale di Aroundo */
+      await wait(ONBOARDING_START_DELAY); 
+      /* Welcome */
+      await showWelcome();
+      /* Why Aroundo? */
+      await showWhyAroundo();
+      /* Nessun evento disponibile: non blocchiamo Aroundo. */
+      if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;}
+      /* evidenzia il marker */
+      showMarkerHighlight(markerData.marker, mapInstance);
+      await wait(1000);
+      /* avvicinamento progressivo */
+      await flyToEvent(markerData.marker, mapInstance);
+      updateMarkerHighlight(markerData.marker, mapInstance);
+      /* apertura del popup REALE */
+      await wait(500);
+      openRealPopup(markerData, mapInstance);
+      /* spiegazione */
+      await wait(1000);
+      await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
+      /* Lasciamo il fumetto visibile per qualche secondo. */
+      await wait(5000);
+      /* Fine V1 */
       finish(mapInstance);
-      return;
-    }
-    /* 2 — evidenzia il marker */
-    showMarkerHighlight(markerData.marker, mapInstance);
-    await wait(1000);
-    /* 3 — avvicinamento progressivo */
-    await flyToEvent(markerData.marker, mapInstance);
-    updateMarkerHighlight(markerData.marker, mapInstance);
-    /* 4 — apertura del popup REALE */
-    await wait(500);
-    openRealPopup(markerData, mapInstance);
-    /* 5 — spiegazione */
-    await wait(1000);
-    await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
-    /* Lasciamo il fumetto visibile per qualche secondo. */
-    await wait(5000);
-    /* Fine V1 */
-    finish(mapInstance);
-  }
+   }
 
 function finish(mapInstance) {
   if (mapInstance) {
