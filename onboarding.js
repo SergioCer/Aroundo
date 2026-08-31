@@ -43,7 +43,7 @@
     layer.appendChild(welcome);
     // permette al browser di applicare lo stato iniziale
     requestAnimationFrame(() => {welcome.classList.add('visible');});
-    await wait(4000);
+    await wait(5000);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
     await wait(500);
@@ -65,7 +65,7 @@
      `;
      layer.appendChild(why);
      requestAnimationFrame(() => {why.classList.add('visible');});
-     await wait(4000);
+     await wait(5000);
      why.classList.remove('visible');
      why.classList.add('hide');
      await wait(500);
@@ -162,8 +162,8 @@
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
       await wait(1500); /* Lascia terminare la finestra iniziale di Aroundo */
-      await showWelcome(); /* 4,5'' */
-      await showWhyAroundo(); /* 4,5'' */
+      await showWelcome(); /* 5,5'' */
+      await showWhyAroundo(); /* 5,5'' */
       if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
@@ -172,13 +172,13 @@
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       openRealPopup(markerData, mapInstance);
-      await wait(4000);
+      await wait(3000);
       hideBubble();
       mapInstance.closePopup();
       // Aggiungi altro
       showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
       await wait(1500);
-      finish(mapInstance); /* total 23,0'' */
+      finish(mapInstance); /* total 24,0'' */
    }
 
    function finish(mapInstance) {
