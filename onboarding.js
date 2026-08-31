@@ -173,20 +173,20 @@
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
       /* spiegazione Marker */
-      await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
-      await wait(500);
-      hideBubble()
+      showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
+      await wait(5000);
       /* avvicinamento progressivo */
       await flyToEvent(markerData.marker, mapInstance);
       updateMarkerHighlight(markerData.marker, mapInstance);
       /* apertura del popup REALE */
       openRealPopup(markerData, mapInstance);
       /* Lasciamo il fumetto visibile per qualche secondo. */
-      await wait(4500);
-      /* Fine V1 */
-      await showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
-      await wait(5500);
-      hideBubble()
+      await wait(5000);
+      hideBubble();
+      mapInstance.closePopup();
+      showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
+      await wait(5000);
+      hideBubble();
       finish(mapInstance);
    }
 
