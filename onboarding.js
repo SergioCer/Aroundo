@@ -166,21 +166,28 @@ function openRealPopup(markerData) {
   }
 
   /* Fine onboarding */
-  function finish() {
-    if (highlight) {
-      highlight.remove();
-      highlight = null;
-    }
-    if (bubble) {
-      bubble.remove();
-      bubble = null;
-    }
-    if (layer) {
-      layer.remove();
-      layer = null;
-    }
-    /* Per ora NON salviamo localStorage.
-     * Durante i test vogliamo che l'onboarding
-     * possa essere ripetuto. */
+function finish() {
+  if (highlight) {
+    highlight.remove();
+    highlight = null;
   }
+  if (bubble) {
+    bubble.classList.remove('visible');
+    bubble.classList.add('hide');
+    setTimeout(() => {
+      if (bubble) {
+        bubble.remove();
+        bubble = null;
+      }
+    }, 700);
+  }
+  if (layer) {
+    setTimeout(() => {
+      if (layer) {
+        layer.remove();
+        layer = null;
+      }
+    }, 700);
+  }
+}
 })();
