@@ -118,7 +118,7 @@
        const point = mapInstance.latLngToContainerPoint(latlng);
        const margin = 16;
        let left = point.x - bubble.offsetWidth / 2;
-       let top = point.y + 100;
+       let top = point.y + 125;
        const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
        left = Math.max(margin, Math.min(left, maxLeft));
        bubble.style.left = `${left}px`;
@@ -176,6 +176,7 @@
       await wait(5000);
       /* Fine V1 */
       await showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
+      await wait(3000);
       finish(mapInstance);
    }
 
