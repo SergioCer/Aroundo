@@ -108,7 +108,7 @@
        layer.appendChild(bubble);
        positionBubble(marker, mapInstance);
        requestAnimationFrame(() => {bubble.classList.add('visible');});
-       await wait(100);
+       await wait(500);
      }
 
      /* Posiziona fumetto vicino al marker */
@@ -118,7 +118,7 @@
        const point = mapInstance.latLngToContainerPoint(latlng);
        const margin = 16;
        let left = point.x - bubble.offsetWidth / 2;
-       let top = point.y + 75;
+       let top = point.y + 100;
        const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
        left = Math.max(margin, Math.min(left, maxLeft));
        bubble.style.left = `${left}px`;
@@ -155,7 +155,7 @@
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
       /* Lascia terminare la finestra iniziale di Aroundo */
-      await wait(1000); 
+      await wait(1500); 
       /* Welcome */
       await showWelcome();
       /* Why Aroundo? */
@@ -164,7 +164,7 @@
       if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;}
       /* evidenzia il marker */
       showMarkerHighlight(markerData.marker, mapInstance);
-      // await wait(500);
+      await wait(500);
       /* spiegazione Marker */
       await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
       /* avvicinamento progressivo */
@@ -172,10 +172,10 @@
       updateMarkerHighlight(markerData.marker, mapInstance);
       /* apertura del popup REALE */
       openRealPopup(markerData, mapInstance);
-      // await wait(500);
       /* Lasciamo il fumetto visibile per qualche secondo. */
       await wait(5000);
       /* Fine V1 */
+      await showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
       finish(mapInstance);
    }
 
