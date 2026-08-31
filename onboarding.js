@@ -30,12 +30,12 @@
   /* Welcome */
   async function showWelcome() {
     const welcome = document.createElement('div');
-    welcome.className = 'onboarding-welcome';
+    welcome.className = 'ng-welcome';
     welcome.innerHTML = `
-      <div class="onboarding-title">
-        Aroundo Onboarding
+      <div class="ng-title">
+        Aroundo ng
       </div>
-      <div class="onboarding-subtitle">
+      <div class="ng-subtitle">
         Welcome!<br>
         Let me show you how it works.
       </div>
@@ -45,7 +45,7 @@
     requestAnimationFrame(() => {
       welcome.classList.add('visible');
     });
-    await wait(ONBOARDING_WELCOME_TIME);
+    await wait(NG_WELCOME_TIME);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
     await wait(450);
@@ -53,9 +53,9 @@
   }
 
   /* Evidenzia marker */
-  function showMarkerHighlight(marker) {
+  function showMarkerHighlight(marker, mapInstance) {
     const latlng = marker.getLatLng();
-    const point = map.latLngToContainerPoint(latlng);
+    const point = mapInstance.latLngToContainerPoint(latlng);
     highlight = document.createElement('div');
     highlight.className = 'onboarding-marker-highlight';
     highlight.style.left = `${point.x}px`;
@@ -64,23 +64,23 @@
   }
 
   /* Aggiorna posizione evidenziazione */
-  function updateMarkerHighlight(marker) {
+  function updateMarkerHighlight(marker, mapInstance) {
     if (!highlight) {
       return;
     }
     const latlng = marker.getLatLng();
-    const point = map.latLngToContainerPoint(latlng);
+    const point = mapInstance.latLngToContainerPoint(latlng);
     highlight.style.left = `${point.x}px`;
     highlight.style.top = `${point.y}px`;
   }
 
   /* Mostra fumetto */
-  async function showBubble(text, marker) {
+  async function showBubble(text, marker, mapInstance) {
     bubble = document.createElement('div');
     bubble.className = 'onboarding-bubble';
     bubble.textContent = text;
     layer.appendChild(bubble);
-    positionBubble(marker);
+    positionBubble(marker, mapInstance);
     requestAnimationFrame(() => {
       bubble.classList.add('visible');
     });
@@ -88,12 +88,12 @@
   }
 
   /* Posiziona fumetto vicino al marker */
-  function positionBubble(marker) {
+  function positionBubble(marker, mapInstance) {
     if (!bubble) {
       return;
     }
     const latlng = marker.getLatLng();
-    const point = map.latLngToContainerPoint(latlng);
+    const point = mapInstance.latLngToContainerPoint(latlng);
     const margin = 16;
     let left = point.x - bubble.offsetWidth / 2;
     let top = point.y - bubble.offsetHeight - 35;
@@ -107,18 +107,11 @@
   }
 
   /* Aspetta che la mappa abbia terminato il movimento */
-  function flyToEvent(marker) {
+  function flyToEvent(marker, mapInstance) {
     return new Promise(resolve => {
       const latlng = marker.getLatLng();
-      map.once('moveend', resolve);
-      map.flyTo(
-        latlng,
-        ONBOARDING_ZOOM,
-        {
-          duration: ONBOARDING_FLY_DURATION,
-          easeLinearity: 0.25
-        }
-      );
+      mapInstance.once('moveend', resolve);
+      mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: ONBOARDING_FLY_DURATION, easeLinearity: 0.25});
     });
   }
 
@@ -140,16 +133,16 @@
     );
   }
 
-   window.aroundoOnboardingStart = function(markerData) {start(markerData);};
+   window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
    
   /* Sequenza principale */
-  async function start(markerData) {
+  async function start(markerData, mapInstance) {
     createLayer();
     /* 1 — Welcome */
     await showWelcome();
     /* Nessun evento disponibile:
      * non blocchiamo Aroundo. */
-    if (!markerData) {
+    if (!markerData || !markerData.marker) {
       console.log(
         'Aroundo Onboarding: nessun evento disponibile.'
       );
@@ -157,19 +150,19 @@
       return;
     }
     /* 2 — evidenzia il marker */
-    showMarkerHighlight(markerData.marker);
+    showMarkerHighlight(markerData.marker, mapInstance);
     await wait(500);
     /* 3 — avvicinamento progressivo */
-    await flyToEvent(markerData.marker);
+    await flyToEvent(markerData.marker, mapInstance);
     updateMarkerHighlight(markerData.marker);
     /* 4 — apertura del popup REALE */
     await wait(300);
-    openRealPopup(markerData);
+    openRealPopup(markerData, mapInstance);
     /* 5 — spiegazione */
     await wait(500);
     await showBubble(
       'Tap an event to discover what is happening around you.',
-      markerData.marker
+      markerData.marker, mapInstance
     );
     /* Lasciamo il fumetto visibile per qualche secondo. */
     await wait(4000);
