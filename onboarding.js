@@ -115,23 +115,14 @@
     });
   }
 
-  /* Apertura popup REALE di Aroundo */
-  function openRealPopup(markerData) {
-    const marker = markerData.marker;
-    /* Recuperiamo l'evento associato al marker.
-     * Per la V1 usiamo l'indice corrispondente
-     * alla struttura già presente in markers. */
-      {console.warn('Aroundo Onboarding: evento demo non trovato.');
-      return;
-    }
-    const event = events[markerIndex];
-    /* Utilizziamo direttamente la funzione reale
-     * già presente in Aroundo. */
-    window.openBasePopup(
-      event,
-      marker.getLatLng()
-    );
-  }
+/* Apertura popup REALE di Aroundo */
+function openRealPopup(markerData) {
+  const marker = markerData.marker;
+  const event = markerData.event;
+  if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
+  window.openBasePopup(event, marker.getLatLng());
+}
+
 
    window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
    
