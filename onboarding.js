@@ -46,7 +46,7 @@
     await wait(4000);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
-    await wait(1000);
+    await wait(500);
     welcome.remove();
   }
 
@@ -68,7 +68,7 @@
      await wait(4000);
      why.classList.remove('visible');
      why.classList.add('hide');
-     await wait(1000);
+     await wait(500);
      why.remove();
    }
    
@@ -161,33 +161,25 @@
       createLayer();
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
-      /* Lascia terminare la finestra iniziale di Aroundo */
-      await wait(1500); 
-      /* Welcome */
-      await showWelcome();
-      /* Why Aroundo? */
-      await showWhyAroundo();
-      /* Nessun evento disponibile: non blocchiamo Aroundo. */
-      if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;}
-      /* evidenzia il marker */
+      await wait(1500); /* Lascia terminare la finestra iniziale di Aroundo */
+      await showWelcome(); /* 4,5'' */
+      await showWhyAroundo(); /* 4,5'' */
+      if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
-      /* spiegazione Marker */
       showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
-      await wait(5000);
-      /* avvicinamento progressivo */
-      await flyToEvent(markerData.marker, mapInstance);
+      await wait(3000);
+      await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
-      /* apertura del popup REALE */
       openRealPopup(markerData, mapInstance);
-      /* Lasciamo il fumetto visibile per qualche secondo. */
-      await wait(5000);
+      await wait(4000);
       hideBubble();
       mapInstance.closePopup();
+      // Aggiungi altro
       showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
       await wait(5000);
       hideBubble();
-      finish(mapInstance);
+      finish(mapInstance); /* total 26,5'' */
    }
 
    function finish(mapInstance) {
