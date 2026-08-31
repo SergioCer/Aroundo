@@ -8,7 +8,7 @@
 
 (function () {
   'use strict';
-  // const ONBOARDING_ZOOM = 13;
+  const ONBOARDING_ZOOM = 13;
   let layer = null;
   let highlight = null;
   let bubble = null;
@@ -107,7 +107,6 @@
        layer.appendChild(bubble);
        positionBubble(marker, mapInstance);
        requestAnimationFrame(() => {bubble.classList.add('visible');});
-       await wait(500);
      }
 
      /* Posiziona fumetto vicino al marker */
@@ -134,7 +133,7 @@
             updateMarkerHighlight(marker, mapInstance);
             resolve();
           });
-          mapInstance.flyTo(latlng, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});
+          mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: 3.5, easeLinearity: 0.25});
         });
       }
    
@@ -172,10 +171,10 @@
       /* apertura del popup REALE */
       openRealPopup(markerData, mapInstance);
       /* Lasciamo il fumetto visibile per qualche secondo. */
-      await wait(5000);
+      await wait(4500);
       /* Fine V1 */
       await showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
-      await wait(5000);
+      await wait(5500);
       finish(mapInstance);
    }
 
