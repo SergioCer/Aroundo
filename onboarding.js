@@ -195,3 +195,4 @@
      * Durante i test vogliamo che l'onboarding
      * possa essere ripetuto. */
   }
+})();
