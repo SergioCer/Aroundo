@@ -1420,8 +1420,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Effetti grafici e Fuochi d'artificio
         marker.on('click', function () {analyticsMarker();
         window.openBasePopup(e, this.getLatLng());});
-        markers.push({ marker, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
+        markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
+        if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
+        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0]);}
     }
 
     /* Funzione prevista da CANCELLARE con la nuova logica */
