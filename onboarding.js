@@ -8,9 +8,9 @@
 
 (function () {
   'use strict';
-  const ONBOARDING_WELCOME_TIME = 3000;
+  const ONBOARDING_WELCOME_TIME = 4000;
   const ONBOARDING_ZOOM = 13;
-  const ONBOARDING_FLY_DURATION = 2.5;
+  const ONBOARDING_FLY_DURATION = 3.5;
   let layer = null;
   let highlight = null;
   let bubble = null;
@@ -48,7 +48,7 @@
     await wait(ONBOARDING_WELCOME_TIME);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
-    await wait(450);
+    await wait(500);
     welcome.remove();
   }
 
