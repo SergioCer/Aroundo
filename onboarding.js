@@ -177,9 +177,8 @@
       mapInstance.closePopup();
       // Aggiungi altro
       showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
-      await wait(5000);
-      hideBubble();
-      finish(mapInstance); /* total 26,5'' */
+      await wait(1500);
+      finish(mapInstance); /* total 23,0'' */
    }
 
    function finish(mapInstance) {
@@ -187,8 +186,8 @@
       if (onboardingOriginalCenter !== null) {
       mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
       if (highlight) {highlight.remove(); highlight = null;}
-      hideBubble()
-      if (layer) {setTimeout(() => {if (layer) {layer.remove(); layer = null;}}, 700);}
+         setTimeout(() => {hideBubble();
+      if (layer) {layer.remove(); layer = null;}}, 3500);
    }
-
+   
 })();
