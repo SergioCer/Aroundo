@@ -109,6 +109,14 @@
        requestAnimationFrame(() => {bubble.classList.add('visible');});
      }
 
+      function hideBubble() {
+        if (!bubble) {return;}
+        bubble.classList.remove('visible');
+        bubble.classList.add('hide');
+        setTimeout(() => {if (bubble) {bubble.remove(); bubble = null;}}, 700);
+      }
+
+
      /* Posiziona fumetto vicino al marker */
      function positionBubble(marker, mapInstance) {
        if (!bubble) {return;}
@@ -166,6 +174,7 @@
       /* spiegazione Marker */
       await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
       await wait(500);
+      hideBubble()
       /* avvicinamento progressivo */
       await flyToEvent(markerData.marker, mapInstance);
       updateMarkerHighlight(markerData.marker, mapInstance);
@@ -176,6 +185,7 @@
       /* Fine V1 */
       await showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
       await wait(5500);
+      hideBubble()
       finish(mapInstance);
    }
 
@@ -184,10 +194,7 @@
       if (onboardingOriginalCenter !== null) {
       mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
       if (highlight) {highlight.remove(); highlight = null;}
-      if (bubble) {
-         bubble.classList.remove('visible');
-         bubble.classList.add('hide');
-         setTimeout(() => {if (bubble) {bubble.remove(); bubble = null;}}, 700);}
+      hideBubble()
       if (layer) {setTimeout(() => {if (layer) {layer.remove(); layer = null;}}, 700);}
    }
 
