@@ -41,15 +41,15 @@
 
 .onboarding-title {
   color: #3b82f6;
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
 .onboarding-subtitle {
   color: #555;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.45;
 }
 
 /* Evidenziazione marker */
@@ -91,8 +91,8 @@
   color: #333;
   background: rgba(255, 255, 255, 0.96);
   border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.35;
+  font-size: 16px;
+  line-height: 1.45;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.20);
   border: 1px solid rgba(59, 130, 246, 0.18);
   opacity: 1;
@@ -120,13 +120,13 @@
     padding: 18px 20px;
   }
   .onboarding-title {
-    font-size: 18px;
+    font-size: 20px;
   }
   .onboarding-subtitle {
-    font-size: 13px;
+    font-size: 16px;
   }
   .onboarding-bubble {
     max-width: calc(100vw - 32px);
-    font-size: 13px;
+    font-size: 16px;
   }
 }
