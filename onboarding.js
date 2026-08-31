@@ -8,9 +8,9 @@
 
 (function () {
   'use strict';
-  const ONBOARDING_WELCOME_TIME = 1800;
+  const ONBOARDING_WELCOME_TIME = 3000;
   const ONBOARDING_ZOOM = 13;
-  const ONBOARDING_FLY_DURATION = 2.2;
+  const ONBOARDING_FLY_DURATION = 2.5;
   let layer = null;
   let highlight = null;
   let bubble = null;
@@ -151,21 +151,21 @@
     }
     /* 2 — evidenzia il marker */
     showMarkerHighlight(markerData.marker, mapInstance);
-    await wait(500);
+    await wait(1000);
     /* 3 — avvicinamento progressivo */
     await flyToEvent(markerData.marker, mapInstance);
-    updateMarkerHighlight(markerData.marker);
+    updateMarkerHighlight(markerData.marker, mapInstance);
     /* 4 — apertura del popup REALE */
-    await wait(300);
+    await wait(500);
     openRealPopup(markerData, mapInstance);
     /* 5 — spiegazione */
-    await wait(500);
+    await wait(1000);
     await showBubble(
       'Tap an event to discover what is happening around you.',
       markerData.marker, mapInstance
     );
     /* Lasciamo il fumetto visibile per qualche secondo. */
-    await wait(4000);
+    await wait(5000);
     /* Fine V1 */
     finish();
   }
