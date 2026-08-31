@@ -31,7 +31,7 @@
   /* Welcome */
   async function showWelcome() {
     const welcome = document.createElement('div');
-    welcome.className = 'onboarding-welcome';
+    welcome.className = 'onboarding-card onboarding-welcome';
     welcome.innerHTML = `
       <div class="onboarding-title">
         Aroundo onboarding...
@@ -49,7 +49,7 @@
     await wait(ONBOARDING_WELCOME_TIME);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
-    await wait(500);
+    await wait(1000);
     welcome.remove();
   }
 
@@ -76,10 +76,17 @@
   }
 
   /* Mostra fumetto */
-  async function showBubble(text, marker, mapInstance) {
+  async function showBubble(title, text, marker, mapInstance) {
     bubble = document.createElement('div');
-    bubble.className = 'onboarding-bubble';
-    bubble.textContent = text;
+    bubble.className = 'onboarding-card onboarding-bubble';
+      bubble.innerHTML = `
+       <div class="onboarding-title">
+         ${title}
+       </div>
+       <div class="onboarding-subtitle">
+         ${text}
+       </div>
+     `;
     layer.appendChild(bubble);
     positionBubble(marker, mapInstance);
     requestAnimationFrame(() => {
@@ -158,10 +165,7 @@ function openRealPopup(markerData) {
     openRealPopup(markerData, mapInstance);
     /* 5 — spiegazione */
     await wait(1000);
-    await showBubble(
-      'Tap an event to discover what is happening around you.',
-      markerData.marker, mapInstance
-    );
+    await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
     /* Lasciamo il fumetto visibile per qualche secondo. */
     await wait(5000);
     /* Fine V1 */
