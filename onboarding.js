@@ -128,14 +128,7 @@
     /* Recuperiamo l'evento associato al marker.
      * Per la V1 usiamo l'indice corrispondente
      * alla struttura già presente in markers. */
-    const markerIndex = markers.indexOf(markerData);
-    if (
-      markerIndex === -1 ||
-      !events[markerIndex]
-    ) {
-      console.warn(
-        'Aroundo Onboarding: evento demo non trovato.'
-      );
+      {console.warn('Aroundo Onboarding: evento demo non trovato.');
       return;
     }
     const event = events[markerIndex];
@@ -150,7 +143,7 @@
    window.aroundoOnboardingStart = function(markerData) {start(markerData);};
    
   /* Sequenza principale */
-  async function start() {
+  async function start(markerData) {
     createLayer();
     /* 1 — Welcome */
     await showWelcome();
