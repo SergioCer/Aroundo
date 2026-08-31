@@ -45,7 +45,7 @@
     requestAnimationFrame(() => {
       welcome.classList.add('visible');
     });
-    await wait(NG_WELCOME_TIME);
+    await wait(ONBOARDING_WELCOME_TIME);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
     await wait(450);
