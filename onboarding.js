@@ -47,7 +47,7 @@
     await wait(4000);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
-    await wait(1000);
+    await wait(500);
     welcome.remove();
   }
 
@@ -69,7 +69,7 @@
      await wait(4000);
      why.classList.remove('visible');
      why.classList.add('hide');
-     await wait(1000);
+     await wait(500);
      why.remove();
    }
    
@@ -155,7 +155,7 @@
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
       /* Lascia terminare la finestra iniziale di Aroundo */
-      await wait(2000); 
+      await wait(1000); 
       /* Welcome */
       await showWelcome();
       /* Why Aroundo? */
@@ -164,15 +164,15 @@
       if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;}
       /* evidenzia il marker */
       showMarkerHighlight(markerData.marker, mapInstance);
-      await wait(1000);
+      // await wait(500);
+      /* spiegazione Marker */
+      await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
       /* avvicinamento progressivo */
       await flyToEvent(markerData.marker, mapInstance);
       updateMarkerHighlight(markerData.marker, mapInstance);
-      /* spiegazione Marker */
-      await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
       /* apertura del popup REALE */
-      await wait(500);
       openRealPopup(markerData, mapInstance);
+      // await wait(500);
       /* Lasciamo il fumetto visibile per qualche secondo. */
       await wait(5000);
       /* Fine V1 */
