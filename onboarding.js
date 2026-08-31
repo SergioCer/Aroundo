@@ -115,7 +115,7 @@
          oldBubble.classList.remove('visible');
          oldBubble.classList.add('hide');
          setTimeout(() => {oldBubble.remove();
-         if (bubble === oldBubble) {bubble = null;}}, 700);
+         if (bubble === oldBubble) {bubble = null;}}, 800);
       }
 
      /* Posiziona fumetto vicino al marker */
