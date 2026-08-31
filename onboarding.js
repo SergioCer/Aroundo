@@ -15,7 +15,9 @@
   let layer = null;
   let highlight = null;
   let bubble = null;
-
+  let onboardingOriginalCenter = null;
+  let onboardingOriginalZoom = null;
+   
   /* Utility */
   function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -135,12 +137,13 @@ function openRealPopup(markerData) {
   window.openBasePopup(event, marker.getLatLng());
 }
 
-
    window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
    
   /* Sequenza principale */
   async function start(markerData, mapInstance) {
     createLayer();
+    onboardingOriginalCenter = mapInstance.getCenter();
+    onboardingOriginalZoom = mapInstance.getZoom();
     /* Lascia terminare la finestra iniziale di Aroundo */
     await wait(ONBOARDING_START_DELAY); 
     /* 1 — Welcome */
@@ -176,6 +179,11 @@ function finish(mapInstance) {
   if (mapInstance) {
     mapInstance.closePopup();
   }
+   if (onboardingOriginalCenter !== null) {
+   mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom,
+      {duration: 2.0, easeLinearity: 0.25}
+      );
+   }
   if (highlight) {
     highlight.remove();
     highlight = null;
