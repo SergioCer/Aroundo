@@ -168,8 +168,17 @@
           mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: 3.5, easeLinearity: 0.25});
         });
       }
-   
-      /* Apertura popup REALE di Aroundo */
+
+    function markerClickEffect(marker) {
+      const element = marker.getElement();
+      if (!element) {return;}
+      element.classList.remove('onboarding-marker-click');
+      // forza il riavvio animazione
+      void element.offsetWidth;
+      element.classList.add('onboarding-marker-click');
+    }
+  
+      /* Apertura Marker */
       function openRealPopup(markerData) {
         const marker = markerData.marker;
         const event = markerData.event;
@@ -195,6 +204,7 @@
       await wait(2000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
+      markerClickEffect(markerData.marker); // Effetto Click sul Marker
       openRealPopup(markerData, mapInstance);
       await wait(3000);
       hideBubble();
