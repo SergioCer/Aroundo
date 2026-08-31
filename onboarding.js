@@ -144,7 +144,7 @@ function openRealPopup(markerData) {
       console.log(
         'Aroundo Onboarding: nessun evento disponibile.'
       );
-      finish();
+      finish(mapInstance);
       return;
     }
     /* 2 — evidenzia il marker */
@@ -165,11 +165,13 @@ function openRealPopup(markerData) {
     /* Lasciamo il fumetto visibile per qualche secondo. */
     await wait(5000);
     /* Fine V1 */
-    finish();
+    finish(mapInstance);
   }
 
-  /* Fine onboarding */
-function finish() {
+function finish(mapInstance) {
+  if (mapInstance) {
+    mapInstance.closePopup();
+  }
   if (highlight) {
     highlight.remove();
     highlight = null;
@@ -193,4 +195,5 @@ function finish() {
     }, 700);
   }
 }
+
 })();
