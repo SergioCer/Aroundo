@@ -46,7 +46,7 @@
     await wait(4000);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
-    await wait(500);
+    await wait(1000);
     welcome.remove();
   }
 
@@ -68,7 +68,7 @@
      await wait(4000);
      why.classList.remove('visible');
      why.classList.add('hide');
-     await wait(500);
+     await wait(1000);
      why.remove();
    }
    
@@ -93,7 +93,7 @@
   }
 
      /* Mostra fumetto */
-     async function showBubble(title, text, marker, mapInstance) {
+     function showBubble(title, text, marker, mapInstance) {
        bubble = document.createElement('div');
        bubble.className = 'onboarding-card onboarding-bubble';
          bubble.innerHTML = `
@@ -165,6 +165,7 @@
       await wait(500);
       /* spiegazione Marker */
       await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
+      await wait(500);
       /* avvicinamento progressivo */
       await flyToEvent(markerData.marker, mapInstance);
       updateMarkerHighlight(markerData.marker, mapInstance);
