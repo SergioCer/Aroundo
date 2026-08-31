@@ -182,6 +182,7 @@
    /* Sequenza */
    async function start(markerData, mapInstance) {
       createLayer();
+      disableMapInteraction(mapInstance);
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
       await wait(1500); /* Lascia terminare la finestra iniziale di Aroundo */
@@ -211,6 +212,26 @@
       if (highlight) {highlight.remove(); highlight = null;}
          setTimeout(() => {hideBubble();
       if (layer) {layer.remove(); layer = null;}}, 3500);
+      enableMapInteraction(mapInstance);
    }
+
+    function disableMapInteraction(map) {
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+    }
+  
+  function enableMapInteraction(map) {
+    map.dragging.enable();
+    map.touchZoom.enable();
+    map.doubleClickZoom.enable();
+    map.scrollWheelZoom.enable();
+    map.doubleClickZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+  }
    
 })();
