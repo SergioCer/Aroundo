@@ -176,7 +176,7 @@
       hideBubble();
       mapInstance.closePopup();
       // Aggiungi altro
-      showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
+      showBubble('Aroundo', 'You are ready!<br>Discover what\'s Around•you.', markerData.marker, mapInstance);
       await wait(1500);
       finish(mapInstance); /* total 24,0'' */
    }
