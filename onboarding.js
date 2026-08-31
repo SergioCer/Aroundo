@@ -8,8 +8,7 @@
 
 (function () {
   'use strict';
-  const ONBOARDING_ZOOM = 13;
-  const ONBOARDING_FLY_DURATION = 3.5;
+  // const ONBOARDING_ZOOM = 13;
   let layer = null;
   let highlight = null;
   let bubble = null;
@@ -135,7 +134,7 @@
             updateMarkerHighlight(marker, mapInstance);
             resolve();
           });
-          mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: ONBOARDING_FLY_DURATION, easeLinearity: 0.25});
+          mapInstance.flyTo(latlng, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});
         });
       }
    
@@ -176,14 +175,14 @@
       await wait(5000);
       /* Fine V1 */
       await showBubble('Aroundo', 'Have fun!', markerData.marker, mapInstance);
-      await wait(3000);
+      await wait(5000);
       finish(mapInstance);
    }
 
    function finish(mapInstance) {
       if (mapInstance) {mapInstance.closePopup();}
       if (onboardingOriginalCenter !== null) {
-      mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 2.0, easeLinearity: 0.25});}
+      mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
       if (highlight) {highlight.remove(); highlight = null;}
       if (bubble) {
          bubble.classList.remove('visible');
