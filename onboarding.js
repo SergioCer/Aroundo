@@ -16,7 +16,6 @@
   let bubble = null;
 
   /* Utility */
-
   function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -51,14 +50,6 @@
     welcome.classList.add('hide');
     await wait(450);
     welcome.remove();
-  }
-
-  /* Trova il primo evento disponibile */
-  function getDemoMarker() {
-    if (!Array.isArray(markers) || markers.length === 0) {
-      return null;
-    }
-    return markers[0];
   }
 
   /* Evidenzia marker */
@@ -156,43 +147,36 @@
     );
   }
 
+   window.aroundoOnboardingStart = function(markerData) {start(markerData);};
+   
   /* Sequenza principale */
   async function start() {
     createLayer();
     /* 1 — Welcome */
     await showWelcome();
-    /* 2 — aspettiamo che i marker siano realmente presenti */
-    let demoMarker = null;
-    for (let i = 0; i < 30; i++) {
-      demoMarker = getDemoMarker();
-      if (demoMarker) {
-        break;
-      }
-      await wait(250);
-    }
     /* Nessun evento disponibile:
      * non blocchiamo Aroundo. */
-    if (!demoMarker) {
+    if (!markerData) {
       console.log(
         'Aroundo Onboarding: nessun evento disponibile.'
       );
       finish();
       return;
     }
-    /* 3 — evidenzia il marker */
-    showMarkerHighlight(demoMarker.marker);
+    /* 2 — evidenzia il marker */
+    showMarkerHighlight(markerData.marker);
     await wait(500);
-    /* 4 — avvicinamento progressivo */
-    await flyToEvent(demoMarker.marker);
-    updateMarkerHighlight(demoMarker.marker);
-    /* 5 — apertura del popup REALE */
+    /* 3 — avvicinamento progressivo */
+    await flyToEvent(markerData.marker);
+    updateMarkerHighlight(markerData.marker);
+    /* 4 — apertura del popup REALE */
     await wait(300);
-    openRealPopup(demoMarker);
-    /* 6 — spiegazione */
+    openRealPopup(markerData);
+    /* 5 — spiegazione */
     await wait(500);
     await showBubble(
       'Tap an event to discover what is happening around you.',
-      demoMarker.marker
+      markerData.marker
     );
     /* Lasciamo il fumetto visibile per qualche secondo. */
     await wait(4000);
@@ -218,11 +202,3 @@
      * Durante i test vogliamo che l'onboarding
      * possa essere ripetuto. */
   }
-
-  /* Avvio */
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', start);
-} else {
-  start();
-}
-})();
