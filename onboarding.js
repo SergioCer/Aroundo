@@ -8,8 +8,6 @@
 
 (function () {
   'use strict';
-  const ONBOARDING_START_DELAY = 2000;
-  const ONBOARDING_WELCOME_TIME = 4000;
   const ONBOARDING_ZOOM = 13;
   const ONBOARDING_FLY_DURATION = 3.5;
   let layer = null;
@@ -45,17 +43,15 @@
     `;
     layer.appendChild(welcome);
     // permette al browser di applicare lo stato iniziale
-    requestAnimationFrame(() => {
-      welcome.classList.add('visible');
-    });
-    await wait(ONBOARDING_WELCOME_TIME);
+    requestAnimationFrame(() => {welcome.classList.add('visible');});
+    await wait(4000);
     welcome.classList.remove('visible');
     welcome.classList.add('hide');
     await wait(1000);
     welcome.remove();
   }
 
-   /* Introduzione — Why Aroundo? */
+   /* Why Aroundo? */
    async function showWhyAroundo() {
      const why = document.createElement('div');
      why.className = 'onboarding-card onboarding-welcome';
@@ -65,14 +61,12 @@
        </div>
        <div class="onboarding-subtitle">
          A map of events happening around you.<br>
-         Explore what's happening in your territory.
+         Explore what's happening in your area.
        </div>
      `;
      layer.appendChild(why);
-     requestAnimationFrame(() => {
-       why.classList.add('visible');
-     });
-     await wait(3000);
+     requestAnimationFrame(() => {why.classList.add('visible');});
+     await wait(4000);
      why.classList.remove('visible');
      why.classList.add('hide');
      await wait(1000);
@@ -92,84 +86,76 @@
 
   /* Aggiorna posizione evidenziazione */
   function updateMarkerHighlight(marker, mapInstance) {
-    if (!highlight) {
-      return;
-    }
+    if (!highlight) {return;}
     const latlng = marker.getLatLng();
     const point = mapInstance.latLngToContainerPoint(latlng);
     highlight.style.left = `${point.x}px`;
     highlight.style.top = `${point.y}px`;
   }
 
-  /* Mostra fumetto */
-  async function showBubble(title, text, marker, mapInstance) {
-    bubble = document.createElement('div');
-    bubble.className = 'onboarding-card onboarding-bubble';
-      bubble.innerHTML = `
-       <div class="onboarding-title">
-         ${title}
-       </div>
-       <div class="onboarding-subtitle">
-         ${text}
-       </div>
-     `;
-    layer.appendChild(bubble);
-    positionBubble(marker, mapInstance);
-    requestAnimationFrame(() => {
-      bubble.classList.add('visible');
-    });
-    await wait(100);
-  }
+     /* Mostra fumetto */
+     async function showBubble(title, text, marker, mapInstance) {
+       bubble = document.createElement('div');
+       bubble.className = 'onboarding-card onboarding-bubble';
+         bubble.innerHTML = `
+          <div class="onboarding-title">
+            ${title}
+          </div>
+          <div class="onboarding-subtitle">
+            ${text}
+          </div>
+        `;
+       layer.appendChild(bubble);
+       positionBubble(marker, mapInstance);
+       requestAnimationFrame(() => {bubble.classList.add('visible');});
+       await wait(100);
+     }
 
-  /* Posiziona fumetto vicino al marker */
-  function positionBubble(marker, mapInstance) {
-    if (!bubble) {
-      return;
-    }
-    const latlng = marker.getLatLng();
-    const point = mapInstance.latLngToContainerPoint(latlng);
-    const margin = 16;
-    let left = point.x - bubble.offsetWidth / 2;
-    let top = point.y + 75;
-    const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
-    left = Math.max(margin, Math.min(left, maxLeft));
-    bubble.style.left = `${left}px`;
-    bubble.style.top = `${top}px`;
-  }
+     /* Posiziona fumetto vicino al marker */
+     function positionBubble(marker, mapInstance) {
+       if (!bubble) {return;}
+       const latlng = marker.getLatLng();
+       const point = mapInstance.latLngToContainerPoint(latlng);
+       const margin = 16;
+       let left = point.x - bubble.offsetWidth / 2;
+       let top = point.y + 75;
+       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
+       left = Math.max(margin, Math.min(left, maxLeft));
+       bubble.style.left = `${left}px`;
+       bubble.style.top = `${top}px`;
+     }
 
-  /* Aspetta che la mappa abbia terminato il movimento */
-  function flyToEvent(marker, mapInstance) {
-    return new Promise(resolve => {
-      const latlng = marker.getLatLng();
-       const updateHighlight = () => {
-         updateMarkerHighlight(marker, mapInstance);
-       };
-       mapInstance.on('move', updateHighlight);
-       mapInstance.once('moveend', () => {mapInstance.off('move', updateHighlight);
-         updateMarkerHighlight(marker, mapInstance);
-         resolve();
-       });
-       mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: ONBOARDING_FLY_DURATION, easeLinearity: 0.25});
-     });
-   }
+     /* Aspetta che la mappa abbia terminato il movimento */
+     function flyToEvent(marker, mapInstance) {
+       return new Promise(resolve => {
+         const latlng = marker.getLatLng();
+         const updateHighlight = () => {updateMarkerHighlight(marker, mapInstance);};
+          mapInstance.on('move', updateHighlight);
+          mapInstance.once('moveend', () => {mapInstance.off('move', updateHighlight);
+            updateMarkerHighlight(marker, mapInstance);
+            resolve();
+          });
+          mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: ONBOARDING_FLY_DURATION, easeLinearity: 0.25});
+        });
+      }
    
-/* Apertura popup REALE di Aroundo */
-function openRealPopup(markerData) {
-  const marker = markerData.marker;
-  const event = markerData.event;
-  if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
-  window.openBasePopup(event, marker.getLatLng());
-}
+      /* Apertura popup REALE di Aroundo */
+      function openRealPopup(markerData) {
+        const marker = markerData.marker;
+        const event = markerData.event;
+        if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
+        window.openBasePopup(event, marker.getLatLng());
+      }
 
    window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
    
-   /* Sequenza principale */
+   /* Sequenza */
    async function start(markerData, mapInstance) {
       createLayer();
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
       /* Lascia terminare la finestra iniziale di Aroundo */
-      await wait(ONBOARDING_START_DELAY); 
+      await wait(2000); 
       /* Welcome */
       await showWelcome();
       /* Why Aroundo? */
@@ -194,37 +180,16 @@ function openRealPopup(markerData) {
       finish(mapInstance);
    }
 
-function finish(mapInstance) {
-  if (mapInstance) {
-    mapInstance.closePopup();
-  }
-   if (onboardingOriginalCenter !== null) {
-   mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom,
-      {duration: 2.0, easeLinearity: 0.25}
-      );
-   }
-  if (highlight) {
-    highlight.remove();
-    highlight = null;
-  }
-  if (bubble) {
-    bubble.classList.remove('visible');
-    bubble.classList.add('hide');
-    setTimeout(() => {
+   function finish(mapInstance) {
+      if (mapInstance) {mapInstance.closePopup();}
+      if (onboardingOriginalCenter !== null) {
+      mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 2.0, easeLinearity: 0.25});}
+      if (highlight) {highlight.remove(); highlight = null;}
       if (bubble) {
-        bubble.remove();
-        bubble = null;
-      }
-    }, 700);
-  }
-  if (layer) {
-    setTimeout(() => {
-      if (layer) {
-        layer.remove();
-        layer = null;
-      }
-    }, 700);
-  }
-}
+         bubble.classList.remove('visible');
+         bubble.classList.add('hide');
+         setTimeout(() => {if (bubble) {bubble.remove(); bubble = null;}}, 700);}
+      if (layer) {setTimeout(() => {if (layer) {layer.remove(); layer = null;}}, 700);}
+   }
 
 })();
