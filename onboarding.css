@@ -25,8 +25,8 @@
     0 12px 40px rgba(0, 0, 0, 0.18);
   opacity: 0;
   transition:
-    opacity 0.45s ease,
-    transform 0.45s ease;
+    opacity 1.0s ease,
+    transform 1.0s ease;
 }
 
 .onboarding-welcome.visible {
@@ -36,7 +36,7 @@
 
 .onboarding-welcome.hide {
   opacity: 0;
-  transform: translate(-50%, -50%) scale(1.03);
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .onboarding-title {
