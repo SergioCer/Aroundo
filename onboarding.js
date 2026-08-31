@@ -8,6 +8,7 @@
 
 (function () {
   'use strict';
+  const ONBOARDING_START_DELAY = 2000;
   const ONBOARDING_WELCOME_TIME = 4000;
   const ONBOARDING_ZOOM = 13;
   const ONBOARDING_FLY_DURATION = 3.5;
@@ -96,7 +97,7 @@
     const point = mapInstance.latLngToContainerPoint(latlng);
     const margin = 16;
     let left = point.x - bubble.offsetWidth / 2;
-    let top = point.y + 100;
+    let top = point.y + 75;
     const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
     left = Math.max(margin, Math.min(left, maxLeft));
     bubble.style.left = `${left}px`;
@@ -133,6 +134,8 @@ function openRealPopup(markerData) {
   /* Sequenza principale */
   async function start(markerData, mapInstance) {
     createLayer();
+    /* Lascia terminare la finestra iniziale di Aroundo */
+    await wait(ONBOARDING_START_DELAY); 
     /* 1 — Welcome */
     await showWelcome();
     /* Nessun evento disponibile:
