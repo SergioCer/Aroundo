@@ -1,10 +1,4 @@
-/* AROUNDO — ONBOARDING — V1
-   Sequenza:
-   1. Welcome
-   2. individua un evento reale
-   3. flyTo verso l'evento
-   4. apre il popup reale
-   5. mostra spiegazione */
+/* AROUNDO — ONBOARDING */
 
 (function () {
   'use strict';
@@ -14,6 +8,37 @@
   let bubble = null;
   let onboardingOriginalCenter = null;
   let onboardingOriginalZoom = null;
+
+   const onboardingTexts = {
+  en: {
+    welcomeTitle: "Aroundo",
+    welcomeText: "Welcome!<br>Let me show you how it works.",
+    whyTitle: "Why Aroundo?",
+    whyText: "A map of events happening around you.<br>Explore what's happening in your area.",
+    eventsTitle: "Events",
+    eventsText: "Tap an event to discover what is happening around you.",
+    finalTitle: "Aroundo",
+    finalText: "You are ready!<br>Discover what's Around•you."
+  },
+  it: {
+    welcomeTitle: "Aroundo",
+    welcomeText: "Benvenuto!<br>Ti mostro come funziona.",
+    whyTitle: "Perché Aroundo?",
+    whyText: "Una mappa degli eventi intorno a te.<br>Scopri cosa succede nella tua zona.",
+    eventsTitle: "Eventi",
+    eventsText: "Tocca un evento per scoprire i suoi dettagli.",
+    finalTitle: "Aroundo",
+    finalText: "Adesso sei pronto!<br>Scopri come vivere al meglio il territorio."
+  }
+};
+
+   const browserLanguage = navigator.language
+     .slice(0, 2)
+     .toLowerCase();
+   const lang = onboardingTexts[browserLanguage]
+     ? browserLanguage
+     : 'en';
+   const t = onboardingTexts[lang];
    
   /* Utility */
   function wait(ms) {
@@ -28,16 +53,15 @@
   }
 
   /* Welcome */
-  async function showWelcome() {
+  async function showWelcome(t) {
     const welcome = document.createElement('div');
     welcome.className = 'onboarding-card onboarding-welcome';
     welcome.innerHTML = `
       <div class="onboarding-title">
-        Aroundo onboarding...
+        ${t.welcomeTitle}
       </div>
       <div class="onboarding-subtitle">
-        Welcome!<br>
-        Let me show you how it works.
+        ${t.welcomeText}
       </div>
     `;
     layer.appendChild(welcome);
@@ -51,17 +75,16 @@
   }
 
    /* Why Aroundo? */
-   async function showWhyAroundo() {
+   async function showWhyAroundo(t) {
      const why = document.createElement('div');
      why.className = 'onboarding-card onboarding-welcome';
      why.innerHTML = `
-       <div class="onboarding-title">
-         Why Aroundo?
-       </div>
-       <div class="onboarding-subtitle">
-         A map of events happening around you.<br>
-         Explore what's happening in your area.
-       </div>
+      <div class="onboarding-title">
+        ${t.whyTitle}
+      </div>
+      <div class="onboarding-subtitle">
+        ${t.whyText}
+      </div>
      `;
      layer.appendChild(why);
      requestAnimationFrame(() => {why.classList.add('visible');});
@@ -162,12 +185,12 @@
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
       await wait(1500); /* Lascia terminare la finestra iniziale di Aroundo */
-      await showWelcome(); /* 5,5'' */
-      await showWhyAroundo(); /* 5,5'' */
+      await showWelcome(t); /* 5,5'' */
+      await showWhyAroundo(t); /* 5,5'' */
       if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
-      showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
+      showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
       await wait(2000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
@@ -176,7 +199,7 @@
       hideBubble();
       mapInstance.closePopup();
       // Aggiungi altro
-      showBubble('Aroundo', 'You are ready!<br>Discover what\'s Around•you.', markerData.marker, mapInstance);
+      showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance);
       await wait(1500);
       finish(mapInstance); /* total 23,0'' width End*/
    }
