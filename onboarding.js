@@ -33,7 +33,7 @@
     welcome.className = 'onboarding-welcome';
     welcome.innerHTML = `
       <div class="onboarding-title">
-        Aroundo ng
+        Aroundo onboarding...
       </div>
       <div class="onboarding-subtitle">
         Welcome!<br>
