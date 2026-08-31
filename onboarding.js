@@ -96,12 +96,9 @@
     const point = mapInstance.latLngToContainerPoint(latlng);
     const margin = 16;
     let left = point.x - bubble.offsetWidth / 2;
-    let top = point.y - bubble.offsetHeight - 35;
+    let top = point.y + 100;
     const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
     left = Math.max(margin, Math.min(left, maxLeft));
-    if (top < margin) {
-      top = point.y + 35;
-    }
     bubble.style.left = `${left}px`;
     bubble.style.top = `${top}px`;
   }
@@ -110,11 +107,18 @@
   function flyToEvent(marker, mapInstance) {
     return new Promise(resolve => {
       const latlng = marker.getLatLng();
-      mapInstance.once('moveend', resolve);
-      mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: ONBOARDING_FLY_DURATION, easeLinearity: 0.25});
-    });
-  }
-
+       const updateHighlight = () => {
+         updateMarkerHighlight(marker, mapInstance);
+       };
+       mapInstance.on('move', updateHighlight);
+       mapInstance.once('moveend', () => {mapInstance.off('move', updateHighlight);
+         updateMarkerHighlight(marker, mapInstance);
+         resolve();
+       });
+       mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: ONBOARDING_FLY_DURATION, easeLinearity: 0.25});
+     });
+   }
+   
 /* Apertura popup REALE di Aroundo */
 function openRealPopup(markerData) {
   const marker = markerData.marker;
