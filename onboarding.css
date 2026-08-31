@@ -8,6 +8,17 @@
   font-family: Arial, sans-serif;
 }
 
+/* Grafica comune Welcome e fumetti */
+.onboarding-card {
+  box-sizing: border-box;
+  padding: 18px 22px;
+  color: #333;
+  background: rgba(255, 248, 210, 0.97);
+  border: 2px solid rgba(245, 158, 11, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.20);
+}
+
 /* Welcome iniziale */
 .onboarding-welcome {
   position: absolute;
@@ -15,17 +26,9 @@
   top: 50%;
   transform: translate(-50%, -50%) scale(0.96);
   width: min(320px, calc(100vw - 40px));
-  box-sizing: border-box;
-  padding: 20px 24px;
   text-align: center;
-  color: #222;
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 18px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
   opacity: 0;
   transition: opacity 1.0s ease, transform 1.0s ease;
-  background: rgba(255, 248, 210, 0.97);
-  border: 2px solid rgba(245, 158, 11, 0.35);
 }
 
 .onboarding-welcome.visible {
@@ -76,20 +79,11 @@
   position: absolute;
   width: max-content;
   max-width: min(280px, calc(100vw - 40px));
-  padding: 11px 14px;
-  box-sizing: border-box;
-  color: #333;
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 12px;
-  font-size: 16px;
-  line-height: 1.45;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.20);
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+  text-align: left;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
   pointer-events: none;
-  background: rgba(255, 248, 210, 0.97);
-  border: 2px solid rgba(245, 158, 11, 0.35);
 }
 
 .onboarding-bubble.visible {
@@ -108,7 +102,6 @@
 @media (max-width: 600px) {
   .onboarding-welcome {
     width: calc(100vw - 32px);
-    padding: 18px 20px;
   }
   .onboarding-title {
     font-size: 20px;
