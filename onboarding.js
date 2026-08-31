@@ -110,12 +110,13 @@
      }
 
       function hideBubble() {
-        if (!bubble) {return;}
-        bubble.classList.remove('visible');
-        bubble.classList.add('hide');
-        setTimeout(() => {if (bubble) {bubble.remove(); bubble = null;}}, 700);
+         if (!bubble) {return;}
+         const oldBubble = bubble;
+         oldBubble.classList.remove('visible');
+         oldBubble.classList.add('hide');
+         setTimeout(() => {oldBubble.remove();
+         if (bubble === oldBubble) {bubble = null;}}, 700);
       }
-
 
      /* Posiziona fumetto vicino al marker */
      function positionBubble(marker, mapInstance) {
