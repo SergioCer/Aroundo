@@ -168,12 +168,11 @@
       /* avvicinamento progressivo */
       await flyToEvent(markerData.marker, mapInstance);
       updateMarkerHighlight(markerData.marker, mapInstance);
+      /* spiegazione Marker */
+      await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
       /* apertura del popup REALE */
       await wait(500);
       openRealPopup(markerData, mapInstance);
-      /* spiegazione */
-      await wait(1000);
-      await showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
       /* Lasciamo il fumetto visibile per qualche secondo. */
       await wait(5000);
       /* Fine V1 */
