@@ -168,7 +168,7 @@
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
       showBubble('Events', 'Tap an event to discover what is happening around you.', markerData.marker, mapInstance);
-      await wait(3000);
+      await wait(2000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       openRealPopup(markerData, mapInstance);
@@ -178,7 +178,7 @@
       // Aggiungi altro
       showBubble('Aroundo', 'You are ready!<br>Discover what\'s Around•you.', markerData.marker, mapInstance);
       await wait(1500);
-      finish(mapInstance); /* total 24,0'' */
+      finish(mapInstance); /* total 23,0'' width End*/
    }
 
    function finish(mapInstance) {
