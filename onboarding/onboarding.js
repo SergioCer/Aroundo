@@ -171,10 +171,9 @@
 
     function markerClickEffect() {
       if (!highlight) {return;}
-      highlight.classList.remove('onboarding-marker-click');
-      // forza il riavvio dell'animazione
-      void highlight.offsetWidth;
-      highlight.classList.add('onboarding-marker-click');
+      highlight.classList.add('click');
+      setTimeout(() => {
+      if (highlight) {highlight.classList.remove('click');}}, 350);
     }
   
       /* Apertura Marker */
