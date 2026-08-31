@@ -94,7 +94,7 @@
 .onboarding-bubble.hide {
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
+  transition: opacity 0.8s ease, transform 0.8s ease;
  }
 
 
