@@ -30,12 +30,12 @@
   /* Welcome */
   async function showWelcome() {
     const welcome = document.createElement('div');
-    welcome.className = 'ng-welcome';
+    welcome.className = 'onboarding-welcome';
     welcome.innerHTML = `
-      <div class="ng-title">
+      <div class="onboarding-title">
         Aroundo ng
       </div>
-      <div class="ng-subtitle">
+      <div class="onboarding-subtitle">
         Welcome!<br>
         Let me show you how it works.
       </div>
