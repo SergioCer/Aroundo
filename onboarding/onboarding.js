@@ -30,7 +30,8 @@
     whyTitle: "Per iniziare: cosa stai guardando?",
     whyText: "Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire cosa puoi fare.",
     eventsTitle: "E tutti quei puntini cosa sono? ",
-    eventsText: "Sono gli eventi!<br>Con un click scopri i dettagli: cos'è, a che ora inizia e quando finisce, chi lo organizza.",
+    // eventsText: "Sono gli eventi!<br>Con un click scopri i dettagli: cos'è, a che ora inizia e quando finisce, chi lo organizza.",
+    eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div><br>Con un click scopri i dettagli: cos'è, a che ora inizia e quando finisce, chi lo organizza.`,
     finalTitle: "Adesso sei pronto!",
     finalText: "Scopri come vivere al meglio il territorio con<br>Aroundo.",
     restartText: "Non è tutto chiaro? Ricominciamo!"
@@ -93,7 +94,7 @@
      `;
      layer.appendChild(why);
      requestAnimationFrame(() => {why.classList.add('visible');});
-     await wait(5000);
+     await wait(7000);
      why.classList.remove('visible');
      why.classList.add('hide');
      await wait(500);
@@ -201,12 +202,12 @@
       onboardingOriginalZoom = mapInstance.getZoom();
       await wait(1500); /* Lascia terminare la finestra iniziale di Aroundo */
       await showWelcome(t); /* 5,5'' */
-      await showWhyAroundo(t); /* 5,5'' */
+      await showWhyAroundo(t); /* 7,5'' */
       if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
       showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-      await wait(2000);
+      await wait(3000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); // Effetto Click sul Marker
@@ -216,13 +217,13 @@
       hideBubble();
       mapInstance.closePopup();
       // Aggiungi altro
-      await wait(1500);
+      await wait(1000);
       showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
       await wait(10000);
       await finish(mapInstance); /* total 23,0'' width End*/
       if (onboardingRestart) {
         onboardingRestart = false;
-        await wait(300);
+        await wait(500);
         await start(onboardingMarkerData, mapInstance);
       }
    }
