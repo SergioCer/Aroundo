@@ -1835,8 +1835,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     /* Gestisce il click sull'indicatore GPS.
-       Azioni: se la geolocalizzazione non è attiva o presenta un errore,
-       avvia la richiesta della posizione dell'utente.
+       Azioni: se la geolocalizzazione non è attiva o presenta un errore, avvia la richiesta della posizione dell'utente.
        Chiamata da: evento click su geoStatus. */  
     geoStatus.addEventListener("click", () => {
       if (
@@ -1850,8 +1849,8 @@ document.addEventListener('DOMContentLoaded', async () => {
        Chiamata da: caricamento pagina; rientro nella pagina. */
     function checkGeoStatus() {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {updateGeoStatus(true);},
-        () => {updateGeoStatus(false);},
+        (pos) => {updateGeoStatus(true);window.gpsReady = true;},
+        () => {updateGeoStatus(false);window.gpsReady = true;},
         { timeout: 5000 });
     }
 
@@ -1876,22 +1875,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
           else zoomLevel = 9; // Regione
           map.setView([userLat, userLng], zoomLevel); // GPS accettato
-              window.gpsReady = true;
           },
           (err) => {
             if(err.code === 1){
               analyticsGPS(false); // Utente ha rifiutato
-              window.gpsReady = true;
             }else{
               analyticsGPS(null); // Stato non determinabile
-              window.gpsReady = true;
             }
             updateGeoError();
             map.setView([defaultLat, defaultLng], defaultZoom);
             });
         } else {
           analyticsGPS(null); // Geolocalizzazione non disponibile
-            window.gpsReady = true;
           updateGeoError();
           map.setView([defaultLat, defaultLng], defaultZoom);
         }
