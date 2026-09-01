@@ -68,12 +68,13 @@
 
 @keyframes onboarding-marker-pulse {
   0% {transform: scale(0.65); opacity: 0.95;}
-  70% {transform: scale(1.25); opacity: 0.25;}
+  70% {transform: scale(1.25); opacity: 0.35;}
   100% {transform: scale(1.35); opacity: 0;}
 }
 
 .onboarding-marker-highlight.click {
-  background: rgba(59, 130, 246, 0.75);
+  background: rgba(13, 110, 253, 0.95);
+  opacity: 1 !important;
 }
 
 /* Fumetto */
