@@ -21,14 +21,14 @@
     finalText: "You are ready!<br>Discover what's Around•you."
   },
   it: {
-    welcomeTitle: "Aroundo",
-    welcomeText: "Benvenuto!<br>Ti mostro come funziona.",
-    whyTitle: "Perché Aroundo?",
-    whyText: "Una mappa degli eventi intorno a te.<br>Scopri cosa succede nella tua zona.",
-    eventsTitle: "Eventi",
-    eventsText: "Tocca un evento per scoprire i suoi dettagli.",
-    finalTitle: "Aroundo",
-    finalText: "Adesso sei pronto!<br>Scopri come vivere al meglio il territorio."
+    welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
+    welcomeText: "Dai, ti faccio vedere come funziona.",
+    whyTitle: "Per iniziare: cosa stai guardando?",
+    whyText: "Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire cosa puoi fare.",
+    eventsTitle: "E tutti quei puntini cosa sono? ",
+    eventsText: "Sono gli eventi!<br>Con un click scopri i dettagli: cos'è, a che ora inizia e quando finisce, chi lo organizza.",
+    finalTitle: "Adesso sei pronto!",
+    finalText: "Scopri come vivere al meglio il territorio con<br>Aroundo."
   }
 };
 
