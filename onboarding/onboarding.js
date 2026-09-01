@@ -169,16 +169,21 @@
         });
       }
 
-    function markerClickEffect() {
-      console.log("MARKER CLICK EFFECT");
-        if (!highlight) {
-        console.log("highlight mancante");
-        return;
-      }
-      highlight.classList.add('click');
-      setTimeout(() => {
-      if (highlight) {highlight.classList.remove('click');}}, 350);
+function markerClickEffect() {
+  console.log("MARKER CLICK EFFECT");
+  if (!highlight) {
+    console.log("highlight mancante");
+    return;
+  }
+  highlight.classList.remove('click');
+  void highlight.offsetWidth;
+  highlight.classList.add('click');
+  setTimeout(() => {
+    if (highlight) {
+      highlight.classList.remove('click');
     }
+  }, 700);
+}
   
       /* Apertura Marker */
       function openRealPopup(markerData) {
