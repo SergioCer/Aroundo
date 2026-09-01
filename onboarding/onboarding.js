@@ -217,7 +217,7 @@
       // Aggiungi altro
       await wait(1500);
       showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
-      await wait(1500);
+      await wait(10000);
       await finish(mapInstance); /* total 23,0'' width End*/
    }
 
