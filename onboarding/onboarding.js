@@ -194,15 +194,15 @@
    
    /* Sequenza */
    async function start(markerData, mapInstance) {
-      while (!window.gpsReady) {await wait(200);}
+      while (!window.gpsReady) {await wait(2000);}
       onboardingMarkerData = markerData;
       createLayer();
       disableMapInteraction(mapInstance);
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
-      await wait(1500); /* Lascia terminare la finestra iniziale di Aroundo */
-      await showWelcome(t); /* 5,5'' */
-      await showWhyAroundo(t); /* 7,5'' */
+      // await wait(1500); // Lascia terminare la finestra iniziale di Aroundo 
+      await showWelcome(t); // 5,5''
+      await showWhyAroundo(t); // 7,5''
       if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
@@ -211,16 +211,17 @@
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); // Effetto Click sul Marker
-      await wait(800);
+      await wait(1000);
       openRealPopup(markerData, mapInstance);
       await wait(3000);
       hideBubble();
+      await wait(500);
       mapInstance.closePopup();
       // Aggiungi altro
       await wait(1000);
       showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
       await wait(10000);
-      await finish(mapInstance); /* total 23,0'' width End*/
+      await finish(mapInstance); // total 37,0'' width End=3,5''
       if (onboardingRestart) {
         onboardingRestart = false;
         await wait(500);
