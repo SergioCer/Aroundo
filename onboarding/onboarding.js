@@ -135,7 +135,7 @@
         bubble.classList.add('visible');
       });
       const restart = bubble.querySelector('.onboarding-restart');
-      if (restart) {restart.addEventListener('click', () => {onboardingRestart = true; await finish(mapInstance);});}
+      if (restart) {restart.addEventListener('click', async () => {onboardingRestart = true; await finish(mapInstance);});}
     }
 
       function hideBubble() {
