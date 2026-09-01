@@ -212,6 +212,7 @@ function markerClickEffect() {
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); // Effetto Click sul Marker
+      await wait(500);
       openRealPopup(markerData, mapInstance);
       await wait(3000);
       hideBubble();
