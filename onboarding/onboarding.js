@@ -129,21 +129,22 @@
       if (!moreButton) {console.warn('Aroundo Onboarding: pulsante More... non trovato.'); return;}
       /* Crea l'alone sul pulsante */
       const rect = moreButton.getBoundingClientRect();
+      const layerRect = layer.getBoundingClientRect();
       moreHighlight = document.createElement('div');
       moreHighlight.className = 'onboarding-marker-highlight';
-      moreHighlight.style.left = `${rect.left + rect.width / 2}px`;
-      moreHighlight.style.top = `${rect.top + rect.height / 2}px`;
+      moreHighlight.style.left =
+        `${rect.left - layerRect.left + rect.width / 2}px`;
+      moreHighlight.style.top =
+        `${rect.top - layerRect.top + rect.height / 2}px`;
       layer.appendChild(moreHighlight);
       await wait(500);
       /* Rimuove l'alone */
       if (moreHighlight) {moreHighlight.remove(); moreHighlight = null;}
-      /* Il click chiude il popup base e apre il popup More... */
-      // CANCELLARE moreButton.click();
+      const originalAnalyticsMore = window.analyticsMore;
       window.openDetailPopup(window.currentEvent, window.currentLatLng);
-      // await wait(500);
+      window.analyticsMore = originalAnalyticsMore;
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(7000);
-      // await wait(500);
+      await wait(10000);
       mapInstance.closePopup();
       await wait(500);
       hideBubble();
