@@ -29,18 +29,18 @@
     welcomeText: "Dai, ti faccio vedere come funziona.",
     whyTitle: "Per iniziare: cosa stai guardando?",
     whyText: "Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br>cosa fare!",
-    eventsTitle: "E tutti quei puntini cosa sono? ",
+    eventsTitle: "E tutti quei puntini<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri i dettagli: cos'è, a che ora inizia, quando finisce, chi lo organizza.`,
     moreTitle: "Ma non è finita qui!...",
     moreText: "Cliccando su More... <br>Scopri nuovi dettagli.<br>Usare Map per avviare il tuo navigatore e raggiungere l'evento",
     moreTitle1: "E non solo!...",
-    moreText1: "Sapere se l'evento è gratuito o a pagamento ed infuturo... <br>chissà... <br>prenotare i posti",
+    moreText1: "Sapere se l'evento è gratuito o a pagamento ed infuturo...<br>chissà... <br>prenotare i posti",
     moreTitle2: "Ma anche",
     moreText2: "Comunicare se hai intenzione di partecipare<br>e se sei registrato...",
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il tuo territorio con...<br>
     <div style="text-align:center;"><strong>Aroundo</strong></div>`,
-    restartText: `<div style="text-align:center;">Non è tutto chiaro?<br>Ricominciamo!</div>`
+    restartText: `<div style="text-align:center;">Non hai capito una michia?<br>Ricominciamo...</div>`
   }
 };
 
@@ -135,7 +135,7 @@
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
       await wait(3000);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
-      await wait(6000);
+      await wait(10000);
       mapInstance.closePopup();
       await wait(1000);
       hideBubble();
