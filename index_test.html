@@ -981,7 +981,8 @@ OK
   let deferredPrompt = null; // Verifica se è stata installata l'APP sui sistemi che accedono
   let gpsReady = false; // Verifica scelta GPS utente ed attesa per avviare onboarding 
   let gpsReadyResolve; // Verifica scelta GPS utente ed attesa per avviare onboarding 
-  const gpsReadyPromise = new Promise(resolve => {gpsReadyResolve = resolve;}); // Verifica scelta GPS utente ed attesa per avviare onboarding 
+  const gpsReadyPromise = new Promise(resolve => {gpsReadyResolve = resolve;}); // Verifica scelta GPS utente ed attesa per avviare onboarding
+  window.gpsReadyPromise = gpsReadyPromise;
   
   window.APP_VERSION = "1.0.0";
   // Coordinate di default (Centro provincia Trapani / Sicilia occidentale)
