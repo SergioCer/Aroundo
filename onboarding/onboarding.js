@@ -193,6 +193,7 @@
    
    /* Sequenza */
    async function start(markerData, mapInstance) {
+      while (!window.gpsReady) {await wait(200);}
       onboardingMarkerData = markerData;
       createLayer();
       disableMapInteraction(mapInstance);
