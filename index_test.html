@@ -979,7 +979,8 @@ OK
   let midnightPercent = 0; // Posizione barra della Mezzanotte
   let totalHours; // Ore totali della Slidebar
   let deferredPrompt = null; // Verifica se è stata installata l'APP sui sistemi che accedono
-  
+  window.gpsReady = false; // Verifica scelta GPS per avviare onboarding.
+
   window.APP_VERSION = "1.0.0";
   // Coordinate di default (Centro provincia Trapani / Sicilia occidentale)
   const defaultLat = 37.87; /* 37.55 */
@@ -1875,18 +1876,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           else if (nearbyEvents.length > 50) zoomLevel = 10; // Provincia
           else zoomLevel = 9; // Regione
           map.setView([userLat, userLng], zoomLevel); // GPS accettato
+              window.gpsReady = true;
           },
           (err) => {
             if(err.code === 1){
               analyticsGPS(false); // Utente ha rifiutato
+              window.gpsReady = true;
             }else{
               analyticsGPS(null); // Stato non determinabile
+              window.gpsReady = true;
             }
             updateGeoError();
             map.setView([defaultLat, defaultLng], defaultZoom);
             });
         } else {
           analyticsGPS(null); // Geolocalizzazione non disponibile
+            window.gpsReady = true;
           updateGeoError();
           map.setView([defaultLat, defaultLng], defaultZoom);
         }
