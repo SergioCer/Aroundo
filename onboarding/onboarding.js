@@ -170,7 +170,11 @@
       }
 
     function markerClickEffect() {
-      if (!highlight) {return;}
+      console.log("MARKER CLICK EFFECT");
+        if (!highlight) {
+        console.log("highlight mancante");
+        return;
+      }
       highlight.classList.add('click');
       setTimeout(() => {
       if (highlight) {highlight.classList.remove('click');}}, 350);
