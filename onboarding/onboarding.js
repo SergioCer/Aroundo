@@ -32,7 +32,7 @@
     eventsTitle: "E tutti quei puntini cosa sono? ",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri i dettagli: cos'è, a che ora inizia, quando finisce, chi lo organizza.`,
     moreTitle: "Ma non è finita qui!",
-    moreText: "Cliccando su More... <br>ottieni tutti i dettagli dell'evento.",
+    moreText: "Cliccando su More... <br>Scopri nuovi dettagli.<br>Usare Map per avviare il tuo navigatore<br>Sapere se l'evento è gratuito o a pagamento",
     finalTitle: "Adesso sei pronto!",
     finalText: "Scopri come vivere al meglio il territorio con...<br>Aroundo",
     restartText: "Non è tutto chiaro? Ricominciamo!"
@@ -138,11 +138,11 @@
       /* Rimuove l'alone */
       if (moreHighlight) {moreHighlight.remove(); moreHighlight = null;}
       /* Il click chiude il popup base e apre il popup More... */
-      moreButton.click();
-      /* Lascia il tempo a Leaflet di aprire il nuovo popup */
+      // CANCELLARE moreButton.click();
+      window.openDetailPopup(window.currentEvent, window.currentLatLng);
       // await wait(500);
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(5000);
+      await wait(7000);
       // await wait(500);
       mapInstance.closePopup();
       await wait(500);
