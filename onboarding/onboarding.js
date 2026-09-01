@@ -219,6 +219,11 @@
       showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
       await wait(10000);
       await finish(mapInstance); /* total 23,0'' width End*/
+      if (onboardingRestart) {
+        onboardingRestart = false;
+        await wait(300);
+        await start(onboardingMarkerData, mapInstance);
+      }
    }
 
    function finish(mapInstance) {
@@ -229,9 +234,6 @@
       hideBubble();
       if (layer) {layer.remove(); layer = null;}
       enableMapInteraction(mapInstance);
-      if (onboardingRestart) {onboardingRestart = false;
-      start(onboardingMarkerData, mapInstance);
-      }   
     }
 
     function disableMapInteraction(map) {
