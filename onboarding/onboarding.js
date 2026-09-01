@@ -169,21 +169,11 @@
         });
       }
 
-function markerClickEffect() {
-  console.log("MARKER CLICK EFFECT");
-  if (!highlight) {
-    console.log("highlight mancante");
-    return;
-  }
-  highlight.classList.remove('click');
-  void highlight.offsetWidth;
-  highlight.classList.add('click');
-  setTimeout(() => {
-    if (highlight) {
-      highlight.classList.remove('click');
+    function markerClickEffect() {
+      if (!highlight) {return;}
+      highlight.classList.add('click');
+      setTimeout(() => {if (highlight) {highlight.classList.remove('click');}}, 500);
     }
-  }, 700);
-}
   
       /* Apertura Marker */
       function openRealPopup(markerData) {
@@ -193,7 +183,7 @@ function markerClickEffect() {
         window.openBasePopup(event, marker.getLatLng());
       }
 
-   window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
+     window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
    
    /* Sequenza */
    async function start(markerData, mapInstance) {
