@@ -172,7 +172,7 @@
     function markerClickEffect() {
       if (!highlight) {return;}
       highlight.classList.add('click');
-      setTimeout(() => {if (highlight) {highlight.classList.remove('click');}}, 500);
+      setTimeout(() => {if (highlight) {highlight.classList.remove('click');}}, 800);
     }
   
       /* Apertura Marker */
