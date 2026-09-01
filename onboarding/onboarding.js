@@ -128,22 +128,9 @@
       const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
         .find(button => button.textContent.trim() === 'More...');
       if (!moreButton) {console.warn('Aroundo Onboarding: pulsante More... non trovato.'); return;}
-      /* Crea l'alone sul pulsante */
-      const rect = moreButton.getBoundingClientRect();
-      const layerRect = layer.getBoundingClientRect();
-      moreHighlight = document.createElement('div');
-      moreHighlight.className = 'onboarding-marker-highlight';
-      moreHighlight.style.left =
-        `${rect.left - layerRect.left + rect.width / 2}px`;
-      moreHighlight.style.top =
-        `${rect.top - layerRect.top + rect.height / 2}px`;
-      layer.appendChild(moreHighlight);
+      /* Apre il popup More... senza registrare analyticsMore() */
+      window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
       await wait(500);
-      /* Rimuove l'alone */
-      if (moreHighlight) {moreHighlight.remove(); moreHighlight = null;}
-      const originalAnalyticsMore = window.analyticsMore;
-      window.openDetailPopup(window.currentEvent, window.currentLatLng);
-      window.analyticsMore = originalAnalyticsMore;
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
       await wait(10000);
       mapInstance.closePopup();
@@ -151,7 +138,7 @@
       hideBubble();
     }
   
-     /* Mostra fumetto */
+    /* Mostra fumetto */
     function showBubble(title, text, marker, mapInstance, restartText = null) {
       bubble = document.createElement('div');
       bubble.className = 'onboarding-card onboarding-bubble';
