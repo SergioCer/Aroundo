@@ -194,7 +194,6 @@
    /* Sequenza */
    async function start(markerData, mapInstance) {
       onboardingMarkerData = markerData;
-      await window.gpsReadyPromise;
       createLayer();
       disableMapInteraction(mapInstance);
       onboardingOriginalCenter = mapInstance.getCenter();
