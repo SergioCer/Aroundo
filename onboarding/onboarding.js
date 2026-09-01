@@ -230,7 +230,6 @@
       if (layer) {layer.remove(); layer = null;}
       enableMapInteraction(mapInstance);
       if (onboardingRestart) {onboardingRestart = false;
-      await wait(300);
       start(onboardingMarkerData, mapInstance);
       }   
     }
