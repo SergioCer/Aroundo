@@ -34,8 +34,9 @@
     moreTitle: "Ma non è finita qui!",
     moreText: "Cliccando su More... <br>Scopri nuovi dettagli.<br>Usare Map per avviare il tuo navigatore<br>Sapere se l'evento è gratuito o a pagamento",
     finalTitle: "Adesso sei pronto!",
-    finalText: "Scopri come vivere al meglio il territorio con...<br>Aroundo",
-    restartText: "Non è tutto chiaro? Ricominciamo!"
+    finalText: `Scopri come vivere al meglio il territorio con...<br>
+    <div style="text-align:center;"><strong>Aroundo</strong></div>`,
+    restartText: `<div style="text-align:center;">Non è tutto chiaro?<br>Ricominciamo!</div>`
   }
 };
 
