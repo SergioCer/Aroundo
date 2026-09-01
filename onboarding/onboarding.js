@@ -10,7 +10,7 @@
   let onboardingOriginalZoom = null;
   let onboardingRestart = false;
   let onboardingMarkerData = null;
-
+  let moreHighlight = null;
 
    const onboardingTexts = {
   en: {
@@ -30,8 +30,9 @@
     whyTitle: "Per iniziare: cosa stai guardando?",
     whyText: "Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire cosa puoi fare.",
     eventsTitle: "E tutti quei puntini cosa sono? ",
-    // eventsText: "Sono gli eventi!<br>Con un click scopri i dettagli: cos'è, a che ora inizia e quando finisce, chi lo organizza.",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div><br>Con un click scopri i dettagli: cos'è, a che ora inizia e quando finisce, chi lo organizza.`,
+    moreTitle: "E non è finita qui!",
+    moreText: "Cliccando su More... <br>puoi scoprire tutti i dettagli dell'evento.",
     finalTitle: "Adesso sei pronto!",
     finalText: "Scopri come vivere al meglio il territorio con<br>Aroundo.",
     restartText: "Non è tutto chiaro? Ricominciamo!"
@@ -121,6 +122,48 @@
     highlight.style.top = `${point.y}px`;
   }
 
+async function showMore(markerData, mapInstance) {
+  /* Cerca il pulsante More... nel popup attualmente aperto */
+  const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
+    .find(button => button.textContent.trim() === 'More...');
+  if (!moreButton) {
+    console.warn('Aroundo Onboarding: pulsante More... non trovato.');
+    return;
+  }
+  /* Crea l'alone sul pulsante */
+  const rect = moreButton.getBoundingClientRect();
+  moreHighlight = document.createElement('div');
+  moreHighlight.className = 'onboarding-marker-highlight';
+  moreHighlight.style.left = `${rect.left + rect.width / 2}px`;
+  moreHighlight.style.top = `${rect.top + rect.height / 2}px`;
+  layer.appendChild(moreHighlight);
+  /* L'alone rimane visibile per 1 secondo */
+  await wait(1000);
+  /* Rimuove l'alone */
+  if (moreHighlight) {
+    moreHighlight.remove();
+    moreHighlight = null;
+  }
+  /* Il click chiude il popup base e apre il popup More... */
+  moreButton.click();
+  /* Lascia il tempo a Leaflet di aprire il nuovo popup */
+  await wait(300);
+  /* Mostra il bubble con le istruzioni */
+  showBubble(
+    t.moreTitle,
+    t.moreText,
+    markerData.marker,
+    mapInstance
+  );
+  /* Popup More... + bubble visibili per 3 secondi */
+  await wait(3000);
+  /* Chiude il bubble */
+  hideBubble();
+  await wait(500);
+  /* Chiude il popup More... */
+  mapInstance.closePopup();
+}
+  
      /* Mostra fumetto */
     function showBubble(title, text, marker, mapInstance, restartText = null) {
       bubble = document.createElement('div');
@@ -183,7 +226,7 @@
     }
   
       /* Apertura Marker */
-      function openRealPopup(markerData) {
+      function showPopup(markerData) {
         const marker = markerData.marker;
         const event = markerData.event;
         if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
@@ -212,11 +255,13 @@
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); // Effetto Click sul Marker
       await wait(1000);
-      openRealPopup(markerData, mapInstance);
+      showPopup(markerData, mapInstance);
       await wait(3000);
       hideBubble();
       await wait(500);
       mapInstance.closePopup();
+      await showMore(markerData, mapInstance);
+      await wait(3000);
       // Aggiungi altro
       await wait(1000);
       showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
