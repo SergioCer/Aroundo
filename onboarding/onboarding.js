@@ -148,7 +148,7 @@
        const point = mapInstance.latLngToContainerPoint(latlng);
        const margin = 16;
        let left = point.x - bubble.offsetWidth / 2;
-       let top = point.y + 125;
+       let top = point.y + 150;
        const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
        left = Math.max(margin, Math.min(left, maxLeft));
        bubble.style.left = `${left}px`;
@@ -202,7 +202,7 @@
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); // Effetto Click sul Marker
-      await wait(500);
+      await wait(800);
       openRealPopup(markerData, mapInstance);
       await wait(3000);
       hideBubble();
