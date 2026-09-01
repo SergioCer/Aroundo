@@ -8,6 +8,9 @@
   let bubble = null;
   let onboardingOriginalCenter = null;
   let onboardingOriginalZoom = null;
+  let onboardingRestart = false;
+  let onboardingMarkerData = null;
+
 
    const onboardingTexts = {
   en: {
@@ -18,7 +21,8 @@
     eventsTitle: "Events",
     eventsText: "Tap an event to discover what is happening around you.",
     finalTitle: "Aroundo",
-    finalText: "You are ready!<br>Discover what's Around•you."
+    finalText: "You are ready!<br>Discover what's Around•you.",
+    restartText: "not clear? Restart!"
   },
   it: {
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
@@ -28,7 +32,8 @@
     eventsTitle: "E tutti quei puntini cosa sono? ",
     eventsText: "Sono gli eventi!<br>Con un click scopri i dettagli: cos'è, a che ora inizia e quando finisce, chi lo organizza.",
     finalTitle: "Adesso sei pronto!",
-    finalText: "Scopri come vivere al meglio il territorio con<br>Aroundo."
+    finalText: "Scopri come vivere al meglio il territorio con<br>Aroundo.",
+    restartText: "Non è tutto chiaro? Ricominciamo!"
   }
 };
 
@@ -116,21 +121,22 @@
   }
 
      /* Mostra fumetto */
-     function showBubble(title, text, marker, mapInstance) {
-       bubble = document.createElement('div');
-       bubble.className = 'onboarding-card onboarding-bubble';
-         bubble.innerHTML = `
-          <div class="onboarding-title">
-            ${title}
-          </div>
-          <div class="onboarding-subtitle">
-            ${text}
-          </div>
-        `;
-       layer.appendChild(bubble);
-       positionBubble(marker, mapInstance);
-       requestAnimationFrame(() => {bubble.classList.add('visible');});
-     }
+    function showBubble(title, text, marker, mapInstance, restartText = null) {
+      bubble = document.createElement('div');
+      bubble.className = 'onboarding-card onboarding-bubble';
+      bubble.innerHTML = `
+        <div class="onboarding-title">${title}</div>
+        <div class="onboarding-subtitle">${text}</div>
+        ${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}
+      `;
+      layer.appendChild(bubble);
+      positionBubble(marker, mapInstance);
+      requestAnimationFrame(() => {
+        bubble.classList.add('visible');
+      });
+      const restart = bubble.querySelector('.onboarding-restart');
+      if (restart) {restart.addEventListener('click', () => {onboardingRestart = true; await finish(mapInstance);});}
+    }
 
       function hideBubble() {
          if (!bubble) {return;}
@@ -187,6 +193,7 @@
    
    /* Sequenza */
    async function start(markerData, mapInstance) {
+      onboardingMarkerData = markerData;
       createLayer();
       disableMapInteraction(mapInstance);
       onboardingOriginalCenter = mapInstance.getCenter();
@@ -208,9 +215,10 @@
       hideBubble();
       mapInstance.closePopup();
       // Aggiungi altro
-      showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance);
       await wait(1500);
-      finish(mapInstance); /* total 23,0'' width End*/
+      showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
+      await wait(1500);
+      await finish(mapInstance); /* total 23,0'' width End*/
    }
 
    function finish(mapInstance) {
@@ -218,10 +226,14 @@
       if (onboardingOriginalCenter !== null) {
       mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
       if (highlight) {highlight.remove(); highlight = null;}
-         setTimeout(() => {hideBubble();
-      if (layer) {layer.remove(); layer = null;}}, 3500);
+      hideBubble();
+      if (layer) {layer.remove(); layer = null;}
       enableMapInteraction(mapInstance);
-   }
+      if (onboardingRestart) {onboardingRestart = false;
+      await wait(300);
+      start(onboardingMarkerData, mapInstance);
+      }   
+    }
 
     function disableMapInteraction(map) {
       map.dragging.disable();
