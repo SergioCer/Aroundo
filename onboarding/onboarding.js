@@ -210,30 +210,32 @@
     await wait(500);
     showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
     await wait(8000);
+    hideBubble(); 
+    await wait(500);
     await flyToEvent(markerData.marker, mapInstance);
     updateMarkerHighlight(markerData.marker, mapInstance);
     simulateClick(highlight); 
     if (highlight) {highlight.remove(); highlight = null;}
     await wait(500);
     showPopup(markerData, mapInstance); 
-    await wait(8000); 
+    await wait(5000); 
     hideBubble(); 
     await wait(500);
+    showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); 
     const moreButton = showMore(markerData, mapInstance);
     const moreHighlight = highlightElement(moreButton);
     simulateClick(moreButton);await wait(500);
     if (moreButton) {moreButton.click();}
-    hideBubble();
-    await wait(500);
-    showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); 
-    await wait(8000); 
+    await wait(3000); 
     if (moreHighlight) {moreHighlight.remove();}
-    hideBubble(); 
+    await wait(5000); 
+    hideBubble();
     await wait(500);
     const mapHighlight = showMap();
     showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
-    await wait(8000); 
+    await wait(3000); 
     if (mapHighlight) {mapHighlight.remove();}
+    await wait(5000); 
     hideBubble();
     await wait(500);
     showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); 
