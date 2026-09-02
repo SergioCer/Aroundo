@@ -131,9 +131,8 @@
     async function showMore(markerData, mapInstance) {
       const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
         .find(button => button.textContent.trim() === 'More...');
-      if (!moreButton) {console.warn('Aroundo Onboarding: pulsante More... non trovato.'); return;}
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance);
-      await wait(500);
+      await wait(200);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
     }
   
