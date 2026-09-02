@@ -85,7 +85,7 @@
      why.remove();
    }
 
-    function highlightElement(element) {
+    function highlight(element) {
       if (!element) {return null;}
       const rect = element.getBoundingClientRect();
       const effect = document.createElement('div');
@@ -94,6 +94,11 @@
       effect.style.top = `${rect.top + rect.height / 2}px`;
       layer.appendChild(effect);
       return effect;
+    }
+
+    function highlightRemove(effect) {
+      if (!effect) {return;}
+      effect.remove();
     }
   
   /* Evidenzia marker */
@@ -116,7 +121,7 @@
       highlight.style.top = `${point.y}px`;
     }
 
-    function simulateClick(element) {
+    function clickSim(element) {
       if (!element) {return;}
       element.classList.add('onboarding-click');
       setTimeout(() => {if (element) {element.classList.remove('onboarding-click');}}, 800);
@@ -200,30 +205,32 @@
     await wait(500);
     await flyToEvent(markerData.marker, mapInstance);
     updateMarkerHighlight(markerData.marker, mapInstance);
-    simulateClick(highlight); 
+    clickSim(highlight); 
     if (highlight) {highlight.remove(); highlight = null;}
     await wait(500);
     showPopup(markerData, mapInstance); 
-    await wait(5000); 
+    await wait(6000); 
     hideBubble(); 
     await wait(500);
-    showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); 
+    showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
+    await wait(10000); 
+    hideBubble(); 
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
-    const moreHighlight = highlightElement(moreButton);
-    simulateClick(moreButton);
+    const moreHighlight = highlight(moreButton);
+    clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
     await wait(3000); 
-    if (moreHighlight) {moreHighlight.remove();}
-    await wait(5000); 
+    highlightRemove(moreHighlight);
+    await wait(7000); 
     hideBubble();
     await wait(500);
-    const mapButton = document.querySelector('.map-btn');
-    const mapHighlight = highlightElement(mapButton);
     showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
+    const mapButton = document.querySelector('.map-btn');
+    const mapHighlight = highlight(mapButton);
     await wait(3000); 
-    if (mapHighlight) {mapHighlight.remove();}
+    highlightRemove(mapHighlight);
     await wait(5000); 
     hideBubble();
     await wait(500);
