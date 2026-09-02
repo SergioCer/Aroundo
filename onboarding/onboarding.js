@@ -128,10 +128,12 @@
   }
 
     /* More... */
-    function showMore(markerData, mapInstance) {
+    async function showMore(markerData, mapInstance) {
       const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
         .find(button => button.textContent.trim() === 'More...');
       if (!moreButton) {console.warn('Aroundo Onboarding: pulsante More... non trovato.'); return;}
+      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
+      await wait(3000);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
     }
   
@@ -230,9 +232,7 @@
       await wait(3000);
       hideBubble(); await wait(500);
       mapInstance.closePopup();
-      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(2000);
-      showMore(markerData, mapInstance);
+      await showMore(markerData, mapInstance);
       await wait(3000);
       hideBubble(); await wait(500);
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance);
