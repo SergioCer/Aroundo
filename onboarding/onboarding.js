@@ -28,8 +28,8 @@
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
     welcomeText: "Dai, ti faccio vedere come funziona.",
     whyTitle: "Per iniziare: cosa stai guardando?",
-    whyText: "Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br>cosa fare!",
-    eventsTitle: "E tutti quei puntini<br>cosa sono?",
+    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
+    eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri i dettagli: cos'è, a che ora inizia, quando finisce, chi lo organizza.`,
     moreTitle: "Ma non è finita qui!...",
     moreText: "Cliccando su More... <br>Scopri nuovi dettagli.<br>Usare Map per avviare il tuo navigatore e raggiungere l'evento",
@@ -133,7 +133,7 @@
         .find(button => button.textContent.trim() === 'More...');
       if (!moreButton) {console.warn('Aroundo Onboarding: pulsante More... non trovato.'); return;}
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(3000);
+      await wait(500);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
     }
   
@@ -226,14 +226,13 @@
       await wait(3000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
-      markerClickEffect(); // Effetto Click sul Marker
-      await wait(1000);
+      markerClickEffect(); await wait(500); // Effetto Click sul Marker
       showPopup(markerData, mapInstance);
-      await wait(3000);
+      await wait(5000);
       hideBubble(); await wait(500);
       mapInstance.closePopup();
       await showMore(markerData, mapInstance);
-      await wait(3000);
+      await wait(5000);
       hideBubble(); await wait(500);
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance);
       await wait(5000);
