@@ -108,7 +108,6 @@
 
     /* More... */
     async function showMore(markerData, mapInstance) {
-      // const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
       await wait(200);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
@@ -203,27 +202,23 @@
       await showMore(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
       showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(5000);
-      mapInstance.closePopup();
-      await wait(500); hideBubble(); await wait(500);
+      mapInstance.closePopup(); hideBubble();await wait(500);
 
       // Aggiungi altro
-      await wait(1000);
       showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
       await wait(10000);
-      await finish(mapInstance); // total 60,7'' width End=3,5''
       if (onboardingRestart) {
         onboardingRestart = false;
-        await wait(500);
         await start(onboardingMarkerData, mapInstance);
+      } else {
+        finish(mapInstance);
       }
    }
 
-   async function finish(mapInstance) {
+   function finish(mapInstance) {
       if (mapInstance) {mapInstance.closePopup();}
       if (onboardingOriginalCenter !== null) {
-        await new Promise(resolve => {mapInstance.once('moveend', resolve);
-        mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});});}
-      // mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+      mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
       if (highlight) {highlight.remove(); highlight = null;}
       hideBubble();
       if (layer) {layer.remove(); layer = null;}
