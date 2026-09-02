@@ -207,7 +207,7 @@
     updateMarkerHighlight(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
     await wait(500);
-    if (highlight) {highlight.remove(); highlight = null;}
+    highlightRemove(markerHighlight); markerHighlight = null;
     showPopup(markerData, mapInstance); 
     await wait(6000); 
     hideBubble(); 
