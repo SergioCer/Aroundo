@@ -92,7 +92,7 @@
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
       await wait(200);
       const mapButton = document.querySelector('.map-btn');
-      console.log('MAP:', mapButton);
+      simulateClick(mapButton);
     }
   
   /* Evidenzia marker */
