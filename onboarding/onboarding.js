@@ -220,30 +220,33 @@
     await wait(7000); 
     hideBubble(); 
     if (moreButton) {moreButton.click();}
+    highlightRemove(moreHighlight);
     await wait(500);
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-    await wait(3000); 
-    highlightRemove(moreHighlight);
-    await wait(7000); 
+    await wait(10000); 
     hideBubble();
     await wait(500);
     showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
-    await wait(3000); 
+    await wait(5000); 
     highlightRemove(mapHighlight);
     await wait(5000); 
     hideBubble();
     await wait(500);
-    showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); 
-    await wait(8000);
+    showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
+    const bookButton = document.querySelector('.book-btn');
+    const bookHighlight = highlight(bookButton);
+    await wait(5000);
+    highlightRemove(bookHighlight);
+    await wait(5000);
     mapInstance.closePopup(); 
     hideBubble();
     await wait(500);
 
     // Aggiungi altro
     showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
-    await wait(10000);
+    await wait(12000);
     if (onboardingRestart) {
       onboardingRestart = false;
       await start(onboardingMarkerData, mapInstance);
