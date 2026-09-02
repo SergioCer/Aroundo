@@ -206,10 +206,10 @@
     await showWelcome(t); 
     await showWhyAroundo(t);
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
-    showMarkerHighlight(markerData.marker, mapInstance);
-    await wait(500);
     showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(3000);
+    showMarkerHighlight(markerData.marker, mapInstance);
+    await wait(7000);
     hideBubble(); 
     await wait(500);
     await flyToEvent(markerData.marker, mapInstance);
