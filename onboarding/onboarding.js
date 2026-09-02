@@ -97,7 +97,7 @@
     const latlng = marker.getLatLng();
     const point = mapInstance.latLngToContainerPoint(latlng);
     highlight = document.createElement('div');
-    highlight.className = 'onboarding-marker-highlight';
+    highlight.className = 'onboarding-highlight';
     highlight.style.left = `${point.x}px`;
     highlight.style.top = `${point.y}px`;
     layer.appendChild(highlight);
@@ -112,10 +112,10 @@
       highlight.style.top = `${point.y}px`;
     }
 
-      function markerClickEffect() {
-      if (!highlight) {return;}
-      highlight.classList.add('click');
-      setTimeout(() => {if (highlight) {highlight.classList.remove('click');}}, 800);
+    function simulateClick(element) {
+      if (!element) {return;}
+      element.classList.add('onboarding-click');
+      setTimeout(() => {if (element) {element.classList.remove('onboarding-click');}}, 800);
     }
   
     /* Mostra fumetto */
@@ -194,7 +194,7 @@
       await wait(7000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
-      markerClickEffect(); await wait(500); // Effetto Click sul Marker
+      simulateClick(highlight); await wait(500); // Effetto Click sul Marker
       showPopup(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
       showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); await wait(7000); hideBubble(); await wait(500);
       await showMore(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
