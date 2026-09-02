@@ -196,53 +196,62 @@
 
      window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
    
-   /* Sequenza */
-   async function start(markerData, mapInstance) {
-      while (!window.gpsReady) {await wait(2000);}
-      onboardingMarkerData = markerData;
-      createLayer();
-      disableMapInteraction(mapInstance);
-      onboardingOriginalCenter = mapInstance.getCenter();
-      onboardingOriginalZoom = mapInstance.getZoom();
-      await showWelcome(t); 
-      await showWhyAroundo(t);
-      if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
-      showMarkerHighlight(markerData.marker, mapInstance);
-      await wait(500);
-      showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-      await wait(7000);
-      await flyToEvent(markerData.marker, mapInstance);
-      updateMarkerHighlight(markerData.marker, mapInstance);
-      simulateClick(highlight); await wait(500); // Effetto Click sul Marker
-      if (highlight) {highlight.remove(); highlight = null;}
-      showPopup(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
-      showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); await wait(7000); hideBubble(); await wait(500);
-      // More
-      const moreButton = await showMore(markerData, mapInstance);
-      const moreHighlight = highlightElement(moreButton);
-      await wait(3000);
-      simulateClick(moreButton);await wait(500);
-      moreButton?.click();await wait(7000);
-      if (moreHighlight) {moreHighlight.remove();}
-      hideBubble();
-      await wait(500);
-      // Map
-      const mapHighlight = showMap();await wait(7000);
-      if (mapHighlight) {mapHighlight.remove();}
-      showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(7000); hideBubble(); await wait(500);
-      showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(7000);
-      mapInstance.closePopup(); hideBubble();await wait(500);
+  /* Sequenza */
+  async function start(markerData, mapInstance) {
+    while (!window.gpsReady) {await wait(2000);}
+    onboardingMarkerData = markerData;
+    createLayer();
+    disableMapInteraction(mapInstance);
+    onboardingOriginalCenter = mapInstance.getCenter();
+    onboardingOriginalZoom = mapInstance.getZoom();
+    await showWelcome(t); 
+    await showWhyAroundo(t);
+    if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
+    showMarkerHighlight(markerData.marker, mapInstance);
+    await wait(500);
+    showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
+    await wait(7000);
+    await flyToEvent(markerData.marker, mapInstance);
+    updateMarkerHighlight(markerData.marker, mapInstance);
+    simulateClick(highlight); 
+    if (highlight) {highlight.remove(); highlight = null;}
+    await wait(500);
+    showPopup(markerData, mapInstance); 
+    await wait(7000); 
+    hideBubble(); 
+    await wait(500);
+    const moreButton = await showMore(markerData, mapInstance);
+    const moreHighlight = highlightElement(moreButton);
+    await wait(3000);
+    simulateClick(moreButton);await wait(500);
+    if (moreButton) {moreButton.click();}
+    showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); 
+    await wait(7000); 
+    if (moreHighlight) {moreHighlight.remove();}
+    hideBubble(); 
+    await wait(500);
+    const mapHighlight = showMap();
+    showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
+    await wait(7000); 
+    if (mapHighlight) {mapHighlight.remove();}
+    hideBubble();
+    await wait(500);
+    showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); 
+    await wait(7000);
+    mapInstance.closePopup(); 
+    hideBubble();
+    await wait(500);
 
-      // Aggiungi altro
-      showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
-      await wait(10000);
-      if (onboardingRestart) {
-        onboardingRestart = false;
-        await start(onboardingMarkerData, mapInstance);
-      } else {
-        finish(mapInstance);
-      }
-   }
+    // Aggiungi altro
+    showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
+    await wait(10000);
+    if (onboardingRestart) {
+      onboardingRestart = false;
+      await start(onboardingMarkerData, mapInstance);
+    } else {
+      finish(mapInstance);
+    }
+  }
 
    function finish(mapInstance) {
       if (mapInstance) {mapInstance.closePopup();}
