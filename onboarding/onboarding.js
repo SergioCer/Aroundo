@@ -27,7 +27,7 @@
   it: {
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
     welcomeText: "Dai, ti faccio vedere come funziona.",
-    whyTitle: "Per iniziare: cosa stai guardando?",
+    whyTitle: "Per iniziare:<br>cosa stai guardando?",
     whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri i dettagli: cos'è, a che ora inizia, quando finisce, chi lo organizza.`,
@@ -132,7 +132,7 @@
       const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
         .find(button => button.textContent.trim() === 'More...');
       if (!moreButton) {console.warn('Aroundo Onboarding: pulsante More... non trovato.'); return;}
-      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
+      showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance);
       await wait(500);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
     }
@@ -230,12 +230,12 @@
       showPopup(markerData, mapInstance);
       await wait(5000);
       hideBubble(); await wait(500);
-      mapInstance.closePopup();
+      // mapInstance.closePopup();
+      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
+      await wait(5000);
       await showMore(markerData, mapInstance);
       await wait(5000);
       hideBubble(); await wait(500);
-      showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance);
-      await wait(5000);
       hideBubble(); await wait(500);
       showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
       await wait(5000);
