@@ -40,7 +40,7 @@
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il tuo territorio con...<br>
     <div style="text-align:center;"><strong>Aroundo</strong></div>`,
-    restartText: `<div style="text-align:center;">Non hai capito una michia?<br>Ricominciamo...</div>`
+    restartText: `<div style="text-align:center;">Non mi sono spiegato bene?<br>Ricominciamo...</div>`
   }
 };
 
@@ -128,17 +128,11 @@
   }
 
     /* More... */
-    async function showMore(markerData, mapInstance) {
+    function showMore(markerData, mapInstance) {
       const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
         .find(button => button.textContent.trim() === 'More...');
       if (!moreButton) {console.warn('Aroundo Onboarding: pulsante More... non trovato.'); return;}
-      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(3000);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
-      await wait(10000);
-      mapInstance.closePopup();
-      await wait(1000);
-      hideBubble();
     }
   
     /* Mostra fumetto */
@@ -234,19 +228,21 @@
       await wait(1000);
       showPopup(markerData, mapInstance);
       await wait(3000);
-      hideBubble();
-      await wait(500);
+      hideBubble(); await wait(500);
       mapInstance.closePopup();
-      await showMore(markerData, mapInstance);
-      await wait(500);
+      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
+      await wait(2000);
+      showMore(markerData, mapInstance);
+      await wait(3000);
+      hideBubble(); await wait(500);
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance);
       await wait(5000);
-      hideBubble();
-      await wait(500);
+      hideBubble(); await wait(500);
       showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
       await wait(5000);
-      hideBubble();
-      await wait(500);
+      mapInstance.closePopup();
+      await wait(2000);
+      hideBubble(); await wait(500);
 
       // Aggiungi altro
       await wait(1000);
