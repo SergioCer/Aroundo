@@ -10,8 +10,7 @@
   let onboardingOriginalZoom = null;
   let onboardingRestart = false;
   let onboardingMarkerData = null;
-  let moreHighlight = null;
-
+  
    const onboardingTexts = {
   en: {
     welcomeTitle: "Aroundo",
