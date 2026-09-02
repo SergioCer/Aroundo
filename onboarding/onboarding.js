@@ -31,46 +31,45 @@
     eventsTitle1: "Ma non è finita qui!...",
     eventsText1: "Cliccando su More...<br>Scopri ulteriori dettagli.<br>E molte altre informazioni riferite all'evento.",
     moreTitle: "Ogni pulsante!",
-    moreText: "Come MAP... <br>Esegue funzioni specifiche.<br>Come... avviare il tuo navigatore per raggiungere l'evento",
-    moreTitle1: "Ma non solo!...",
-    moreText1: "Sapere se l'evento è gratuito, a pagamento ed infuturo...<br>chissà... prenotare...!",
+    moreText: "Come Map<br>Esegue funzioni specifiche.<br>Come... avviare direttamente il tuo navigatore per raggiungere l'evento",
+    moreTitle1: "Oppure",
+    moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed infuturo...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
-    moreText2: "Hai intenzione di partecipare...<br>Semplicemente Dillo!<br>In più se sei registrato...<br>puoi essere avvisato in tempo del suo inizio.",
+    moreText2: "Hai intenzione di partecipare...<br>Semplicissimo...Dillo!<br>Inoltre se sei registrato...<br>puoi essere avvisato in tempo del suo inizio per non perderlo.",
+    
     finalTitle: "Adesso sei pronto!",
-    finalText: `Scopri come vivere al meglio il tuo territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
-    restartText: `<div style="text-align:center;">Non mi sono spiegato?<br>Va bene, ricominciamo...</div>`
+    finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
+    restartText: `<div style="text-align:center;">Non mi sono spiegato?<br>Va bene...ricominciamo...</div>`
   }
 };
 
-   const browserLanguage = navigator.language .slice(0, 2) .toLowerCase();
-   const lang = onboardingTexts[browserLanguage] ? browserLanguage : 'en';
-   const t = onboardingTexts[lang];
+    const browserLanguage = navigator.language .slice(0, 2) .toLowerCase();
+    const lang = onboardingTexts[browserLanguage] ? browserLanguage : 'en';
+    const t = onboardingTexts[lang];
    
-  /* Utility */
-  function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));
-  }
+    function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
 
-  /* Crea contenitore onboarding */
-  function createLayer() {
-    layer = document.createElement('div');
-    layer.id = 'onboarding-layer';
-    document.body.appendChild(layer);
-  }
+    /* Crea contenitore onboarding */
+    function createLayer() {
+      layer = document.createElement('div');
+      layer.id = 'onboarding-layer';
+      document.body.appendChild(layer);
+    }
 
-  /* Welcome */
-  async function showWelcome(t) {
-    const welcome = document.createElement('div');
-    welcome.className = 'onboarding-card onboarding-welcome';
-    welcome.innerHTML = `<div class="onboarding-title">${t.welcomeTitle}</div><div class="onboarding-subtitle">${t.welcomeText}</div>`;
-    layer.appendChild(welcome);
-    // permette al browser di applicare lo stato iniziale
-    requestAnimationFrame(() => {welcome.classList.add('visible');});
-    await wait(5000);
-    welcome.classList.remove('visible');
-    welcome.classList.add('hide');
-    await wait(500);
-    welcome.remove();
-  }
+    /* Welcome */
+    async function showWelcome(t) {
+      const welcome = document.createElement('div');
+      welcome.className = 'onboarding-card onboarding-welcome';
+      welcome.innerHTML = `<div class="onboarding-title">${t.welcomeTitle}</div><div class="onboarding-subtitle">${t.welcomeText}</div>`;
+      layer.appendChild(welcome);
+      // permette al browser di applicare lo stato iniziale
+      requestAnimationFrame(() => {welcome.classList.add('visible');});
+      await wait(7000);
+      welcome.classList.remove('visible');
+      welcome.classList.add('hide');
+      await wait(500);
+      welcome.remove();
+    }
 
    /* Why Aroundo? */
    async function showWhyAroundo(t) {
@@ -85,7 +84,14 @@
      await wait(500);
      why.remove();
    }
-   
+
+    /* More... */
+    async function showMore(markerData, mapInstance) {
+      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
+      await wait(200);
+      window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
+    }
+  
   /* Evidenzia marker */
   function showMarkerHighlight(marker, mapInstance) {
     const latlng = marker.getLatLng();
@@ -97,20 +103,19 @@
     layer.appendChild(highlight);
   }
 
-  /* Aggiorna posizione evidenziazione */
-  function updateMarkerHighlight(marker, mapInstance) {
-    if (!highlight) {return;}
-    const latlng = marker.getLatLng();
-    const point = mapInstance.latLngToContainerPoint(latlng);
-    highlight.style.left = `${point.x}px`;
-    highlight.style.top = `${point.y}px`;
-  }
+    /* Aggiorna posizione evidenziazione */
+    function updateMarkerHighlight(marker, mapInstance) {
+      if (!highlight) {return;}
+      const latlng = marker.getLatLng();
+      const point = mapInstance.latLngToContainerPoint(latlng);
+      highlight.style.left = `${point.x}px`;
+      highlight.style.top = `${point.y}px`;
+    }
 
-    /* More... */
-    async function showMore(markerData, mapInstance) {
-      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(200);
-      window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
+      function markerClickEffect() {
+      if (!highlight) {return;}
+      highlight.classList.add('click');
+      setTimeout(() => {if (highlight) {highlight.classList.remove('click');}}, 800);
     }
   
     /* Mostra fumetto */
@@ -162,12 +167,6 @@
         });
       }
 
-    function markerClickEffect() {
-      if (!highlight) {return;}
-      highlight.classList.add('click');
-      setTimeout(() => {if (highlight) {highlight.classList.remove('click');}}, 800);
-    }
-  
       /* Apertura Marker */
       function showPopup(markerData) {
         const marker = markerData.marker;
@@ -186,22 +185,21 @@
       disableMapInteraction(mapInstance);
       onboardingOriginalCenter = mapInstance.getCenter();
       onboardingOriginalZoom = mapInstance.getZoom();
-      // await wait(1500); // Lascia terminare la finestra iniziale di Aroundo 
-      await showWelcome(t); // 5,5''
-      await showWhyAroundo(t); // 7,5''
+      await showWelcome(t); 
+      await showWhyAroundo(t);
       if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
       showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-      await wait(5000);
+      await wait(7000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); await wait(500); // Effetto Click sul Marker
-      showPopup(markerData, mapInstance); await wait(5000); hideBubble(); await wait(500);
-      showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
+      showPopup(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
+      showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); await wait(7000); hideBubble(); await wait(500);
       await showMore(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
-      showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
-      showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(5000);
+      showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(7000); hideBubble(); await wait(500);
+      showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(7000);
       mapInstance.closePopup(); hideBubble();await wait(500);
 
       // Aggiungi altro
