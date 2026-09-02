@@ -30,19 +30,19 @@
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
     whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
-    eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni.`,
+    eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili immediate.`,
     eventsTitle1: "Ma non è finita qui!...",
-    eventsText1: "Cliccando su More... <br>Scopri ulteriori dettagli.<br>Usare Map per avviare il tuo navigatore e raggiungere l'evento",
+    eventsText1: "Cliccando su More...<br>Scopri ulteriori dettagli.<br>E molte altre informazioni utili riferite all'evento.",
     moreTitle: "Ogni pulsante!",
-    moreText: "Come More... <br>Esegue altre funzioni.<br>Come... avviare il tuo navigatore per raggiungere l'evento",
-    moreTitle1: "E non solo!...",
-    moreText1: "Sapere se l'evento è gratuito o a pagamento ed infuturo...<br>chissà... prenotare i posti",
-    moreTitle2: "Ma anche",
-    moreText2: "Comunicare se hai intenzione di partecipare<br>e se sei registrato...",
+    moreText: "Come MAP... <br>Esegue funzioni specifiche.<br>Come... avviare il tuo navigatore per raggiungere l'evento",
+    moreTitle1: "Ma non solo!...",
+    moreText1: "Sapere se l'evento è gratuito, a pagamento ed infuturo...<br>chissà... prenotare...!",
+    moreTitle2: "E anche...",
+    moreText2: "Comunicare se hai intenzione di partecipare<br>e se sei registrato... magari essere avvisato in tempo del suo inizio.",
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il tuo territorio con...<br>
     <div style="text-align:center;"><strong>Aroundo</strong></div>`,
-    restartText: `<div style="text-align:center;">Non mi sono spiegato bene?<br>Ricominciamo...</div>`
+    restartText: `<div style="text-align:center;">Non mi sono spiegato?<br>Va bene, ricominciamo...</div>`
   }
 };
 
@@ -234,7 +234,7 @@
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
       showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(5000);
       mapInstance.closePopup();
-      await wait(1000); hideBubble(); await wait(500);
+      await wait(500); hideBubble(); await wait(500);
 
       // Aggiungi altro
       await wait(1000);
