@@ -227,21 +227,12 @@
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); await wait(500); // Effetto Click sul Marker
-      showPopup(markerData, mapInstance);
-      await wait(5000);
-      hideBubble(); await wait(500);
-      // mapInstance.closePopup();
-      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(5000);
-      await showMore(markerData, mapInstance);
-      await wait(5000);
-      hideBubble(); await wait(500);
-      hideBubble(); await wait(500);
-      showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
-      await wait(5000);
+      showPopup(markerData, mapInstance); await wait(5000); hideBubble(); await wait(500);
+      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
+      await showMore(markerData, mapInstance); await wait(5000); hideBubble(); await wait(500);
+      showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(5000);
       mapInstance.closePopup();
-      await wait(2000);
-      hideBubble(); await wait(500);
+      await wait(1000); hideBubble(); await wait(500);
 
       // Aggiungi altro
       await wait(1000);
