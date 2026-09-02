@@ -30,11 +30,13 @@
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
     whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
-    eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri i dettagli: cos'è, a che ora inizia, quando finisce, chi lo organizza.`,
-    moreTitle: "Ma non è finita qui!...",
-    moreText: "Cliccando su More... <br>Scopri nuovi dettagli.<br>Usare Map per avviare il tuo navigatore e raggiungere l'evento",
+    eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni.`,
+    eventsTitle1: "Ma non è finita qui!...",
+    eventsText1: "Cliccando su More... <br>Scopri ulteriori dettagli.<br>Usare Map per avviare il tuo navigatore e raggiungere l'evento",
+    moreTitle: "Ogni pulsante!",
+    moreText: "Come More... <br>Esegue altre funzioni.<br>Come... avviare il tuo navigatore per raggiungere l'evento",
     moreTitle1: "E non solo!...",
-    moreText1: "Sapere se l'evento è gratuito o a pagamento ed infuturo...<br>chissà... <br>prenotare i posti",
+    moreText1: "Sapere se l'evento è gratuito o a pagamento ed infuturo...<br>chissà... prenotare i posti",
     moreTitle2: "Ma anche",
     moreText2: "Comunicare se hai intenzione di partecipare<br>e se sei registrato...",
     finalTitle: "Adesso sei pronto!",
@@ -131,7 +133,7 @@
     async function showMore(markerData, mapInstance) {
       const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
         .find(button => button.textContent.trim() === 'More...');
-      showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance);
+      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
       await wait(200);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
     }
@@ -227,8 +229,9 @@
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); await wait(500); // Effetto Click sul Marker
       showPopup(markerData, mapInstance); await wait(5000); hideBubble(); await wait(500);
-      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
+      showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
       await showMore(markerData, mapInstance); await wait(5000); hideBubble(); await wait(500);
+      showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
       showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(5000);
       mapInstance.closePopup();
       await wait(1000); hideBubble(); await wait(500);
