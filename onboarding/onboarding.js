@@ -216,11 +216,13 @@
     await wait(3000); 
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
+    await wait(3000);
     clickSim(moreButton);
-    await wait(7000); 
-    hideBubble(); 
+    await wait(500);
     if (moreButton) {moreButton.click();}
+    await wait(7000);
     highlightRemove(moreHighlight);
+    hideBubble(); 
     await wait(500);
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
     await wait(5000); 
