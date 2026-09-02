@@ -101,11 +101,6 @@
  }
 
 .onboarding-restart {
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-.onboarding-restart {
   margin-top: 14px;
   color: #3b82f6;
   font-weight: 700;
@@ -113,7 +108,6 @@
   cursor: pointer;
   pointer-events: auto;
 }
-
 
 /* Mobile */
 @media (max-width: 600px) {
