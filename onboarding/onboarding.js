@@ -90,6 +90,9 @@
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
       await wait(200);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
+      await wait(200);
+      const mapButton = document.querySelector('.map-btn');
+      console.log('MAP:', mapButton);
     }
   
   /* Evidenzia marker */
