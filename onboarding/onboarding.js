@@ -92,7 +92,7 @@
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
       await wait(200);
       const mapButton = document.querySelector('.map-btn');
-      highlightElement(mapButton);
+      return highlightElement(mapButton);
     }
 
     function highlightElement(element) {
@@ -212,7 +212,11 @@
       if (highlight) {highlight.remove(); highlight = null;}
       showPopup(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
       showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); await wait(7000); hideBubble(); await wait(500);
-      await showMore(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
+      const mapHighlight = await showMore(markerData, mapInstance);
+      await wait(7000);
+      if (mapHighlight) {mapHighlight.remove();}
+      hideBubble();
+      await wait(500);
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(7000); hideBubble(); await wait(500);
       showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(7000);
       mapInstance.closePopup(); hideBubble();await wait(500);
