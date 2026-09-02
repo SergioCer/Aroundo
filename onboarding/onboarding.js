@@ -92,7 +92,18 @@
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
       await wait(200);
       const mapButton = document.querySelector('.map-btn');
-      simulateClick(mapButton);
+      highlightElement(mapButton);
+    }
+
+    function highlightElement(element) {
+      if (!element) {return null;}
+      const rect = element.getBoundingClientRect();
+      const effect = document.createElement('div');
+      effect.className = 'onboarding-highlight';
+      effect.style.left = `${rect.left + rect.width / 2}px`;
+      effect.style.top = `${rect.top + rect.height / 2}px`;
+      layer.appendChild(effect);
+      return effect;
     }
   
   /* Evidenzia marker */
