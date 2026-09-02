@@ -50,7 +50,7 @@
     function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
 
     /* Crea contenitore onboarding */
-    function createLayer() {
+    function layerCreate() {
       layer = document.createElement('div');
       layer.id = 'onboarding-layer';
       document.body.appendChild(layer);
@@ -102,7 +102,7 @@
     }
   
   /* Evidenzia marker */
-  function showMarkerHighlight(marker, mapInstance) {
+  function markerHighlightShow(marker, mapInstance) {
     const latlng = marker.getLatLng();
     const point = mapInstance.latLngToContainerPoint(latlng);
     markerHighlight = document.createElement('div');
@@ -113,7 +113,7 @@
   }
 
     /* Aggiorna posizione evidenziazione */
-    function updateMarkerHighlight(marker, mapInstance) {
+    function markerHighlightUpdate(marker, mapInstance) {
       if (!markerHighlight) {return;}
       const latlng = marker.getLatLng();
       const point = mapInstance.latLngToContainerPoint(latlng);
@@ -166,10 +166,10 @@
      function flyToEvent(marker, mapInstance) {
        return new Promise(resolve => {
          const latlng = marker.getLatLng();
-         const updateHighlight = () => {updateMarkerHighlight(marker, mapInstance);};
+         const updateHighlight = () => {markerHighlightUpdate(marker, mapInstance);};
           mapInstance.on('move', updateHighlight);
           mapInstance.once('moveend', () => {mapInstance.off('move', updateHighlight);
-            updateMarkerHighlight(marker, mapInstance);
+            markerHighlightUpdate(marker, mapInstance);
             resolve();
           });
           mapInstance.flyTo(latlng, ONBOARDING_ZOOM, {duration: 3.5, easeLinearity: 0.25});
@@ -177,7 +177,7 @@
       }
 
       /* Apertura Marker */
-      function showPopup(markerData) {
+      function popupShow(markerData) {
         const marker = markerData.marker;
         const event = markerData.event;
         if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
@@ -190,7 +190,7 @@
   async function start(markerData, mapInstance) {
     while (!window.gpsReady) {await wait(2000);}
     onboardingMarkerData = markerData;
-    createLayer();
+    layerCreate();
     disableMapInteraction(mapInstance);
     onboardingOriginalCenter = mapInstance.getCenter();
     onboardingOriginalZoom = mapInstance.getZoom();
@@ -199,16 +199,16 @@
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
     showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
     await wait(3000);
-    showMarkerHighlight(markerData.marker, mapInstance);
+    markerHighlightShow(markerData.marker, mapInstance);
     await wait(7000);
     hideBubble(); 
     await wait(500);
     await flyToEvent(markerData.marker, mapInstance);
-    updateMarkerHighlight(markerData.marker, mapInstance);
+    markerHighlightUpdate(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
-    showPopup(markerData, mapInstance); 
+    popupShow(markerData, mapInstance); 
     await wait(3000); 
     hideBubble(); 
     await wait(500);
@@ -223,23 +223,22 @@
     highlightRemove(moreHighlight);
     await wait(500);
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-    await wait(10000); 
-    hideBubble();
-    await wait(500);
-    showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
+    await wait(5000); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
     await wait(5000); 
+    hideBubble();
     highlightRemove(mapHighlight);
-    await wait(5000); 
+    await wait(500);
+    showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
+    await wait(10000); 
     hideBubble();
     await wait(500);
     showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
     const bookButton = document.querySelector('.book-btn');
     const bookHighlight = highlight(bookButton);
-    await wait(5000);
+    await wait(10000);
     highlightRemove(bookHighlight);
-    await wait(5000);
     mapInstance.closePopup(); 
     hideBubble();
     await wait(500);
