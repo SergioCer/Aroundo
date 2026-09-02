@@ -1,5 +1,3 @@
-/* AROUNDO — ONBOARDING */
-
 (function () {
   'use strict';
   const ONBOARDING_ZOOM = 13;
@@ -39,23 +37,17 @@
     moreTitle2: "E anche...",
     moreText2: "Comunicare se hai intenzione di partecipare<br>e se sei registrato... magari essere avvisato in tempo del suo inizio.",
     finalTitle: "Adesso sei pronto!",
-    finalText: `Scopri come vivere al meglio il tuo territorio con...<br>
-    <div style="text-align:center;"><strong>Aroundo</strong></div>`,
+    finalText: `Scopri come vivere al meglio il tuo territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
     restartText: `<div style="text-align:center;">Non mi sono spiegato?<br>Va bene, ricominciamo...</div>`
   }
 };
 
-   const browserLanguage = navigator.language
-     .slice(0, 2)
-     .toLowerCase();
-   const lang = onboardingTexts[browserLanguage]
-     ? browserLanguage
-     : 'en';
+   const browserLanguage = navigator.language .slice(0, 2) .toLowerCase();
+   const lang = onboardingTexts[browserLanguage] ? browserLanguage : 'en';
    const t = onboardingTexts[lang];
    
   /* Utility */
-  function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /* Crea contenitore onboarding */
@@ -69,14 +61,7 @@
   async function showWelcome(t) {
     const welcome = document.createElement('div');
     welcome.className = 'onboarding-card onboarding-welcome';
-    welcome.innerHTML = `
-      <div class="onboarding-title">
-        ${t.welcomeTitle}
-      </div>
-      <div class="onboarding-subtitle">
-        ${t.welcomeText}
-      </div>
-    `;
+    welcome.innerHTML = `<div class="onboarding-title">${t.welcomeTitle}</div><div class="onboarding-subtitle">${t.welcomeText}</div>`;
     layer.appendChild(welcome);
     // permette al browser di applicare lo stato iniziale
     requestAnimationFrame(() => {welcome.classList.add('visible');});
@@ -91,14 +76,7 @@
    async function showWhyAroundo(t) {
      const why = document.createElement('div');
      why.className = 'onboarding-card onboarding-welcome';
-     why.innerHTML = `
-      <div class="onboarding-title">
-        ${t.whyTitle}
-      </div>
-      <div class="onboarding-subtitle">
-        ${t.whyText}
-      </div>
-     `;
+     why.innerHTML = `<div class="onboarding-title">${t.whyTitle}</div><div class="onboarding-subtitle">${t.whyText}</div>`;
      layer.appendChild(why);
      requestAnimationFrame(() => {why.classList.add('visible');});
      await wait(7000);
@@ -141,16 +119,10 @@
     function showBubble(title, text, marker, mapInstance, restartText = null) {
       bubble = document.createElement('div');
       bubble.className = 'onboarding-card onboarding-bubble';
-      bubble.innerHTML = `
-        <div class="onboarding-title">${title}</div>
-        <div class="onboarding-subtitle">${text}</div>
-        ${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}
-      `;
+      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}`;
       layer.appendChild(bubble);
       positionBubble(marker, mapInstance);
-      requestAnimationFrame(() => {
-        bubble.classList.add('visible');
-      });
+      requestAnimationFrame(() => {bubble.classList.add('visible');});
       const restart = bubble.querySelector('.onboarding-restart');
       if (restart) {restart.addEventListener('click', async () => {onboardingRestart = true; await finish(mapInstance);});}
     }
@@ -161,7 +133,7 @@
          oldBubble.classList.remove('visible');
          oldBubble.classList.add('hide');
          setTimeout(() => {oldBubble.remove();
-         if (bubble === oldBubble) {bubble = null;}}, 800);
+         if (bubble === oldBubble) {bubble = null;}}, 500);
       }
 
      /* Posiziona fumetto vicino al marker */
@@ -223,13 +195,13 @@
       showMarkerHighlight(markerData.marker, mapInstance);
       await wait(500);
       showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-      await wait(3000);
+      await wait(5000);
       await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
       updateMarkerHighlight(markerData.marker, mapInstance);
       markerClickEffect(); await wait(500); // Effetto Click sul Marker
       showPopup(markerData, mapInstance); await wait(5000); hideBubble(); await wait(500);
       showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
-      await showMore(markerData, mapInstance); await wait(5000); hideBubble(); await wait(500);
+      await showMore(markerData, mapInstance); await wait(7000); hideBubble(); await wait(500);
       showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); await wait(5000); hideBubble(); await wait(500);
       showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); await wait(5000);
       mapInstance.closePopup();
@@ -239,7 +211,7 @@
       await wait(1000);
       showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
       await wait(10000);
-      await finish(mapInstance); // total 37,0'' width End=3,5''
+      await finish(mapInstance); // total 60,7'' width End=3,5''
       if (onboardingRestart) {
         onboardingRestart = false;
         await wait(500);
