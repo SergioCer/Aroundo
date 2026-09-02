@@ -64,7 +64,7 @@
       layer.appendChild(welcome);
       // permette al browser di applicare lo stato iniziale
       requestAnimationFrame(() => {welcome.classList.add('visible');});
-      await wait(7000);
+      await wait(10000);
       welcome.classList.remove('visible');
       welcome.classList.add('hide');
       await wait(500);
@@ -78,7 +78,7 @@
      why.innerHTML = `<div class="onboarding-title">${t.whyTitle}</div><div class="onboarding-subtitle">${t.whyText}</div>`;
      layer.appendChild(why);
      requestAnimationFrame(() => {why.classList.add('visible');});
-     await wait(7000);
+     await wait(10000);
      why.classList.remove('visible');
      why.classList.add('hide');
      await wait(500);
@@ -86,9 +86,8 @@
    }
 
     /* More... */
-    async function showMore(markerData, mapInstance) {
+    function showMore(markerData, mapInstance) {
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      await wait(200);
       const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
         .find(button => button.textContent.trim() === 'More...');
       return moreButton;
@@ -210,34 +209,35 @@
     showMarkerHighlight(markerData.marker, mapInstance);
     await wait(500);
     showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-    await wait(7000);
+    await wait(8000);
     await flyToEvent(markerData.marker, mapInstance);
     updateMarkerHighlight(markerData.marker, mapInstance);
     simulateClick(highlight); 
     if (highlight) {highlight.remove(); highlight = null;}
     await wait(500);
     showPopup(markerData, mapInstance); 
-    await wait(7000); 
+    await wait(8000); 
     hideBubble(); 
     await wait(500);
-    const moreButton = await showMore(markerData, mapInstance);
+    const moreButton = showMore(markerData, mapInstance);
     const moreHighlight = highlightElement(moreButton);
-    await wait(3000);
     simulateClick(moreButton);await wait(500);
     if (moreButton) {moreButton.click();}
+    hideBubble();
+    await wait(500);
     showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); 
-    await wait(7000); 
+    await wait(8000); 
     if (moreHighlight) {moreHighlight.remove();}
     hideBubble(); 
     await wait(500);
     const mapHighlight = showMap();
     showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
-    await wait(7000); 
+    await wait(8000); 
     if (mapHighlight) {mapHighlight.remove();}
     hideBubble();
     await wait(500);
     showBubble(t.moreTitle2, t.moreText2, markerData.marker, mapInstance); 
-    await wait(7000);
+    await wait(8000);
     mapInstance.closePopup(); 
     hideBubble();
     await wait(500);
