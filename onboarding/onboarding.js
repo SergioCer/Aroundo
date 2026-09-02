@@ -2,7 +2,7 @@
   'use strict';
   const ONBOARDING_ZOOM = 13;
   let layer = null;
-  let highlight = null;
+  let markerHighlight = null;
   let bubble = null;
   let onboardingOriginalCenter = null;
   let onboardingOriginalZoom = null;
@@ -105,20 +105,20 @@
   function showMarkerHighlight(marker, mapInstance) {
     const latlng = marker.getLatLng();
     const point = mapInstance.latLngToContainerPoint(latlng);
-    highlight = document.createElement('div');
-    highlight.className = 'onboarding-highlight';
-    highlight.style.left = `${point.x}px`;
-    highlight.style.top = `${point.y}px`;
-    layer.appendChild(highlight);
+    markerHighlight = document.createElement('div');
+    markerHighlight.className = 'onboarding-highlight';
+    markerHighlight.style.left = `${point.x}px`;
+    markerHighlight.style.top = `${point.y}px`;
+    layer.appendChild(markerHighlight);
   }
 
     /* Aggiorna posizione evidenziazione */
     function updateMarkerHighlight(marker, mapInstance) {
-      if (!highlight) {return;}
+      if (!markerHighlight) {return;}
       const latlng = marker.getLatLng();
       const point = mapInstance.latLngToContainerPoint(latlng);
-      highlight.style.left = `${point.x}px`;
-      highlight.style.top = `${point.y}px`;
+      markerHighlight.style.left = `${point.x}px`;
+      markerHighlight.style.top = `${point.y}px`;
     }
 
     function clickSim(element) {
@@ -205,9 +205,9 @@
     await wait(500);
     await flyToEvent(markerData.marker, mapInstance);
     updateMarkerHighlight(markerData.marker, mapInstance);
-    clickSim(highlight); 
-    if (highlight) {highlight.remove(); highlight = null;}
+    clickSim(markerHighlight); 
     await wait(500);
+    if (highlight) {highlight.remove(); highlight = null;}
     showPopup(markerData, mapInstance); 
     await wait(6000); 
     hideBubble(); 
@@ -215,6 +215,7 @@
     showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
     await wait(10000); 
     hideBubble(); 
+    await wait(500);
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
@@ -255,7 +256,7 @@
       if (mapInstance) {mapInstance.closePopup();}
       if (onboardingOriginalCenter !== null) {
       mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
-      if (highlight) {highlight.remove(); highlight = null;}
+      if (markerHighlight) {markerHighlight.remove(); markerHighlight = null;}
       hideBubble();
       if (layer) {layer.remove(); layer = null;}
       enableMapInteraction(mapInstance);
