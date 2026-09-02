@@ -85,20 +85,6 @@
      why.remove();
    }
 
-    /* More... */
-    function showMore(markerData, mapInstance) {
-      showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-      const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
-        .find(button => button.textContent.trim() === 'More...');
-      return moreButton;
-    }
-
-    /* Map... */
-    function showMap() {
-      const mapButton = document.querySelector('.map-btn');
-      return highlightElement(mapButton);
-    }
-
     function highlightElement(element) {
       if (!element) {return null;}
       const rect = element.getBoundingClientRect();
@@ -222,16 +208,19 @@
     hideBubble(); 
     await wait(500);
     showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance); 
-    const moreButton = showMore(markerData, mapInstance);
+    showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
+    const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlightElement(moreButton);
-    simulateClick(moreButton);await wait(500);
+    simulateClick(moreButton);
+    await wait(500);
     if (moreButton) {moreButton.click();}
     await wait(3000); 
     if (moreHighlight) {moreHighlight.remove();}
     await wait(5000); 
     hideBubble();
     await wait(500);
-    const mapHighlight = showMap();
+    const mapButton = document.querySelector('.map-btn');
+    const mapHighlight = highlightElement(mapButton);
     showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
     await wait(3000); 
     if (mapHighlight) {mapHighlight.remove();}
