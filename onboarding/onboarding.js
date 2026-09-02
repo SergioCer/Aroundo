@@ -192,7 +192,7 @@
       await wait(500);
       showBubble(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
       await wait(7000);
-      await flyToEvent(markerData.marker, mapInstance); /* 3,5'' */
+      await flyToEvent(markerData.marker, mapInstance);
       updateMarkerHighlight(markerData.marker, mapInstance);
       simulateClick(highlight); await wait(500); // Effetto Click sul Marker
       if (highlight) {highlight.remove(); highlight = null;}
