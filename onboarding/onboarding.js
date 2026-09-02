@@ -108,8 +108,7 @@
 
     /* More... */
     async function showMore(markerData, mapInstance) {
-      const moreButton = [...document.querySelectorAll('.leaflet-popup button')]
-        .find(button => button.textContent.trim() === 'More...');
+      // const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
       showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
       await wait(200);
       window.openDetailPopup(window.currentEvent, window.currentLatLng, false);
@@ -219,10 +218,12 @@
       }
    }
 
-   function finish(mapInstance) {
+   async function finish(mapInstance) {
       if (mapInstance) {mapInstance.closePopup();}
       if (onboardingOriginalCenter !== null) {
-      mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+        await new Promise(resolve => {mapInstance.once('moveend', resolve);
+        mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});});}
+      // mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
       if (highlight) {highlight.remove(); highlight = null;}
       hideBubble();
       if (layer) {layer.remove(); layer = null;}
