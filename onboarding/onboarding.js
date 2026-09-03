@@ -188,12 +188,12 @@
         });
       }
 
-    function categoryGet(id) {
+    function categoryGet(position) {
       const checkboxes = document.querySelectorAll('#menu-items .category-checkbox');
       return checkboxes[position] || null;
     }
 
-    function categorySelect(id) {
+    function categorySelect(position) {
       const checkbox = categoryGet(position);
       if (!checkbox) {return;}
       checkbox.checked = true;
@@ -233,14 +233,15 @@
     clickSim(markerHighlight); 
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
-    markerShow(markerData, mapInstance); 
+    markerShow(markerData, mapInstance);
+    await wait(3000);
     bubbleHide(); 
     await wait(500);
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
-    await wait(7000); 
+    await wait(3000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(2000);
+    await wait(6000);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
@@ -383,7 +384,7 @@
       map.scrollWheelZoom.disable();
       map.boxZoom.disable();
       map.keyboard.disable();
-      map.getPane('markerPane').style.pointerEvents = 'none';
+      map.on('click', stopOnboardingMapClick);
     }
   
     function enableMapInteraction(map) {
@@ -393,7 +394,12 @@
       map.scrollWheelZoom.enable();
       map.boxZoom.enable();
       map.keyboard.enable();
-      map.getPane('markerPane').style.pointerEvents = '';
+      map.off('click', stopOnboardingMapClick);
+    }
+ 
+    function stopOnboardingMapClick(event) {
+      L.DomEvent.stopPropagation(event.originalEvent);
+      L.DomEvent.preventDefault(event.originalEvent);
     }
    
 })();
