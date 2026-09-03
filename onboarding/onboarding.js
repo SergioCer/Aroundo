@@ -29,10 +29,10 @@
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
-    eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve desrizione, eventuali locandine ed in più...",
+    eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine ed in più...",
     moreTitle: "Deversi pulsanti!",
     moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Per esempio...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento.",
-    moreTitle1: "Oppure",
+    moreTitle1: "Oppure...",
     moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
     moreText2: "Volessi partecipare...<br>Basta...Dirlo!<br>Così, se sei registrato, puoi essere avvisato in tempo.",
@@ -49,13 +49,17 @@
     categoriesTitle5: "Riaprendo infatti...",
     categoriesText5: "Troverai la tua selezione.<br>Se vuoi, puoi modificarle o reimpostare tutte le categorie con un solo click sul selettore in alto.",
     categoriesTitle6: "In questo modo,",
-    categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando avii Aroundo.",
+    categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando apri Aroundo.",
+    categoriesTitle7: "Ma i colori?",
+    categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
+    categoriesTitle8: "Perchè cambiano?",
+    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...lo scoprirai.E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
     timelineTitle: "Questa è la Linea del Tempo!",
-    timelineText: "Grazie a questa puoi spostarti avanti ed indietro nei giorni, scoprendo cosa accadrà o cosa è gia successo.",
+    timelineText: "Grazie a questa puoi spostarti avanti ed indietro nei giorni, scoprendo cosa accadrà o cosa è gia successo.Il puntino al centro ti riporta ad oggi",
     timelineTitle1: "E con le maniglie...",
     timelineText1: "Puoi stabilire l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
-    timelineText2: "Se vuoi sapere ieri...domani...dopodomani...tra un mese, in quella specifica zona della mappa, dopo le xx e prima delle yy quali eventi ci sono delle categorie che ti interessano!",
+    timelineText2: "Se vuoi sapere ieri...domani...dopodomani...tra un mese, in quella specifica zona della mappa, dopo le xx e prima delle yy quali eventi ci sono delle categorie che ti interessano...",
     timelineTitle3: "Tutto è sotto il tuo controllo!",
     timelineText3: "Non dovrai mai più cercare tra manifesti, social, gruppi, riviste, ricordare dove hai visto, chiedere ad amici, sfogliare pagine e pagine...",
     timelineTitle4: "Aroundo è",
@@ -309,7 +313,7 @@
 
     await wait(2000);
     const category0 = highlight(categoryGet(0));
-    await wait(6000);
+    await wait(5000);
     clickSim(categoryGet(0));
     await wait(500);
     categorySelect(0);
@@ -367,7 +371,15 @@
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
-    await wait(6000);
+    await wait(7000);
+    bubbleHide();
+    await wait(500);
+    bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
+    await wait(7000);
+    bubbleHide();
+    await wait(500);
+    bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
+    await wait(7000);
     bubbleHide();
     await wait(500);
 
