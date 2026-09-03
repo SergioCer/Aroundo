@@ -31,11 +31,11 @@
     eventsTitle1: "Cliccando su More...",
     eventsText1: "Scopri ulteriori dettagli.<br>E molte altre informazioni riferite all'evento.",
     moreTitle: "Ogni pulsante!",
-    moreText: "Come Map...<br>Esegue funzioni specifiche.<br>Come... avviare direttamente il tuo navigatore per raggiungere l'evento",
+    moreText: "Come Map...<br>Esegue funzioni specifiche.<br>Per esempio... avviare direttamente il tuo navigatore per raggiungere l'evento",
     moreTitle1: "Oppure",
     moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed infuturo...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
-    moreText2: "Hai intenzione di partecipare...<br>Semplicissimo...Dillo!<br>Inoltre, se sei registrato...<br>puoi essere avvisato per non perderlo.",
+    moreText2: "Volessi partecipare...<br>Semplicissimo...Dillo!<br>Così, se sei registrato, puoi essere avvisato in tempo.",
     categoriesTitle: "Questo è il menu Categories",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando lo apri",
@@ -252,7 +252,7 @@
     await wait(2000); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
-    await wait(80000); 
+    await wait(8000); 
     highlightRemove(mapHighlight);
     bubbleHide();
     await wait(500);
