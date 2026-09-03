@@ -23,19 +23,22 @@
   },
   it: {
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
-    welcomeText: "Dai, ti faccio vedere come funziona.<br><br>Ti guido io.",
+    welcomeText: "Dai, ti faccio vedere come funziona.<br>Ti guido io.",
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
     whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire...<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
+
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
-    eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili.`,
+    eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito cosa succede, a che ora inizia, quando finisce, chi organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine ed in più...",
-    moreTitle: "Deversi pulsanti!",
-    moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Per esempio...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento.",
-    moreTitle1: "Oppure...",
+
+    moreTitle: "Diversi pulsanti!",
+    moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Avviare direttamente il tuo navigatore per raggiungere l'evento.",
+    moreTitle1: "E c'è di più.",
     moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
-    moreText2: "Volessi partecipare...<br>Basta...Dirlo!<br>Così, se sei registrato, puoi essere avvisato in tempo.",
+    moreText2: "Volessi partecipare!<br>Basta...dirlo.<br>Così, se sei registrato, puoi essere avvisato in tempo.",
+
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
@@ -43,7 +46,7 @@
     categoriesTitle2: "Se non selezioni nulla?",
     categoriesText2: "Nessun problema.<br>Chiudendo il menu, e puoi anche fare click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Oppure...",
-    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
+    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non è tutto attivo.",
     categoriesTitle4: "Se hai fatto una selezione?",
     categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
@@ -52,18 +55,26 @@
     categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando apri Aroundo.",
     categoriesTitle7: "Ma i colori?",
     categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
-    categoriesTitle8: "Perchè cambiano?",
-    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...lo scoprirai.<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
+    categoriesTitle8: "Perché cambiano?",
+    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...poi lo scoprirai.<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
+
+    tickerTitle: "E se non fai click?",
+    tickerText: "Nessun problema, in basso, ordinati per ora di inizio, scorrono una selezione degli eventi più vicini nel tempo tra quelli dell'area osservata",
+   
     timelineTitle: "Questa è la Linea del Tempo!",
-    timelineText: "Grazie a questa puoi spostarti avanti ed indietro nei giorni, scoprendo cosa accadrà o cosa è gia successo.Il puntino al centro ti riporta ad oggi",
-    timelineTitle1: "E con le maniglie...",
-    timelineText1: "Puoi stabilire l'ora di inizio e di fine degli eventi a cui sei interessato!",
+    timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.Il puntino al centro ti riporta ad oggi",
+    timelineTitle1: "Ora guarda le maniglie rotonde...",
+    timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
-    timelineText2: "Se vuoi sapere ieri...domani...dopodomani...tra un mese, in quella specifica zona della mappa, dopo le xx e prima delle yy quali eventi ci sono delle categorie che ti interessano...",
-    timelineTitle3: "Tutto è sotto il tuo controllo!",
-    timelineText3: "Non dovrai mai più cercare tra manifesti, social, gruppi, riviste, ricordare dove hai visto, chiedere ad amici, sfogliare pagine e pagine...",
-    timelineTitle4: "Aroundo è",
-    timelineText4: "Spazio-Temporale<br>grazie a tutte queste combinazioni, saprai sempre cosa fare!<br>Guadagna il tuo tempo, è il bene più prezioso.",
+    timelineText2: "Se vuoi sapere cosa succede ieri, domani, dopodomani o tra un mese, in quella specifica zona della mappa, dopo le 16 e prima delle 22 quali eventi ci sono delle categorie che ti interessano...",
+    timelineTitle3: "Hai tu il controllo!",
+    timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
+    timelineTitle4: "Se sei turista...",
+    timelineText4: "Abilitando la posizione, ti troverai già immerso negli eventi della zona senza neanche conoscerla e dover cercare!",
+    timelineTitle5: "Pianificare una vacanza...",
+    timelineText5: "Sarà molto più semplice<br>Sposta la mappa nella zona in cui andrai, seleziona la data in cui sarai presente, e saprai in anticipo cosa potrai fare!",
+    timelineTitle6: "Aroundo è...",
+    timelineText6: `<div style="text-align:center;">Spazio-Temporale<br>Grazie a tutte queste combinazioni, saprai cosa fare!<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -383,6 +394,11 @@
     bubbleHide();
     await wait(500);
 
+    cardShow(t.tickerTitle, t.tickerText, markerData.marker, mapInstance);
+    await wait(8000);
+    cardHide();
+    await wait(500);
+
     cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
     await wait(10000);
     cardHide();
@@ -398,10 +414,19 @@
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
     await wait(10000);
     bubbleHide();
-
+    bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
+    await wait(10000);
+    bubbleHide();
+    bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
+    await wait(10000);
+    bubbleHide();
+    await wait(500);
     
     bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
     await wait(12000);
+    bubbleHide();
+    await wait(500);
+
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
 
