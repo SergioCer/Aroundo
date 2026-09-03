@@ -151,7 +151,7 @@
     }
 
     /* Apertura Marker */
-    function popupShow(markerData) {
+    function markerShow(markerData) {
       const marker = markerData.marker;
       const event = markerData.event;
       if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
@@ -181,6 +181,20 @@
         });
       }
 
+    function categorySelect(id) {
+      const checkbox = categoryGet(id);
+      if (!checkbox) {return;}
+      checkbox.checked = true;
+      checkbox.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+
+    function categoriesSelectAll() {
+      const toggle = document.getElementById('select-all-toggle');
+      if (!toggle) {return;}
+      toggle.checked = true;
+      toggle.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+
   /* Regia */
   async function start(markerData, mapInstance) {
     while (!window.gpsReady) {await wait(2000);}
@@ -209,7 +223,7 @@
     clickSim(markerHighlight); 
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
-    popupShow(markerData, mapInstance); 
+    markerShow(markerData, mapInstance); 
     bubbleHide(); 
     await wait(500);
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
@@ -266,6 +280,33 @@
     await wait(500);
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
+    await wait(1000);
+    const category1 = highlight(categoryGet(1));
+    await wait(3000);
+    clickSim(categoryGet(1));
+    await wait(500);
+    categorySelect(1);
+    
+    await wait(1000);
+    const category2 = highlight(categoryGet(2));
+    await wait(2000);
+    clickSim(categoryGet(2));
+    await wait(500);
+    categorySelect(2);
+    
+    await wait(1000);
+    const category7 = highlight(categoryGet(7));
+    await wait(1000);
+    clickSim(categoryGet(7));
+    await wait(500);
+    categorySelect(7);
+    
+    await wait(1000);
+    const category12 = highlight(categoryGet(12));
+    await wait(1000);
+    clickSim(categoryGet(12));
+    await wait(500);
+    categorySelect(12);
     await wait(7000);
     bubbleHide();
     await wait(500);
