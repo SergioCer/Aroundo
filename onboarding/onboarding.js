@@ -488,6 +488,8 @@
   });
     }
 
+let onboardingTotalTime = 0;
+ 
   function onboardingWait(title, text, type = "normal") {
   const cleanText = (title + " " + text)
     .replace(/<[^>]*>/g, '')
@@ -501,10 +503,13 @@
     important: 6000
   };
   const totalTime = Math.min(12000, baseTime[type] + readingTime);
+  onboardingTotalTime += totalTime;
   console.log("Aroundo onboarding:",{
       title: title.replace(/<[^>]*>/g, ''), words, type,
       readingSeconds: (readingTime / 1000).toFixed(1),
       totalSeconds: (totalTime / 1000).toFixed(1)});
+    console.log("Durata onboarding:",
+  (onboardingTotalTime / 1000 / 60).toFixed(2), "minuti");
   return wait(totalTime);
 }
 
