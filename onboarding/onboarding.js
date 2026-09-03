@@ -228,12 +228,12 @@
     markerHighlightShow(markerData.marker, mapInstance);
     await wait(9000);
     await flyToEvent(markerData.marker, mapInstance);
-    bubbleHide(); 
-    await wait(500);
     markerHighlightUpdate(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
+    bubbleHide(); 
+    await wait(500);
     markerShow(markerData, mapInstance); 
     bubbleHide(); 
     await wait(500);
@@ -287,43 +287,43 @@
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
     await wait(3000);
     if (categoryButton) {categoryButton.click();}
-    await wait(5000);
+    await wait(7000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
-    await wait(1000);
+    await wait(2000);
     const category1 = highlight(categoryGet(1));
-    await wait(3000);
+    await wait(6000);
     clickSim(categoryGet(1));
     await wait(500);
     categorySelect(1);
     
-    await wait(1000);
+    await wait(500);
     const category2 = highlight(categoryGet(2));
-    await wait(2000);
+    await wait(1000);
     clickSim(categoryGet(2));
     await wait(500);
     categorySelect(2);
     
-    await wait(1000);
-    const category7 = highlight(categoryGet(7));
+    await wait(500);
+    const category7 = highlight(categoryGet(3));
     await wait(1000);
     clickSim(categoryGet(7));
     await wait(500);
     categorySelect(7);
     
-    await wait(1000);
-    const category12 = highlight(categoryGet(12));
+    await wait(500);
+    const category12 = highlight(categoryGet(6));
     await wait(1000);
     clickSim(categoryGet(12));
     await wait(500);
     categorySelect(12);
-    await wait(7000);
+    await wait(8000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
-    await wait(7000);
+    await wait(8000);
     highlightRemove(category1);
     highlightRemove(category2);
     highlightRemove(category7);
@@ -333,11 +333,11 @@
     await wait(500);
 
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
-    await wait(3000);
+    await wait(4000);
     if (categoryButton) {categoryButton.click();}
     const selectAllButton = document.getElementById('select-all-toggle');
     const selectAllHighlight = highlight(selectAllButton);
-    await wait(3000);
+    await wait(4000);
     clickSim(selectAllButton);
     await wait(500);
     categoriesSelectAll();
@@ -347,7 +347,7 @@
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
-    await wait(5000);
+    await wait(8000);
     bubbleHide();
     await wait(500);
     
