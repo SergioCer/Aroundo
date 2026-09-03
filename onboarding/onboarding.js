@@ -33,7 +33,7 @@
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine ed in più...",
 
     moreTitle: "Diversi pulsanti!",
-    moreText: "Come Map...<br>Che Eseguono funzioni come...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento.",
+    moreText: "Come Map...<br>Che Eseguono funzioni, per esempio avviare direttamente il tuo navigatore per raggiungere l'evento.",
     moreTitle1: "E c'è di più.",
     moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
@@ -390,7 +390,7 @@
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
-    await wait(9000);
+    await wait(10000);
     bubbleHide();
     await wait(500);
 
@@ -405,7 +405,7 @@
     cardHide();
     await wait(500);
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle1, t.timelineText1,"important");
+    await onboardingWait(t.timelineTitle1, t.timelineText1,"normal");
     // await wait(10000);
     bubbleHide();
     await wait(500);
@@ -420,7 +420,7 @@
     bubbleHide();
     await wait(500);
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle4, t.timelineText4,"important");
+    await onboardingWait(t.timelineTitle4, t.timelineText4,"normal");
     // await wait(10000);
     bubbleHide();
     await wait(500);
@@ -499,16 +499,25 @@ let onboardingTotalTime = 0;
   const readingTime = words / 2.2 * 1000;
   const baseTime = {
     short: 2500, 
-    normal: 4000, 
-    important: 6000
+    normal: 3500, 
+    important: 5000
   };
-  const totalTime = Math.min(12000, baseTime[type] + readingTime);
+  const maxTime = {
+  short: 8000,
+  normal: 12000,
+  important: 18000
+};
+  const calculatedTime = baseTime[type] + readingTime;
+  const totalTime = Math.min(maxTime[type], calculatedTime);
   onboardingTotalTime += totalTime;
-  console.log("Aroundo onboarding:",{
-      title: title.replace(/<[^>]*>/g, ''), words, type,
-      readingSeconds: (readingTime / 1000).toFixed(1),
-      totalSeconds: (totalTime / 1000).toFixed(1)});
-    console.log("Durata onboarding:",
+  console.log("Aroundo onboarding:", {
+  title: title.replace(/<[^>]*>/g, ''), words, type,
+  readingSeconds: (readingTime / 1000).toFixed(1),
+  calculatedSeconds: (calculatedTime / 1000).toFixed(1),
+  totalSeconds: (totalTime / 1000).toFixed(1),
+  limited: calculatedTime > maxTime[type]
+});
+  console.log("Durata onboarding:",
   (onboardingTotalTime / 1000 / 60).toFixed(2), "minuti");
   return wait(totalTime);
 }
