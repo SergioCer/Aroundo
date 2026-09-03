@@ -25,7 +25,7 @@
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
     welcomeText: "Dai, ti faccio vedere come funziona.<br><br>Ti guido io.",
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
-    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire...<br><div style="text-align:center;"><strong><br>COSA FARE!</strong></div>`,
+    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire...<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
@@ -230,11 +230,11 @@
     onboardingOriginalCenter = mapInstance.getCenter();
     onboardingOriginalZoom = mapInstance.getZoom();
     cardShow(t.welcomeTitle, t.welcomeText);
-    await wait(9000);
+    await wait(8000);
     cardHide();
     await wait(500);
     cardShow(t.whyTitle, t.whyText);
-    await wait(9000);
+    await wait(8000);
     cardHide();
     await wait(500);
     
