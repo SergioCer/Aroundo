@@ -9,7 +9,7 @@
 /* Grafica comune Welcome e fumetti */
 .onboarding-card {
   box-sizing: border-box;
-  padding: 18px 22px;
+  padding: 12px 12px;
   color: #333;
   background: rgba(255, 248, 210, 0.97);
   border: 3px solid rgba(245, 158, 11, 0.35);
@@ -23,7 +23,7 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%) scale(0.96);
-  width: min(320px, calc(100vw - 30px));
+  width: min(320px, calc(100vw - 25px));
   text-align: center;
   opacity: 0;
   transition: opacity 1.0s ease, transform 1.0s ease;
@@ -87,12 +87,12 @@
 .onboarding-bubble {
   position: absolute;
   width: max-content;
-  max-width: min(280px, calc(100vw - 30px));
+  max-width: min(280px, calc(100vw - 25px));
   text-align: left;
   opacity: 0;
   transform: translateY(6px);
   transition: opacity 0.8s ease, transform 0.8s ease;
-  padding: 20px 24px;
+  padding: 12px 12px;
   border-radius: 44px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   pointer-events: none;
@@ -120,10 +120,10 @@
 
 /* Mobile */
 @media (max-width: 560px) {
-  .onboarding-welcome {width: calc(100vw - 20px);}
+  .onboarding-welcome {width: calc(100vw - 15px);}
   .onboarding-title {font-size: 20px;}
   .onboarding-subtitle {font-size: 16px;}
-  .onboarding-bubble {max-width: calc(100vw - 20px);
+  .onboarding-bubble {max-width: calc(100vw - 15px);
   font-size: 16px;
   }
 }
