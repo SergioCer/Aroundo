@@ -42,7 +42,7 @@
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
-    categoriesText1: "Vengono disattivate tutte le categorie.<br>Lasciandoti libertà di scegliere.<br>Come noti, infatti, sono spariti tutti gli eventi! ma non preoccuparti.",
+    categoriesText1: "Vengono disattivate tutte le categorie.<br>Lasciandoti libertà di scegliere.<br>Come noti, infatti, sono spariti tutti gli eventi!<br>Ma non preoccuparti.",
     categoriesTitle2: "Se non selezioni nulla?",
     categoriesText2: "Nessun problema.<br>Chiudendo il menu, e puoi anche fare click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Oppure...",
@@ -50,7 +50,7 @@
     categoriesTitle4: "Se hai fatto una selezione?",
     categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
-    categoriesText5: "Troverai la tua selezione.<br>Se vuoi, puoi modificarle o reimpostare tutte le categorie con un solo click sul selettore in alto.",
+    categoriesText5: "Troverai la tua selezione.<br>Se vuoi, puoi modificare o reimpostare tutte le categorie con un solo click sul selettore in alto.",
     categoriesTitle6: "In questo modo,",
     categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando apri Aroundo.",
     categoriesTitle7: "Ma i colori?",
@@ -380,22 +380,26 @@
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
+    await onboardingWait(t.categoriesTitle6, t.categoriesText6,"important");
+    // await wait(9000);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
-    await wait(9000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
-    await wait(9000);
+    await onboardingWait(t.categoriesTitle7, t.categoriesText7,"important");
+    // await wait(9000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
-    await wait(10000);
+    await onboardingWait(t.categoriesTitle8, t.categoriesText8,"important");
+    // await wait(10000);
     bubbleHide();
     await wait(500);
 
     cardShow(t.tickerTitle, t.tickerText, markerData.marker, mapInstance);
-    await wait(8000);
+    await onboardingWait(t.tickerTitle, t.tickerText,"important");
+    // await wait(8000);
     cardHide();
     await wait(500);
 
@@ -496,16 +500,16 @@ let onboardingTotalTime = 0;
     .replace(/\s+/g, ' ')
     .trim();
   const words = cleanText ? cleanText.split(' ').length : 0;
-  const readingTime = words / 2.2 * 1000;
+  const readingTime = words / 2.4 * 1000; // Velocità di lettura 2.2=132 2.4=144 2.6=156 2.8=168 parole/minuto
   const baseTime = {
-    short: 2500, 
-    normal: 3500, 
-    important: 5000
+    short: 2000, 
+    normal: 3000, 
+    important: 4000
   };
   const maxTime = {
   short: 8000,
   normal: 12000,
-  important: 18000
+  important: 22000
 };
   const calculatedTime = baseTime[type] + readingTime;
   const totalTime = Math.min(maxTime[type], calculatedTime);
