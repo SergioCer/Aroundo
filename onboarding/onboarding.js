@@ -29,13 +29,13 @@
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
-    eventsText1: "Scopri ulteriori dettagli.<br>E molte altre informazioni riferite all'evento.",
-    moreTitle: "Ogni pulsante!",
-    moreText: "Come Map...<br>Esegue funzioni specifiche.<br>Per esempio... avviare direttamente il tuo navigatore per raggiungere l'evento",
+    eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve desrizione, eventuali locandine ed in più...",
+    moreTitle: "Deversi pulsanti!",
+    moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Per esempio...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento",
     moreTitle1: "Oppure",
-    moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed infuturo...<br>chissà... prenotare...?",
+    moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed in futuro...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
-    moreText2: "Volessi partecipare...<br>Semplicissimo...Dillo!<br>Così, se sei registrato, puoi essere avvisato in tempo.",
+    moreText2: "Volessi partecipare...<br>Basta...Dirlo!<br>Così, se sei registrato, puoi essere avvisato in tempo.",
     categoriesTitle: "Questo è il menu Categories",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando lo apri",
@@ -232,8 +232,6 @@
     clickSim(markerHighlight); 
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
-    bubbleHide(); 
-    await wait(500);
     markerShow(markerData, mapInstance); 
     bubbleHide(); 
     await wait(500);
