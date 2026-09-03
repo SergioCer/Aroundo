@@ -33,7 +33,7 @@
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine ed in più...",
 
     moreTitle: "Diversi pulsanti!",
-    moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Avviare direttamente il tuo navigatore per raggiungere l'evento.",
+    moreText: "Come Map...<br>Che Eseguono funzioni come...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento.",
     moreTitle1: "E c'è di più.",
     moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
@@ -72,7 +72,7 @@
     timelineTitle4: "Se sei turista...",
     timelineText4: "Abilitando la posizione, ti troverai già immerso negli eventi della zona senza neanche conoscerla e dover cercare!",
     timelineTitle5: "Pianificare una vacanza...",
-    timelineText5: "Sarà molto più semplice<br>Sposta la mappa nella zona in cui andrai, seleziona la data in cui sarai presente, e saprai in anticipo cosa potrai fare!",
+    timelineText5: "Sarà molto più semplice!<br>Sposta la mappa nella zona in cui andrai, seleziona la data in cui sarai presente, e saprai in anticipo cosa potrai fare!",
     timelineTitle6: "Aroundo è...",
     timelineText6: `<div style="text-align:center;">Spazio-Temporale<br>Grazie a tutte queste combinazioni, saprai cosa fare!<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
     
@@ -425,8 +425,8 @@
     await wait(500);
     bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
     
-    await onboardingWait(t.timelineTitle6, t.timelineText6,"short");
-    // await wait(10000);
+    await onboardingWait(t.timelineTitle6, t.timelineText6,"important");
+    // await wait(12000);
 
     bubbleHide();
     await wait(500);
@@ -489,7 +489,10 @@
     .trim();
   const words = cleanText ? cleanText.split(' ').length : 0;
   const readingTime = words / 2.2 * 1000;
-  const baseTime = {short: 2500, normal: 4000, important: 6000
+  const baseTime = {
+    short: 2500, 
+    normal: 4000, 
+    important: 6000
   };
   const totalTime = Math.min(12000, baseTime[type] + readingTime);
   console.log("Aroundo onboarding:",{
