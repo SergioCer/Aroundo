@@ -23,13 +23,13 @@
   },
   it: {
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
-    welcomeText: "Dai, ti faccio vedere come funziona.<br>Ti guido io",
+    welcomeText: "Dai, ti faccio vedere come funziona.<br>Ti guido io.",
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
-    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
+    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili.`,
-    eventsTitle1: "Ma non è finita qui!...",
-    eventsText1: "Cliccando su More...<br>Scopri ulteriori dettagli.<br>E molte altre informazioni riferite all'evento.",
+    eventsTitle1: "Cliccando su More...",
+    eventsText1: "Scopri ulteriori dettagli.<br>E molte altre informazioni riferite all'evento.",
     moreTitle: "Ogni pulsante!",
     moreText: "Come Map<br>Esegue funzioni specifiche.<br>Come... avviare direttamente il tuo navigatore per raggiungere l'evento",
     moreTitle1: "Oppure",
@@ -218,13 +218,12 @@
     await wait(3000); 
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(3000);
+    await wait(5000);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
-    await wait(500);
     highlightRemove(moreHighlight);
-    await wait(7000);
+    await wait(5000);
     hideBubble(); 
     await wait(500);
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
@@ -248,7 +247,7 @@
     hideBubble();
     await wait(500);
 
-    bubbleShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
+    showBubble(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
     await wait(3000);
