@@ -23,7 +23,7 @@
   },
   it: {
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
-    welcomeText: "Dai, ti faccio vedere come funziona.",
+    welcomeText: "Dai, ti faccio vedere come funziona.<br>Ti guido io",
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
     whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente puoi scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
@@ -35,7 +35,7 @@
     moreTitle1: "Oppure",
     moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed infuturo...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
-    moreText2: "Hai intenzione di partecipare...<br>Semplicissimo...Dillo!<br>Inoltre se sei registrato...<br>puoi essere avvisato in tempo del suo inizio per non perderlo.",
+    moreText2: "Hai intenzione di partecipare...<br>Semplicissimo...Dillo!<br>Inoltre, se sei registrato...<br>puoi essere avvisato in tempo del suo inizio per non perderlo.",
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -220,8 +220,9 @@
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
-    await wait(7000);
+    await wait(500);
     highlightRemove(moreHighlight);
+    await wait(7000);
     hideBubble(); 
     await wait(500);
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
@@ -229,8 +230,8 @@
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
     await wait(5000); 
-    hideBubble();
     highlightRemove(mapHighlight);
+    hideBubble();
     await wait(500);
     showBubble(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
     await wait(10000); 
