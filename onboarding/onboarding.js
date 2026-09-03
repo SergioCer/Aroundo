@@ -112,9 +112,12 @@
       if (!bubble) {return;}
       const latlng = marker.getLatLng();
       const point = mapInstance.latLngToContainerPoint(latlng);
+      const mapRect = mapInstance.getContainer().getBoundingClientRect();
+      const x = mapRect.left + point.x;
+      const y = mapRect.top + point.y;
       const margin = 16;
       let left = point.x - bubble.offsetWidth / 2;
-      let top = point.y + 150;
+      let top = point.y + 130;
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
       left = Math.max(margin, Math.min(left, maxLeft));
       bubble.style.left = `${left}px`;
