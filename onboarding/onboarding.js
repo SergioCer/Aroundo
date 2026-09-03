@@ -53,7 +53,7 @@
     categoriesTitle7: "Ma i colori?",
     categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
     categoriesTitle8: "Perchè cambiano?",
-    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...lo scoprirai.E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
+    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...lo scoprirai.<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
     timelineTitle: "Questa è la Linea del Tempo!",
     timelineText: "Grazie a questa puoi spostarti avanti ed indietro nei giorni, scoprendo cosa accadrà o cosa è gia successo.Il puntino al centro ti riporta ad oggi",
     timelineTitle1: "E con le maniglie...",
