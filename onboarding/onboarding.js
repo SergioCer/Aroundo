@@ -31,7 +31,7 @@
     eventsTitle1: "Cliccando su More...",
     eventsText1: "Scopri ulteriori dettagli.<br>E molte altre informazioni riferite all'evento.",
     moreTitle: "Ogni pulsante!",
-    moreText: "Come Map<br>Esegue funzioni specifiche.<br>Come... avviare direttamente il tuo navigatore per raggiungere l'evento",
+    moreText: "Come Map...<br>Esegue funzioni specifiche.<br>Come... avviare direttamente il tuo navigatore per raggiungere l'evento",
     moreTitle1: "Oppure",
     moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed infuturo...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
@@ -208,14 +208,13 @@
     await flyToEvent(markerData.marker, mapInstance);
     markerHighlightUpdate(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
-    await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
     popupShow(markerData, mapInstance); 
-    await wait(3000); 
+    await wait(2000); 
     hideBubble(); 
     await wait(500);
     showBubble(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
-    await wait(3000); 
+    await wait(6000); 
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
     await wait(5000);
@@ -250,12 +249,14 @@
     showBubble(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
-    await wait(3000);
+    await wait(4000);
     clickSim(categoryButton);
     await wait(500);
-    if (categoryButton) {categoryButton.click();}
-    await wait(5000);
     highlightRemove(categoryHighlight);
+    if (categoryButton) {categoryButton.click();}
+    await wait(7000);
+    hideBubble();
+    await wait(500);
     
     // Aggiungi altro
     showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
