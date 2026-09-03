@@ -25,7 +25,7 @@
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
     welcomeText: "Dai, ti faccio vedere come funziona.<br><br>Ti guido io.",
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
-    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
+    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire<br><div style="text-align:center;"><strong><br>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
@@ -58,6 +58,7 @@
     const t = onboardingTexts[lang];
    
     function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
+    window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
 
     /* Crea contenitore onboarding */
     function layerCreate() {
@@ -66,36 +67,6 @@
       document.body.appendChild(layer);
     }
 
-    /* Welcome 
-    async function showWelcome(t) {
-      const welcome = document.createElement('div');
-      welcome.className = 'onboarding-card onboarding-welcome';
-      welcome.innerHTML = `<div class="onboarding-title">${t.welcomeTitle}</div><div class="onboarding-subtitle">${t.welcomeText}</div>`;
-      layer.appendChild(welcome);
-      // permette al browser di applicare lo stato iniziale
-      requestAnimationFrame(() => {welcome.classList.add('visible');});
-      await wait(10000);
-      welcome.classList.remove('visible');
-      welcome.classList.add('hide');
-      await wait(500);
-      welcome.remove();
-    }
-*/
-  
-   /* Why Aroundo? 
-   async function showWhyAroundo(t) {
-     const why = document.createElement('div');
-     why.className = 'onboarding-card onboarding-welcome';
-     why.innerHTML = `<div class="onboarding-title">${t.whyTitle}</div><div class="onboarding-subtitle">${t.whyText}</div>`;
-     layer.appendChild(why);
-     requestAnimationFrame(() => {why.classList.add('visible');});
-     await wait(10000);
-     why.classList.remove('visible');
-     why.classList.add('hide');
-     await wait(500);
-     why.remove();
-   }
-*/
     function cardShow(title, text) {
       const card = document.createElement('div');
       card.className = 'onboarding-card onboarding-welcome';
@@ -110,6 +81,40 @@
       card.classList.remove('visible');
       card.classList.add('hide');
       setTimeout(() => {card.remove();}, 500);
+    }
+  
+    function bubbleShow(title, text, marker, mapInstance, restartText = null) {
+      bubble = document.createElement('div');
+      bubble.className = 'onboarding-card onboarding-bubble';
+      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}`;
+      layer.appendChild(bubble);
+      bubblePosition(marker, mapInstance);
+      requestAnimationFrame(() => {bubble.classList.add('visible');});
+      const restart = bubble.querySelector('.onboarding-restart');
+      if (restart) {restart.addEventListener('click', async () => {onboardingRestart = true; await finish(mapInstance);});}
+    }
+
+    function bubbleHide() {
+      if (!bubble) {return;}
+      const oldBubble = bubble;
+      oldBubble.classList.remove('visible');
+      oldBubble.classList.add('hide');
+      setTimeout(() => {oldBubble.remove();
+      if (bubble === oldBubble) {bubble = null;}}, 500);
+    }
+
+    /* Posiziona fumetto vicino al marker */
+    function bubblePosition(marker, mapInstance) {
+      if (!bubble) {return;}
+      const latlng = marker.getLatLng();
+      const point = mapInstance.latLngToContainerPoint(latlng);
+      const margin = 16;
+      let left = point.x - bubble.offsetWidth / 2;
+      let top = point.y + 150;
+      const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
+      left = Math.max(margin, Math.min(left, maxLeft));
+      bubble.style.left = `${left}px`;
+      bubble.style.top = `${top}px`;
     }
   
     function highlight(element) {
@@ -127,17 +132,31 @@
       if (!effect) {return;}
       effect.remove();
     }
+
+    function clickSim(element) {
+      if (!element) {return;}
+      element.classList.add('onboarding-click');
+      setTimeout(() => {if (element) {element.classList.remove('onboarding-click');}}, 800);
+    }
   
-  /* Evidenzia marker */
-  function markerHighlightShow(marker, mapInstance) {
-    const latlng = marker.getLatLng();
-    const point = mapInstance.latLngToContainerPoint(latlng);
-    markerHighlight = document.createElement('div');
-    markerHighlight.className = 'onboarding-highlight';
-    markerHighlight.style.left = `${point.x}px`;
-    markerHighlight.style.top = `${point.y}px`;
-    layer.appendChild(markerHighlight);
-  }
+    /* Evidenzia marker */
+    function markerHighlightShow(marker, mapInstance) {
+      const latlng = marker.getLatLng();
+      const point = mapInstance.latLngToContainerPoint(latlng);
+      markerHighlight = document.createElement('div');
+      markerHighlight.className = 'onboarding-highlight';
+      markerHighlight.style.left = `${point.x}px`;
+      markerHighlight.style.top = `${point.y}px`;
+      layer.appendChild(markerHighlight);
+    }
+
+    /* Apertura Marker */
+    function popupShow(markerData) {
+      const marker = markerData.marker;
+      const event = markerData.event;
+      if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
+      window.openBasePopup(event, marker.getLatLng());
+    }
 
     /* Aggiorna posizione evidenziazione */
     function markerHighlightUpdate(marker, mapInstance) {
@@ -147,47 +166,6 @@
       markerHighlight.style.left = `${point.x}px`;
       markerHighlight.style.top = `${point.y}px`;
     }
-
-    function clickSim(element) {
-      if (!element) {return;}
-      element.classList.add('onboarding-click');
-      setTimeout(() => {if (element) {element.classList.remove('onboarding-click');}}, 800);
-    }
-  
-    /* Mostra fumetto */
-    function bubbleShow(title, text, marker, mapInstance, restartText = null) {
-      bubble = document.createElement('div');
-      bubble.className = 'onboarding-card onboarding-bubble';
-      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}`;
-      layer.appendChild(bubble);
-      bubblePosition(marker, mapInstance);
-      requestAnimationFrame(() => {bubble.classList.add('visible');});
-      const restart = bubble.querySelector('.onboarding-restart');
-      if (restart) {restart.addEventListener('click', async () => {onboardingRestart = true; await finish(mapInstance);});}
-    }
-
-      function bubbleHide() {
-         if (!bubble) {return;}
-         const oldBubble = bubble;
-         oldBubble.classList.remove('visible');
-         oldBubble.classList.add('hide');
-         setTimeout(() => {oldBubble.remove();
-         if (bubble === oldBubble) {bubble = null;}}, 500);
-      }
-
-     /* Posiziona fumetto vicino al marker */
-     function bubblePosition(marker, mapInstance) {
-       if (!bubble) {return;}
-       const latlng = marker.getLatLng();
-       const point = mapInstance.latLngToContainerPoint(latlng);
-       const margin = 16;
-       let left = point.x - bubble.offsetWidth / 2;
-       let top = point.y + 150;
-       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
-       left = Math.max(margin, Math.min(left, maxLeft));
-       bubble.style.left = `${left}px`;
-       bubble.style.top = `${top}px`;
-     }
 
      /* Aspetta che la mappa abbia terminato il movimento */
      function flyToEvent(marker, mapInstance) {
@@ -203,17 +181,7 @@
         });
       }
 
-      /* Apertura Marker */
-      function popupShow(markerData) {
-        const marker = markerData.marker;
-        const event = markerData.event;
-        if (!event) {console.warn('Aroundo Onboarding: evento reale non trovato.');return;}
-        window.openBasePopup(event, marker.getLatLng());
-      }
-
-     window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
-   
-  /* Sequenza */
+  /* Regia */
   async function start(markerData, mapInstance) {
     while (!window.gpsReady) {await wait(2000);}
     onboardingMarkerData = markerData;
@@ -221,8 +189,6 @@
     disableMapInteraction(mapInstance);
     onboardingOriginalCenter = mapInstance.getCenter();
     onboardingOriginalZoom = mapInstance.getZoom();
-    // await showWelcome(t); 
-    // await showWhyAroundo(t);
     cardShow(t.welcomeTitle, t.welcomeText);
     await wait(10000);
     cardHide();
@@ -244,7 +210,6 @@
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
     popupShow(markerData, mapInstance); 
-    await wait(2000); 
     bubbleHide(); 
     await wait(500);
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
@@ -259,7 +224,6 @@
     bubbleHide(); 
     await wait(500);
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-    await wait(2000); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
     await wait(8000); 
@@ -311,7 +275,6 @@
     bubbleHide();
     await wait(500);
     
-    // Aggiungi altro
     bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
     await wait(12000);
     if (onboardingRestart) {
@@ -341,14 +304,14 @@
       map.keyboard.disable();
     }
   
-  function enableMapInteraction(map) {
-    map.dragging.enable();
-    map.touchZoom.enable();
-    map.doubleClickZoom.enable();
-    map.scrollWheelZoom.enable();
-    map.doubleClickZoom.enable();
-    map.boxZoom.enable();
-    map.keyboard.enable();
-  }
+    function enableMapInteraction(map) {
+      map.dragging.enable();
+      map.touchZoom.enable();
+      map.doubleClickZoom.enable();
+      map.scrollWheelZoom.enable();
+      map.doubleClickZoom.enable();
+      map.boxZoom.enable();
+      map.keyboard.enable();
+    }
    
 })();
