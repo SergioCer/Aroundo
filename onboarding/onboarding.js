@@ -23,7 +23,7 @@
   },
   it: {
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
-    welcomeText: "Dai, ti faccio vedere come funziona.<br>Ti guido io.",
+    welcomeText: "Dai, ti faccio vedere come funziona.<br><br>Ti guido io.",
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
     whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire<br><div style="text-align:center;"><strong>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
@@ -38,6 +38,14 @@
     moreText2: "Hai intenzione di partecipare...<br>Semplicissimo...Dillo!<br>Inoltre, se sei registrato...<br>puoi essere avvisato in tempo del suo inizio per non perderlo.",
     categoriesTitle: "Questo è il menu Categories",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli elementi che corrispondono alle tue preferenze.",
+    categoriesTitle1: "Quando lo apri",
+    categoriesText1: "Vengono tolte tutte le catogorie.<br>Lasciandoti scegliere solo quelle di tuo interesse.<br>Come noti sono spariti tutti gli eventi!",
+    categoriesTitle2: "E se non selezioni nulla?",
+    categoriesText2: "Nessun problema.<br>Chiudendo il menu, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
+    categoriesTitle3: "Oppure...",
+    categoriesText3: "Seleziona quelle che ti interessano.<br>Appariranno solo gli eventi corrispondenti alle categorie selezionate.",
+    categoriesTitle4: "Se hai fatto una scelta.",
+    categoriesText4: "Verrà mantenuta.<br>Fino a quando non la cambi, vedrai solo gli eventi delle categorie selezionate da te.",
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -225,10 +233,10 @@
     hideBubble(); 
     await wait(500);
     showBubble(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-    await wait(5000); 
+    await wait(2000); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
-    await wait(5000); 
+    await wait(8000); 
     highlightRemove(mapHighlight);
     hideBubble();
     await wait(500);
@@ -244,7 +252,7 @@
     mapInstance.closePopup(); 
     hideBubble();
     await wait(500);
-
+    
     showBubble(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
@@ -253,6 +261,25 @@
     await wait(500);
     highlightRemove(categoryHighlight);
     if (categoryButton) {categoryButton.click();}
+    await wait(7000);
+    hideBubble();
+    await wait(500);
+    showBubble(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
+    await wait(7000);
+    hideBubble();
+    await wait(500);
+    showBubble(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
+    await wait(3000);
+    if (categoryButton) {categoryButton.click();}
+    await wait(5000);
+    hideBubble();
+    await wait(500);
+    showBubble(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
+    if (categoryButton) {categoryButton.click();}
+    await wait(7000);
+    hideBubble();
+    await wait(500);
+    showBubble(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(7000);
     if (categoryButton) {categoryButton.click();}
     hideBubble();
