@@ -46,6 +46,10 @@
     categoriesText3: "Seleziona quelle che ti interessano.<br>Appariranno solo gli eventi corrispondenti alle categorie selezionate.",
     categoriesTitle4: "Se hai fatto una scelta.",
     categoriesText4: "Verrà mantenuta.<br>Fino a quando non la cambi, vedrai solo gli eventi delle categorie selezionate da te.",
+    categoriesTitle5: "Riaprendo infatti.",
+    categoriesText5: "Troverai le tue scelte.<br>Se vuoi puoi selezionare nuovamente tutte le categorie con un solo click.",
+    categoriesTitle6: "In questo modo,",
+    categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa.",
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -261,7 +265,7 @@
     bubbleHide();
     await wait(500);
     
-    bubbleShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
+    cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
     await wait(4000);
@@ -270,7 +274,7 @@
     highlightRemove(categoryHighlight);
     if (categoryButton) {categoryButton.click();}
     await wait(7000);
-    bubbleHide();
+    cardHide();
     await wait(500);
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     await wait(7000);
@@ -316,7 +320,30 @@
     await wait(500);
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(7000);
+    highlightRemove(category1);
+    highlightRemove(category2);
+    highlightRemove(category7);
+    highlightRemove(category12);
     if (categoryButton) {categoryButton.click();}
+    bubbleHide();
+    await wait(500);
+
+    bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
+    await wait(3000);
+    if (categoryButton) {categoryButton.click();}
+    const selectAllButton = document.getElementById('select-all-toggle');
+    const selectAllHighlight = highlight(selectAllButton);
+    await wait(3000);
+    clickSim(selectAllButton);
+    await wait(500);
+    categoriesSelectAll();
+    await wait(4000);
+    bubbleHide();
+    await wait(500);
+    bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
+    highlightRemove(selectAllHighlight);
+    if (categoryButton) {categoryButton.click();}
+    await wait(5000);
     bubbleHide();
     await wait(500);
     
