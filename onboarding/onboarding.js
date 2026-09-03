@@ -36,6 +36,8 @@
     moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed infuturo...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
     moreText2: "Hai intenzione di partecipare...<br>Semplicissimo...Dillo!<br>Inoltre, se sei registrato...<br>puoi essere avvisato in tempo del suo inizio per non perderlo.",
+    categoriesTitle: "Questo è il menu Categories",
+    categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli elementi che corrispondono alle tue preferenze.",
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -246,6 +248,16 @@
     hideBubble();
     await wait(500);
 
+    bubbleShow(t.categoriesTitle, t.categoriesText, ...);
+    const categoryButton = document.querySelector('#menu-toggle');
+    const categoryHighlight = highlight(categoryButton);
+    await wait(3000);
+    clickSim(categoryButton);
+    await wait(500);
+    if (categoryButton) {categoryButton.click();}
+    await wait(5000);
+    highlightRemove(categoryHighlight);
+    
     // Aggiungi altro
     showBubble(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
     await wait(12000);
