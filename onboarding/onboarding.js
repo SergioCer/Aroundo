@@ -226,10 +226,10 @@
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
     await wait(3000);
     markerHighlightShow(markerData.marker, mapInstance);
-    await wait(7000);
+    await wait(9000);
+    await flyToEvent(markerData.marker, mapInstance);
     bubbleHide(); 
     await wait(500);
-    await flyToEvent(markerData.marker, mapInstance);
     markerHighlightUpdate(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
     await wait(500);
@@ -249,9 +249,10 @@
     bubbleHide(); 
     await wait(500);
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
+    await wait(2000); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
-    await wait(8000); 
+    await wait(80000); 
     highlightRemove(mapHighlight);
     bubbleHide();
     await wait(500);
