@@ -52,20 +52,22 @@
   line-height: 1.45;
 }
 
-/* Evidenziazione marker */
+/* Evidenzia elemento */
 .onboarding-highlight {
   position: absolute;
   width: 48px;
   height: 48px;
   margin-left: -24px;
   margin-top: -24px;
-  border: 3px solid rgba(13, 110, 253, 1);
+  /* border: 3px solid rgba(13, 110, 253, 1); */
+  border: 3px solid rgba(245, 158, 11, 1);
   border-radius: 50%;
   box-sizing: border-box;
-  animation: onboarding-pulse 0.9s ease-out infinite;
+  animation: onboarding-pulse 0.75s ease-out infinite;
   pointer-events: none;
 }
 
+/* Effetto pulsazione */
 @keyframes onboarding-pulse {
   0% {transform: scale(0.65); opacity: 0.95;}
   70% {transform: scale(1.25); opacity: 0.35;}
@@ -119,10 +121,10 @@
 
 /* Mobile */
 @media (max-width: 600px) {
-  .onboarding-welcome {width: calc(100vw - 32px);}
+  .onboarding-welcome {width: calc(100vw - 28px);}
   .onboarding-title {font-size: 20px;}
   .onboarding-subtitle {font-size: 16px;}
-  .onboarding-bubble {max-width: calc(100vw - 32px);
+  .onboarding-bubble {max-width: calc(100vw - 28px);
   font-size: 16px;
   }
 }
