@@ -43,7 +43,7 @@
     categoriesTitle2: "Se non selezioni nulla?",
     categoriesText2: "Nessun problema.<br>Chiudendo il menu, e puoi anche fare click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Oppure...",
-    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti. Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
+    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
     categoriesTitle4: "Se hai fatto una selezione?",
     categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
@@ -371,15 +371,15 @@
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
-    await wait(7000);
+    await wait(9000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
-    await wait(7000);
+    await wait(9000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
-    await wait(7000);
+    await wait(9000);
     bubbleHide();
     await wait(500);
 
