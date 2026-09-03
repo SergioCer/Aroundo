@@ -66,7 +66,7 @@
       document.body.appendChild(layer);
     }
 
-    /* Welcome */
+    /* Welcome 
     async function showWelcome(t) {
       const welcome = document.createElement('div');
       welcome.className = 'onboarding-card onboarding-welcome';
@@ -80,8 +80,9 @@
       await wait(500);
       welcome.remove();
     }
-
-   /* Why Aroundo? */
+*/
+  
+   /* Why Aroundo? 
    async function showWhyAroundo(t) {
      const why = document.createElement('div');
      why.className = 'onboarding-card onboarding-welcome';
@@ -94,7 +95,23 @@
      await wait(500);
      why.remove();
    }
+*/
+    function cardShow(title, text) {
+      const card = document.createElement('div');
+      card.className = 'onboarding-card onboarding-welcome';
+      card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>`;
+      layer.appendChild(card);
+      requestAnimationFrame(() => {card.classList.add('visible');});
+    }
 
+    function cardHide() {
+      const card = layer.querySelector('.onboarding-welcome');
+      if (!card) {return;}
+      card.classList.remove('visible');
+      card.classList.add('hide');
+      setTimeout(() => {card.remove();}, 500);
+    }
+  
     function highlight(element) {
       if (!element) {return null;}
       const rect = element.getBoundingClientRect();
@@ -143,7 +160,7 @@
       bubble.className = 'onboarding-card onboarding-bubble';
       bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}`;
       layer.appendChild(bubble);
-      positionBubble(marker, mapInstance);
+      bubblePosition(marker, mapInstance);
       requestAnimationFrame(() => {bubble.classList.add('visible');});
       const restart = bubble.querySelector('.onboarding-restart');
       if (restart) {restart.addEventListener('click', async () => {onboardingRestart = true; await finish(mapInstance);});}
@@ -159,7 +176,7 @@
       }
 
      /* Posiziona fumetto vicino al marker */
-     function positionBubble(marker, mapInstance) {
+     function bubblePosition(marker, mapInstance) {
        if (!bubble) {return;}
        const latlng = marker.getLatLng();
        const point = mapInstance.latLngToContainerPoint(latlng);
@@ -204,8 +221,16 @@
     disableMapInteraction(mapInstance);
     onboardingOriginalCenter = mapInstance.getCenter();
     onboardingOriginalZoom = mapInstance.getZoom();
-    await showWelcome(t); 
-    await showWhyAroundo(t);
+    // await showWelcome(t); 
+    // await showWhyAroundo(t);
+    cardShow(t.welcomeTitle, t.welcomeText);
+    await wait(10000);
+    cardHide();
+    await wait(500);
+    cardShow(t.whyTitle, t.whyText);
+    await wait(10000);
+    cardHide();
+    await wait(500);
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
     await wait(3000);
