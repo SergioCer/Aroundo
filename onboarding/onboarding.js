@@ -230,18 +230,19 @@
     onboardingOriginalCenter = mapInstance.getCenter();
     onboardingOriginalZoom = mapInstance.getZoom();
     cardShow(t.welcomeTitle, t.welcomeText);
-    await wait(10000);
+    await wait(9000);
     cardHide();
     await wait(500);
     cardShow(t.whyTitle, t.whyText);
-    await wait(10000);
+    await wait(9000);
     cardHide();
     await wait(500);
+    
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
     await wait(3000);
     markerHighlightShow(markerData.marker, mapInstance);
-    await wait(9000);
+    await wait(8000);
     await flyToEvent(markerData.marker, mapInstance);
     markerHighlightUpdate(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
@@ -263,6 +264,7 @@
     await wait(5000);
     bubbleHide(); 
     await wait(500);
+    
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
     await wait(2000); 
     const mapButton = document.querySelector('.map-btn');
@@ -284,8 +286,7 @@
     bubbleHide();
     await wait(500);
     
-    if (onboardingOriginalCenter !== null) {
-    mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
 
     cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
@@ -310,52 +311,51 @@
     await wait(500);
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
-
-    await wait(2000);
+    await wait(4000);
+    
     const category0 = highlight(categoryGet(0));
-    await wait(5000);
+    await wait(1000);
     clickSim(categoryGet(0));
     await wait(500);
     categorySelect(0);
-    await wait(1000);
-    highlightRemove(category0);
-    
     await wait(500);
+    highlightRemove(category0);
+    await wait(500);
+    
     const category1 = highlight(categoryGet(1));
-    await wait(1000);
+    await wait(500);
     clickSim(categoryGet(1));
     await wait(500);
     categorySelect(1);
     await wait(500);
     highlightRemove(category1);
-    
     await wait(500);
+    
     const category6 = highlight(categoryGet(6));
-    await wait(1000);
+    await wait(500);
     clickSim(categoryGet(6));
     await wait(500);
     categorySelect(6);
     await wait(500);
     highlightRemove(category6);
-    
     await wait(500);
+    
     const category11 = highlight(categoryGet(11));
-    await wait(1000);
+    await wait(500);
     clickSim(categoryGet(11));
     await wait(500);
     categorySelect(11);
     await wait(500);
     highlightRemove(category11);
-    
     await wait(8000);
     bubbleHide();
     await wait(500);
+    
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(8000);
     if (categoryButton) {categoryButton.click();}
     bubbleHide();
     await wait(500);
-
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     await wait(2000);
     if (categoryButton) {categoryButton.click();}
@@ -402,18 +402,14 @@
     
     bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
     await wait(12000);
-    if (onboardingRestart) {
-      onboardingRestart = false;
-      await start(onboardingMarkerData, mapInstance);
-    } else {
-      finish(mapInstance);
-    }
+    if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
 
    function finish(mapInstance) {
       if (mapInstance) {mapInstance.closePopup();}
       if (markerHighlight) {markerHighlight.remove(); markerHighlight = null;}
       bubbleHide();
+      cardHide();
       if (layer) {layer.remove(); layer = null;}
       enableMapInteraction(mapInstance);
     }
