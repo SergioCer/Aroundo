@@ -62,7 +62,7 @@
     tickerText: "Nessun problema, in basso, ordinati per ora di inizio, scorrono una selezione degli eventi più vicini nel tempo tra quelli dell'area osservata",
    
     timelineTitle: "Questa è la Linea del Tempo!",
-    timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.Il puntino al centro ti riporta ad oggi",
+    timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino al centro ti riporta ad oggi",
     timelineTitle1: "Ora guarda le maniglie rotonde...",
     timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
@@ -402,23 +402,32 @@
     cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
     await wait(10000);
     cardHide();
+    await wait(500);
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
     await wait(10000);
     bubbleHide();
+    await wait(500);
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await wait(10000);
     bubbleHide();
+    await wait(500);
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
     await wait(10000);
     bubbleHide();
+    await wait(500);
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
     await wait(10000);
     bubbleHide();
+    await wait(500);
     bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
     await wait(10000);
     bubbleHide();
+    await wait(500);
     bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
-    await wait(10000);
+    
+    await onboardingWait(t.timelineTitle6, t.timelineText6,"short");
+    // await wait(10000);
+
     bubbleHide();
     await wait(500);
     
@@ -472,5 +481,23 @@
     }
   });
     }
+
+  function onboardingWait(title, text, type = "normal") {
+  const cleanText = (title + " " + text)
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const words = cleanText ? cleanText.split(' ').length : 0;
+  const readingTime = words / 2.2 * 1000;
+  const baseTime = {short: 2500, normal: 4000, important: 6000
+  };
+  const totalTime = Math.min(12000, baseTime[type] + readingTime);
+  console.log("Aroundo onboarding:",{
+      title: title.replace(/<[^>]*>/g, ''), words, type,
+      readingSeconds: (readingTime / 1000).toFixed(1),
+      totalSeconds: (totalTime / 1000).toFixed(1)});
+  return wait(totalTime);
+}
+
  
 })();
