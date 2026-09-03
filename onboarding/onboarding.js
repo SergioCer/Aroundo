@@ -33,7 +33,7 @@
     moreTitle: "Deversi pulsanti!",
     moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Per esempio...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento",
     moreTitle1: "Oppure",
-    moreText1: "Sapere se l'accesso è gratuito, se a pagamento e quanto costa, ed in futuro...<br>chissà... prenotare...?",
+    moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
     moreText2: "Volessi partecipare...<br>Basta...Dirlo!<br>Così, se sei registrato, puoi essere avvisato in tempo.",
     categoriesTitle: "Questo è il menu Categories",
