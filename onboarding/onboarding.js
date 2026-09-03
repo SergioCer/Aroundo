@@ -248,7 +248,7 @@
     hideBubble();
     await wait(500);
 
-    bubbleShow(t.categoriesTitle, t.categoriesText, ...);
+    bubbleShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
     await wait(3000);
