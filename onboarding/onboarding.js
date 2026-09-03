@@ -50,6 +50,16 @@
     categoriesText5: "Troverai la tua selezione.<br>Se vuoi, puoi modificarle o reimpostare tutte le categorie con un solo click sul selettore in alto.",
     categoriesTitle6: "In questo modo,",
     categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando avii Aroundo.",
+    timelineTitle: "Questa è la Linea del Tempo!",
+    timelineText: "Grazie a questa puoi spostarti avanti ed indietro nei giorni, scoprendo cosa accadrà o cosa è gia successo.",
+    timelineTitle1: "E con le maniglie...",
+    timelineText1: "Puoi stabilire l'ora di inizio e di fine degli eventi a cui sei interessato!",
+    timelineTitle2: "Quindi per esempio...",
+    timelineText2: "Se vuoi sapere ieri...domani...dopodomani...tra un mese, in quella specifica zona della mappa, dopo le xx e prima delle yy quali eventi ci sono delle categorie che ti interessano.",
+    timelineTitle3: "Tutto è sotto il tuo controllo",
+    timelineText3: "Non dovrai mai più cercare tra manifesti, social, gruppi, riviste, ricordare dove hai visto, chiedere ad amici, sfogliare pagine e pagine...",
+    timelineTitle4: "Aroundo è",
+    timelineText4: "Spazio-Temporale<br>grazie a tutte queste combinazioni, saprai sempre cosa fare!<br>Guadagna il tuo tempo, è il bene più prezioso.",
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -293,13 +303,14 @@
     await wait(500);
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
+
     await wait(2000);
     const category0 = highlight(categoryGet(0));
     await wait(6000);
     clickSim(categoryGet(0));
     await wait(500);
     categorySelect(0);
-    await wait(1500);
+    await wait(1000);
     highlightRemove(category0);
     
     await wait(500);
@@ -308,7 +319,7 @@
     clickSim(categoryGet(1));
     await wait(500);
     categorySelect(1);
-    await wait(1500);
+    await wait(500);
     highlightRemove(category1);
     
     await wait(500);
@@ -317,7 +328,7 @@
     clickSim(categoryGet(6));
     await wait(500);
     categorySelect(6);
-    await wait(1500);
+    await wait(500);
     highlightRemove(category6);
     
     await wait(500);
@@ -326,7 +337,7 @@
     clickSim(categoryGet(11));
     await wait(500);
     categorySelect(11);
-    await wait(1500);
+    await wait(500);
     highlightRemove(category11);
     
     await wait(8000);
@@ -356,6 +367,23 @@
     await wait(6000);
     bubbleHide();
     await wait(500);
+
+    cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
+    await wait(8000);
+    cardHide();
+    bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
+    await wait(8000);
+    bubbleHide();
+    bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
+    await wait(8000);
+    bubbleHide();
+    bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
+    await wait(8000);
+    bubbleHide();
+    bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
+    await wait(8000);
+    bubbleHide();
+
     
     bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
     await wait(12000);
