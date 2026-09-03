@@ -189,11 +189,12 @@
       }
 
     function categoryGet(id) {
-      return document.getElementById(`cat-${id}`);
+      const checkboxes = document.querySelectorAll('#menu-items .category-checkbox');
+      return checkboxes[position] || null;
     }
 
     function categorySelect(id) {
-      const checkbox = categoryGet(id);
+      const checkbox = categoryGet(position);
       if (!checkbox) {return;}
       checkbox.checked = true;
       checkbox.dispatchEvent(new Event('change', {bubbles: true}));
@@ -292,41 +293,46 @@
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
-    const category1 = highlight(categoryGet(1));
+    const category0 = highlight(categoryGet(0));
     await wait(6000);
+    clickSim(categoryGet(0));
+    await wait(500);
+    categorySelect(0);
+    await wait(2000);
+    highlightRemove(category0);
+    
+    await wait(500);
+    const category1 = highlight(categoryGet(1));
+    await wait(1000);
     clickSim(categoryGet(1));
     await wait(500);
     categorySelect(1);
+    await wait(2000);
+    highlightRemove(category1);
     
     await wait(500);
-    const category2 = highlight(categoryGet(2));
+    const category6 = highlight(categoryGet(6));
     await wait(1000);
-    clickSim(categoryGet(2));
+    clickSim(categoryGet(6));
     await wait(500);
-    categorySelect(2);
+    categorySelect(6);
+    await wait(2000);
+    highlightRemove(category6);
     
     await wait(500);
-    const category7 = highlight(categoryGet(3));
+    const category11 = highlight(categoryGet(11));
     await wait(1000);
-    clickSim(categoryGet(7));
+    clickSim(categoryGet(11));
     await wait(500);
-    categorySelect(7);
+    categorySelect(11);
+    await wait(2000);
+    highlightRemove(category11);
     
-    await wait(500);
-    const category12 = highlight(categoryGet(6));
-    await wait(1000);
-    clickSim(categoryGet(12));
-    await wait(500);
-    categorySelect(12);
     await wait(8000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(8000);
-    highlightRemove(category1);
-    highlightRemove(category2);
-    highlightRemove(category7);
-    highlightRemove(category12);
     if (categoryButton) {categoryButton.click();}
     bubbleHide();
     await wait(500);
