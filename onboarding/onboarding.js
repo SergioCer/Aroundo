@@ -369,19 +369,19 @@
     await wait(500);
 
     cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(10000);
     cardHide();
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(10000);
     bubbleHide();
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(10000);
     bubbleHide();
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(10000);
     bubbleHide();
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(10000);
     bubbleHide();
 
     
