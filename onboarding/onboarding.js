@@ -181,6 +181,10 @@
         });
       }
 
+    function categoryGet(id) {
+      return document.getElementById(`cat-${id}`);
+    }
+
     function categorySelect(id) {
       const checkbox = categoryGet(id);
       if (!checkbox) {return;}
