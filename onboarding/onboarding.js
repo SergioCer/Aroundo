@@ -236,14 +236,15 @@
     bubbleHide(); 
     await wait(500);
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
-    await wait(6000); 
+    await wait(7000); 
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(7000);
+    await wait(2000);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
     highlightRemove(moreHighlight);
+    await wait(5000);
     bubbleHide(); 
     await wait(500);
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
@@ -384,7 +385,6 @@
       map.touchZoom.enable();
       map.doubleClickZoom.enable();
       map.scrollWheelZoom.enable();
-      map.doubleClickZoom.enable();
       map.boxZoom.enable();
       map.keyboard.enable();
       map.getPane('markerPane').style.pointerEvents = '';
