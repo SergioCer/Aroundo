@@ -31,7 +31,7 @@
     eventsTitle1: "Cliccando su More...",
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve desrizione, eventuali locandine ed in più...",
     moreTitle: "Deversi pulsanti!",
-    moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Per esempio...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento",
+    moreText: "Come Map...<br>Che Eseguono funzioni specifiche.<br>Per esempio...<br>Avviare direttamente il tuo navigatore per raggiungere l'evento.",
     moreTitle1: "Oppure",
     moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
     moreTitle2: "E se...",
@@ -264,7 +264,7 @@
     bubbleShow(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
     const bookButton = document.querySelector('.book-btn');
     const bookHighlight = highlight(bookButton);
-    await wait(10000);
+    await wait(8000);
     highlightRemove(bookHighlight);
     mapInstance.closePopup(); 
     bubbleHide();
@@ -299,7 +299,7 @@
     clickSim(categoryGet(0));
     await wait(500);
     categorySelect(0);
-    await wait(2000);
+    await wait(1500);
     highlightRemove(category0);
     
     await wait(500);
@@ -308,7 +308,7 @@
     clickSim(categoryGet(1));
     await wait(500);
     categorySelect(1);
-    await wait(2000);
+    await wait(1500);
     highlightRemove(category1);
     
     await wait(500);
@@ -317,7 +317,7 @@
     clickSim(categoryGet(6));
     await wait(500);
     categorySelect(6);
-    await wait(2000);
+    await wait(1500);
     highlightRemove(category6);
     
     await wait(500);
@@ -326,7 +326,7 @@
     clickSim(categoryGet(11));
     await wait(500);
     categorySelect(11);
-    await wait(2000);
+    await wait(1500);
     highlightRemove(category11);
     
     await wait(8000);
@@ -339,11 +339,11 @@
     await wait(500);
 
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
-    await wait(4000);
+    await wait(2000);
     if (categoryButton) {categoryButton.click();}
     const selectAllButton = document.getElementById('select-all-toggle');
     const selectAllHighlight = highlight(selectAllButton);
-    await wait(4000);
+    await wait(6000);
     clickSim(selectAllButton);
     await wait(500);
     categoriesSelectAll();
@@ -353,7 +353,7 @@
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
-    await wait(8000);
+    await wait(6000);
     bubbleHide();
     await wait(500);
     
@@ -384,7 +384,14 @@
       map.scrollWheelZoom.disable();
       map.boxZoom.disable();
       map.keyboard.disable();
-      map.on('click', stopOnboardingMapClick);
+        map.eachLayer(layer => {
+    if (layer instanceof L.Marker) {
+      const element = layer.getElement();
+      if (element) {
+        element.style.pointerEvents = 'none';
+      }
+    }
+  });
     }
   
     function enableMapInteraction(map) {
@@ -394,12 +401,14 @@
       map.scrollWheelZoom.enable();
       map.boxZoom.enable();
       map.keyboard.enable();
-      map.off('click', stopOnboardingMapClick);
+        map.eachLayer(layer => {
+    if (layer instanceof L.Marker) {
+      const element = layer.getElement();
+      if (element) {
+        element.style.pointerEvents = '';
+      }
+    }
+  });
     }
  
-    function stopOnboardingMapClick(event) {
-      L.DomEvent.stopPropagation(event.originalEvent);
-      L.DomEvent.preventDefault(event.originalEvent);
-    }
-   
 })();
