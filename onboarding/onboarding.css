@@ -86,13 +86,13 @@
 .onboarding-bubble {
   position: absolute;
   width: max-content;
-  max-width: min(280px, calc(100vw - 40px));
+  max-width: min(280px, calc(100vw - 30px));
   text-align: left;
   opacity: 0;
   transform: translateY(6px);
   transition: opacity 0.8s ease, transform 0.8s ease;
   padding: 20px 24px;
-  border-radius: 36px;
+  border-radius: 40px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   pointer-events: none;
 }
