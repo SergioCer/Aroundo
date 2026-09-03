@@ -25,7 +25,7 @@
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
     welcomeText: "Dai, ti faccio vedere come funziona.<br><br>Ti guido io.",
     whyTitle: "Per iniziare:<br>cosa stai guardando?",
-    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire<br><div style="text-align:center;"><strong><br>COSA FARE!</strong></div>`,
+    whyText: `Una mappa degli eventi che accadono intorno a te.<br>Così finalmente potrai scoprire...<br><div style="text-align:center;"><strong><br>COSA FARE!</strong></div>`,
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito: cos'è, a che ora inizia, quando finisce, chi lo organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
@@ -39,11 +39,11 @@
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
-    categoriesText1: "Vengono disattivate tutte le catogorie.<br>Lasciandoti libertà di scegliere.<br>Come noti, infatti, sono spariti tutti gli eventi! ma non preoccuparti.",
+    categoriesText1: "Vengono disattivate tutte le categorie.<br>Lasciandoti libertà di scegliere.<br>Come noti, infatti, sono spariti tutti gli eventi! ma non preoccuparti.",
     categoriesTitle2: "Se non selezioni nulla?",
-    categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi anche fare click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
+    categoriesText2: "Nessun problema.<br>Chiudendo il menu, e puoi anche fare click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Oppure...",
-    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti. Il selettore in alto ti informerà che non tutto è attivo.",
+    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti. Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
     categoriesTitle4: "Se hai fatto una selezione?",
     categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
@@ -55,8 +55,8 @@
     timelineTitle1: "E con le maniglie...",
     timelineText1: "Puoi stabilire l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
-    timelineText2: "Se vuoi sapere ieri...domani...dopodomani...tra un mese, in quella specifica zona della mappa, dopo le xx e prima delle yy quali eventi ci sono delle categorie che ti interessano.",
-    timelineTitle3: "Tutto è sotto il tuo controllo",
+    timelineText2: "Se vuoi sapere ieri...domani...dopodomani...tra un mese, in quella specifica zona della mappa, dopo le xx e prima delle yy quali eventi ci sono delle categorie che ti interessano!",
+    timelineTitle3: "Tutto è sotto il tuo controllo!",
     timelineText3: "Non dovrai mai più cercare tra manifesti, social, gruppi, riviste, ricordare dove hai visto, chiedere ad amici, sfogliare pagine e pagine...",
     timelineTitle4: "Aroundo è",
     timelineText4: "Spazio-Temporale<br>grazie a tutte queste combinazioni, saprai sempre cosa fare!<br>Guadagna il tuo tempo, è il bene più prezioso.",
@@ -280,6 +280,9 @@
     bubbleHide();
     await wait(500);
     
+    if (onboardingOriginalCenter !== null) {
+    mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+
     cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
@@ -397,8 +400,6 @@
 
    function finish(mapInstance) {
       if (mapInstance) {mapInstance.closePopup();}
-      if (onboardingOriginalCenter !== null) {
-      mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
       if (markerHighlight) {markerHighlight.remove(); markerHighlight = null;}
       bubbleHide();
       if (layer) {layer.remove(); layer = null;}
