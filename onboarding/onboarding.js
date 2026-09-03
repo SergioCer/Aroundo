@@ -376,6 +376,7 @@
       map.scrollWheelZoom.disable();
       map.boxZoom.disable();
       map.keyboard.disable();
+      map.getPane('markerPane').style.pointerEvents = 'none';
     }
   
     function enableMapInteraction(map) {
@@ -386,6 +387,7 @@
       map.doubleClickZoom.enable();
       map.boxZoom.enable();
       map.keyboard.enable();
+      map.getPane('markerPane').style.pointerEvents = '';
     }
    
 })();
