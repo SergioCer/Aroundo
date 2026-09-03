@@ -43,7 +43,7 @@
     categoriesTitle2: "Se non selezioni nulla?",
     categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi anche fare click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Oppure...",
-    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti, il selettore in alto ti informerà che non tutto è attivo.",
+    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti. Il selettore in alto ti informerà che non tutto è attivo.",
     categoriesTitle4: "Se hai fatto una selezione?",
     categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
@@ -253,7 +253,7 @@
     await wait(2000); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
-    await wait(8000); 
+    await wait(9000); 
     highlightRemove(mapHighlight);
     bubbleHide();
     await wait(500);
@@ -264,7 +264,7 @@
     bubbleShow(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
     const bookButton = document.querySelector('.book-btn');
     const bookHighlight = highlight(bookButton);
-    await wait(8000);
+    await wait(9000);
     highlightRemove(bookHighlight);
     mapInstance.closePopup(); 
     bubbleHide();
@@ -282,7 +282,7 @@
     cardHide();
     await wait(500);
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
-    await wait(7000);
+    await wait(9000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
