@@ -8,6 +8,8 @@
   let onboardingOriginalZoom = null;
   let onboardingRestart = false;
   let onboardingMarkerData = null;
+  let onboardingNextReadyAt = 0;
+
   
    const onboardingTexts = {
   en: {
@@ -101,6 +103,7 @@
       card.className = 'onboarding-card onboarding-welcome';
       card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(card);
+      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text, "i");
       requestAnimationFrame(() => {card.classList.add('visible');});
     }
 
@@ -117,6 +120,7 @@
       bubble.className = 'onboarding-card onboarding-bubble';
       bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(bubble);
+      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text, "i");
       bubblePosition(marker, mapInstance);
       requestAnimationFrame(() => {bubble.classList.add('visible');});
       const restart = bubble.querySelector('.onboarding-restart');
@@ -241,14 +245,15 @@
     onboardingOriginalCenter = mapInstance.getCenter();
     onboardingOriginalZoom = mapInstance.getZoom();
     cardShow(t.welcomeTitle, t.welcomeText);
-    await wait(8000);
-    cardHide();
-    await wait(500);
-    // cardShow(t.whyTitle, t.whyText);
     // await wait(8000);
     // cardHide();
     // await wait(500);
+    await onboardingNext(t.welcomeTitle, t.welcomeText, "i", "card");
+    
     cardShow(t.whyTitle, t.whyText);
+    // await wait(8000);
+    // cardHide();
+    // await wait(500);
     await onboardingNext(t.whyTitle, t.whyText, "i", "card");
 
     
@@ -310,9 +315,11 @@
     await wait(500);
     highlightRemove(categoryHighlight);
     if (categoryButton) {categoryButton.click();}
-    await wait(7000);
-    cardHide();
-    await wait(500);
+    // await wait(7000);
+    // cardHide();
+    // await wait(500);
+    await onboardingNext(t.categoriesTitle, t.categoriesText, "i", "card");
+    
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     await wait(9000);
     bubbleHide();
@@ -390,69 +397,71 @@
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
-    await onboardingWait(t.categoriesTitle7, t.categoriesText7,"i");
-    // await wait(9000);
-    bubbleHide();
-    await wait(500);
-    bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
-    await onboardingWait(t.categoriesTitle8, t.categoriesText8,"i");
-    // await wait(10000);
-    bubbleHide();
-    await wait(500);
-
-    cardShow(t.tickerTitle, t.tickerText, markerData.marker, mapInstance);
-    await onboardingWait(t.tickerTitle, t.tickerText,"i");
-    // await wait(8000);
-    cardHide();
-    await wait(500);
-
-    cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle, t.timelineText,"i");
-    // await wait(10000);
-    cardHide();
-    await wait(500);
-    bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle1, t.timelineText1,"n");
-    // await wait(10000);
-    bubbleHide();
-    await wait(500);
-    // bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle2, t.timelineText2,"i");
-    // await wait(10000);
+    // await onboardingWait(t.categoriesTitle7, t.categoriesText7,"i");
     // bubbleHide();
     // await wait(500);
+    await onboardingNext(t.categoriesTitle7, t.categoriesText7,"n");
+    
+    bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
+    // await onboardingWait(t.categoriesTitle8, t.categoriesText8,"i");
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext(t.categoriesTitle8, t.categoriesText8,"n");
 
+    cardShow(t.tickerTitle, t.tickerText, markerData.marker, mapInstance);
+    // await onboardingWait(t.tickerTitle, t.tickerText,"i");
+    // cardHide();
+    // await wait(500);
+    await onboardingNext(t.tickerTitle, t.tickerText,"n", "card");
+
+    cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle, t.timelineText,"i");
+    // cardHide();
+    // await wait(500);
+    await onboardingNext(t.timelineTitle, t.timelineText,"n", "card");
+
+    bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle1, t.timelineText1,"n");
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext(t.timelineTitle1, t.timelineText1,"n");
+    
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle2, t.timelineText2,"i");
+    // bubbleHide();
+    // await wait(500);
     await onboardingNext(t.timelineTitle2, t.timelineText2, "i");
-
     
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle3, t.timelineText3,"i");
-    // await wait(10000);
-    bubbleHide();
-    await wait(500);
-    bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle4, t.timelineText4,"n");
-    // await wait(10000);
-    bubbleHide();
-    await wait(500);
-    bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle5, t.timelineText5,"i");
-    // await wait(10000);
-    bubbleHide();
-    await wait(500);
-    bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle3, t.timelineText3,"i");
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext(t.timelineTitle3, t.timelineText3, "i");
     
-    await onboardingWait(t.timelineTitle6, t.timelineText6,"i");
-    // await wait(12000);
+    bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle4, t.timelineText4,"n");
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext(t.timelineTitle4, t.timelineText4, "i");
 
-    bubbleHide();
-    await wait(500);
+    bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle5, t.timelineText5,"i");
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext(t.timelineTitle5, t.timelineText5, "i");
+
+    bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle6, t.timelineText6,"i");
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext(t.timelineTitle6, t.timelineText6, "i");
     
     bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
-    await wait(12000);
-    bubbleHide();
-    await wait(500);
+    // await wait(12000);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext(t.finalTitle, t.finalText, "i");
+    
 
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
@@ -532,28 +541,21 @@ let onboardingTotalTime = 0;
   return wait(totalTime);
 }
 
-  function onboardingNext(title, text, type = "n", mode = "bubble") {
+function onboardingNext(mode = "bubble") {
   return new Promise(async resolve => {
-    const cleanText = (title + " " + text)
-      .replace(/<[^>]*>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-    const words = cleanText ? cleanText.split(' ').length : 0;
-    const readingTime = words / 2.6 * 1000;
-    const baseTime = {
-      n: 1000,
-      i: 1800
-    };
-    const readingFactor = 0.30;
-    const minTime = baseTime[type] + readingTime * readingFactor;
     const next = layer.querySelector('.onboarding-next');
     if (!next) {
       console.warn('Aroundo onboarding: pulsante next non trovato.');
       resolve();
       return;
     }
-    next.disabled = true;
-    await wait(minTime);
+    const remaining = Math.max(
+      0,
+      onboardingNextReadyAt - Date.now()
+    );
+    if (remaining > 0) {
+      await wait(remaining);
+    }
     next.disabled = false;
     next.onclick = () => {
       next.onclick = null;
@@ -567,5 +569,22 @@ let onboardingTotalTime = 0;
     };
   });
 }
+
+function onboardingReadingTime(title, text, type = "n") {
+  const cleanText = (title + " " + text)
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const words = cleanText ? cleanText.split(' ').length : 0;
+  const readingTime = words / 2.6 * 1000;
+  const baseTime = {
+    n: 1000,
+    i: 1800
+  };
+  const readingFactor = 0.30;
+  return baseTime[type] + readingTime * readingFactor;
+}
+
+  
  
 })();
