@@ -33,47 +33,47 @@
     eventsTitle1: "Cliccando su More...",
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine ed in più...",
 
-    moreTitle: "Diversi pulsanti!",
-    moreText: "Come Map...<br>Che Eseguono funzioni, per esempio avviare direttamente il tuo navigatore per raggiungere l'evento.",
-    moreTitle1: "E c'è di più.",
-    moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
-    moreTitle2: "E se...",
-    moreText2: "Volessi partecipare!<br>Basta...dirlo.<br>Così, se sei registrato, puoi essere avvisato in tempo.",
+    // moreTitle: "Diversi pulsanti!",
+    // moreText: "Come Map...<br>Che Eseguono funzioni, per esempio avviare direttamente il tuo navigatore per raggiungere l'evento.",
+    // moreTitle1: "E c'è di più.",
+    // moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
+    // moreTitle2: "E se...",
+    // moreText2: "Volessi partecipare!<br>Basta...dirlo.<br>Così, se sei registrato, puoi essere avvisato in tempo.",
 
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
-    categoriesText1: "Vengono disattivate tutte le categorie.<br>Lasciandoti libertà di scegliere.<br>Come noti, infatti, sono spariti tutti gli eventi!<br>Ma non preoccuparti.",
-    categoriesTitle2: "Se non selezioni nulla?",
-    categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
-    categoriesTitle3: "Oppure...",
+    categoriesText1: "Vengono disattivate tutte le categorie.<br>Così puoi scegliere liberamente i tuoi interessi.<br>Come vedi, gli eventi sono spariti.",
+    // categoriesTitle2: "Se non selezioni nulla?",
+    // categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
+    categoriesTitle3: "Adesso...",
     categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non è tutto attivo.",
-    categoriesTitle4: "Se hai fatto una selezione?",
-    categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
+    // categoriesTitle4: "Se hai fatto una selezione?",
+    // categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
-    categoriesText5: "Troverai la tua selezione.<br>Se vuoi, puoi modificare le scelte, oppure con un solo click sul selettore in alto reimpostare tutto, da puntino apparirà pieno.",
-    categoriesTitle6: "In questo modo,",
-    categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando apri<br>Aroundo",
-    categoriesTitle7: "Ma i colori?",
-    categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
-    categoriesTitle8: "Perché cambiano?",
+    categoriesText5: "Troverai la tua selezione.<br>Puoi modificarla oppure, con un solo click sul selettore in alto, mostrare nuovamente tutto.",
+    // categoriesTitle6: "In questo modo,",
+    // categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando apri<br>Aroundo",
+    // categoriesTitle7: "Ma i colori?",
+    // categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
+    categoriesTitle8: "Perché i colori cambiano?",
     categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...poi lo scoprirai.<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
 
     tickerTitle: "E se non fai click?",
-    tickerText: "Nessun problema, in basso, ordinati per ora di inizio, scorrono una selezione degli eventi più vicini nel tempo tra quelli dell'area osservata",
+    tickerText: "Nessun problema, in basso, trovi gli eventi della zona che stai guardando, ordinati per orario.",
    
     timelineTitle: "Questa è la Linea del Tempo!",
     timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset e ti riporta ad oggi",
     timelineTitle1: "Ora guarda le maniglie rotonde...",
     timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
-    timelineText2: "Puoi sapere cosa è successo ieri, domani, dopodomani o tra un mese, in quella specifica zona della mappa, magari dopo le 16 o prima delle 22 e solo delle categorie che ti interessano...",
+    timelineText2: "Puoi sapere cosa è successo ieri, cosa accadrà domani, dopodomani o tra un mese, in quella specifica zona della mappa, magari dopo le 16 o prima delle 22 e solo delle categorie che ti interessano...",
     timelineTitle3: "Hai tu il controllo!",
     timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
-    timelineTitle4: "Se sei turista...",
-    timelineText4: "Abilitando la posizione, ti troverai già immerso negli eventi della zona senza neanche conoscerla e dover cercare!",
-    timelineTitle5: "Pianificare una vacanza...",
-    timelineText5: "Sarà molto più semplice!<br>Sposta la mappa nella zona in cui andrai, seleziona la data in cui sarai presente, e saprai in anticipo cosa potrai fare!",
+    // timelineTitle4: "Se sei turista...",
+    // timelineText4: "Abilitando la posizione, ti troverai già immerso negli eventi della zona senza neanche conoscerla e dover cercare!",
+    // timelineTitle5: "Pianificare una vacanza...",
+    // timelineText5: "Sarà molto più semplice!<br>Sposta la mappa nella zona in cui andrai, seleziona la data in cui sarai presente, e saprai in anticipo cosa potrai fare!",
     timelineTitle6: "Aroundo è...",
     timelineText6: `<div style="text-align:center;">Spazio-Temporale<br>Grazie a tutte queste combinazioni, saprai cosa fare!<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
     
@@ -281,6 +281,7 @@
     if (moreButton) {moreButton.click();}
     await onboardingNext();
     
+    /*
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
     await wait(1000); 
     const mapButton = document.querySelector('.map-btn');
@@ -300,6 +301,7 @@
     highlightRemove(bookHighlight);
     await onboardingNext();
     mapInstance.closePopup(); 
+    */ 
     
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
 
@@ -314,8 +316,10 @@
     if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
+    /*
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
     await onboardingNext();
+    */
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
@@ -357,10 +361,11 @@
     highlightRemove(category11);
     await onboardingNext();
     
-    bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
+    /* bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(5000);
     // if (categoryButton) {categoryButton.click();}
     await onboardingNext();
+    */
     
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     await wait(1000);
@@ -372,7 +377,8 @@
     await wait(500);
     categoriesSelectAll();
     await onboardingNext();
-   
+
+    /*
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
@@ -381,7 +387,8 @@
     
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
     await onboardingNext();
-    
+    */
+      
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
     await onboardingNext();
 
@@ -400,11 +407,13 @@
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
     await onboardingNext();
     
+    /*
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
     await onboardingNext();
 
     bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
     await onboardingNext();
+    */
 
     bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
     await onboardingNext();
