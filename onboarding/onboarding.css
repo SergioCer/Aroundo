@@ -118,6 +118,38 @@
   pointer-events: auto;
 }
 
+.onboarding-next {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 24px;
+  line-height: 36px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  pointer-events: auto;
+  /* box-shadow: none; */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+
+.onboarding-next:disabled {
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
+.onboarding-next:not(:disabled):active {
+  transform: scale(0.90);
+}
+
 /* Mobile */
 @media (max-width: 560px) {
   .onboarding-welcome {width: calc(100vw - 15px);}
