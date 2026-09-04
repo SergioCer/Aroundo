@@ -267,8 +267,8 @@
     clickSim(markerHighlight); 
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
-    await onboardingNext();
     markerShow(markerData, mapInstance);
+    await onboardingNext();
     
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
     await wait(1000);
@@ -306,17 +306,15 @@
     cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
-    await wait(1000);
-    clickSim(categoryButton);
     await onboardingNext("card");
     highlightRemove(categoryHighlight);
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
-    // if (categoryButton) {categoryButton.click();}
+    clickSim(categoryButton);
+    if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
-    await wait(1000);
     // if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
@@ -375,86 +373,46 @@
     await wait(500);
     categoriesSelectAll();
     await wait(4000);
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
    
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
-    await onboardingWait(t.categoriesTitle6, t.categoriesText6,"i");
-    // await wait(9000);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
-    // await onboardingWait(t.categoriesTitle7, t.categoriesText7,"i");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
-    // await onboardingWait(t.categoriesTitle8, t.categoriesText8,"i");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
 
     cardShow(t.tickerTitle, t.tickerText, markerData.marker, mapInstance);
-    // await onboardingWait(t.tickerTitle, t.tickerText,"i");
-    // cardHide();
-    // await wait(500);
     await onboardingNext("card");
 
     cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle, t.timelineText,"i");
-    // cardHide();
-    // await wait(500);
     await onboardingNext("card");
 
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle1, t.timelineText1,"n");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle2, t.timelineText2,"i");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle3, t.timelineText3,"i");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle4, t.timelineText4,"n");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
 
     bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle5, t.timelineText5,"i");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
 
     bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
-    // await onboardingWait(t.timelineTitle6, t.timelineText6,"i");
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
-    // await wait(12000);
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
-
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
 
