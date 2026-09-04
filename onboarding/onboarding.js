@@ -242,7 +242,7 @@
       toggle.dispatchEvent(new Event('change', {bubbles: true}));
     }
 
-  /* Regia */
+  /* REGIA */
   async function start(markerData, mapInstance) {
     while (!window.gpsReady) {await wait(2000);}
     onboardingMarkerData = markerData;
@@ -252,37 +252,26 @@
     onboardingOriginalZoom = mapInstance.getZoom();
     
     cardShow(t.welcomeTitle, t.welcomeText);
-    // await wait(8000);
-    // cardHide();
-    // await wait(500);
     await onboardingNext("card");
     
     cardShow(t.whyTitle, t.whyText);
-    // await wait(8000);
-    // cardHide();
-    // await wait(500);
     await onboardingNext("card");
-
     
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-    await wait(3000);
+    await wait(2000);
     markerHighlightShow(markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(5000);
     await flyToEvent(markerData.marker, mapInstance);
     markerHighlightUpdate(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
     await wait(500);
     highlightRemove(markerHighlight); markerHighlight = null;
-    markerShow(markerData, mapInstance);
-    await wait(3000);
-    // bubbleHide(); 
-    // await wait(500);
     await onboardingNext();
-    
+    markerShow(markerData, mapInstance);
     
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
-    await wait(3000);
+    await wait(2000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
     await wait(6000);
@@ -290,40 +279,27 @@
     await wait(500);
     if (moreButton) {moreButton.click();}
     highlightRemove(moreHighlight);
-    await wait(5000);
-    // bubbleHide(); 
-    // await wait(500);
     await onboardingNext();
-    
     
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-    await wait(2000); 
+    await wait(1000); 
     const mapButton = document.querySelector('.map-btn');
     const mapHighlight = highlight(mapButton);
-    await wait(9000); 
+    await wait(5000); 
     highlightRemove(mapHighlight);
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
-    
     
     bubbleShow(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
-    // await wait(10000); 
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
-    
     
     bubbleShow(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
+    await wait(1000);
     const bookButton = document.querySelector('.book-btn');
     const bookHighlight = highlight(bookButton);
-    await wait(9000);
+    await wait(5000);
     highlightRemove(bookHighlight);
-    mapInstance.closePopup(); 
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
-    
+    mapInstance.closePopup(); 
     
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
 
@@ -334,16 +310,10 @@
     clickSim(categoryButton);
     await wait(500);
     highlightRemove(categoryHighlight);
-    if (categoryButton) {categoryButton.click();}
-    // await wait(7000);
-    // cardHide();
-    // await wait(500);
+    // if (categoryButton) {categoryButton.click();}
     await onboardingNext("card");
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
-    // await wait(9000);
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
