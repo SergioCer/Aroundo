@@ -45,7 +45,7 @@
     categoriesTitle1: "Quando apri il menu...",
     categoriesText1: "Vengono disattivate tutte le categorie.<br>Lasciandoti libertà di scegliere.<br>Come noti, infatti, sono spariti tutti gli eventi!<br>Ma non preoccuparti.",
     categoriesTitle2: "Se non selezioni nulla?",
-    categoriesText2: "Nessun problema.<br>Chiudendo il menu, e puoi anche fare click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
+    categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Oppure...",
     categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non è tutto attivo.",
     categoriesTitle4: "Se hai fatto una selezione?",
@@ -242,7 +242,7 @@
       toggle.dispatchEvent(new Event('change', {bubbles: true}));
     }
 
-  /***** REGIA *****/
+  //***** REGIA *****//
   async function start(markerData, mapInstance) {
     while (!window.gpsReady) {await wait(2000);}
     onboardingMarkerData = markerData;
@@ -271,10 +271,10 @@
     markerShow(markerData, mapInstance);
     
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
-    await wait(2000);
+    await wait(1000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(6000);
+    await wait(5000);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
@@ -308,25 +308,24 @@
     const categoryHighlight = highlight(categoryButton);
     await wait(1000);
     clickSim(categoryButton);
-
     await onboardingNext("card");
     highlightRemove(categoryHighlight);
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
-    if (categoryButton) {categoryButton.click();}
+    // if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
     await wait(1000);
-    if (categoryButton) {categoryButton.click();}
+    // if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
-    await wait(3000);
+    await wait(2000);
     
     const category0 = highlight(categoryGet(0));
-    await wait(1000);
+    await wait(500);
     clickSim(categoryGet(0));
     await wait(500);
     categorySelect(0);
@@ -359,7 +358,6 @@
     categorySelect(11);
     await wait(500);
     highlightRemove(category11);
-    await wait(5000);
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
