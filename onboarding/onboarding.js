@@ -102,7 +102,7 @@
       card.className = 'onboarding-card onboarding-welcome';
       card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(card);
-      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text, "i");
+      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
       requestAnimationFrame(() => {card.classList.add('visible');});
     }
 
@@ -119,7 +119,7 @@
       bubble.className = 'onboarding-card onboarding-bubble';
       bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(bubble);
-      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text, "i");
+      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
       bubblePosition(marker, mapInstance);
       requestAnimationFrame(() => {bubble.classList.add('visible');});
       const restart = bubble.querySelector('.onboarding-restart');
@@ -277,8 +277,8 @@
     await wait(5000);
     clickSim(moreButton);
     await wait(500);
-    if (moreButton) {moreButton.click();}
     highlightRemove(moreHighlight);
+    if (moreButton) {moreButton.click();}
     await onboardingNext();
     
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
@@ -315,7 +315,6 @@
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
-    // if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
@@ -360,24 +359,24 @@
     
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(5000);
-    if (categoryButton) {categoryButton.click();}
+    // if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
-    await wait(2000);
+    await wait(1000);
     if (categoryButton) {categoryButton.click();}
     const selectAllButton = document.getElementById('select-all-toggle');
     const selectAllHighlight = highlight(selectAllButton);
-    await wait(6000);
+    await wait(5000);
     clickSim(selectAllButton);
     await wait(500);
     categoriesSelectAll();
-    await wait(4000);
     await onboardingNext();
    
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
+    categoriesSelectAll();
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
@@ -491,19 +490,17 @@ function onboardingNext(mode = "bubble") {
   });
 }
 
-function onboardingReadingTime(title, text, type = "n") {
+function onboardingReadingTime(title, text) {
   const cleanText = (title + " " + text)
     .replace(/<[^>]*>/g, '')
     .replace(/\s+/g, ' ')
     .trim();
   const words = cleanText ? cleanText.split(' ').length : 0;
-  const readingTime = words / 2.6 * 1000;
-  const baseTime = {
-    n: 1000,
-    i: 1800
-  };
-  const readingFactor = 0.30;
-  return baseTime[type] + readingTime * readingFactor;
+  const readingTime = words / 2.6 * 1000; // parole al minuto
+  const baseTime = 1000;
+  const readingFactor = 0.25; // 0.30 più lento, 0.20 più veloce
+  return baseTime + readingTime * readingFactor;
 }
+
  
 })();
