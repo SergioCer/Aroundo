@@ -9,7 +9,6 @@
   let onboardingRestart = false;
   let onboardingMarkerData = null;
   let onboardingNextReadyAt = 0;
-  let onboardingTotalTime = 0;
   
    const onboardingTexts = {
   en: {
@@ -124,7 +123,14 @@
       bubblePosition(marker, mapInstance);
       requestAnimationFrame(() => {bubble.classList.add('visible');});
       const restart = bubble.querySelector('.onboarding-restart');
-      if (restart) {restart.addEventListener('click', async () => {onboardingRestart = true; await finish(mapInstance);});}
+      if (restart) {restart.addEventListener('click', () => {onboardingRestart = true;
+      bubbleHide();
+      if (onboardingNext.resolve) {const resolve = onboardingNext.resolve;
+      onboardingNext.resolve = null;
+      wait(500).then(resolve);
+          }
+        });
+      }
     }
 
     function bubbleHide() {
@@ -244,6 +250,7 @@
     disableMapInteraction(mapInstance);
     onboardingOriginalCenter = mapInstance.getCenter();
     onboardingOriginalZoom = mapInstance.getZoom();
+    
     cardShow(t.welcomeTitle, t.welcomeText);
     // await wait(8000);
     // cardHide();
@@ -269,8 +276,11 @@
     highlightRemove(markerHighlight); markerHighlight = null;
     markerShow(markerData, mapInstance);
     await wait(3000);
-    bubbleHide(); 
-    await wait(500);
+    // bubbleHide(); 
+    // await wait(500);
+    await onboardingNext();
+    
+    
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
     await wait(3000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
@@ -281,8 +291,10 @@
     if (moreButton) {moreButton.click();}
     highlightRemove(moreHighlight);
     await wait(5000);
-    bubbleHide(); 
-    await wait(500);
+    // bubbleHide(); 
+    // await wait(500);
+    await onboardingNext();
+    
     
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
     await wait(2000); 
@@ -290,20 +302,28 @@
     const mapHighlight = highlight(mapButton);
     await wait(9000); 
     highlightRemove(mapHighlight);
-    bubbleHide();
-    await wait(500);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+    
+    
     bubbleShow(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
-    await wait(10000); 
-    bubbleHide();
-    await wait(500);
+    // await wait(10000); 
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+    
+    
     bubbleShow(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
     const bookButton = document.querySelector('.book-btn');
     const bookHighlight = highlight(bookButton);
     await wait(9000);
     highlightRemove(bookHighlight);
     mapInstance.closePopup(); 
-    bubbleHide();
-    await wait(500);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+    
     
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
 
@@ -321,15 +341,19 @@
     await onboardingNext("card");
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
-    await wait(9000);
-    bubbleHide();
-    await wait(500);
+    // await wait(9000);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+    
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
     await wait(3000);
     if (categoryButton) {categoryButton.click();}
-    await wait(7000);
-    bubbleHide();
-    await wait(500);
+    // await wait(7000);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+    
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await wait(4000);
@@ -369,14 +393,17 @@
     await wait(500);
     highlightRemove(category11);
     await wait(8000);
-    bubbleHide();
-    await wait(500);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
     
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(8000);
     if (categoryButton) {categoryButton.click();}
-    bubbleHide();
-    await wait(500);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+    
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     await wait(2000);
     if (categoryButton) {categoryButton.click();}
@@ -387,15 +414,19 @@
     await wait(500);
     categoriesSelectAll();
     await wait(4000);
-    bubbleHide();
-    await wait(500);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+   
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
     await onboardingWait(t.categoriesTitle6, t.categoriesText6,"i");
     // await wait(9000);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
-    bubbleHide();
-    await wait(500);
+    // bubbleHide();
+    // await wait(500);
+    await onboardingNext();
+    
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
     // await onboardingWait(t.categoriesTitle7, t.categoriesText7,"i");
     // bubbleHide();
@@ -509,41 +540,13 @@
   });
     }
 
-  function onboardingWait(title, text, type = "n") {
-  const cleanText = (title + " " + text)
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  const words = cleanText ? cleanText.split(' ').length : 0;
-  const readingTime = words / 2.6 * 1000; // Velocità di lettura 2.2=132 2.4=144 2.6=156 2.8=168 parole/minuto
-  const baseTime = {
-    n: 1000, 
-    i: 2000
-  };
-  const maxTime = {
-  n: 12000,
-  i: 24000
-};
-  const calculatedTime = baseTime[type] + readingTime;
-  const totalTime = Math.min(maxTime[type], calculatedTime);
-  onboardingTotalTime += totalTime;
-  console.log("Aroundo onboarding:", {
-  title: title.replace(/<[^>]*>/g, ''), words, type,
-  readingSeconds: (readingTime / 1000).toFixed(1),
-  calculatedSeconds: (calculatedTime / 1000).toFixed(1),
-  totalSeconds: (totalTime / 1000).toFixed(1),
-  limited: calculatedTime > maxTime[type]
-});
-  console.log("Durata onboarding:",
-  (onboardingTotalTime / 1000 / 60).toFixed(2), "minuti");
-  return wait(totalTime);
-}
-
 function onboardingNext(mode = "bubble") {
   return new Promise(async resolve => {
+    onboardingNext.resolve = resolve;
     const next = layer.querySelector('.onboarding-next');
     if (!next) {
       console.warn('Aroundo onboarding: pulsante next non trovato.');
+      onboardingNext.resolve = null;
       resolve();
       return;
     }
@@ -558,6 +561,7 @@ function onboardingNext(mode = "bubble") {
     next.onclick = () => {
       next.onclick = null;
       next.disabled = true;
+      onboardingNext.resolve = null;
       if (mode === "card") {
         cardHide();
       } else {
