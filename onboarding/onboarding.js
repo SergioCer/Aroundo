@@ -242,7 +242,7 @@
       toggle.dispatchEvent(new Event('change', {bubbles: true}));
     }
 
-  /* REGIA */
+  /***** REGIA *****/
   async function start(markerData, mapInstance) {
     while (!window.gpsReady) {await wait(2000);}
     onboardingMarkerData = markerData;
@@ -306,27 +306,24 @@
     cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
-    await wait(4000);
+    await wait(1000);
     clickSim(categoryButton);
-    await wait(500);
-    highlightRemove(categoryHighlight);
-    // if (categoryButton) {categoryButton.click();}
+
     await onboardingNext("card");
+    highlightRemove(categoryHighlight);
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
+    if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
-    await wait(3000);
+    await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    // await wait(7000);
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
-    await wait(4000);
+    await wait(3000);
     
     const category0 = highlight(categoryGet(0));
     await wait(1000);
@@ -362,16 +359,12 @@
     categorySelect(11);
     await wait(500);
     highlightRemove(category11);
-    await wait(8000);
-    // bubbleHide();
-    // await wait(500);
+    await wait(5000);
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
-    await wait(8000);
+    await wait(5000);
     if (categoryButton) {categoryButton.click();}
-    // bubbleHide();
-    // await wait(500);
     await onboardingNext();
     
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
