@@ -62,11 +62,11 @@
     tickerText: "Nessun problema, in basso, ordinati per ora di inizio, scorrono una selezione degli eventi più vicini nel tempo tra quelli dell'area osservata",
    
     timelineTitle: "Questa è la Linea del Tempo!",
-    timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino al centro ti riporta ad oggi",
+    timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset e ti riporta ad oggi",
     timelineTitle1: "Ora guarda le maniglie rotonde...",
     timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
-    timelineText2: "Se vuoi sapere cosa succede ieri, domani, dopodomani o tra un mese, in quella specifica zona della mappa, dopo le 16 e prima delle 22 quali eventi ci sono delle categorie che ti interessano...",
+    timelineText2: "Puoi sapere cosa succede ieri, domani, dopodomani o tra un mese, in quella specifica zona della mappa, dopo le 16 e prima delle 22 quali eventi ci sono delle categorie che ti interessano...",
     timelineTitle3: "Hai tu il controllo!",
     timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
     timelineTitle4: "Se sei turista...",
@@ -380,62 +380,62 @@
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
-    await onboardingWait(t.categoriesTitle6, t.categoriesText6,"important");
+    await onboardingWait(t.categoriesTitle6, t.categoriesText6,"i");
     // await wait(9000);
     highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
-    await onboardingWait(t.categoriesTitle7, t.categoriesText7,"important");
+    await onboardingWait(t.categoriesTitle7, t.categoriesText7,"i");
     // await wait(9000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
-    await onboardingWait(t.categoriesTitle8, t.categoriesText8,"important");
+    await onboardingWait(t.categoriesTitle8, t.categoriesText8,"i");
     // await wait(10000);
     bubbleHide();
     await wait(500);
 
     cardShow(t.tickerTitle, t.tickerText, markerData.marker, mapInstance);
-    await onboardingWait(t.tickerTitle, t.tickerText,"important");
+    await onboardingWait(t.tickerTitle, t.tickerText,"i");
     // await wait(8000);
     cardHide();
     await wait(500);
 
     cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle, t.timelineText,"important");
+    await onboardingWait(t.timelineTitle, t.timelineText,"i");
     // await wait(10000);
     cardHide();
     await wait(500);
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle1, t.timelineText1,"normal");
+    await onboardingWait(t.timelineTitle1, t.timelineText1,"n");
     // await wait(10000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle2, t.timelineText2,"important");
+    await onboardingWait(t.timelineTitle2, t.timelineText2,"i");
     // await wait(10000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle3, t.timelineText3,"important");
+    await onboardingWait(t.timelineTitle3, t.timelineText3,"i");
     // await wait(10000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle4, t.timelineText4,"normal");
+    await onboardingWait(t.timelineTitle4, t.timelineText4,"n");
     // await wait(10000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle5, t.timelineText5,"important");
+    await onboardingWait(t.timelineTitle5, t.timelineText5,"i");
     // await wait(10000);
     bubbleHide();
     await wait(500);
     bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
     
-    await onboardingWait(t.timelineTitle6, t.timelineText6,"important");
+    await onboardingWait(t.timelineTitle6, t.timelineText6,"i");
     // await wait(12000);
 
     bubbleHide();
@@ -494,22 +494,20 @@
 
 let onboardingTotalTime = 0;
  
-  function onboardingWait(title, text, type = "normal") {
+  function onboardingWait(title, text, type = "n") {
   const cleanText = (title + " " + text)
     .replace(/<[^>]*>/g, '')
     .replace(/\s+/g, ' ')
     .trim();
   const words = cleanText ? cleanText.split(' ').length : 0;
-  const readingTime = words / 2.4 * 1000; // Velocità di lettura 2.2=132 2.4=144 2.6=156 2.8=168 parole/minuto
+  const readingTime = words / 2.6 * 1000; // Velocità di lettura 2.2=132 2.4=144 2.6=156 2.8=168 parole/minuto
   const baseTime = {
-    short: 2000, 
-    normal: 3000, 
-    important: 4000
+    n: 1000, 
+    i: 2000
   };
   const maxTime = {
-  short: 8000,
-  normal: 12000,
-  important: 22000
+  n: 12000,
+  i: 24000
 };
   const calculatedTime = baseTime[type] + readingTime;
   const totalTime = Math.min(maxTime[type], calculatedTime);
