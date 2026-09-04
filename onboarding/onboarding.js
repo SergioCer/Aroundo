@@ -66,7 +66,7 @@
     timelineTitle1: "Ora guarda le maniglie rotonde...",
     timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
-    timelineText2: "Puoi sapere cosa succede ieri, domani, dopodomani o tra un mese, in quella specifica zona della mappa, dopo le 16 e prima delle 22 quali eventi ci sono delle categorie che ti interessano...",
+    timelineText2: "Puoi sapere cosa è successo ieri, domani, dopodomani o tra un mese, in quella specifica zona della mappa, magari dopo le 16 o prima delle 22 e solo delle categorie che ti interessano...",
     timelineTitle3: "Hai tu il controllo!",
     timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
     timelineTitle4: "Se sei turista...",
@@ -244,10 +244,13 @@
     await wait(8000);
     cardHide();
     await wait(500);
+    // cardShow(t.whyTitle, t.whyText);
+    // await wait(8000);
+    // cardHide();
+    // await wait(500);
     cardShow(t.whyTitle, t.whyText);
-    await wait(8000);
-    cardHide();
-    await wait(500);
+    await onboardingNext(t.whyTitle, t.whyText, "i", "card");
+
     
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
@@ -529,7 +532,7 @@ let onboardingTotalTime = 0;
   return wait(totalTime);
 }
 
-  function onboardingNext(title, text, type = "n") {
+  function onboardingNext(title, text, type = "n", mode = "bubble") {
   return new Promise(async resolve => {
     const cleanText = (title + " " + text)
       .replace(/<[^>]*>/g, '')
@@ -555,16 +558,14 @@ let onboardingTotalTime = 0;
     next.onclick = () => {
       next.onclick = null;
       next.disabled = true;
-      if (bubble) {
-        bubbleHide();
-      } else {
+      if (mode === "card") {
         cardHide();
+      } else {
+        bubbleHide();
       }
       wait(500).then(resolve);
     };
   });
 }
-
-
  
 })();
