@@ -99,7 +99,7 @@
     function cardShow(title, text) {
       const card = document.createElement('div');
       card.className = 'onboarding-card onboarding-welcome';
-      card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>`;
+      card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(card);
       requestAnimationFrame(() => {card.classList.add('visible');});
     }
@@ -115,7 +115,7 @@
     function bubbleShow(title, text, marker, mapInstance, restartText = null) {
       bubble = document.createElement('div');
       bubble.className = 'onboarding-card onboarding-bubble';
-      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}`;
+      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(bubble);
       bubblePosition(marker, mapInstance);
       requestAnimationFrame(() => {bubble.classList.add('visible');});
@@ -413,11 +413,16 @@
     // await wait(10000);
     bubbleHide();
     await wait(500);
-    bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
-    await onboardingWait(t.timelineTitle2, t.timelineText2,"i");
+    // bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
+    // await onboardingWait(t.timelineTitle2, t.timelineText2,"i");
     // await wait(10000);
-    bubbleHide();
-    await wait(500);
+    // bubbleHide();
+    // await wait(500);
+
+    bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
+    await onboardingNext(t.timelineTitle2, t.timelineText2, "i");
+
+    
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
     await onboardingWait(t.timelineTitle3, t.timelineText3,"i");
     // await wait(10000);
@@ -523,6 +528,43 @@ let onboardingTotalTime = 0;
   (onboardingTotalTime / 1000 / 60).toFixed(2), "minuti");
   return wait(totalTime);
 }
+
+  function onboardingNext(title, text, type = "n") {
+  return new Promise(async resolve => {
+    const cleanText = (title + " " + text)
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const words = cleanText ? cleanText.split(' ').length : 0;
+    const readingTime = words / 2.6 * 1000;
+    const baseTime = {
+      n: 1000,
+      i: 1800
+    };
+    const readingFactor = 0.30;
+    const minTime = baseTime[type] + readingTime * readingFactor;
+    const next = layer.querySelector('.onboarding-next');
+    if (!next) {
+      console.warn('Aroundo onboarding: pulsante next non trovato.');
+      resolve();
+      return;
+    }
+    next.disabled = true;
+    await wait(minTime);
+    next.disabled = false;
+    next.onclick = () => {
+      next.onclick = null;
+      next.disabled = true;
+      if (bubble) {
+        bubbleHide();
+      } else {
+        cardHide();
+      }
+      wait(500).then(resolve);
+    };
+  });
+}
+
 
  
 })();
