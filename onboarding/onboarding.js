@@ -370,9 +370,8 @@
     */
     
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
-    await wait(1000);
+    // await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    // highlight(selectAllButton);
     await wait(3000);
     highlightRemove(selectAllHighlight);
     await wait(500);
@@ -392,6 +391,9 @@
     */
       
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
+    await flyToEvent(markerData.marker, mapInstance);
+    await wait(3000);
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
     await onboardingNext();
 
     cardShow(t.tickerTitle, t.tickerText);
