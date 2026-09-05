@@ -403,6 +403,16 @@
     await onboardingNext("card");
 
     cardShow(t.timelineTitle, t.timelineText);
+    const prevDay = document.getElementById("prev-day");
+    const nextDay = document.getElementById("next-day");
+    const resetDay = document.getElementById("reset-day");
+    const prevDayHighlight = highlight(prevDay);
+    await wait(3000);
+    highlightRemove(prevDayHighlight);
+    clickSim(prevDay);
+    await wait(500);
+    prevDay.click();
+    await wait(500);
     await onboardingNext("card");
 
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
