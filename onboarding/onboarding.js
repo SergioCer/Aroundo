@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  const ONBOARDING_ZOOM = 13;
+  const ONBOARDING_ZOOM = 14;
   let layer = null;
   let markerHighlight = null;
   let bubble = null;
@@ -59,8 +59,8 @@
     categoriesTitle8: "Perché i colori cambiano?",
     categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...poi lo scoprirai...<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
 
-    tickerTitle: "E se non fai click?",
-    tickerText: "Nessun problema, in basso, trovi gli eventi della zona che stai guardando, ordinati per orario.",
+    // tickerTitle: "E se non fai click?",
+    // tickerText: "Nessun problema, in basso, trovi gli eventi della zona che stai guardando, ordinati per orario.",
    
     timelineTitle: "Questa è la Linea del Tempo!",
     timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset e ti riporta ad oggi",
@@ -370,9 +370,8 @@
     */
     
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
-    // await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    await wait(3000);
+    await wait(4000);
     highlightRemove(selectAllHighlight);
     await wait(500);
     clickSim(selectAllButton);
@@ -393,17 +392,15 @@
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
     await flyToEvent(markerData.marker, mapInstance);
     await wait(3000);
-    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
     await onboardingNext();
 
+    /*
     cardShow(t.tickerTitle, t.tickerText);
-    const ticker = document.getElementById('eventTickerContent');
-    const tickerHighlight = highlight(ticker);
-    await wait(3000);
-    highlightRemove(tickerHighlight);
     await onboardingNext("card");
+    */
 
     cardShow(t.timelineTitle, t.timelineText);
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
     const resetDay = document.getElementById("reset-day");
