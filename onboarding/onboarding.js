@@ -43,7 +43,7 @@
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
-    categoriesText1: "Vengono disattivate tutte le categorie.<br>Così puoi scegliere liberamente i tuoi interessi.<br>Come vedi, gli eventi sono spariti.",
+    categoriesText1: "Vengono disattivate tutte le categorie.<br>Così puoi scegliere liberamente i tuoi interessi.<br>Come vedi, sulla mappa gli eventi sono spariti.",
     // categoriesTitle2: "Se non selezioni nulla?",
     // categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Adesso...",
@@ -373,8 +373,9 @@
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     await wait(1000);
     if (categoryButton) {categoryButton.click();}
+    highlight(categoryButton);
     await wait(5000);
-    highlightRemove(selectAllHighlight);
+    highlightRemove(categoryHighlight);
     await wait(500);
     categoriesSelectAll();
     await onboardingNext();
