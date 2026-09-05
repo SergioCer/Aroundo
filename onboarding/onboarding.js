@@ -309,7 +309,6 @@
     clickSim(categoryButton);
     await wait(500);
     if (categoryButton) {categoryButton.click();}
-    await wait(1000);
     categoriesSelectAll();
     await wait(3000);
     await onboardingNext("card");
@@ -361,6 +360,8 @@
     categorySelect(11);
     await wait(500);
     highlightRemove(category11);
+    const selectAllButton = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
+    const selectAllHighlight = highlight(selectAllButton);
     await onboardingNext();
     
     /* bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
@@ -370,12 +371,13 @@
     */
     
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
-    const selectAllButton = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
     await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    const selectAllHighlight = highlight(selectAllButton);
+    // highlight(selectAllButton);
     await wait(3000);
     highlightRemove(selectAllHighlight);
+    await wait(500);
+    clickSim(selectAllButton);
     await wait(500);
     categoriesSelectAll();
     await onboardingNext();
