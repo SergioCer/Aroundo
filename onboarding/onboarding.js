@@ -407,8 +407,8 @@
     const resetDay = document.getElementById("reset-day");
     
     const prevDayHighlight = highlight(prevDay);
-    await wait(2000);
-    clickSim(prevDay); await wait(500);
+    await wait(3000);
+    clickSim(prevDay); await wait(1000);
     prevDay.click(); await wait(500);
     clickSim(prevDay); await wait(500);
     prevDay.click(); await wait(500);
@@ -417,14 +417,14 @@
     highlightRemove(prevDayHighlight);
 
     const resetDayHighlight = highlight(resetDay);
-    await wait(2000);
-    clickSim(resetDay); await wait(500);
+    await wait(3000);
+    clickSim(resetDay); await wait(1000);
     resetDay.click(); await wait(500);
     highlightRemove(resetDayHighlight);
 
     const nextDayHighlight = highlight(nextDay);
-    await wait(2000);
-    clickSim(nextDay); await wait(500);
+    await wait(3000);
+    clickSim(nextDay); await wait(1000);
     nextDay.click(); await wait(500);
     clickSim(nextDay); await wait(500);
     nextDay.click(); await wait(500);
