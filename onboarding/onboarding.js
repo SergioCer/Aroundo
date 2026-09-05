@@ -311,9 +311,9 @@
     clickSim(categoryButton);
     await wait(500);
     if (categoryButton) {categoryButton.click();}
-    await wait(3000);
+    await wait(1000);
     clickSim(selectAllButton);
-    await wait(500);
+    await wait(3000);
     if (selectAllButton) {selectAllButton.click();}
     await onboardingNext("card");
     
