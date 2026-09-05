@@ -257,7 +257,6 @@
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
     await wait(1000);
     markerHighlightShow(markerData.marker, mapInstance);
-    await wait(5000);
     await flyToEvent(markerData.marker, mapInstance);
     markerHighlightUpdate(markerData.marker, mapInstance);
     clickSim(markerHighlight); 
@@ -270,7 +269,7 @@
     await wait(1000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(5000);
+    await wait(3500);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
@@ -304,6 +303,7 @@
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
     cardShow(t.categoriesTitle, t.categoriesText);
     const categoryButton = document.querySelector('#menu-toggle');
+    const selectAllHighlight = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
     const categoryHighlight = highlight(categoryButton);
     await wait(3000);
     highlightRemove(categoryHighlight);
@@ -312,7 +312,7 @@
     if (categoryButton) {categoryButton.click();}
     await wait(1000);
     categoriesSelectAll();
-    await wait(5000);
+    await wait(3000);
     await onboardingNext("card");
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
@@ -373,9 +373,9 @@
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    highlight(categoryButton);
+    highlight(selectAllHighlight);
     await wait(5000);
-    highlightRemove(categoryHighlight);
+    highlightRemove(selectAllHighlight);
     await wait(500);
     categoriesSelectAll();
     await onboardingNext();
