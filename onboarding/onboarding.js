@@ -280,8 +280,8 @@
     highlightRemove(moreHighlight);
     await onboardingNext();
     
+    mapInstance.closePopup();
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
-    if (moreButton) {moreButton.click();}
     
     /*
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
@@ -302,7 +302,6 @@
     await wait(5000);
     highlightRemove(bookHighlight);
     await onboardingNext();
-    mapInstance.closePopup(); 
     */ 
     
     cardShow(t.categoriesTitle, t.categoriesText);
