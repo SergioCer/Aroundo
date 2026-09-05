@@ -312,14 +312,19 @@
     await wait(500);
     if (categoryButton) {categoryButton.click();}
     await wait(1000);
+      console.log('selectAll:', selectAllButton);
+      console.log('visible:', selectAllButton?.offsetParent !== null);
+      console.log('checked:', selectAllButton?.checked);
     clickSim(selectAllButton);
     await wait(3000);
     if (selectAllButton) {selectAllButton.click();}
     await onboardingNext("card");
+    if (categoryButton) {categoryButton.click();}
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await onboardingNext();
+    if (categoryButton) {categoryButton.click();}
     
     /*
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
