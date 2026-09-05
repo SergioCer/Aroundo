@@ -47,7 +47,7 @@
     // categoriesTitle2: "Se non selezioni nulla?",
     // categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Adesso...",
-    categoriesText3: "Seleziona le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non è tutto attivo.",
+    categoriesText3: "Puoi selezionare le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non è tutto attivo.",
     // categoriesTitle4: "Se hai fatto una selezione?",
     // categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
@@ -269,7 +269,7 @@
     await wait(1000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(3500);
+    await wait(3000);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
@@ -303,7 +303,8 @@
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
     cardShow(t.categoriesTitle, t.categoriesText);
     const categoryButton = document.querySelector('#menu-toggle');
-    const selectAllHighlight = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
+    const selectAllButton = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
+    const selectAllHighlight = highlight(selectAllButton);
     const categoryHighlight = highlight(categoryButton);
     await wait(3000);
     highlightRemove(categoryHighlight);
@@ -326,7 +327,7 @@
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
-    await wait(2000);
+    await wait(1000);
     
     const category0 = highlight(categoryGet(0));
     await wait(500);
@@ -374,7 +375,7 @@
     await wait(1000);
     if (categoryButton) {categoryButton.click();}
     highlight(selectAllHighlight);
-    await wait(5000);
+    await wait(3000);
     highlightRemove(selectAllHighlight);
     await wait(500);
     categoriesSelectAll();
@@ -508,7 +509,7 @@ function onboardingReadingTime(title, text) {
   const words = cleanText ? cleanText.split(' ').length : 0;
   const readingTime = words / 2.6 * 1000; // parole al minuto
   const baseTime = 1000;
-  const readingFactor = 0.25; // 0.30 più lento, 0.20 più veloce
+  const readingFactor = 0.20; // 0.30 più lento, 0.20 più veloce
   return baseTime + readingTime * readingFactor;
 }
 
