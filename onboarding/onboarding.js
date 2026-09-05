@@ -439,18 +439,18 @@
     highlightRemove(resetDayHighlight2);
     await onboardingNext("card");
 
-bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
-const slider = document.getElementById('timeline-wrapper');
-const handles = slider.querySelectorAll('.noUi-handle');
-const startHandle = handles[0];
-const endHandle = handles[1];
-const startHighlight = highlight(startHandle);
-await wait(3000);
-highlightRemove(startHighlight);
-const endHighlight = highlight(endHandle);
-await wait(3000);
-highlightRemove(endHighlight);
-await onboardingNext();
+    bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
+    const slider = document.getElementById('time-range');
+    const handles = slider.querySelectorAll('.noUi-handle');
+    const startHandle = handles[0];
+    const endHandle = handles[1];
+    const startHighlight = highlight(startHandle);
+    await wait(3000);
+    highlightRemove(startHighlight);
+    const endHighlight = highlight(endHandle);
+    await wait(3000);
+    highlightRemove(endHighlight);
+    await onboardingNext();
     
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await onboardingNext();
