@@ -511,5 +511,17 @@ function onboardingReadingTime(title, text) {
   return baseTime + readingTime * readingFactor;
 }
 
+document.addEventListener('click', (event) => {
+  console.log('CLICK DOCUMENT:', event.target);
+
+  if (
+    menuItemsDiv.classList.contains('open') && 
+    !menuItemsDiv.contains(event.target) && 
+    !toggleBtn.contains(event.target)
+  ) {
+    // ...
+  }
+});
+  
  
 })();
