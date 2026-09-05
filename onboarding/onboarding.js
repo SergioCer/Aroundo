@@ -303,8 +303,6 @@
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
     cardShow(t.categoriesTitle, t.categoriesText);
     const categoryButton = document.querySelector('#menu-toggle');
-    const selectAllButton = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
-    const selectAllHighlight = highlight(selectAllButton);
     const categoryHighlight = highlight(categoryButton);
     await wait(3000);
     highlightRemove(categoryHighlight);
@@ -372,9 +370,10 @@
     */
     
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
+    const selectAllButton = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
     await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    highlight(selectAllHighlight);
+    const selectAllHighlight = highlight(selectAllButton);
     await wait(3000);
     highlightRemove(selectAllHighlight);
     await wait(500);
