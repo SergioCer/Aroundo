@@ -210,7 +210,7 @@
     }
 
   
-    /* Aspetta che la mappa abbia terminato il movimento 
+    /* Aspetta che la mappa abbia terminato il movimento */
     function flyToEvent(marker, mapInstance) {
       return new Promise(resolve => {
         const updatePosition = () => {markerHighlightUpdate(marker, mapInstance); bubblePosition(marker, mapInstance);};
@@ -218,30 +218,7 @@
         mapInstance.once('moveend', () => {mapInstance.off('move', updatePosition); markerHighlightUpdate(marker, mapInstance); bubblePosition(marker, mapInstance); resolve();});
         mapInstance.flyTo(marker.getLatLng(), ONBOARDING_ZOOM, {duration: 3.5, easeLinearity: 0.25});});
     }
-  */
-
-  function flyToEvent(marker, mapInstance) {
-  return new Promise(resolve => {
-    const updateHighlight = () => {
-      markerHighlightUpdate(marker, mapInstance);
-    };
-
-    mapInstance.on('move', updateHighlight);
-
-    mapInstance.once('moveend', () => {
-      mapInstance.off('move', updateHighlight);
-      markerHighlightUpdate(marker, mapInstance);
-      resolve();
-    });
-
-    mapInstance.flyTo(
-      marker.getLatLng(),
-      ONBOARDING_ZOOM,
-      {duration: 3.5, easeLinearity: 0.25}
-    );
-  });
-}
-
+  
     function categoryGet(position) {
       const checkboxes = document.querySelectorAll('#menu-items .category-checkbox');
       return checkboxes[position] || null;
@@ -296,6 +273,7 @@
     await wait(5000);
     clickSim(moreButton);
     await wait(500);
+    if (moreButton) {moreButton.click();}
     highlightRemove(moreHighlight);
     await onboardingNext();
     
