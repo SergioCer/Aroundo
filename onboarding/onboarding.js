@@ -31,7 +31,7 @@
     eventsTitle: "E tutti quei puntini...<br>cosa sono?",
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito cosa succede, a che ora inizia, quando finisce, chi organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
-    eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine ed in più...",
+    eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine e...",
 
     // moreTitle: "Diversi pulsanti!",
     // moreText: "Come Map...<br>Che Eseguono funzioni, per esempio avviare direttamente il tuo navigatore per raggiungere l'evento.",
@@ -300,7 +300,8 @@
     highlightRemove(bookHighlight);
     await onboardingNext();
     */ 
-    
+
+    /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
     cardShow(t.categoriesTitle, t.categoriesText);
     const categoryButton = document.querySelector('#menu-toggle');
     const selectAllButton = document.getElementById('select-all-toggle');
@@ -310,6 +311,7 @@
     clickSim(categoryButton);
     await wait(500);
     if (categoryButton) {categoryButton.click();}
+    await wait(3000);
     clickSim(selectAllButton);
     await wait(500);
     if (selectAllButton) {selectAllButton.click();}
