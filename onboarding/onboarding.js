@@ -151,8 +151,8 @@
       const x = mapRect.left + point.x;
       const y = mapRect.top + point.y;
       const margin = 16;
-      let left = point.x - bubble.offsetWidth / 2;
-      let top = point.y + 130;
+      let left = x - bubble.offsetWidth / 2;
+      let top = y + 130;
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
       left = Math.max(margin, Math.min(left, maxLeft));
       bubble.style.left = `${left}px`;
@@ -278,7 +278,6 @@
     clickSim(moreButton);
     await wait(500);
     highlightRemove(moreHighlight);
-    if (moreButton) {moreButton.click();}
     await onboardingNext();
     
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
@@ -306,8 +305,9 @@
     mapInstance.closePopup(); 
     */ 
     
-    cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
+    cardShow(t.categoriesTitle, t.categoriesText);
     const categoryButton = document.querySelector('#menu-toggle');
+    const selectAllButton = document.getElementById('select-all-toggle');
     const categoryHighlight = highlight(categoryButton);
     await wait(3000);
     highlightRemove(categoryHighlight);
@@ -374,7 +374,6 @@
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    const selectAllButton = document.getElementById('select-all-toggle');
     const selectAllHighlight = highlight(selectAllButton);
     await wait(5000);
     highlightRemove(selectAllHighlight);
@@ -396,10 +395,10 @@
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
     await onboardingNext();
 
-    cardShow(t.tickerTitle, t.tickerText, markerData.marker, mapInstance);
+    cardShow(t.tickerTitle, t.tickerText);
     await onboardingNext("card");
 
-    cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
+    cardShow(t.timelineTitle, t.timelineText);
     await onboardingNext("card");
 
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
