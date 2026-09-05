@@ -325,7 +325,7 @@
     */
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
-    // if (categoryButton) {categoryButton.click();}
+    if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
     const category0 = highlight(categoryGet(0));
@@ -511,17 +511,4 @@ function onboardingReadingTime(title, text) {
   return baseTime + readingTime * readingFactor;
 }
 
-document.addEventListener('click', (event) => {
-  console.log('CLICK DOCUMENT:', event.target);
-
-  if (
-    menuItemsDiv.classList.contains('open') && 
-    !menuItemsDiv.contains(event.target) && 
-    !toggleBtn.contains(event.target)
-  ) {
-    // ...
-  }
-});
-  
- 
 })();
