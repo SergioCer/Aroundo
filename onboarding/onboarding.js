@@ -304,7 +304,6 @@
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
     cardShow(t.categoriesTitle, t.categoriesText);
     const categoryButton = document.querySelector('#menu-toggle');
-    const selectAllButton = document.getElementById('select-all-toggle');
     const categoryHighlight = highlight(categoryButton);
     await wait(3000);
     highlightRemove(categoryHighlight);
@@ -312,19 +311,13 @@
     await wait(500);
     if (categoryButton) {categoryButton.click();}
     await wait(1000);
-      console.log('selectAll:', selectAllButton);
-      console.log('visible:', selectAllButton?.offsetParent !== null);
-      console.log('checked:', selectAllButton?.checked);
-    clickSim(selectAllButton);
-    await wait(3000);
-    if (selectAllButton) {selectAllButton.click();}
+    categoriesSelectAll();
+    await wait(5000);
     await onboardingNext("card");
-    if (categoryButton) {categoryButton.click();}
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await onboardingNext();
-    if (categoryButton) {categoryButton.click();}
     
     /*
     bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
@@ -380,10 +373,8 @@
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     await wait(1000);
     if (categoryButton) {categoryButton.click();}
-    const selectAllHighlight = highlight(selectAllButton);
     await wait(5000);
     highlightRemove(selectAllHighlight);
-    clickSim(selectAllButton);
     await wait(500);
     categoriesSelectAll();
     await onboardingNext();
