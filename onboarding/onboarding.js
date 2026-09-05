@@ -308,12 +308,12 @@
     await wait(3000);
     highlightRemove(categoryHighlight);
     clickSim(categoryButton);
-    if (categoryButton) {categoryButton.click();}
     clickSim(selectAllButton);
     await wait(500);
     await onboardingNext("card");
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
+    if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     /*
