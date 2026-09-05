@@ -396,6 +396,10 @@
     await onboardingNext();
 
     cardShow(t.tickerTitle, t.tickerText);
+    const ticker = document.getElementById('eventTickerContent');
+    const tickerHighlight = highlight(ticker);
+    await wait(3000);
+    highlightRemove(tickerHighlight);
     await onboardingNext("card");
 
     cardShow(t.timelineTitle, t.timelineText);
