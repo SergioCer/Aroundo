@@ -57,7 +57,7 @@
     // categoriesTitle7: "Ma i colori?",
     // categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
     categoriesTitle8: "Perché i colori cambiano?",
-    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...poi lo scoprirai.<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
+    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...poi lo scoprirai...<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
 
     tickerTitle: "E se non fai click?",
     tickerText: "Nessun problema, in basso, trovi gli eventi della zona che stai guardando, ordinati per orario.",
@@ -269,7 +269,7 @@
     await wait(1000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(3000);
+    await wait(2000);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
@@ -324,7 +324,7 @@
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
-    await wait(1000);
+    await wait(2000);
     
     const category0 = highlight(categoryGet(0));
     await wait(500);
