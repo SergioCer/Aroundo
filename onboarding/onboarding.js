@@ -281,6 +281,9 @@
     if (moreButton) {moreButton.click();}
     await onboardingNext();
     
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+    if (moreButton) {moreButton.click();}
+    
     /*
     bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
     await wait(1000); 
@@ -303,17 +306,18 @@
     mapInstance.closePopup(); 
     */ 
     
-    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
-
     cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
-    await onboardingNext("card");
+    await wait(3000);
     highlightRemove(categoryHighlight);
-    
-    bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     clickSim(categoryButton);
     if (categoryButton) {categoryButton.click();}
+    clickSim(selectAllButton);
+    await wait(500);
+    await onboardingNext("card");
+    
+    bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     await onboardingNext();
     
     /*
@@ -322,7 +326,7 @@
     */
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
-    if (categoryButton) {categoryButton.click();}
+    // if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
     const category0 = highlight(categoryGet(0));
@@ -373,6 +377,7 @@
     const selectAllButton = document.getElementById('select-all-toggle');
     const selectAllHighlight = highlight(selectAllButton);
     await wait(5000);
+    highlightRemove(selectAllHighlight);
     clickSim(selectAllButton);
     await wait(500);
     categoriesSelectAll();
@@ -380,7 +385,6 @@
 
     /*
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
-    highlightRemove(selectAllHighlight);
     if (categoryButton) {categoryButton.click();}
     categoriesSelectAll();
     await onboardingNext();
