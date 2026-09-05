@@ -158,7 +158,7 @@
       bubble.style.left = `${left}px`;
       bubble.style.top = `${top}px`;
     }
-  
+   
     function highlight(element) {
       if (!element) {return null;}
       const rect = element.getBoundingClientRect();
@@ -209,7 +209,8 @@
       markerHighlight.style.top = `${point.y}px`;
     }
 
-    /* Aspetta che la mappa abbia terminato il movimento */
+  
+    /* Aspetta che la mappa abbia terminato il movimento 
     function flyToEvent(marker, mapInstance) {
       return new Promise(resolve => {
         const updatePosition = () => {markerHighlightUpdate(marker, mapInstance); bubblePosition(marker, mapInstance);};
@@ -217,6 +218,29 @@
         mapInstance.once('moveend', () => {mapInstance.off('move', updatePosition); markerHighlightUpdate(marker, mapInstance); bubblePosition(marker, mapInstance); resolve();});
         mapInstance.flyTo(marker.getLatLng(), ONBOARDING_ZOOM, {duration: 3.5, easeLinearity: 0.25});});
     }
+  */
+
+  function flyToEvent(marker, mapInstance) {
+  return new Promise(resolve => {
+    const updateHighlight = () => {
+      markerHighlightUpdate(marker, mapInstance);
+    };
+
+    mapInstance.on('move', updateHighlight);
+
+    mapInstance.once('moveend', () => {
+      mapInstance.off('move', updateHighlight);
+      markerHighlightUpdate(marker, mapInstance);
+      resolve();
+    });
+
+    mapInstance.flyTo(
+      marker.getLatLng(),
+      ONBOARDING_ZOOM,
+      {duration: 3.5, easeLinearity: 0.25}
+    );
+  });
+}
 
     function categoryGet(position) {
       const checkboxes = document.querySelectorAll('#menu-items .category-checkbox');
@@ -254,7 +278,7 @@
     
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-    await wait(2000);
+    await wait(1000);
     markerHighlightShow(markerData.marker, mapInstance);
     await wait(5000);
     await flyToEvent(markerData.marker, mapInstance);
