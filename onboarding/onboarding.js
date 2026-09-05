@@ -266,10 +266,9 @@
     await onboardingNext();
     
     bubbleShow(t.eventsTitle1, t.eventsText1, markerData.marker, mapInstance);
-    await wait(1000);
     const moreButton = [...document.querySelectorAll('.leaflet-popup button')] .find(button => button.textContent.trim() === 'More...');
     const moreHighlight = highlight(moreButton);
-    await wait(2000);
+    await wait(3000);
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
@@ -326,22 +325,13 @@
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
-    const category0 = highlight(categoryGet(0));
+    const category10 = highlight(categoryGet(10));
     await wait(500);
-    clickSim(categoryGet(0));
+    clickSim(categoryGet(10));
     await wait(500);
-    categorySelect(0);
+    categorySelect(10);
     await wait(500);
-    highlightRemove(category0);
-    await wait(500);
-    
-    const category1 = highlight(categoryGet(1));
-    await wait(500);
-    clickSim(categoryGet(1));
-    await wait(500);
-    categorySelect(1);
-    await wait(500);
-    highlightRemove(category1);
+    highlightRemove(category10);
     await wait(500);
     
     const category6 = highlight(categoryGet(6));
@@ -353,13 +343,22 @@
     highlightRemove(category6);
     await wait(500);
     
-    const category11 = highlight(categoryGet(11));
+    const category1 = highlight(categoryGet(1));
     await wait(500);
-    clickSim(categoryGet(11));
+    clickSim(categoryGet(1));
     await wait(500);
-    categorySelect(11);
+    categorySelect(1);
     await wait(500);
-    highlightRemove(category11);
+    highlightRemove(category1);
+    await wait(500);
+    
+    const category0 = highlight(categoryGet(0));
+    await wait(500);
+    clickSim(categoryGet(0));
+    await wait(500);
+    categorySelect(0);
+    await wait(500);
+    highlightRemove(category0);
     const selectAllButton = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
     const selectAllHighlight = highlight(selectAllButton);
     await onboardingNext();
@@ -406,13 +405,39 @@
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
     const resetDay = document.getElementById("reset-day");
+    
     const prevDayHighlight = highlight(prevDay);
-    await wait(3000);
+    await wait(2000);
+    clickSim(prevDay); await wait(500);
+    prevDay.click(); await wait(500);
+    clickSim(prevDay); await wait(500);
+    prevDay.click(); await wait(500);
+    clickSim(prevDay); await wait(500);
+    prevDay.click(); await wait(500);
     highlightRemove(prevDayHighlight);
-    clickSim(prevDay);
-    await wait(500);
-    prevDay.click();
-    await wait(500);
+
+    const resetDayHighlight = highlight(resetDay);
+    await wait(2000);
+    clickSim(resetDay); await wait(500);
+    resetDay.click(); await wait(500);
+    highlightRemove(resetDayHighlight);
+
+    const nextDayHighlight = highlight(nextDay);
+    await wait(2000);
+    clickSim(nextDay); await wait(500);
+    nextDay.click(); await wait(500);
+    clickSim(nextDay); await wait(500);
+    nextDay.click(); await wait(500);
+    clickSim(nextDay); await wait(500);
+    nextDay.click(); await wait(500);
+    highlightRemove(nextDayHighlight);
+
+    const resetDayHighlight2 = highlight(resetDay);
+    await wait(1000);
+    clickSim(resetDay); await wait(500);
+    resetDay.click(); await wait(500);
+    highlightRemove(resetDayHighlight2);
+
     await onboardingNext("card");
 
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
