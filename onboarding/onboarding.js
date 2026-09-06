@@ -43,7 +43,7 @@
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
-    categoriesText1: "Vengono disattivate tutte le categorie.<br>Così puoi scegliere liberamente i tuoi interessi.<br>Come vedi, sulla mappa sono spariti gli eventi.",
+    categoriesText1: "Vengono disattivate tutte le categorie.<br>Così le puoi scegliere liberamente.<br>Come vedi, sulla mappa sono spariti gli eventi.",
     // categoriesTitle2: "Se non selezioni nulla?",
     // categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Adesso...",
@@ -438,15 +438,19 @@
     const values = slider.noUiSlider.get();
     const newStart = Number(values[0]) + 4;
     slider.noUiSlider.set([newStart, values[1]]);
+    highlightRemove(startHighlight);
     await wait(2000);
     const endHighlight = highlight(endHandle);
     await wait(3000);
     const newEnd = Number(values[1]) - 12;
     slider.noUiSlider.set([newStart, newEnd]);
-    await wait(2000);
-    await onboardingNext();
-    highlightRemove(startHighlight);
     highlightRemove(endHighlight);
+    await wait(2000);
+    const startHighlight = highlight(startHandle1);
+    const endHighlight = highlight(endHandle1);
+    await onboardingNext();
+    highlightRemove(startHighlight1);
+    highlightRemove(endHighlight1);
     
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await onboardingNext();
@@ -467,10 +471,9 @@
     cardShow(t.timelineTitle6, t.timelineText6);
     await onboardingNext("card");
     
-    cardShow(t.finalTitle, t.finalText, markerData.marker);
-    await onboardingNext("card");
+    bubbleShow(t.finalTitle, t.finalText, markerData.marker);
+    await onboardingNext();
     resetDay.click();
-
     
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
