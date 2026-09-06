@@ -152,9 +152,11 @@
       const y = mapRect.top + point.y;
       const margin = 16;
       let left = x - bubble.offsetWidth / 2;
-      let top = y + 75; // Spostamento in basso rispetto all'elemento selezionato
+      let top = y + 50; // Spostamento in basso rispetto all'elemento selezionato
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
       left = Math.max(margin, Math.min(left, maxLeft));
+      const maxTop = window.innerHeight - bubble.offsetHeight - margin;
+      top = Math.min(top, maxTop);
       bubble.style.left = `${left}px`;
       bubble.style.top = `${top}px`;
     }
