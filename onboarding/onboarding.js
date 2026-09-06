@@ -150,7 +150,7 @@
       const mapRect = mapInstance.getContainer().getBoundingClientRect();
       const x = mapRect.left + point.x;
       const y = mapRect.top + point.y;
-      const margin = 16;
+      const margin = 26;
       let left = x - bubble.offsetWidth / 2;
       let top = y + 50; // Spostamento in basso rispetto all'elemento selezionato
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
