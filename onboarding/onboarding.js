@@ -50,7 +50,7 @@
     timelineTitle2: "Quindi per esempio...",
     timelineText2: "Puoi sapere cosa è successo ieri, cosa accadrà domani, dopodomani...in quella specifica zona della mappa, negli orari selezionati e solo delle categorie che ti interessano!",
     timelineTitle3: "Aroundo è...",
-    timelineText3: `<div style="text-align:center;">Spazio-Temporale<br>Grazie a tutte queste combinazioni, saprai cosa fare!<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
+    timelineText3: `<div style="text-align:center;">Spazio-Temporale<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -72,14 +72,26 @@
       document.body.appendChild(layer);
     }
 
-    function cardShow(title, text) {
-      const card = document.createElement('div');
-      card.className = 'onboarding-card onboarding-welcome';
-      card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
-      layer.appendChild(card);
-      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
-      requestAnimationFrame(() => {card.classList.add('visible');});
-    }
+function cardShow(title, text, restartText = null) {
+  const card = document.createElement('div');
+  card.className = 'onboarding-card onboarding-welcome';
+  card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
+  layer.appendChild(card);
+  onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
+  requestAnimationFrame(() => {card.classList.add('visible');});
+  const restart = card.querySelector('.onboarding-restart');
+  if (restart) {
+    restart.addEventListener('click', () => {
+      onboardingRestart = true;
+      cardHide();
+      if (onboardingNext.resolve) {
+        const resolve = onboardingNext.resolve;
+        onboardingNext.resolve = null;
+        wait(500).then(resolve);
+      }
+    });
+  }
+}
 
     function cardHide() {
       const card = layer.querySelector('.onboarding-welcome');
@@ -92,30 +104,22 @@
     function bubbleShow(title, text, marker, mapInstance, restartText = null) {
       bubble = document.createElement('div');
       bubble.className = 'onboarding-card onboarding-bubble';
-      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
+      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(bubble);
       onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
       bubblePosition(marker, mapInstance);
       requestAnimationFrame(() => {bubble.classList.add('visible');});
-      const restart = bubble.querySelector('.onboarding-restart');
-      if (restart) {restart.addEventListener('click', () => {onboardingRestart = true;
-      bubbleHide();
-      if (onboardingNext.resolve) {const resolve = onboardingNext.resolve;
-      onboardingNext.resolve = null;
-      wait(500).then(resolve);
-          }
-        });
-      }
     }
 
-    function bubbleHide() {
-      if (!bubble) {return;}
-      const oldBubble = bubble;
-      oldBubble.classList.remove('visible');
-      oldBubble.classList.add('hide');
-      setTimeout(() => {oldBubble.remove();
-      if (bubble === oldBubble) {bubble = null;}}, 500);
-    }
+function bubbleShow(title, text, marker, mapInstance) {
+  bubble = document.createElement('div');
+  bubble.className = 'onboarding-card onboarding-bubble';
+  bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
+  layer.appendChild(bubble);
+  onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
+  bubblePosition(marker, mapInstance);
+  requestAnimationFrame(() => {bubble.classList.add('visible');});
+}
 
     /* Posiziona fumetto vicino al marker */
     function bubblePosition(marker, mapInstance) {
@@ -275,22 +279,22 @@
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
-    const category10 = highlight(categoryGet(10).nextElementSibling);
+    const category12 = highlight(categoryGet(12).nextElementSibling);
     await wait(500);
-    clickSim(categoryGet(10));
+    clickSim(categoryGet(12));
     await wait(500);
-    categorySelect(10);
+    categorySelect(12);
     await wait(500);
-    highlightRemove(category10);
+    highlightRemove(category12);
     await wait(500);
     
-    const category6 = highlight(categoryGet(6).nextElementSibling);
+    const category3 = highlight(categoryGet(3).nextElementSibling);
     await wait(500);
-    clickSim(categoryGet(6));
+    clickSim(categoryGet(3));
     await wait(500);
-    categorySelect(6);
+    categorySelect(3);
     await wait(500);
-    highlightRemove(category6);
+    highlightRemove(category3);
     await wait(500);
     
     const category1 = highlight(categoryGet(1).nextElementSibling);
@@ -315,7 +319,7 @@
     
     bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
-    await wait(4000);
+    await wait(5000);
     await wait(500);
     clickSim(selectAllButton);
     await wait(500);
@@ -392,8 +396,8 @@
     cardShow(t.timelineTitle3, t.timelineText3);
     await onboardingNext("card");
     
-    bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
-    await onboardingNext();
+    cardShow(t.finalTitle, t.finalText, t.restartText);
+    await onboardingNext("card");
     resetDay.click();
     
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
