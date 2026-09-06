@@ -155,6 +155,7 @@
   .onboarding-title {font-size: 20px;}
   .onboarding-subtitle {font-size: 16px;}
   .onboarding-bubble {max-width: calc(100vw - 15px);
+  .onboarding-highlight-categories {margin-top: 50px;}
   font-size: 16px;
   }
 }
