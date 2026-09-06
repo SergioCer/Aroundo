@@ -424,12 +424,10 @@
     nextDay.click();
     clickSim(nextDay); await wait(500);
     nextDay.click();
+    clickSim(nextDay); await wait(500);
+    nextDay.click();
     highlightRemove(nextDayHighlight);
 
-    const resetDayHighlight2 = highlight(resetDay);
-    clickSim(resetDay); await wait(500);
-    resetDay.click();
-    highlightRemove(resetDayHighlight2);
     await onboardingNext("card");
 
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
@@ -446,7 +444,7 @@
     highlightRemove(startHighlight);
     const endHighlight = highlight(endHandle);
     await wait(3000);
-    const newEnd = Number(values[1]) - 2;
+    const newEnd = Number(values[1]) - 12;
     slider.noUiSlider.set([newStart, newEnd]);
     await wait(2000);
     highlightRemove(endHighlight);
@@ -493,14 +491,7 @@
       map.scrollWheelZoom.disable();
       map.boxZoom.disable();
       map.keyboard.disable();
-        map.eachLayer(layer => {
-    if (layer instanceof L.Marker) {
-      const element = layer.getElement();
-      if (element) {
-        element.style.pointerEvents = 'none';
-      }
-    }
-  });
+      map.eachLayer(layer => {if (layer instanceof L.Marker) {const element = layer.getElement(); if (element) {element.style.pointerEvents = 'none';}}});
     }
   
     function enableMapInteraction(map) {
@@ -510,58 +501,33 @@
       map.scrollWheelZoom.enable();
       map.boxZoom.enable();
       map.keyboard.enable();
-        map.eachLayer(layer => {
-    if (layer instanceof L.Marker) {
-      const element = layer.getElement();
-      if (element) {
-        element.style.pointerEvents = '';
-      }
-    }
-  });
+      map.eachLayer(layer => {if (layer instanceof L.Marker) {const element = layer.getElement();if (element) {element.style.pointerEvents = '';}}});
     }
 
-function onboardingNext(mode = "bubble") {
-  return new Promise(async resolve => {
-    onboardingNext.resolve = resolve;
-    const next = layer.querySelector('.onboarding-next');
-    if (!next) {
-      console.warn('Aroundo onboarding: pulsante next non trovato.');
-      onboardingNext.resolve = null;
-      resolve();
-      return;
+    function onboardingNext(mode = "bubble") {
+      return new Promise(async resolve => {
+        onboardingNext.resolve = resolve;
+        const next = layer.querySelector('.onboarding-next');
+        if (!next) {console.warn('Aroundo onboarding: pulsante next non trovato.'); onboardingNext.resolve = null; resolve(); return;}
+        const remaining = Math.max(0, onboardingNextReadyAt - Date.now());
+        if (remaining > 0) {await wait(remaining);}
+        next.disabled = false;
+        next.onclick = () => {next.onclick = null; next.disabled = true; onboardingNext.resolve = null;
+          if (mode === "card") {cardHide();
+          } else {bubbleHide();}
+          wait(500).then(resolve);};});
     }
-    const remaining = Math.max(
-      0,
-      onboardingNextReadyAt - Date.now()
-    );
-    if (remaining > 0) {
-      await wait(remaining);
-    }
-    next.disabled = false;
-    next.onclick = () => {
-      next.onclick = null;
-      next.disabled = true;
-      onboardingNext.resolve = null;
-      if (mode === "card") {
-        cardHide();
-      } else {
-        bubbleHide();
-      }
-      wait(500).then(resolve);
-    };
-  });
-}
 
-function onboardingReadingTime(title, text) {
-  const cleanText = (title + " " + text)
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  const words = cleanText ? cleanText.split(' ').length : 0;
-  const readingTime = words / 2.6 * 1000; // parole al minuto
-  const baseTime = 1000;
-  const readingFactor = 0.20; // 0.30 più lento, 0.20 più veloce
-  return baseTime + readingTime * readingFactor;
-}
+    function onboardingReadingTime(title, text) {
+      const cleanText = (title + " " + text)
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const words = cleanText ? cleanText.split(' ').length : 0;
+      const readingTime = words / 2.8 * 1000; // parole al minuto
+      const baseTime = 1000;
+      const readingFactor = 0.20; // 0.30 più lento, 0.20 più veloce
+      return baseTime + readingTime * readingFactor;
+    }
 
 })();
