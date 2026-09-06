@@ -302,12 +302,11 @@
     cardShow(t.categoriesTitle, t.categoriesText);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
-    await wait(3000);
-    highlightRemove(categoryHighlight);
     clickSim(categoryButton);
     await wait(500);
     if (categoryButton) {categoryButton.click();}
     categoriesSelectAll();
+    highlightRemove(categoryHighlight);
     await onboardingNext("card");
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
@@ -357,7 +356,7 @@
     categorySelect(0);
     await wait(500);
     highlightRemove(category0);
-    const selectAllButton = document.getElementById('select-all-toggle'); // highlight(selectAllHighlight); highlightRemove(selectAllHighlight);
+    const selectAllButton = document.getElementById('select-all-toggle');
     const selectAllHighlight = highlight(selectAllButton);
     await onboardingNext();
     
@@ -388,7 +387,6 @@
     */
       
     bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
-    await flyToEvent(markerData.marker, mapInstance);
     await wait(3000);
     await onboardingNext();
 
@@ -398,7 +396,6 @@
     */
 
     cardShow(t.timelineTitle, t.timelineText);
-    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
     const resetDay = document.getElementById("reset-day");
@@ -442,15 +439,15 @@
     const endHandle = handles[1];
     const startHighlight = highlight(startHandle);
     await wait(3000);
-    const values = slider.get();
+    const values = slider.noUiSlider.get();
     const newStart = Number(values[0]) + 4;
-    slider.set([newStart, newEnd]);
+    slider.noUiSlider.set([newStart, values[1]]);
     await wait(2000);
     highlightRemove(startHighlight);
     const endHighlight = highlight(endHandle);
     await wait(3000);
     const newEnd = Number(values[1]) - 2;
-    slider.set([newStart, newEnd]);
+    slider.noUiSlider.set([newStart, newEnd]);
     await wait(2000);
     highlightRemove(endHighlight);
     await onboardingNext();
