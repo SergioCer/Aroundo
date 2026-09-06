@@ -324,7 +324,7 @@
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
-    const category10 = highlight(categoryGet(10));
+    const category10 = highlight(categoryGet(10).nextElementSibling);
     await wait(500);
     clickSim(categoryGet(10));
     await wait(500);
@@ -333,7 +333,7 @@
     highlightRemove(category10);
     await wait(500);
     
-    const category6 = highlight(categoryGet(6));
+    const category6 = highlight(categoryGet(6).nextElementSibling);
     await wait(500);
     clickSim(categoryGet(6));
     await wait(500);
@@ -342,7 +342,7 @@
     highlightRemove(category6);
     await wait(500);
     
-    const category1 = highlight(categoryGet(1));
+    const category1 = highlight(categoryGet(1).nextElementSibling);
     await wait(500);
     clickSim(categoryGet(1));
     await wait(500);
@@ -351,7 +351,7 @@
     highlightRemove(category1);
     await wait(500);
     
-    const category0 = highlight(categoryGet(0));
+    const category0 = highlight(categoryGet(0).nextElementSibling);
     await wait(500);
     clickSim(categoryGet(0));
     await wait(500);
