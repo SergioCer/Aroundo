@@ -57,7 +57,7 @@
     // categoriesTitle7: "Ma i colori?",
     // categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
     categoriesTitle8: "Perché i colori cambiano?",
-    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e...poi lo scoprirai...<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
+    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi... lo scoprirai...<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
 
     // tickerTitle: "E se non fai click?",
     // tickerText: "Nessun problema, in basso, trovi gli eventi della zona che stai guardando, ordinati per orario.",
@@ -306,8 +306,8 @@
     await wait(500);
     if (categoryButton) {categoryButton.click();}
     categoriesSelectAll();
-    highlightRemove(categoryHighlight);
     await onboardingNext("card");
+    highlightRemove(categoryHighlight);
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
@@ -369,12 +369,12 @@
     bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await wait(4000);
-    highlightRemove(selectAllHighlight);
     await wait(500);
     clickSim(selectAllButton);
     await wait(500);
     categoriesSelectAll();
     await onboardingNext();
+    highlightRemove(selectAllHighlight);
 
     /*
     bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
@@ -406,8 +406,6 @@
     prevDay.click();
     clickSim(prevDay); await wait(500);
     prevDay.click();
-    clickSim(prevDay); await wait(500);
-    prevDay.click();
     highlightRemove(prevDayHighlight);
 
     const resetDayHighlight = highlight(resetDay);
@@ -424,8 +422,6 @@
     nextDay.click();
     clickSim(nextDay); await wait(500);
     nextDay.click();
-    clickSim(nextDay); await wait(500);
-    nextDay.click();
     highlightRemove(nextDayHighlight);
 
     await onboardingNext("card");
@@ -436,35 +432,20 @@
     const startHandle = handles[0];
     const endHandle = handles[1];
     const startHighlight = highlight(startHandle);
-    const updateStartHighlight = () => {
-    const rect = startHandle.getBoundingClientRect();
-    const parentRect = slider.getBoundingClientRect();
-      startHighlight.style.left = `${rect.left - parentRect.left + rect.width / 2}px`;
-      startHighlight.style.top = `${rect.top - parentRect.top + rect.height / 2}px`;
-    };
-    slider.noUiSlider.on('update', updateStartHighlight);
     await wait(3000);
+    highlightRemove(startHighlight);
     const values = slider.noUiSlider.get();
     const newStart = Number(values[0]) + 4;
     slider.noUiSlider.set([newStart, values[1]]);
     await wait(2000);
-    slider.noUiSlider.off('update', updateStartHighlight);
-    highlightRemove(startHighlight);
-
     const endHighlight = highlight(endHandle);
-    const updateEndHighlight = () => {
-    const rect = endHandle.getBoundingClientRect();
-    const parentRect = slider.getBoundingClientRect();
-      endHighlight.style.left = `${rect.left - parentRect.left + rect.width / 2}px`;
-      endHighlight.style.top = `${rect.top - parentRect.top + rect.height / 2}px`;
-    };
-    slider.noUiSlider.on('update', updateEndHighlight);
     await wait(3000);
+    highlightRemove(endHighlight);
     const newEnd = Number(values[1]) - 12;
     slider.noUiSlider.set([newStart, newEnd]);
     await wait(2000);
-    slider.noUiSlider.off('update', updateEndHighlight);
-    highlightRemove(endHighlight);
+    await onboardingNext();
+    bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await onboardingNext();
     
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
