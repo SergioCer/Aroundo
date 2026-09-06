@@ -164,6 +164,7 @@
       const rect = element.getBoundingClientRect();
       const effect = document.createElement('div');
       effect.className = 'onboarding-highlight';
+        if (element.id === 'menu-toggle') {effect.classList.add('onboarding-highlight-categories');}
       effect.style.left = `${rect.left + rect.width / 2}px`;
       effect.style.top = `${rect.top + rect.height / 2}px`;
       layer.appendChild(effect);
