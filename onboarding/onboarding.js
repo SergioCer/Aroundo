@@ -32,14 +32,6 @@
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito cosa succede, a che ora inizia, quando finisce, chi organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine e...",
-
-    // moreTitle: "Diversi pulsanti!",
-    // moreText: "Come Map...<br>Che Eseguono funzioni, per esempio avviare direttamente il tuo navigatore per raggiungere l'evento.",
-    // moreTitle1: "E c'è di più.",
-    // moreText1: "Sapere se l'accesso è gratuito o a pagamento, quanto costa, ed in futuro...<br>chissà... prenotare...?",
-    // moreTitle2: "E se...",
-    // moreText2: "Volessi partecipare!<br>Basta...dirlo.<br>Così, se sei registrato, puoi essere avvisato in tempo.",
-
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
@@ -59,23 +51,14 @@
     categoriesTitle8: "Perché i puntini cambiano?",
     categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi...<br>Se è iniziato da poco, per breve tempo oscillerà ancora riducendosi.",
 
-    // tickerTitle: "E se non fai click?",
-    // tickerText: "Nessun problema, in basso, trovi gli eventi della zona che stai guardando, ordinati per orario.",
-   
     timelineTitle: "Questi sono i giorni!",
     timelineText: "Puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset.",
     timelineTitle1: "Queste le ore!",
     timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato.",
     timelineTitle2: "Quindi per esempio...",
     timelineText2: "Puoi sapere cosa è successo ieri, cosa accadrà domani, dopodomani...in quella specifica zona della mappa, negli orari selezionati e solo delle categorie che ti interessano!",
-    // timelineTitle3: "Hai tu il controllo!",
-    // timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
-    // timelineTitle4: "Se sei turista...",
-    // timelineText4: "Abilitando la posizione, ti troverai già immerso negli eventi della zona senza neanche conoscerla e dover cercare!",
-    // timelineTitle5: "Pianificare una vacanza...",
-    // timelineText5: "Sarà molto più semplice!<br>Sposta la mappa nella zona in cui andrai, seleziona la data in cui sarai presente, e saprai in anticipo cosa potrai fare!",
-    timelineTitle6: "Aroundo è...",
-    timelineText6: `<div style="text-align:center;">Spazio-Temporale<br>Grazie a tutte queste combinazioni, saprai cosa fare!<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
+    timelineTitle3: "Aroundo è...",
+    timelineText3: `<div style="text-align:center;">Spazio-Temporale<br>Grazie a tutte queste combinazioni, saprai cosa fare!<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -281,27 +264,6 @@
     mapInstance.closePopup();
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
     
-    /*
-    bubbleShow(t.moreTitle, t.moreText, markerData.marker, mapInstance);
-    await wait(1000); 
-    const mapButton = document.querySelector('.map-btn');
-    const mapHighlight = highlight(mapButton);
-    await wait(5000); 
-    highlightRemove(mapHighlight);
-    await onboardingNext();
-    
-    bubbleShow(t.moreTitle1, t.moreText1, markerData.marker, mapInstance); 
-    await onboardingNext();
-    
-    bubbleShow(t.moreTitle2, t.moreText2, markerData.marker, mapInstance);
-    await wait(1000);
-    const bookButton = document.querySelector('.book-btn');
-    const bookHighlight = highlight(bookButton);
-    await wait(5000);
-    highlightRemove(bookHighlight);
-    await onboardingNext();
-    */ 
-
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
     cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
@@ -395,11 +357,6 @@
     await wait(3000);
     await onboardingNext();
 
-    /*
-    cardShow(t.tickerTitle, t.tickerText);
-    await onboardingNext("card");
-    */
-
     cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
@@ -462,20 +419,7 @@
     bubbleShow(t.timelineTitle2, t.timelineText2);
     await onboardingNext();
     
-    /*
-    bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
-    await onboardingNext();
-    */
-    
-    /*
-    bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
-    await onboardingNext();
-
-    bubbleShow(t.timelineTitle5, t.timelineText5, markerData.marker, mapInstance);
-    await onboardingNext();
-    */
-
-    cardShow(t.timelineTitle6, t.timelineText6);
+    cardShow(t.timelineTitle3, t.timelineText3);
     await onboardingNext("card");
     
     bubbleShow(t.finalTitle, t.finalText);
