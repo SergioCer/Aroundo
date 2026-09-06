@@ -23,7 +23,7 @@ en: {
   eventsText1: "Discover more details.<br>The exact location, a short description, any posters and...",
   
   categoriesTitle: "This is the Categories menu!",
-  categoriesText: "Open it to select your interests.<br>And display on the map only the events that match your preferences.",
+  categoriesText: "Open it to select your interests and display on the map only the events that match your preferences.",
   categoriesTitle1: "When you open the menu...",
   categoriesText1: "All categories are deactivated.<br>So you can choose them freely.<br>As you can see, the events have disappeared from the map.",
   categoriesTitle2: "Now...",
@@ -58,7 +58,7 @@ en: {
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine e...",
 
     categoriesTitle: "Questo è il menu Categorie!",
-    categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
+    categoriesText: "Aprendolo puoi selezionare i tuoi interessi e visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
     categoriesText1: "Vengono disattivate tutte le categorie.<br>Così le puoi scegliere liberamente.<br>Come vedi, sulla mappa sono spariti gli eventi.",
     categoriesTitle2: "Adesso...",
