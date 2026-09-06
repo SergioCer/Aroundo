@@ -152,7 +152,7 @@
       const y = mapRect.top + point.y;
       const margin = 16;
       let left = x - bubble.offsetWidth / 2;
-      let top = y + 100;
+      let top = y + 75; // Spostamento in basso rispetto all'elemento selezionato
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
       left = Math.max(margin, Math.min(left, maxLeft));
       bubble.style.left = `${left}px`;
@@ -164,7 +164,7 @@
       const rect = element.getBoundingClientRect();
       const effect = document.createElement('div');
       effect.className = 'onboarding-highlight';
-        if (element.id === 'menu-toggle') {effect.classList.add('onboarding-highlight-categories');}
+          if (element.id === 'select-all-toggle') {effect.classList.add('onboarding-highlight-selectall');}
       effect.style.left = `${rect.left + rect.width / 2}px`;
       effect.style.top = `${rect.top + rect.height / 2}px`;
       layer.appendChild(effect);
