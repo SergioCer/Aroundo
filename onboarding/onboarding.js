@@ -442,9 +442,16 @@
     const endHandle = handles[1];
     const startHighlight = highlight(startHandle);
     await wait(3000);
+    const values = slider.get();
+    const newStart = Number(values[0]) + 4;
+    slider.set([newStart, newEnd]);
+    await wait(2000);
     highlightRemove(startHighlight);
     const endHighlight = highlight(endHandle);
     await wait(3000);
+    const newEnd = Number(values[1]) - 2;
+    slider.set([newStart, newEnd]);
+    await wait(2000);
     highlightRemove(endHighlight);
     await onboardingNext();
     
