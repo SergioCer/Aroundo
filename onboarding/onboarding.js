@@ -313,16 +313,16 @@
     await onboardingNext("card");
     highlightRemove(categoryHighlight);
     
-    bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle1, t.categoriesText1);
     if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
     /*
-    bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle2, t.categoriesText2);
     await onboardingNext();
     */
     
-    bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle3, t.categoriesText3);
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
@@ -371,7 +371,7 @@
     await onboardingNext();
     */
     
-    bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle5, t.categoriesText5);
     if (categoryButton) {categoryButton.click();}
     await wait(4000);
     await wait(500);
@@ -391,7 +391,7 @@
     await onboardingNext();
     */
       
-    bubbleShow(t.categoriesTitle8, t.categoriesText8, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle8, t.categoriesText8);
     await wait(3000);
     await onboardingNext();
 
@@ -411,11 +411,13 @@
     prevDay.click();
     clickSim(prevDay); await wait(1000);
     prevDay.click();
+    highlightRemove(prevDayHighlight);
 
     const resetDayHighlight = highlight(resetDay);
     await wait(3000);
     clickSim(resetDay); await wait(1000);
     resetDay.click();
+    highlightRemove(resetDayHighlight);
 
     const nextDayHighlight = highlight(nextDay);
     await wait(3000);
@@ -425,12 +427,15 @@
     nextDay.click();
     clickSim(nextDay); await wait(1000);
     nextDay.click();
+    const prevDayHighlight1 = highlight(prevDay);
+    const resetDayHighlight1 = highlight(resetDay);
     await onboardingNext("card");
-    highlightRemove(prevDayHighlight);
-    highlightRemove(resetDayHighlight);
+    highlightRemove(prevDayHighlight1);
+    highlightRemove(resetDayHighlight1);
     highlightRemove(nextDayHighlight);
+    
 
-    bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
+    bubbleShow(t.timelineTitle1, t.timelineText1);
     const slider = document.getElementById('time-range');
     const handles = slider.querySelectorAll('.noUi-handle');
     const startHandle = handles[0];
@@ -441,20 +446,20 @@
     const newStart = Number(values[0]) + 4;
     slider.noUiSlider.set([newStart, values[1]]);
     highlightRemove(startHighlight);
-    await wait(2000);
+    await wait(1000);
     const endHighlight = highlight(endHandle);
     await wait(3000);
     const newEnd = Number(values[1]) - 12;
     slider.noUiSlider.set([newStart, newEnd]);
     highlightRemove(endHighlight);
-    await wait(2000);
+    await wait(1000);
     const startHighlight1 = highlight(startHandle);
     const endHighlight1 = highlight(endHandle);
     await onboardingNext();
     highlightRemove(startHighlight1);
     highlightRemove(endHighlight1);
     
-    bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
+    bubbleShow(t.timelineTitle2, t.timelineText2);
     await onboardingNext();
     
     /*
@@ -473,7 +478,7 @@
     cardShow(t.timelineTitle6, t.timelineText6);
     await onboardingNext("card");
     
-    bubbleShow(t.finalTitle, t.finalText, markerData.marker);
+    bubbleShow(t.finalTitle, t.finalText);
     await onboardingNext();
     resetDay.click();
     
