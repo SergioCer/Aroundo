@@ -275,7 +275,7 @@
     await onboardingNext("card");
     highlightRemove(categoryHighlight);
     
-    bubbleShow(t.categoriesTitle1, t.categoriesText1);
+    bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
@@ -284,7 +284,7 @@
     await onboardingNext();
     */
     
-    bubbleShow(t.categoriesTitle3, t.categoriesText3);
+    bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
