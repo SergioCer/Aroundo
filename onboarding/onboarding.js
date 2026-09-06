@@ -409,13 +409,11 @@
     prevDay.click();
     clickSim(prevDay); await wait(1000);
     prevDay.click();
-    highlightRemove(prevDayHighlight);
 
     const resetDayHighlight = highlight(resetDay);
     await wait(3000);
     clickSim(resetDay); await wait(1000);
     resetDay.click();
-    highlightRemove(resetDayHighlight);
 
     const nextDayHighlight = highlight(nextDay);
     await wait(3000);
@@ -425,9 +423,10 @@
     nextDay.click();
     clickSim(nextDay); await wait(1000);
     nextDay.click();
-    highlightRemove(nextDayHighlight);
-
     await onboardingNext("card");
+    highlightRemove(prevDayHighlight);
+    highlightRemove(resetDayHighlight);
+    highlightRemove(nextDayHighlight);
 
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
     const slider = document.getElementById('time-range');
@@ -436,18 +435,18 @@
     const endHandle = handles[1];
     const startHighlight = highlight(startHandle);
     await wait(3000);
-    highlightRemove(startHighlight);
     const values = slider.noUiSlider.get();
     const newStart = Number(values[0]) + 4;
     slider.noUiSlider.set([newStart, values[1]]);
     await wait(2000);
     const endHighlight = highlight(endHandle);
     await wait(3000);
-    highlightRemove(endHighlight);
     const newEnd = Number(values[1]) - 12;
     slider.noUiSlider.set([newStart, newEnd]);
     await wait(2000);
     await onboardingNext();
+    highlightRemove(startHighlight);
+    highlightRemove(endHighlight);
     
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await onboardingNext();
