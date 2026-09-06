@@ -261,7 +261,7 @@
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
     
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
-    cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
+    cardShow(t.categoriesTitle, t.categoriesText,);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
     clickSim(categoryButton);
@@ -400,7 +400,7 @@
     await onboardingNext("card");
     resetDay.click();
     
-    if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
+    if (onboardingRestart) {onboardingRestart = false; finish(mapInstance); await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
 
    function finish(mapInstance) {
@@ -452,7 +452,7 @@
         .replace(/\s+/g, ' ')
         .trim();
       const words = cleanText ? cleanText.split(' ').length : 0;
-      const readingTime = words / 2.8 * 1000; // parole al minuto
+      const readingTime = words / 2.8 * 1000; // Velocità di lettura
       const baseTime = 1000;
       const readingFactor = 0.20; // 0.30 più lento, 0.20 più veloce
       return baseTime + readingTime * readingFactor;
