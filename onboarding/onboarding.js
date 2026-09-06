@@ -436,17 +436,34 @@
     const startHandle = handles[0];
     const endHandle = handles[1];
     const startHighlight = highlight(startHandle);
+    const updateStartHighlight = () => {
+    const rect = startHandle.getBoundingClientRect();
+    const parentRect = slider.getBoundingClientRect();
+      startHighlight.style.left = `${rect.left - parentRect.left + rect.width / 2}px`;
+      startHighlight.style.top = `${rect.top - parentRect.top + rect.height / 2}px`;
+    };
+    slider.noUiSlider.on('update', updateStartHighlight);
     await wait(3000);
     const values = slider.noUiSlider.get();
     const newStart = Number(values[0]) + 4;
     slider.noUiSlider.set([newStart, values[1]]);
     await wait(2000);
+    slider.noUiSlider.off('update', updateStartHighlight);
     highlightRemove(startHighlight);
+
     const endHighlight = highlight(endHandle);
+    const updateEndHighlight = () => {
+    const rect = endHandle.getBoundingClientRect();
+    const parentRect = slider.getBoundingClientRect();
+      endHighlight.style.left = `${rect.left - parentRect.left + rect.width / 2}px`;
+      endHighlight.style.top = `${rect.top - parentRect.top + rect.height / 2}px`;
+    };
+    slider.noUiSlider.on('update', updateEndHighlight);
     await wait(3000);
     const newEnd = Number(values[1]) - 12;
     slider.noUiSlider.set([newStart, newEnd]);
     await wait(2000);
+    slider.noUiSlider.off('update', updateEndHighlight);
     highlightRemove(endHighlight);
     await onboardingNext();
     
