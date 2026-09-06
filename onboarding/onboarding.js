@@ -392,7 +392,7 @@
     cardShow(t.timelineTitle3, t.timelineText3);
     await onboardingNext("card");
     
-    bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance);
+    bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
     await onboardingNext();
     resetDay.click();
     
