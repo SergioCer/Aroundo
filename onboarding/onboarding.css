@@ -120,10 +120,10 @@
 
 .onboarding-next {
   position: absolute;
-  right: -3px;
-  bottom: -3px;
-  width: 34px;
-  height: 34px;
+  right: -10px;
+  bottom: -10px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -137,6 +137,12 @@
   pointer-events: auto;
   box-shadow: none;
   transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+.onboarding-next::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
 }
 
 .onboarding-next:disabled {
