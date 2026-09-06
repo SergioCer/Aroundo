@@ -446,8 +446,8 @@
     slider.noUiSlider.set([newStart, newEnd]);
     highlightRemove(endHighlight);
     await wait(2000);
-    const startHighlight = highlight(startHandle1);
-    const endHighlight = highlight(endHandle1);
+    const startHighlight1 = highlight(startHandle);
+    const endHighlight1 = highlight(endHandle);
     await onboardingNext();
     highlightRemove(startHighlight1);
     highlightRemove(endHighlight1);
