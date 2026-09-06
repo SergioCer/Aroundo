@@ -104,7 +104,7 @@ function cardShow(title, text, restartText = null) {
     function bubbleShow(title, text, marker, mapInstance, restartText = null) {
       bubble = document.createElement('div');
       bubble.className = 'onboarding-card onboarding-bubble';
-      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
+      bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(bubble);
       onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
       bubblePosition(marker, mapInstance);
