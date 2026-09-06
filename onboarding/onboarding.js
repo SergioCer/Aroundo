@@ -130,11 +130,10 @@ function bubbleShow(title, text, marker, mapInstance) {
       const x = mapRect.left + point.x;
       const y = mapRect.top + point.y;
       const margin = 16;
-      const nextExtra = 10;
       let left = x - bubble.offsetWidth / 2;
-      let top = y + 50; // Spostamento in basso rispetto all'elemento selezionato
-        if (window.innerWidth <= 520) {left = (window.innerWidth - bubble.offsetWidth - nextExtra) / 2;}
-      const maxLeft = window.innerWidth - bubble.offsetWidth - margin - nextExtra;
+      let top = y + 40; // Spostamento in basso rispetto all'elemento selezionato
+        if (window.innerWidth <= 520) {left = (window.innerWidth - bubble.offsetWidth) / 2 - 10 ;} // il -10 compensa il btn next che sborda
+      const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
       left = Math.max(margin, Math.min(left, maxLeft));
       const maxTop = window.innerHeight - bubble.offsetHeight - margin;
       top = Math.min(top, maxTop);
