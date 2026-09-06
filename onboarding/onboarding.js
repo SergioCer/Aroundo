@@ -47,7 +47,7 @@
     // categoriesTitle2: "Se non selezioni nulla?",
     // categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Adesso...",
-    categoriesText3: "Puoi selezionare le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non è tutto attivo.",
+    categoriesText3: "Puoi selezionare le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
     // categoriesTitle4: "Se hai fatto una selezione?",
     // categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
     categoriesTitle5: "Riaprendo infatti...",
@@ -68,8 +68,8 @@
     timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato!",
     timelineTitle2: "Quindi per esempio...",
     timelineText2: "Puoi sapere cosa è successo ieri, cosa accadrà domani, dopodomani o tra un mese, in quella specifica zona della mappa, magari dopo le 16 o prima delle 22 e solo delle categorie che ti interessano...",
-    timelineTitle3: "Hai tu il controllo!",
-    timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
+    // timelineTitle3: "Hai tu il controllo!",
+    // timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
     // timelineTitle4: "Se sei turista...",
     // timelineText4: "Abilitando la posizione, ti troverai già immerso negli eventi della zona senza neanche conoscerla e dover cercare!",
     // timelineTitle5: "Pianificare una vacanza...",
@@ -255,7 +255,6 @@
     
     if (!markerData || !markerData.marker) {console.log('Aroundo Onboarding: nessun evento disponibile.'); finish(mapInstance); return;} /*Nessun evento disponibile: non blocca Aroundo.*/
     bubbleShow(t.eventsTitle, t.eventsText, markerData.marker, mapInstance);
-    await wait(1000);
     markerHighlightShow(markerData.marker, mapInstance);
     await flyToEvent(markerData.marker, mapInstance);
     markerHighlightUpdate(markerData.marker, mapInstance);
@@ -309,7 +308,6 @@
     await wait(500);
     if (categoryButton) {categoryButton.click();}
     categoriesSelectAll();
-    await wait(3000);
     await onboardingNext("card");
     
     bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
@@ -407,34 +405,33 @@
     
     const prevDayHighlight = highlight(prevDay);
     await wait(3000);
-    clickSim(prevDay); await wait(1000);
-    prevDay.click(); await wait(500);
     clickSim(prevDay); await wait(500);
-    prevDay.click(); await wait(500);
+    prevDay.click();
     clickSim(prevDay); await wait(500);
-    prevDay.click(); await wait(500);
+    prevDay.click();
+    clickSim(prevDay); await wait(500);
+    prevDay.click();
     highlightRemove(prevDayHighlight);
 
     const resetDayHighlight = highlight(resetDay);
     await wait(3000);
-    clickSim(resetDay); await wait(1000);
-    resetDay.click(); await wait(500);
+    clickSim(resetDay); await wait(500);
+    resetDay.click();
     highlightRemove(resetDayHighlight);
 
     const nextDayHighlight = highlight(nextDay);
     await wait(3000);
-    clickSim(nextDay); await wait(1000);
-    nextDay.click(); await wait(500);
     clickSim(nextDay); await wait(500);
-    nextDay.click(); await wait(500);
+    nextDay.click();
     clickSim(nextDay); await wait(500);
-    nextDay.click(); await wait(500);
+    nextDay.click();
+    clickSim(nextDay); await wait(500);
+    nextDay.click();
     highlightRemove(nextDayHighlight);
 
     const resetDayHighlight2 = highlight(resetDay);
-    await wait(1000);
     clickSim(resetDay); await wait(500);
-    resetDay.click(); await wait(500);
+    resetDay.click();
     highlightRemove(resetDayHighlight2);
     await onboardingNext("card");
 
@@ -454,8 +451,10 @@
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await onboardingNext();
     
+    /*
     bubbleShow(t.timelineTitle3, t.timelineText3, markerData.marker, mapInstance);
     await onboardingNext();
+    */
     
     /*
     bubbleShow(t.timelineTitle4, t.timelineText4, markerData.marker, mapInstance);
@@ -465,10 +464,10 @@
     await onboardingNext();
     */
 
-    bubbleShow(t.timelineTitle6, t.timelineText6, markerData.marker, mapInstance);
+    cardShow(t.timelineTitle6, t.timelineText6);
     await onboardingNext();
     
-    bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance, t.restartText);
+    cardShow(t.finalTitle, t.finalText, markerData.marker);
     await onboardingNext();
     
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
