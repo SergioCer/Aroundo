@@ -11,17 +11,41 @@
   let onboardingNextReadyAt = 0;
   
    const onboardingTexts = {
-  en: {
-    welcomeTitle: "Aroundo",
-    welcomeText: "Welcome!<br>Let me show you how it works.",
-    whyTitle: "Why Aroundo?",
-    whyText: "A map of events happening around you.<br>Explore what's happening in your area.",
-    eventsTitle: "Events",
-    eventsText: "Tap an event to discover what is happening around you.",
-    finalTitle: "Aroundo",
-    finalText: "You are ready!<br>Discover what's Around•you.",
-    restartText: "not clear? Restart!"
-  },
+en: {
+  welcomeTitle: "Aroundo is happy to meet you!",
+  welcomeText: "Come on, let me show you how it works.<br>I'll guide you.",
+  whyTitle: "To get started:<br>what are you looking at?",
+  whyText: "A map of events happening around you.<br>So you can finally discover...<br><div style=\"text-align:center;\"><strong>WHAT TO DO!</strong></div>",
+  
+  eventsTitle: "And all those little dots...<br>what are they?",
+  eventsText: "<div style=\"text-align:center;\"><strong>They're events!</strong></div>With a click you can immediately discover what's happening, when it starts, when it ends, who is organising it, and other useful information.",
+  eventsTitle1: "Clicking on More...",
+  eventsText1: "Discover more details.<br>The exact location, a short description, any posters and...",
+  
+  categoriesTitle: "This is the Categories menu!",
+  categoriesText: "Open it to select your interests.<br>And display on the map only the events that match your preferences.",
+  categoriesTitle1: "When you open the menu...",
+  categoriesText1: "All categories are deactivated.<br>So you can choose them freely.<br>As you can see, the events have disappeared from the map.",
+  categoriesTitle2: "Now...",
+  categoriesText2: "You can select your favourites.<br>Only matching events will appear.<br>The selector at the top, with a dot, lets you know that not everything is active.",
+  categoriesTitle3: "When you open it again...",
+  categoriesText3: "You'll find your selection.<br>You can change it or, with a single click on the selector at the top, show everything again.",
+  categoriesTitle4: "Why do the dots change?",
+  categoriesText4: "The closer an event gets to its start time, the bigger it becomes and...it starts bouncing, and then...<br>If it has just started, it will keep swaying briefly as it gets smaller.",
+  
+  timelineTitle: "These are the days!",
+  timelineText: "You can move backwards and forwards, discovering what will happen or what has already happened.<br>The dot underneath the centre acts as a reset.",
+  timelineTitle1: "And these are the hours!",
+  timelineText1: "You can select the start and end times of the events you're interested in.",
+  timelineTitle2: "So, for example...",
+  timelineText2: "You can find out what happened yesterday, what will happen tomorrow, the day after tomorrow...in that specific area of the map, during the selected times, and only for the categories you're interested in!",
+  timelineTitle3: "Aroundo is...",
+  timelineText3: "<div style=\"text-align:center;\">Space-Time<br>Save time.<br>It's your most precious asset.</div>",
+  
+  finalTitle: "Now you're ready!",
+  finalText: "Discover how to make the most of <strong>YOUR</strong> territory with...<br><div style=\"text-align:center;\"><strong>Aroundo</strong></div>",
+  restartText: "<div style=\"text-align:center;\">Didn't I explain it clearly?<br>Okay...let's start again...</div>"
+},
   it: {
     welcomeTitle: "Aroundo è felice di fare la tua conoscenza!",
     welcomeText: "Dai, ti faccio vedere come funziona.<br>Ti guido io.",
@@ -32,6 +56,7 @@
     eventsText: `<div style="text-align: center;"><strong>Sono gli eventi!</strong></div>Con un click scopri subito cosa succede, a che ora inizia, quando finisce, chi organizza, ed altre informazioni utili.`,
     eventsTitle1: "Cliccando su More...",
     eventsText1: "Scopri ulteriori dettagli.<br>Il luogo preciso, una breve descrizione, eventuali locandine e...",
+
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
