@@ -150,7 +150,7 @@
 }
 
 /* Mobile */
-@media (max-width: 560px) {
+@media (max-width: 520px) {
   .onboarding-welcome {width: calc(100vw - 15px);}
   .onboarding-title {font-size: 20px;}
   .onboarding-subtitle {font-size: 16px;}
