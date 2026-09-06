@@ -36,20 +36,12 @@
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
     categoriesText1: "Vengono disattivate tutte le categorie.<br>Così le puoi scegliere liberamente.<br>Come vedi, sulla mappa sono spariti gli eventi.",
-    // categoriesTitle2: "Se non selezioni nulla?",
-    // categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
-    categoriesTitle3: "Adesso...",
-    categoriesText3: "Puoi selezionare le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
-    // categoriesTitle4: "Se hai fatto una selezione?",
-    // categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
-    categoriesTitle5: "Riaprendo...",
-    categoriesText5: "Troverai la tua selezione.<br>Puoi modificarla oppure, con un solo click sul selettore in alto, mostrare nuovamente tutto.",
-    // categoriesTitle6: "In questo modo,",
-    // categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando apri<br>Aroundo",
-    // categoriesTitle7: "Ma i colori?",
-    // categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
-    categoriesTitle8: "Perché i puntini cambiano?",
-    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi...<br>Se è iniziato da poco, per breve tempo oscillerà ancora riducendosi.",
+    categoriesTitle2: "Adesso...",
+    categoriesText2: "Puoi selezionare le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
+    categoriesTitle3: "Riaprendo...",
+    categoriesText3: "Troverai la tua selezione.<br>Puoi modificarla oppure, con un solo click sul selettore in alto, mostrare nuovamente tutto.",
+    categoriesTitle4: "Perché i puntini cambiano?",
+    categoriesText4: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi...<br>Se è iniziato da poco, per breve tempo oscillerà ancora riducendosi.",
 
     timelineTitle: "Questi sono i giorni!",
     timelineText: "Puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset.",
@@ -279,12 +271,7 @@
     if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
-    /*
-    bubbleShow(t.categoriesTitle2, t.categoriesText2);
-    await onboardingNext();
-    */
-    
-    bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
@@ -323,17 +310,10 @@
     await wait(500);
     highlightRemove(category0);
     const selectAllButton = document.getElementById('select-all-toggle');
-    // const selectAllHighlight = highlight(selectAllButton);
     const selectAllHighlight = highlight(selectAllButton.parentElement);
     await onboardingNext();
     
-    /* bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
-    await wait(5000);
-    // if (categoryButton) {categoryButton.click();}
-    await onboardingNext();
-    */
-    
-    bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await wait(4000);
     await wait(500);
@@ -343,17 +323,7 @@
     await onboardingNext();
     highlightRemove(selectAllHighlight);
 
-    /*
-    bubbleShow(t.categoriesTitle6, t.categoriesText6, markerData.marker, mapInstance);
-    if (categoryButton) {categoryButton.click();}
-    categoriesSelectAll();
-    await onboardingNext();
-    
-    bubbleShow(t.categoriesTitle7, t.categoriesText7, markerData.marker, mapInstance);
-    await onboardingNext();
-    */
-      
-    bubbleShow(t.categoriesTitle8, t.categoriesText8);
+    bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(3000);
     await onboardingNext();
 
@@ -416,13 +386,13 @@
     highlightRemove(startHighlight1);
     highlightRemove(endHighlight1);
     
-    bubbleShow(t.timelineTitle2, t.timelineText2);
+    bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await onboardingNext();
     
     cardShow(t.timelineTitle3, t.timelineText3);
     await onboardingNext("card");
     
-    bubbleShow(t.finalTitle, t.finalText);
+    bubbleShow(t.finalTitle, t.finalText, markerData.marker, mapInstance);
     await onboardingNext();
     resetDay.click();
     
