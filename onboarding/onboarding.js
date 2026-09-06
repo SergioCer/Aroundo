@@ -154,7 +154,7 @@
       const nextExtra = 10;
       let left = x - bubble.offsetWidth / 2;
       let top = y + 50; // Spostamento in basso rispetto all'elemento selezionato
-        if (window.innerWidth <= 520) {left = (window.innerWidth - bubble.offsetWidth) / 2;} else {left = x - bubble.offsetWidth / 2;}
+        if (window.innerWidth <= 520) {left = (window.innerWidth - bubble.offsetWidth - nextExtra) / 2;}
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin - nextExtra;
       left = Math.max(margin, Math.min(left, maxLeft));
       const maxTop = window.innerHeight - bubble.offsetHeight - margin;
@@ -303,7 +303,7 @@
     */ 
 
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
-    cardShow(t.categoriesTitle, t.categoriesText);
+    cardShow(t.categoriesTitle, t.categoriesText, markerData.marker, mapInstance);
     const categoryButton = document.querySelector('#menu-toggle');
     const categoryHighlight = highlight(categoryButton);
     clickSim(categoryButton);
@@ -371,7 +371,7 @@
     await onboardingNext();
     */
     
-    bubbleShow(t.categoriesTitle5, t.categoriesText5);
+    bubbleShow(t.categoriesTitle5, t.categoriesText5, markerData.marker, mapInstance);
     if (categoryButton) {categoryButton.click();}
     await wait(4000);
     await wait(500);
@@ -400,7 +400,7 @@
     await onboardingNext("card");
     */
 
-    cardShow(t.timelineTitle, t.timelineText);
+    cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
     const resetDay = document.getElementById("reset-day");
@@ -435,7 +435,7 @@
     highlightRemove(nextDayHighlight);
     
 
-    bubbleShow(t.timelineTitle1, t.timelineText1);
+    bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
     const slider = document.getElementById('time-range');
     const handles = slider.querySelectorAll('.noUi-handle');
     const startHandle = handles[0];
