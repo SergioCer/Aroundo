@@ -154,6 +154,7 @@
       const nextExtra = 10;
       let left = x - bubble.offsetWidth / 2;
       let top = y + 50; // Spostamento in basso rispetto all'elemento selezionato
+        if (window.innerWidth <= 520) {left = (window.innerWidth - bubble.offsetWidth) / 2;} else {left = x - bubble.offsetWidth / 2;}
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin - nextExtra;
       left = Math.max(margin, Math.min(left, maxLeft));
       const maxTop = window.innerHeight - bubble.offsetHeight - margin;
