@@ -72,26 +72,26 @@
       document.body.appendChild(layer);
     }
 
-function cardShow(title, text, restartText = null) {
-  const card = document.createElement('div');
-  card.className = 'onboarding-card onboarding-welcome';
-  card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
-  layer.appendChild(card);
-  onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
-  requestAnimationFrame(() => {card.classList.add('visible');});
-  const restart = card.querySelector('.onboarding-restart');
-  if (restart) {
-    restart.addEventListener('click', () => {
-      onboardingRestart = true;
-      cardHide();
-      if (onboardingNext.resolve) {
-        const resolve = onboardingNext.resolve;
-        onboardingNext.resolve = null;
-        wait(500).then(resolve);
+    function cardShow(title, text, restartText = null) {
+      const card = document.createElement('div');
+      card.className = 'onboarding-card onboarding-welcome';
+      card.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div>${restartText ? `<div class="onboarding-restart">${restartText}</div>` : ''}<button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
+      layer.appendChild(card);
+      onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
+      requestAnimationFrame(() => {card.classList.add('visible');});
+      const restart = card.querySelector('.onboarding-restart');
+      if (restart) {
+        restart.addEventListener('click', () => {
+          onboardingRestart = true;
+          cardHide();
+          if (onboardingNext.resolve) {
+            const resolve = onboardingNext.resolve;
+            onboardingNext.resolve = null;
+            wait(500).then(resolve);
+          }
+        });
       }
-    });
-  }
-}
+    }
 
     function cardHide() {
       const card = layer.querySelector('.onboarding-welcome');
@@ -101,7 +101,7 @@ function cardShow(title, text, restartText = null) {
       setTimeout(() => {card.remove();}, 500);
     }
   
-    function bubbleShow(title, text, marker, mapInstance, restartText = null) {
+    function bubbleShow(title, text, marker, mapInstance) {
       bubble = document.createElement('div');
       bubble.className = 'onboarding-card onboarding-bubble';
       bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
@@ -111,16 +111,17 @@ function cardShow(title, text, restartText = null) {
       requestAnimationFrame(() => {bubble.classList.add('visible');});
     }
 
-function bubbleShow(title, text, marker, mapInstance) {
-  bubble = document.createElement('div');
-  bubble.className = 'onboarding-card onboarding-bubble';
-  bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
-  layer.appendChild(bubble);
-  onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
-  bubblePosition(marker, mapInstance);
-  requestAnimationFrame(() => {bubble.classList.add('visible');});
-}
-
+    function bubbleHide() {
+      if (!bubble) {return;}
+      const oldBubble = bubble;
+      oldBubble.classList.remove('visible');
+      oldBubble.classList.add('hide');
+      setTimeout(() => {
+        oldBubble.remove();
+        if (bubble === oldBubble) {bubble = null;}
+      }, 500);
+    }
+    
     /* Posiziona fumetto vicino al marker */
     function bubblePosition(marker, mapInstance) {
       if (!bubble) {return;}
