@@ -166,7 +166,6 @@
       const rect = element.getBoundingClientRect();
       const effect = document.createElement('div');
       effect.className = 'onboarding-highlight';
-          if (element.id === 'select-all-toggle') {effect.classList.add('onboarding-highlight-selectall');}
       effect.style.left = `${rect.left + rect.width / 2}px`;
       effect.style.top = `${rect.top + rect.height / 2}px`;
       layer.appendChild(effect);
@@ -360,7 +359,8 @@
     await wait(500);
     highlightRemove(category0);
     const selectAllButton = document.getElementById('select-all-toggle');
-    const selectAllHighlight = highlight(selectAllButton);
+    // const selectAllHighlight = highlight(selectAllButton);
+    const selectAllHighlight = highlight(selectAllButton.parentElement);
     await onboardingNext();
     
     /* bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
