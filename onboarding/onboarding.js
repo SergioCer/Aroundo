@@ -402,25 +402,25 @@
     
     const prevDayHighlight = highlight(prevDay);
     await wait(3000);
-    clickSim(prevDay); await wait(500);
+    clickSim(prevDay); await wait(1000);
     prevDay.click();
-    clickSim(prevDay); await wait(500);
+    clickSim(prevDay); await wait(1000);
     prevDay.click();
     highlightRemove(prevDayHighlight);
 
     const resetDayHighlight = highlight(resetDay);
     await wait(3000);
-    clickSim(resetDay); await wait(500);
+    clickSim(resetDay); await wait(1000);
     resetDay.click();
     highlightRemove(resetDayHighlight);
 
     const nextDayHighlight = highlight(nextDay);
     await wait(3000);
-    clickSim(nextDay); await wait(500);
+    clickSim(nextDay); await wait(1000);
     nextDay.click();
-    clickSim(nextDay); await wait(500);
+    clickSim(nextDay); await wait(1000);
     nextDay.click();
-    clickSim(nextDay); await wait(500);
+    clickSim(nextDay); await wait(1000);
     nextDay.click();
     highlightRemove(nextDayHighlight);
 
@@ -469,6 +469,8 @@
     
     cardShow(t.finalTitle, t.finalText, markerData.marker);
     await onboardingNext("card");
+    resetDay.click();
+
     
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
