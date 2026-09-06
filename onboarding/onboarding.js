@@ -152,7 +152,7 @@
       const y = mapRect.top + point.y;
       const margin = 16;
       let left = x - bubble.offsetWidth / 2;
-      let top = y + 130;
+      let top = y + 100;
       const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
       left = Math.max(margin, Math.min(left, maxLeft));
       bubble.style.left = `${left}px`;
