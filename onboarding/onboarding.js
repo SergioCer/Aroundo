@@ -43,31 +43,31 @@
     categoriesTitle: "Questo è il menu Categorie!",
     categoriesText: "Aprendolo puoi selezionare i tuoi interessi.<br>E visualizzare sulla mappa solo gli eventi che corrispondono alle tue preferenze.",
     categoriesTitle1: "Quando apri il menu...",
-    categoriesText1: "Vengono disattivate tutte le categorie.<br>Così puoi scegliere liberamente i tuoi interessi.<br>Come vedi, sulla mappa gli eventi sono spariti.",
+    categoriesText1: "Vengono disattivate tutte le categorie.<br>Così puoi scegliere liberamente i tuoi interessi.<br>Come vedi, sulla mappa sono spariti gli eventi.",
     // categoriesTitle2: "Se non selezioni nulla?",
     // categoriesText2: "Nessun problema.<br>Chiudendo il menu, puoi fare un semplice click sulla mappa, verranno mostrati nuovamente tutti gli eventi di tutte le categorie.",
     categoriesTitle3: "Adesso...",
     categoriesText3: "Puoi selezionare le tue preferite.<br>Appariranno solo gli eventi corrispondenti.<br>Il selettore in alto, con un puntino, ti informerà che non tutto è attivo.",
     // categoriesTitle4: "Se hai fatto una selezione?",
     // categoriesText4: "Verrà sempre mantenuta.<br>E fino a quando non cambi, vedrai solo i tuoi eventi preferiti.",
-    categoriesTitle5: "Riaprendo infatti...",
+    categoriesTitle5: "Riaprendo...",
     categoriesText5: "Troverai la tua selezione.<br>Puoi modificarla oppure, con un solo click sul selettore in alto, mostrare nuovamente tutto.",
     // categoriesTitle6: "In questo modo,",
     // categoriesText6: "tutti gli eventi di tutte le categorie saranno nuovamente visibili sulla mappa, come quando apri<br>Aroundo",
     // categoriesTitle7: "Ma i colori?",
     // categoriesText7: "Corrispondono alle categorie, in questo modo sai subito che tipo di evento si svolge in quel luogo, e noterai che anche la dimensione e gli effetti cambiano.",
-    categoriesTitle8: "Perché i colori cambiano?",
-    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi... lo scoprirai...<br>E se è iniziato da poco, non sparisce, ma per breve tempo oscillerà riducendosi.",
+    categoriesTitle8: "Perché i puntini cambiano?",
+    categoriesText8: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi...<br>Se è iniziato da poco, per breve tempo oscillerà ancora riducendosi.",
 
     // tickerTitle: "E se non fai click?",
     // tickerText: "Nessun problema, in basso, trovi gli eventi della zona che stai guardando, ordinati per orario.",
    
-    timelineTitle: "Questa è la Linea del Tempo!",
-    timelineText: "Grazie a questa puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset e ti riporta ad oggi",
-    timelineTitle1: "Ora guarda le maniglie rotonde...",
-    timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato!",
+    timelineTitle: "Questi sono i giorni!",
+    timelineText: "Puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset.",
+    timelineTitle1: "Queste le ore!",
+    timelineText1: "Puoi selezionare l'ora di inizio e di fine degli eventi a cui sei interessato.",
     timelineTitle2: "Quindi per esempio...",
-    timelineText2: "Puoi sapere cosa è successo ieri, cosa accadrà domani, dopodomani o tra un mese, in quella specifica zona della mappa, magari dopo le 16 o prima delle 22 e solo delle categorie che ti interessano...",
+    timelineText2: "Puoi sapere cosa è successo ieri, cosa accadrà domani, dopodomani...in quella specifica zona della mappa, negli orari selezionati e solo delle categorie che ti interessano!",
     // timelineTitle3: "Hai tu il controllo!",
     // timelineText3: "Non dovrai più perdere tempo tra manifesti, social, gruppi, riviste... ricordare dove avevi visto qualcosa, chiedere ad amici, sfogliare pagine e pagine...",
     // timelineTitle4: "Se sei turista...",
@@ -444,8 +444,6 @@
     const newEnd = Number(values[1]) - 12;
     slider.noUiSlider.set([newStart, newEnd]);
     await wait(2000);
-    await onboardingNext();
-    bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
     await onboardingNext();
     
     bubbleShow(t.timelineTitle2, t.timelineText2, markerData.marker, mapInstance);
