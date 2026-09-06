@@ -467,10 +467,10 @@
     */
 
     cardShow(t.timelineTitle6, t.timelineText6);
-    await onboardingNext();
+    await onboardingNext("card");
     
     cardShow(t.finalTitle, t.finalText, markerData.marker);
-    await onboardingNext();
+    await onboardingNext("card");
     
     if (onboardingRestart) {onboardingRestart = false; await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
