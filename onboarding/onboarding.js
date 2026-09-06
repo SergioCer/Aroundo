@@ -331,7 +331,7 @@
     await wait(3000);
     await onboardingNext();
 
-    cardShow(t.timelineTitle, t.timelineText, markerData.marker, mapInstance);
+    cardShow(t.timelineTitle, t.timelineText);
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
     const resetDay = document.getElementById("reset-day");
