@@ -1026,11 +1026,10 @@ OK
   });
   
   map.addLayer(markersCluster);
-markersCluster.on('animationend', () => {
-  markersCluster.eachLayer(layer => {
-    console.log('VISIBLE', layer._childCount || 1, layer);
-  });
+markersCluster._featureGroup.eachLayer(layer => {
+  console.log('FEATURE', layer._childCount || 1, layer);
 });
+
  // NUOVO
 
 
