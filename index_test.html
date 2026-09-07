@@ -1027,8 +1027,6 @@ OK
   
   map.addLayer(markersCluster);
 
-  console.log(markersCluster._featureGroup); // NUOVA
-  
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
@@ -1414,6 +1412,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       markersCluster.removeLayer(m.marker);
       });
       markers = [];
+      
+  console.log('RENDER', currentDate, timelineMode, 'EVENTI', events.length); // NUOVA
+
       events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
       events.forEach(e => {
         const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
