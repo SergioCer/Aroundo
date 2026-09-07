@@ -1024,6 +1024,8 @@ OK
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
   });
+
+  map.addLayer(markersCluster);
   
 markersCluster.on('animationend', () => {
   console.log('VISIBLE PARENT', markersCluster._featureGroup);
