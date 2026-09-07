@@ -1027,12 +1027,11 @@ OK
   
   map.addLayer(markersCluster);
 markersCluster.on('animationend', () => {
-  function testCluster(c) {
-    if (c._childClusters && c._childClusters.length) {c._childClusters.forEach(testCluster);
-    } else {console.log('CLUSTER FINALE', c._childCount, c);}
-  }
-  testCluster(markersCluster._topClusterLevel);
-});  // NUOVO
+  markersCluster.eachLayer(layer => {
+    console.log('VISIBLE', layer._childCount || 1, layer);
+  });
+});
+ // NUOVO
 
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
