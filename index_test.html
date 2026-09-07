@@ -1026,9 +1026,8 @@ OK
   });
   
   map.addLayer(markersCluster);
-  markersCluster.on('clusteradd', e => console.log('CLUSTER:', e.layer.getChildCount(), e.layer.getAllChildMarkers())); // NUOVA
-  markersCluster.on('layeradd', e => { if (e.layer.getChildCount) console.log('CLUSTER:', e.layer.getChildCount(), e.layer.getAllChildMarkers()); }); // NUOVA
-  console.log(markersCluster);
+
+  console.log(markersCluster._featureGroup); // NUOVA
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
