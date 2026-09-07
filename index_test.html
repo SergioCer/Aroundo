@@ -1026,7 +1026,10 @@ OK
   });
   
   map.addLayer(markersCluster);
-  markersCluster.on('animationend', () => console.log('ANIMATION END', markersCluster));
+  markersCluster.on('animationend', () => {
+  console.log('CHILD CLUSTERS', markersCluster._topClusterLevel._childClusters);
+}); // NUOVO
+
 
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
