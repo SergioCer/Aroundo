@@ -1026,6 +1026,8 @@ OK
   });
   
   map.addLayer(markersCluster);
+  markersCluster.on('animationend', () => console.log('ANIMATION END', markersCluster));
+
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
