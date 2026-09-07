@@ -283,8 +283,9 @@ en: {
 
 const morePopup = document.querySelector('.leaflet-popup-content-wrapper');
 const moreHeight = morePopup.offsetHeight;
+const screenHeight = window.innerHeight;
 const centerPoint =  mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
-const deltaY = moreHeight / 2;
+const deltaY = moreHeight + 100 - screenHeight / 2;
 centerPoint.y += deltaY;
 const moveMore = mapInstance.containerPointToLatLng(centerPoint);
     
