@@ -89,7 +89,6 @@ en: {
    
     function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
     window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
-    window.aroundoOnboardingSetMarker = function(marker) {if (!marker) return; onboardingMarkerData.marker = marker;};
   
     /* Crea contenitore onboarding */
     function layerCreate() {
@@ -286,7 +285,7 @@ const morePopup = document.querySelector('.leaflet-popup-content-wrapper');
 const moreHeight = morePopup.offsetHeight;
 const screenHeight = window.innerHeight;
 const centerPoint =  mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
-const deltaY = moreHeight + 20 - screenHeight / 2;
+const deltaY = moreHeight + 140 - screenHeight / 2;
 centerPoint.y += deltaY;
 const moveMore = mapInstance.containerPointToLatLng(centerPoint);
     
