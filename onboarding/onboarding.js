@@ -88,7 +88,7 @@ en: {
     const t = onboardingTexts[lang];
    
     function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
-    // window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
+    window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
     window.aroundoOnboardingSetMarker = function(marker) {if (!marker) return; onboardingMarkerData.marker = marker;};
   
     /* Crea contenitore onboarding */
