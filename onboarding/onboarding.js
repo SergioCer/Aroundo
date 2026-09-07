@@ -155,15 +155,13 @@ en: {
       const mapRect = mapInstance.getContainer().getBoundingClientRect();
       const x = mapRect.left + point.x;
       const y = mapRect.top + point.y;
-      const margin = 16;
+      const margin = 12;
       let left = x - bubble.offsetWidth / 2;
       let top = y + 40; // Spostamento in basso rispetto all'elemento selezionato
-if (window.innerWidth <= 520) {
-  left = (window.innerWidth - bubble.offsetWidth) / 2;
-} else {
-  const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
-  left = Math.max(margin, Math.min(left, maxLeft));
-}      
+      if (window.innerWidth <= 520) {left = (window.innerWidth - bubble.offsetWidth) / 2;
+      } else {const maxLeft = window.innerWidth - bubble.offsetWidth - margin;
+        left = Math.max(margin, Math.min(left, maxLeft));
+      }      
       const maxTop = window.innerHeight - bubble.offsetHeight - margin;
       top = Math.min(top, maxTop);
       bubble.style.left = `${left}px`;
@@ -286,7 +284,7 @@ if (window.innerWidth <= 520) {
     await onboardingNext();
     
     mapInstance.closePopup();
-    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, 8, {duration: 3.5, easeLinearity: 0.25});}
     
     /*  Ricordarsi che nel DOM 'Categorie' deseleziona tutto se tutto è selezionato e che chiude 'Categorie' se si fa click fuori */ 
     cardShow(t.categoriesTitle, t.categoriesText,);
@@ -359,6 +357,8 @@ if (window.innerWidth <= 520) {
     await wait(3000);
     await onboardingNext();
 
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+    
     cardShow(t.timelineTitle, t.timelineText);
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
