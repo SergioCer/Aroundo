@@ -1428,7 +1428,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
     if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
-        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);}
+        // {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} // ATTIVA
+      {window.aroundoOnboardingStarted = false; window.aroundoOnboardingStart(markers[0], map);}
     }
 
     /* Funzione prevista da CANCELLARE con la nuova logica */
