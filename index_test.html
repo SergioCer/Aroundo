@@ -1027,9 +1027,10 @@ OK
 
   map.addLayer(markersCluster);
   
-Object.values(markersCluster._featureGroup._layers).forEach(layer => {
-  if (layer.getChildCount) console.log('CLUSTER', layer.getChildCount(), layer);
-});
+Object.values(markersCluster._featureGroup._layers)
+.filter(l => l._markers)
+.map(l => l._markers.length)
+
  // NUOVO
 
 
