@@ -1427,11 +1427,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
 
-      /* Onboarding NUOVA da attivare */
-/* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
+    if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
         {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);}
     }
-    */
 
     /* Funzione prevista da CANCELLARE con la nuova logica */
     // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
