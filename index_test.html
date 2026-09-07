@@ -1026,10 +1026,13 @@ OK
   });
   
   map.addLayer(markersCluster);
-  markersCluster.on('animationend', () => {
-  console.log('CHILD CLUSTERS', markersCluster._topClusterLevel._childClusters);
-}); // NUOVO
-
+markersCluster.on('animationend', () => {
+  function testCluster(c) {
+    if (c._childClusters && c._childClusters.length) {c._childClusters.forEach(testCluster);
+    } else {console.log('CLUSTER FINALE', c._childCount, c);}
+  }
+  testCluster(markersCluster._topClusterLevel);
+});  // NUOVO
 
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
@@ -1417,9 +1420,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       markersCluster.removeLayer(m.marker);
       });
       markers = [];
-      
-console.log('RENDER', currentDate, timelineMode, 'EVENTI', events.length); // NUOVO
-
       events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
       events.forEach(e => {
         const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
@@ -1433,9 +1433,6 @@ console.log('RENDER', currentDate, timelineMode, 'EVENTI', events.length); // NU
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
 
-console.log('MARKERS CREATI', markers.length);  // NUOVO
-console.log('CLUSTER LAYERS', markersCluster.getLayers().length);
-      
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
     }
