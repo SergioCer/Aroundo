@@ -1027,7 +1027,8 @@ OK
   
   map.addLayer(markersCluster);
   markersCluster.on('clusteradd', e => console.log('CLUSTER:', e.layer.getChildCount(), e.layer.getAllChildMarkers())); // NUOVA
-
+  markersCluster.on('layeradd', e => { if (e.layer.getChildCount) console.log('CLUSTER:', e.layer.getChildCount(), e.layer.getAllChildMarkers()); }); // NUOVA
+  console.log(markersCluster);
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
@@ -1426,10 +1427,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.openBasePopup(e, this.getLatLng());});
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
-
-    if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
-        // {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} // ATTIVA
-      {window.aroundoOnboardingStarted = false; window.aroundoOnboardingStart(markers[0], map);}
+    /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
+       {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
     }
 
     /* Funzione prevista da CANCELLARE con la nuova logica */
