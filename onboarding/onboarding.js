@@ -89,7 +89,7 @@ en: {
    
     function wait(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
     window.aroundoOnboardingStart = function(markerData, mapInstance) {start(markerData, mapInstance);};
-  
+
     /* Crea contenitore onboarding */
     function layerCreate() {
       layer = document.createElement('div');
