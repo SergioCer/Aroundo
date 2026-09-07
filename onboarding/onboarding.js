@@ -280,8 +280,12 @@ en: {
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
-      await wait(100);
-      mapInstance.panBy([0, -50]);
+    
+    const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
+    centerPoint.y -= 50;
+    const moveMore = mapInstance.containerPointToLatLng(centerPoint);
+    mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 1.5, easeLinearity: 0.25});
+    
     highlightRemove(moreHighlight);
     await onboardingNext();
     
