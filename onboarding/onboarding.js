@@ -284,8 +284,9 @@ en: {
     const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
     centerPoint.y -= 50;
     const moveMore = mapInstance.containerPointToLatLng(centerPoint);
-    mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 1.5, easeLinearity: 0.25});
-    
+    mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 0.5, easeLinearity: 0.25});
+    await wait(500);
+    bubblePosition(markerData.marker, mapInstance);
     highlightRemove(moreHighlight);
     await onboardingNext();
     
