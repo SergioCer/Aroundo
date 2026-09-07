@@ -280,9 +280,8 @@ en: {
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
-    await wait(100);
-    const popup = document.querySelector('.leaflet-popup');
-      if (popup) {popup.style.top = '94px';}
+      await wait(100);
+      mapInstance.panBy([0, 50]);
     highlightRemove(moreHighlight);
     await onboardingNext();
     
