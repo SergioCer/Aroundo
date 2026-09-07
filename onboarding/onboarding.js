@@ -281,7 +281,7 @@ en: {
     await wait(500);
     if (moreButton) {moreButton.click();}
       await wait(100);
-      mapInstance.panBy([0, 50]);
+      mapInstance.panBy([0, -50]);
     highlightRemove(moreHighlight);
     await onboardingNext();
     
