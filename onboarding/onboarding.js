@@ -40,7 +40,7 @@ en: {
   timelineTitle2: "So, for example...",
   timelineText2: "You can find out what happened yesterday, what will happen tomorrow, the day after tomorrow...in that specific area of the map, during the selected times, and only for the categories you're interested in!",
   timelineTitle3: "Aroundo is...",
-  timelineText3: "<div style=\"text-align:center;\">Space-Time<br>Save time.<br>It's your most precious asset.</div>",
+  timelineText3: "<div style=\"text-align:center;\">Space-Time<br>Save time.<br>It's your most precious asset!</div>",
   
   finalTitle: "Now you're ready!",
   finalText: "Discover how to make the most of <strong>YOUR</strong> territory with...<br><div style=\"text-align:center;\"><strong>Aroundo</strong></div>",
@@ -75,7 +75,7 @@ en: {
     timelineTitle2: "Quindi per esempio...",
     timelineText2: "Puoi sapere cosa è successo ieri, cosa accadrà domani, dopodomani...in quella specifica zona della mappa, negli orari selezionati e solo delle categorie che ti interessano!",
     timelineTitle3: "Aroundo è...",
-    timelineText3: `<div style="text-align:center;">Spazio-Temporale<br>Guadagna tempo.<br>È il tuo bene più prezioso."</div>`,
+    timelineText3: `<div style="text-align:center;">Spazio-Temporale<br>Guadagna tempo.<br>È il tuo bene più prezioso!</div>`,
     
     finalTitle: "Adesso sei pronto!",
     finalText: `Scopri come vivere al meglio il <strong>TUO</strong> territorio con...<br><div style="text-align:center;"><strong>Aroundo</strong></div>`,
@@ -280,11 +280,18 @@ en: {
     clickSim(moreButton);
     await wait(500);
     if (moreButton) {moreButton.click();}
-    
+
+    const mapRect = mapInstance.getContainer().getBoundingClientRect();
+    const markerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
+    const moreButtonRect = moreButton.getBoundingClientRect();
+    const gap = 12;
+    const targetY = 94 + moreButtonRect.height + gap;
+    const shiftY = markerPoint.y - (targetY - mapRect.top);
     const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
-    centerPoint.y -= 50;
+    centerPoint.y -= shiftY;
     const moveMore = mapInstance.containerPointToLatLng(centerPoint);
-    mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 0.5, easeLinearity: 0.25});
+    
+    mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 0.4, easeLinearity: 0.25});
     await wait(500);
     bubblePosition(markerData.marker, mapInstance);
     highlightRemove(moreHighlight);
@@ -360,12 +367,12 @@ en: {
     await onboardingNext();
     highlightRemove(selectAllHighlight);
 
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(3000);
     await onboardingNext();
 
-    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
-    
     cardShow(t.timelineTitle, t.timelineText);
     const prevDay = document.getElementById("prev-day");
     const nextDay = document.getElementById("next-day");
