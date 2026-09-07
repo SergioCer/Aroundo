@@ -1009,6 +1009,7 @@ OK
   'running': 13,
   'finished': 10
   };
+  // Creazione della mappa 
   const map = L.map('map', {
     zoomControl: false, // Visualizza o nasconde i controlli dello ZOOM integrati
     minZoom: 3, // evita zoom troppo lontano, 0 = mappa mondiale, 9 = area di circa una regione.
@@ -1016,19 +1017,23 @@ OK
     attributionControl: true // default true
     }).setView([defaultLat, defaultLng], defaultZoom);
 
+  // Gestione dei cluster dei Markers
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 30, // 0 nessun cluster ; 150 tutto raggruppato
   // disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster./* Funzione prevista da CANCELLARE con la nuova logica */    
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
   });
-
+  
   map.addLayer(markersCluster);
+  markersCluster.on('layeradd', e => { if (e.layer.getChildCount) console.log('CLUSTER:', e.layer.getChildCount(), e.layer.getAllChildMarkers()); }); // NUOVA
 
+  
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
   
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
+  // Layer della Mappa
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution: '&copy; OpenStreetMap contributors',maxZoom: 19}).addTo(map);
   // 🌿 Base Mappa NEUTRA BUONA
   // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OpenStreetMap & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
@@ -1413,10 +1418,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       events.forEach(e => {
         const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
         const stateClass = stateData.state;
-        // 🎨 ICONA
-        const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {
-          icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)
-        })
+        // 🎨 Creazione delle icone dei Marker sulla mappa
+        const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)})
         markersCluster.addLayer(marker); // Visualizzazione/Gestione dei marker
         updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Effetti grafici e Fuochi d'artificio
         marker.on('click', function () {analyticsMarker();
@@ -1428,7 +1431,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     /* Funzione prevista da CANCELLARE con la nuova logica */
-    // Dimensione, Classe e Colore dei Markers  
+    // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
     function createIcon(color, state) {
       const size = markerSizes[state] || 10;
       return L.divIcon({ className: '', html: `<div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div>`,
