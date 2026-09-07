@@ -281,10 +281,12 @@ en: {
     await wait(500);
     if (moreButton) {moreButton.click();}
 
-const moreButtonRect = moreButton.getBoundingClientRect();
+const morePopup = document.querySelector('.leaflet-popup');
+const morePopupRect = morePopup.getBoundingClientRect();
+const moreHeight = morePopupRect.height;
 const markerRect = markerData.marker.getElement().getBoundingClientRect();
 const gap = 12;
-const targetY = 94 + moreButtonRect.height + gap;
+const targetY = 94 + moreHeight + gap;
 const markerCenterY = markerRect.top + markerRect.height / 2;
 const deltaY = markerCenterY - targetY;
 const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
