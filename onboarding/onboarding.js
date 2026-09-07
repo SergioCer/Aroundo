@@ -281,7 +281,7 @@ en: {
     await wait(500);
     if (moreButton) {moreButton.click();}
 
-const morePopup = document.querySelector('.leaflet-popup');
+const morePopup = document.querySelector('.leaflet-popup-content-wrapper');
 const morePopupRect = morePopup.getBoundingClientRect();
 const moreHeight = morePopupRect.height;
 const markerRect = markerData.marker.getElement().getBoundingClientRect();
