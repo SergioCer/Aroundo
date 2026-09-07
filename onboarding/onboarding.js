@@ -282,14 +282,10 @@ en: {
     if (moreButton) {moreButton.click();}
 
 const morePopup = document.querySelector('.leaflet-popup-content-wrapper');
-const morePopupRect = morePopup.getBoundingClientRect();
-const moreHeight = morePopupRect.height;
-const markerRect = markerData.marker.getElement().getBoundingClientRect();
-const targetY = moreHeight + 170 ;
-const markerCenterY = markerRect.top + markerRect.height / 2;
-const deltaY = markerCenterY + targetY;
-const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
-centerPoint.y -= deltaY;
+const moreHeight = morePopup.offsetHeight;
+const centerPoint =  mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
+const deltaY = moreHeight / 2;
+centerPoint.y += deltaY;
 const moveMore = mapInstance.containerPointToLatLng(centerPoint);
     
     mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 0.4, easeLinearity: 0.25});
