@@ -66,7 +66,7 @@ en: {
     categoriesTitle3: "Riaprendo...",
     categoriesText3: "Troverai la tua selezione.<br>Puoi modificarla oppure, con un solo click sul selettore in alto, mostrare nuovamente tutto.",
     categoriesTitle4: "Perché i puntini cambiano?",
-    categoriesText4: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi...<br>Se è iniziato da poco, per breve tempo oscillerà ancora riducendosi.",
+    categoriesText4: "Più un evento è vicino al suo orario di inizio, più sarà grande e...inizia a saltellare e poi...<br>Se è iniziato da poco, oscillerà ancora per breve tempo, riducendosi.",
 
     timelineTitle: "Questi sono i giorni!",
     timelineText: "Puoi spostarti avanti ed indietro, scoprendo cosa accadrà o cosa è già successo.<br>Il puntino sotto al centro serve da reset.",
@@ -281,13 +281,13 @@ en: {
     await wait(500);
     if (moreButton) {moreButton.click();}
 
-const morePopup = document.querySelector('.leaflet-popup-content-wrapper');
-const moreHeight = morePopup.offsetHeight;
-const screenHeight = window.innerHeight;
-const centerPoint =  mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
-const deltaY = moreHeight + 140 - screenHeight / 2;
-centerPoint.y += deltaY;
-const moveMore = mapInstance.containerPointToLatLng(centerPoint);
+    const morePopup = document.querySelector('.leaflet-popup-content-wrapper');
+    const moreHeight = morePopup.offsetHeight;
+    const screenHeight = window.innerHeight;
+    const centerPoint =  mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
+    const deltaY = moreHeight + 140 - screenHeight / 2;
+    centerPoint.y += deltaY;
+    const moveMore = mapInstance.containerPointToLatLng(centerPoint);
     
     mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 0.4, easeLinearity: 0.25});
     await wait(500);
@@ -400,9 +400,9 @@ const moveMore = mapInstance.containerPointToLatLng(centerPoint);
     nextDay.click();
     const prevDayHighlight1 = highlight(prevDay);
     const resetDayHighlight1 = highlight(resetDay);
-prevDay.addEventListener("click", () => {highlightRemove(prevDayHighlight1);});
-nextDay.addEventListener("click", () => {highlightRemove(nextDayHighlight);});
-resetDay.addEventListener("click", () => {highlightRemove(resetDayHighlight1);});
+    prevDay.addEventListener("click", () => {highlightRemove(prevDayHighlight1);});
+    nextDay.addEventListener("click", () => {highlightRemove(nextDayHighlight);});
+    resetDay.addEventListener("click", () => {highlightRemove(resetDayHighlight1);});
     await onboardingNext("card");
     highlightRemove(prevDayHighlight1);
     highlightRemove(resetDayHighlight1);
