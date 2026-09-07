@@ -282,11 +282,12 @@ en: {
     if (moreButton) {moreButton.click();}
 
     const mapRect = mapInstance.getContainer().getBoundingClientRect();
-    const markerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
+    const mapCenterY = mapInstance.getSize().y / 2;
     const moreButtonRect = moreButton.getBoundingClientRect();
     const gap = 12;
     const targetY = 94 + moreButtonRect.height + gap;
-    const shiftY = markerPoint.y - (targetY - mapRect.top);
+    const targetMapY = targetY - mapRect.top;
+    const shiftY = mapCenterY - targetMapY;
     const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
     centerPoint.y -= shiftY;
     const moveMore = mapInstance.containerPointToLatLng(centerPoint);
