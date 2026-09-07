@@ -1025,12 +1025,10 @@ OK
   zoomToBoundsOnClick: true
   });
   
-  map.addLayer(markersCluster);
-markersCluster._featureGroup.eachLayer(layer => {
-  console.log('FEATURE', layer._childCount || 1, layer);
-});
-
- // NUOVO
+markersCluster.on('animationend', () => {
+  console.log('VISIBLE PARENT', markersCluster._featureGroup);
+  console.log('VISIBLE CLUSTERS', markersCluster._featureGroup._layers);
+}); // NUOVO
 
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
