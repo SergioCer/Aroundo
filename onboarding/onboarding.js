@@ -281,16 +281,15 @@ en: {
     await wait(500);
     if (moreButton) {moreButton.click();}
 
-    const mapRect = mapInstance.getContainer().getBoundingClientRect();
-    const mapCenterY = mapInstance.getSize().y / 2;
-    const moreButtonRect = moreButton.getBoundingClientRect();
-    const gap = 12;
-    const targetY = 94 + moreButtonRect.height + gap;
-    const targetMapY = targetY - mapRect.top;
-    const shiftY = mapCenterY - targetMapY;
-    const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
-    centerPoint.y -= shiftY;
-    const moveMore = mapInstance.containerPointToLatLng(centerPoint);
+const moreButtonRect = moreButton.getBoundingClientRect();
+const markerRect = markerData.marker.getElement().getBoundingClientRect();
+const gap = 12;
+const targetY = 94 + moreButtonRect.height + gap;
+const markerCenterY = markerRect.top + markerRect.height / 2;
+const deltaY = markerCenterY - targetY;
+const centerPoint = mapInstance.latLngToContainerPoint(markerData.marker.getLatLng());
+centerPoint.y -= deltaY;
+const moveMore = mapInstance.containerPointToLatLng(centerPoint);
     
     mapInstance.flyTo(moveMore, ONBOARDING_ZOOM, {duration: 0.4, easeLinearity: 0.25});
     await wait(500);
