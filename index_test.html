@@ -1027,10 +1027,10 @@ OK
 
   map.addLayer(markersCluster);
   
-markersCluster.on('animationend', () => {
-  console.log('VISIBLE PARENT', markersCluster._featureGroup);
-  console.log('VISIBLE CLUSTERS', markersCluster._featureGroup._layers);
-}); // NUOVO
+Object.values(markersCluster._featureGroup._layers).forEach(layer => {
+  if (layer.getChildCount) console.log('CLUSTER', layer.getChildCount(), layer);
+});
+ // NUOVO
 
 
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
