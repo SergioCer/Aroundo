@@ -1021,8 +1021,12 @@ OK
   // cluster.getChildCount() → restituisce solo il numero totale degli elementi appartenenti a quel cluster.
   // cluster.getAllChildMarkers() → Restituisce i Marker Leaflet appartenenti a quel cluster,
   // dai quali possiamo leggere la posizione lat/lng e le eventuali informazioni associate al Marker.
-  // da console per ottenere numero di cluster, elementi presenti in ciascun cluster, ID del cluster e posizione su schermo presenti nel DOM :
+  // Da console, per ottenere i cluster attualmente rappresentati nel DOM, il numero di elementi di ciascun cluster, l'ID del cluster e la posizione sullo schermo:
   // [...document.querySelectorAll('.marker-cluster')].map(e => ({id:e._leaflet_id,count:e.querySelector('span').textContent,pos:e.style.transform}))
+  // Relazione che ci interessa:
+  // cluster._leaflet_id → getAllChildMarkers() → marker._leaflet_id; marker._leaflet_id; marker._leaflet_id; ...
+  // [...document.querySelectorAll('.marker-cluster')].map(e => ({id: e._leaflet_id, count: Number(e.querySelector('span').textContent), rect: e.getBoundingClientRect()}))
+
 
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 30, // 0 nessun cluster ; 150 tutto raggruppato
