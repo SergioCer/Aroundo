@@ -1017,7 +1017,13 @@ OK
     attributionControl: true // default true
     }).setView([defaultLat, defaultLng], defaultZoom);
 
-  // Gestione dei cluster dei Markers
+  // Gestione dei cluster dei Markers:
+  // cluster.getChildCount() → restituisce solo il numero totale degli elementi appartenenti a quel cluster.
+  // cluster.getAllChildMarkers() → Restituisce i Marker Leaflet appartenenti a quel cluster,
+  // dai quali possiamo leggere la posizione lat/lng e le eventuali informazioni associate al Marker.
+  // da console per ottenere numero di cluster, elementi presenti in ciascun cluster, ID del cluster e posizione su schermo presenti nel DOM :
+  // [...document.querySelectorAll('.marker-cluster')].map(e => ({id:e._leaflet_id,count:e.querySelector('span').textContent,pos:e.style.transform}))
+
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 30, // 0 nessun cluster ; 150 tutto raggruppato
   // disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster./* Funzione prevista da CANCELLARE con la nuova logica */    
@@ -1025,7 +1031,7 @@ OK
   zoomToBoundsOnClick: true
   });
 
-  map.addLayer(markersCluster);
+  map.addLayer(markersCluster); // Espone i cluster sulla mappa nella loro posizione con il numero di elementi presenti.
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
@@ -1425,8 +1431,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
 
-    if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
-       {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);}
+    /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
+       {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
     }
 
     /* Funzione prevista da CANCELLARE con la nuova logica */
