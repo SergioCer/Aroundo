@@ -1027,9 +1027,51 @@ OK
   // cluster._leaflet_id → getAllChildMarkers() → marker._leaflet_id; marker._leaflet_id; marker._leaflet_id; ...
   // [...document.querySelectorAll('.marker-cluster')].map(e => ({id: e._leaflet_id, count: Number(e.querySelector('span').textContent), rect: e.getBoundingClientRect()}))
 
+  // Struttura interna del cluster:
+  // MarkerClusterGroup._topClusterLevel → _childClusters → MarkerCluster → (_childClusters / _markers) → Marker.
+  // Un MarkerCluster può quindi contenere direttamente dei Marker oppure altri MarkerCluster;
+  // getAllChildMarkers() percorre ricorsivamente questa struttura e restituisce tutti i Marker appartenenti al cluster, indipendentemente dal livello gerarchico.
+  //
+  // ATTENZIONE: il _leaflet_id dell'elemento DOM .marker-cluster NON corrisponde necessariamente al _leaflet_id dell'istanza MarkerCluster che lo rappresenta.
+  // Inoltre gli _leaflet_id di Marker e MarkerCluster cambiano quando le relative istanze vengono ricreate durante gli aggiornamenti della mappa.
+  //
+  // Al click su un cluster, Leaflet.markercluster percorre il seguente flusso:
+  // Map._handleDOMEvent → _fireDOMEvent → MarkerClusterGroup._propagateEvent → MarkerClusterGroup._zoomOrSpiderfy → MarkerCluster.spiderfy().
+  // La spiderizzazione è quindi una gestione interna di Leaflet.markercluster successiva all'intercettazione del cluster e non fa parte della funzione renderEvents().
+  // Un cluster la cui rappresentazione DOM viene nascosta non viene quindi eliminato dalla struttura interna:
+  // può continuare ad esistere e ad essere gestito da Leaflet.markercluster, mentre la sua rappresentazione visiva viene sostituita dalla logica personalizzata.
+  //  
+  // La relazione affidabile da intercettare è quindi quella dell'istanza MarkerCluster reale: cluster._leaflet_id → cluster.getAllChildMarkers() → marker._leaflet_id.
+  // La corrispondenza DOM .marker-cluster → MarkerCluster non va stabilita confrontando direttamente i rispettivi _leaflet_id.
+  // È stato verificato che il MarkerCluster non deve necessariamente essere rimosso dalla struttura interna di MarkerClusterGroup per impedirne la visualizzazione.
+  // La sua rappresentazione grafica può essere nascosta direttamente sul relativo elemento DOM tramite:
+  // dom.style.display = 'none';
+  // In questo modo il cluster rimane integro nella struttura interna di MarkerClusterGroup,
+  // mantenendo i riferimenti ai Marker figli, ma non viene più rappresentato graficamente.
+  // Questo permette di utilizzare i Marker restituiti da getAllChildMarkers() per una rappresentazione grafica personalizzata,
+  // senza la coesistenza visiva del cluster originale.
+  
+  // Per nascondere un cluster già rappresentato nel DOM NON è necessario rimuoverlo da MarkerClusterGroup né modificarne la struttura interna.
+  // È sufficiente intervenire sull'elemento DOM .marker-cluster corrispondente: cluster DOM → el.style.display = 'none'.
+  //
+  // Questo consente di mantenere intatta la struttura interna di Leaflet.markercluster, lasciando disponibili il cluster, 
+  // i suoi Marker e le relative relazioni gerarchiche, ma impedendone temporaneamente la rappresentazione grafica.
+  //
+  // La soglia di esplodibilità determina quindi quali cluster devono essere nascosti:
+  // count <= soglia → il cluster viene nascosto e i suoi Marker possono essere rappresentati dalla nostra logica geometrica;
+  // count > soglia  → il cluster rimane rappresentato normalmente da Leaflet.markercluster.
+  //
+  // Il nascondimento è applicato alla rappresentazione DOM corrente.
+  // Quando Leaflet.markercluster ricalcola la rappresentazione in seguito a uno zoom,
+  // i cluster possono essere nuovamente creati/rappresentati nel DOM; il criterio di soglia deve quindi essere riapplicato alla nuova rappresentazione.
+  //
+  // IMPORTANTE: nascondere il cluster NON significa rimuoverlo dalla struttura MarkerClusterGroup.
+  // Se la nostra composizione non è rappresentabile, il cluster deve rimanere disponibile
+  // e continuare a comportarsi secondo la logica nativa di Leaflet.markercluster, inclusa la spiderizzazione al click.
+
 
   const markersCluster = L.markerClusterGroup({
-  maxClusterRadius: 30, // 0 nessun cluster ; 150 tutto raggruppato
+  maxClusterRadius: 30, // → scala spaziale di prossimità del clustering, espressa in pixel allo zoom corrente.
   // disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster./* Funzione prevista da CANCELLARE con la nuova logica */    
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
@@ -1077,10 +1119,10 @@ OK
    window.addEventListener('resize', resizeCanvas);
    map.on('move zoom resize', resizeCanvas);
 
-  // Aggiorna lo stato visivo dei marker ogni 2 minuti 
-  setInterval(() => {renderEvents(); updateMarkerVisibility();}, 2 * 60 * 1000);
+  // Aggiorna lo stato visivo dei marker ogni 5 minuti 
+  setInterval(() => {renderEvents(); updateMarkerVisibility();}, 5 * 60 * 1000);
 
-  // Ricarica gli eventi da Supabase ogni 30 minuti
+  // Ricarica gli eventi da Supabase ogni 60 minuti
   setInterval(async () => {
   /* const data = await fetchEvents();
     if (data) { events = data; */
@@ -1088,7 +1130,7 @@ OK
       renderEvents();
       updateMarkerVisibility();
       updateTicker();
-  }, 30 * 60 * 1000);
+  }, 60 * 60 * 1000);
   
 // DOM  
 document.addEventListener('DOMContentLoaded', async () => {
