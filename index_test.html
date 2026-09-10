@@ -1079,47 +1079,41 @@ OK
   map.addLayer(markersCluster); // Espone i cluster sulla mappa nella loro posizione con il numero di elementi presenti.
 
   // ***** NUOVO motore di rappresentazione grafica dei markers ***** //
-  function getVisibleClusters() {
-  const visibleClusters = [...document.querySelectorAll('.marker-cluster')]
-    .filter(el => {
-      const rect = el.getBoundingClientRect();
-      const style = window.getComputedStyle(el);
-      return (style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0);
-    })
-    .map((el, index) => {
-      const rect = el.getBoundingClientRect();
-      return {index: index + 1, element: el, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, count: Number(el.querySelector('span')?.textContent) || 0};
-    });
-  console.log('[Cluster analysis] Cluster visibili:', visibleClusters);
-  visibleClusters.forEach(cluster => {
-    console.log(`Cluster #${cluster.index} → count: ${cluster.count} → posizione: (${cluster.x.toFixed(1)}, ${cluster.y.toFixed(1)})`);
-  });
-  return visibleClusters;  // richiamo : getVisibleClusters();
-}
+    // Legge i cluster visibili dal DOM.
+    function getVisibleClusters() {
+      const visibleClusters = [...document.querySelectorAll('.marker-cluster')]
+        .filter(el => {const rect = el.getBoundingClientRect(); const style = window.getComputedStyle(el);
+          return (style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0);})
+        .map((el, index) => {const rect = el.getBoundingClientRect();
+          return {index: index + 1, element: el, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, count: Number(el.querySelector('span')?.textContent) || 0};});
+      return visibleClusters;
+    }
 
-function calcGeometry(count, mode) {
-  const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
-  const markerDiameter = reducedGeometry ? 10 : 32;
-  const markerRadius = markerDiameter / 2;
-  let type;
-  let compositionRadius;
-  let maxClusterRadius;
-  if (count >= 2 && count <= 7) {type = 'SINGLE'; compositionRadius = markerRadius + markerDiameter + 4; maxClusterRadius = reducedGeometry ? 42 : 108;} 
-  else if (count >= 8 && count <= 19) {type = 'DOUBLE'; compositionRadius = markerRadius + 2 * (markerDiameter + 4); maxClusterRadius = reducedGeometry ? 42 : 108;} 
-  else {type = 'NATIVE'; compositionRadius = null; maxClusterRadius = reducedGeometry ? 42 : 108;}
-  return {type, count, markerDiameter, markerRadius, compositionRadius, maxClusterRadius, reducedGeometry};}  
+    // Determina la geometria teorica in base a count e modalità.
+    function calcGeometry(count, mode) {
+      const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
+      const markerDiameter = reducedGeometry ? 10 : 32;
+      const markerRadius = markerDiameter / 2;
+      let type;
+      let compositionRadius;
+      let maxClusterRadius;
+      if (count >= 2 && count <= 7) {type = 'SINGLE'; compositionRadius = markerRadius + markerDiameter + 4; maxClusterRadius = reducedGeometry ? 42 : 108;} 
+      else if (count >= 8 && count <= 19) {type = 'DOUBLE'; compositionRadius = markerRadius + 2 * (markerDiameter + 4); maxClusterRadius = reducedGeometry ? 42 : 108;} 
+      else {type = 'NATIVE'; compositionRadius = null; maxClusterRadius = reducedGeometry ? 42 : 108;}
+      return {type, count, markerDiameter, markerRadius, compositionRadius, maxClusterRadius, reducedGeometry};
+    }
 
-  function calcCollisionThreshold(typeA, typeB, mode) {
-  const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
-  if (reducedGeometry) {
-  const thresholds = {'SINGLE-SINGLE': 42, 'SINGLE-DOUBLE': 56, 'DOUBLE-SINGLE': 56, 'DOUBLE-DOUBLE': 70,
-                      'SINGLE-MARKER': 28, 'MARKER-SINGLE': 28, 'DOUBLE-MARKER': 42, 'MARKER-DOUBLE': 42};
-  return thresholds[`${typeA}-${typeB}`] ?? null;}
-  const thresholds = {'SINGLE-SINGLE': 108, 'SINGLE-DOUBLE': 144, 'DOUBLE-SINGLE': 144, 'DOUBLE-DOUBLE': 180, 'SINGLE-MARKER': 72,
-                      'MARKER-SINGLE': 72, 'DOUBLE-MARKER': 108, 'MARKER-DOUBLE': 108};
-  return thresholds[`${typeA}-${typeB}`] ?? null;
-}
-  
+    // Restituisce la soglia di collisione cluster ↔ cluster.
+    function calcCollisionThreshold(typeA, typeB, mode) {
+      const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
+      if (reducedGeometry) {
+      const thresholds = {'SINGLE-SINGLE': 42, 'SINGLE-DOUBLE': 56, 'DOUBLE-SINGLE': 56, 'DOUBLE-DOUBLE': 70};
+      return thresholds[`${typeA}-${typeB}`] ?? null;}
+      const thresholds = {'SINGLE-SINGLE': 108, 'SINGLE-DOUBLE': 144, 'DOUBLE-SINGLE': 144, 'DOUBLE-DOUBLE': 180};
+      return thresholds[`${typeA}-${typeB}`] ?? null;
+    }
+
+    // Decide esclusivamente SI/NO sull'esplodibilità.
     function canExplodeCluster(candidate, visibleClusters, mode) {
       const candidateGeometry = calcGeometry(candidate.count, mode);
       // Cluster non esplodibile per definizione
@@ -1139,7 +1133,17 @@ function calcGeometry(count, mode) {
         if (distance <= threshold) {return false;}}
       return true;
     }
-  
+
+    // Recupera i dati dei marker figli solo dopo il SI di canExplodeCluster. 
+    function getClusterData(cluster) {
+      const childMarkers = cluster.getAllChildMarkers();
+      return childMarkers .map(marker => {const data = markers.find(item => item.marker === marker);
+          if (!data) return null;
+          const category = categories.find(c => c.id_categoria === data.category);
+          return {marker, event: data.event, id: data.event?.id_evento, start: data.start, end: data.end, category: data.category, color: category?.mc_colore || '#999'};
+        })
+        .filter(Boolean);
+    }
   
   // ***** FINE NUOVO MOTORE ***** //
 
