@@ -1071,14 +1071,11 @@ OK
 
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 108, // → scala spaziale di prossimità del clustering, espressa in pixel allo zoom corrente.
-  // disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster./* Funzione prevista da CANCELLARE con la nuova logica */    
+  // disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster.
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true
   });
 
-  window.__markersCluster = markersCluster;  // ***** CANCELLARE è una prova per verifica da console *****
-  window.__markers = markers;  // ***** CANCELLARE è una prova per verifica da console *****
-  
   map.addLayer(markersCluster); // Espone i cluster sulla mappa nella loro posizione con il numero di elementi presenti.
 
   // ***** NUOVO motore di rappresentazione grafica dei markers ***** //
@@ -1138,14 +1135,12 @@ OK
     }
 
     // Recupera i dati dei marker figli solo dopo il SI di canExplodeCluster. 
-    function getClusterData(cluster) {
-      const childMarkers = cluster.getAllChildMarkers();
-      return childMarkers .map(marker => {const data = markers.find(item => item.marker === marker);
-          if (!data) return null;
-          const category = categories.find(c => c.id_categoria === data.category);
-          return {marker, event: data.event, id: data.event?.id_evento, start: data.start, end: data.end, category: data.category, color: category?.mc_colore || '#999'};
-        })
-        .filter(Boolean);
+    function getClusterData(cluster, markers) {
+      return cluster.getAllChildMarkers().map(marker => {
+        const data = markers.find(item => item.marker === marker);
+        if (!data) return null;
+        const category = categories.find(c => c.id_categoria === data.category);
+        return {marker, event: data.event, id: data.event?.id_evento, start: data.start, end: data.end, category: data.category, color: category?.mc_colore || '#999'};}).filter(Boolean);
     }
   
   // ***** FINE NUOVO MOTORE ***** //
@@ -1479,18 +1474,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return data;
       }
 
-  /* CANCELLARE VECCHIA LOGICA // Preleva gli Eventi ed Organizzatori da supabase
-  // chiamato da: DOM; set interval 30'
-  async function fetchEvents() {let query = supabase .from('eventi')
-      .select(`*, organizzatori (or_nome), luoghi (lu_lat, lu_lng, lu_location, lu_descrizione, id_comune, comuni (co_descrizione))`)
-      .eq('ev_attivo', true);
-    const { data, error } = await query;
-    if (error) {console.error("Errore caricamento eventi:", error);
-    return [];
-    }
-    return data;
-  }
-*/
     async function selectEvents(filters = {}) {
       let query = supabase .from('eventi')
         .select(`*, organizzatori (or_nome), luoghi (lu_lat,lu_lng,lu_location,lu_descrizione,id_comune,comuni (co_descrizione))`)
@@ -1551,10 +1534,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
-  window.__markers = markers;  // ***** CANCELLARE è una prova per verifica da console *****
     }
 
-    /* Funzione prevista da CANCELLARE con la nuova logica */
     // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
     function createIcon(color, state) {
       const size = markerSizes[state] || 10;
@@ -1705,7 +1686,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
   }
 
-    /* Funzione prevista da CANCELLARE con la nuova logica */
     /* Determina lo stato temporale di un evento rispetto all'ora attuale.
        Azioni: calcola distanza dall'inizio e durata; assegna lo stato del marker (futuro, countdown, in corso o terminato).
        Chiamata da: renderEvents(). */
@@ -2256,7 +2236,6 @@ requestAnimationFrame(animateFX);
 }
 animateFX();
 
-    /* Funzione prevista da CANCELLARE con la nuova logica */
     /* Aggiorna lo stato visivo e i fireworks del marker.
        Azioni: imposta lo stato e avvia/interrompe i fireworks in base allo stato ricevuto.
        Chiamata da: renderEvents().*/
