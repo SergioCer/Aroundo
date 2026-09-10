@@ -1256,8 +1256,13 @@ OK
 
     function runCocleaEngine() {
       const visibleClusters = getVisibleClusters();
+console.log('COCLEA CLUSTERS', visibleClusters.map(c => ({
+  count: c.count,
+  x: Math.round(c.x),
+  y: Math.round(c.y)
+})));      
       visibleClusters.forEach(candidate => {
-  console.log('COCLEA CANDIDATE', {
+console.log('COCLEA CANDIDATE', {
     count: candidate.count,
     explodable: canExplodeCluster(candidate, visibleClusters, timelineMode)
   });
@@ -1267,19 +1272,28 @@ OK
         const cluster = Object.values(markersCluster._featureGroup._layers)
           .find(layer => layer.getChildCount?.() === candidate.count &&
             layer._icon === candidate.element);
+console.log('COCLEA LEAFLET CLUSTER', {
+  trovato: !!cluster,
+  count: cluster?.getChildCount?.(),
+  icon: !!cluster?._icon,
+  stessoElemento: cluster?._icon === candidate.element
+});          
         if (!cluster) return;
         const data = getClusterData(cluster, markers);
+console.log('COCLEA DATA', {
+      count: data.length
+    });        
         if (!data.length) return;
         const geometry = calcGeometry(data.length, timelineMode);
         const coclea = buildCoclea(data, geometry, getAppTime());
+    console.log('COCLEA BUILD', {
+      input: data.length,
+      output: coclea.length,
+      geometry: geometry.type
+    });        
         hideCluster(candidate);
         renderCoclea(coclea, cluster.getLatLng());
       });
-    console.log('COCLEA CLUSTERS', visibleClusters.map(c => ({
-  count: c.count,
-  x: Math.round(c.x),
-  y: Math.round(c.y)
-})));  
     }
  
   
