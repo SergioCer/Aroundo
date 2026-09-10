@@ -1191,7 +1191,15 @@ OK
     buildSequence(pastSequence, 'PAST', -1);
     return result;
   }
-  
+
+    // Rimuove i markers dal layer.
+    function detachCocleaMarkers(coclea) {
+      coclea.forEach(item => {
+        markersCluster.removeLayer(item.marker);
+        map.addLayer(item.marker);
+      });
+    }
+    
     // Nasconde i cluster da leaflet.
     function hideCluster(cluster) {
       const el = cluster?.element;
@@ -1259,6 +1267,8 @@ console.log('COCLEA DATA', {
       output: coclea.length,
       geometry: geometry.type
     });  
+      if (!coclea.length) return;
+      detachCocleaMarkers(coclea);        
 console.log('COCLEA HIDE');        
         hideCluster(candidate);
 console.log('COCLEA RENDER', {
