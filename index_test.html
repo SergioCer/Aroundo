@@ -1096,6 +1096,53 @@ OK
   });
   return visibleClusters;  // richiamo : getVisibleClusters();
 }
+
+function calcGeometry(count, mode) {
+  const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
+  const markerDiameter = reducedGeometry ? 10 : 32;
+  const markerRadius = markerDiameter / 2;
+  let type;
+  let compositionRadius;
+  let maxClusterRadius;
+  if (count >= 2 && count <= 7) {type = 'SINGLE'; compositionRadius = markerRadius + markerDiameter + 4; maxClusterRadius = reducedGeometry ? 42 : 108;} 
+  else if (count >= 8 && count <= 19) {type = 'DOUBLE'; compositionRadius = markerRadius + 2 * (markerDiameter + 4); maxClusterRadius = reducedGeometry ? 42 : 108;} 
+  else {type = 'NATIVE'; compositionRadius = null; maxClusterRadius = reducedGeometry ? 42 : 108;}
+  return {type, count, markerDiameter, markerRadius, compositionRadius, maxClusterRadius, reducedGeometry};}  
+
+  function calcCollisionThreshold(typeA, typeB, mode) {
+  const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
+  if (reducedGeometry) {
+  const thresholds = {'SINGLE-SINGLE': 42, 'SINGLE-DOUBLE': 56, 'DOUBLE-SINGLE': 56, 'DOUBLE-DOUBLE': 70,
+                      'SINGLE-MARKER': 28, 'MARKER-SINGLE': 28, 'DOUBLE-MARKER': 42, 'MARKER-DOUBLE': 42};
+  return thresholds[`${typeA}-${typeB}`] ?? null;}
+  const thresholds = {'SINGLE-SINGLE': 108, 'SINGLE-DOUBLE': 144, 'DOUBLE-SINGLE': 144, 'DOUBLE-DOUBLE': 180, 'SINGLE-MARKER': 72,
+                      'MARKER-SINGLE': 72, 'DOUBLE-MARKER': 108, 'MARKER-DOUBLE': 108};
+  return thresholds[`${typeA}-${typeB}`] ?? null;
+}
+  
+    function canExplodeCluster(candidate, visibleClusters, mode) {
+      const candidateGeometry = calcGeometry(candidate.count, mode);
+      // Cluster non esplodibile per definizione
+      if (candidateGeometry.type === 'NATIVE') {return false;}
+      for (const other of visibleClusters) {
+        // Non confrontare il cluster con sé stesso
+        if (other === candidate) {continue;}
+        const otherGeometry = calcGeometry(other.count, mode);
+        // I cluster NATIVE non partecipano alla nostra esplosione
+        if (otherGeometry.type === 'NATIVE') {continue;}
+        const threshold = calcCollisionThreshold(candidateGeometry.type, otherGeometry.type, mode);
+        if (threshold === null) {continue;}
+        const dx = candidate.x - other.x;
+        const dy = candidate.y - other.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        // Distanza uguale alla soglia = ancora collisione potenziale
+        if (distance <= threshold) {return false;}}
+      return true;
+    }
+  
+  
+  // ***** FINE NUOVO MOTORE ***** //
+
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
