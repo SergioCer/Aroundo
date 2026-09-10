@@ -1076,8 +1076,8 @@ OK
   zoomToBoundsOnClick: true
   });
 
-  window.__markersCluster = markersCluster; // ***** CANCELLARE è una prova per verifica da console *****
-  window.__markers = markers;
+  window.__markersCluster = markersCluster;  // ***** CANCELLARE è una prova per verifica da console *****
+  window.__markers = markers;  // ***** CANCELLARE è una prova per verifica da console *****
   
   map.addLayer(markersCluster); // Espone i cluster sulla mappa nella loro posizione con il numero di elementi presenti.
 
@@ -1218,9 +1218,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   checkGeoStatus();
   setupTimeline();
   renderEvents();
+  console.log('markers dopo renderEvents:', markers.length);  // ***** CANCELLARE è una prova per verifica da console *****
   updateMarkerVisibility();
   updateDateUI();
   updateTicker();
+    window.__markers = markers;  // ***** CANCELLARE è una prova per verifica da console *****
+
 });
       
     const SHARE_URL = "https://aroundo.it/?src=share";
