@@ -1096,7 +1096,7 @@ OK
   
     // Determina la geometria teorica in base a count e modalità.
     function calcGeometry(count, mode) {
-      const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
+      const reducedGeometry = mode === 'past' || mode === 'day';
       const markerDiameter = reducedGeometry ? 10 : 32;
       const markerRadius = markerDiameter / 2;
       let type;
@@ -1110,7 +1110,7 @@ OK
 
     // Restituisce la soglia di collisione cluster ↔ cluster.
     function calcCollisionThreshold(typeA, typeB, mode) {
-      const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
+      const reducedGeometry = mode === 'past' || mode === 'day';
       if (reducedGeometry) {
       const thresholds = {'SINGLE-SINGLE': 42, 'SINGLE-DOUBLE': 56, 'DOUBLE-SINGLE': 56, 'DOUBLE-DOUBLE': 70};
       return thresholds[`${typeA}-${typeB}`] ?? null;}
@@ -1151,7 +1151,7 @@ OK
     // Costruisce la geometria temporale a coclea.
     // A resta al centro; il futuro procede in senso orario, il passato in senso antiorario.
     // Le corone sono contenitori della stessa sequenza temporale.
-    function buildCoclea(clusterData, geometry, referenceTime) {
+    function buildCoclea(clusterData, geometry, referenceTime, mode) {
       if (!clusterData?.length || !geometry || !referenceTime) return [];
       const GAP = 4;
       const SLOTS = 6;
@@ -1164,75 +1164,31 @@ OK
         })
         .filter(item => item.start instanceof Date && !isNaN(item.start));
       if (!data.length) return [];
-      // Futuro: dal più vicino al più lontano.
-      const future = data
-        .filter(item => item.start >= referenceTime)
-        .sort((a, b) => a.start - b.start);
-      // Passato: dal più recente al più remoto.
-      const past = data
-        .filter(item => item.start < referenceTime)
-        .sort((a, b) => b.start - a.start);
-      // A: primo futuro; se non esiste, ultimo evento iniziato.
+    let future;
+    let past;
+    if (mode === 'past') {future = []; past = [...data].sort((a, b) => b.start - a.start);
+    } else if (mode === 'day') {future = [...data].sort((a, b) => a.start - b.start); past = [];
+    } else {future = data .filter(item => item.start >= referenceTime) .sort((a, b) => a.start - b.start);
+      past = data .filter(item => item.start < referenceTime) .sort((a, b) => b.start - a.start);}
       const A = future[0] || past[0];
       if (!A) return [];
-      const result = [{
-        ...A,
-        role: 'A',
-        ring: 0,
-        angle: null,
-        radius: 0,
-        x: 0,
-        y: 0
-      }];
+      const result = [{...A, role: 'A', ring: 0, angle: null, radius: 0, x: 0, y: 0}];
       const futureSequence = future.slice(1);
       const pastSequence = past.filter(item => item !== A);
-      /* Costruisce una sequenza.
-       * La prima corona parte dal bordo di A.
-       * La seconda corona parte dal bordo massimo
-       * della prima corona, mantenendo lo stesso principio. */
       const buildSequence = (items, role, direction) => {
         let index = 0;
         let previousOuterRadius = A.radius;
         for (let ring = 1; index < items.length; ring++) {
-          const ringItems = items.slice(index, index + SLOTS);
-          ringItems.forEach((item, slot) => {
-            const angle = direction > 0
-              ? slot * STEP
-              : 300 - slot * STEP;
-        /* La prima posizione di ogni nuova corona riparte dal contenitore precedente.
-         * La distanza del centro del marker è: bordo precedente + gap + raggio corrente */
+        const ringItems = items.slice(index, index + SLOTS);
+        ringItems.forEach((item, slot) => {const angle = direction > 0 ? slot * STEP : 300 - slot * STEP;
         const radius = previousOuterRadius + GAP + item.radius;
         const radians = angle * Math.PI / 180;
-        result.push({
-          ...item,
-          role,
-          ring,
-          angle,
-          radius,
-          x: Math.sin(radians) * radius,
-          y: -Math.cos(radians) * radius
-        });
-        /*
-         * L'ingombro raggiunto da questo marker diventa
-         * il riferimento per il successivo.
-         */
-        previousOuterRadius = radius + item.radius;
-      });
-      index += ringItems.length;
-    }
+        result.push({...item, role, ring, angle, radius, x: Math.sin(radians) * radius, y: -Math.cos(radians) * radius});
+        previousOuterRadius = radius + item.radius;});
+      index += ringItems.length;}
   };
-    // Futuro: prima corona → seconda corona, senso orario.
     buildSequence(futureSequence, 'FUTURE', 1);
-    // Passato: con DOUBLE la seconda corona ha priorità.
-    // L'ordine temporale rimane comunque invariato.
-    if (geometry.type === 'DOUBLE') {
-      // Per ora costruiamo la sequenza completa antioraria:
-      // la gestione della priorità della seconda corona
-      // viene mantenuta come proprietà geometrica della sequenza.
-      buildSequence(pastSequence, 'PAST', -1);
-    } else {
-      buildSequence(pastSequence, 'PAST', -1);
-    }
+    buildSequence(pastSequence, 'PAST', -1);
     return result;
   }
   
@@ -1317,7 +1273,7 @@ console.log('COCLEA DONE');
 
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
-  map.attributionControl.setPrefix(''); // rimuove "Leaflet"
+  map.attributionControl.setPrefix(''); // rimuove la dicitura "Leaflet"
   
   // 🌿 Base Mappa – OpenStreetMap HTTPS Versione Apple vecchia con Chrome
   // Layer della Mappa
@@ -1344,8 +1300,9 @@ console.log('COCLEA DONE');
     }
     
   const canvas = document.getElementById('fx-canvas');
-   const ctx = canvas.getContext('2d');
-   function resizeCanvas() {
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
      const rect = map.getContainer().getBoundingClientRect();
      canvas.width = rect.width;
      canvas.height = rect.height;
