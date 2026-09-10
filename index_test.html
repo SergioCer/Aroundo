@@ -1290,10 +1290,26 @@ console.log('COCLEA DATA', {
       input: data.length,
       output: coclea.length,
       geometry: geometry.type
-    });        
+    });  
+console.log('COCLEA HIDE');        
         hideCluster(candidate);
+console.log('COCLEA RENDER', {
+  center: cluster.getLatLng(),
+  items: coclea.map(x => ({
+    id: x.id,
+    role: x.role,
+    ring: x.ring,
+    angle: x.angle,
+    radius: x.radius,
+    x: x.x,
+    y: x.y,
+    size: x.size,
+    state: x.state
+  }))
+});        
         renderCoclea(coclea, cluster.getLatLng());
       });
+console.log('COCLEA DONE');      
     }
  
   
