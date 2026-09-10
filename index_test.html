@@ -1190,12 +1190,6 @@ OK
     return result;
   }
     
-    // Nasconde i cluster da leaflet.
-    function hideCluster(cluster) {
-      const el = cluster?.element;
-      if (el) el.style.display = 'none';
-    }
-
     // Rappresenta la geometria della coclea senza modificarne la logica temporale.
     // Gli effetti grafici vengono applicati dopo la creazione dei Marker.
     function renderCoclea(coclea, center) {
@@ -1218,24 +1212,17 @@ OK
         if (!cluster) return;
         const data = getClusterData(cluster, markers);
         if (!data.length) return;
+        data.forEach(item => {
+  markersCluster.removeLayer(item.marker);
+  map.addLayer(item.marker);
+});
         const geometry = calcGeometry(data.length, timelineMode);
         const coclea = buildCoclea(data, geometry, getAppTime(), timelineMode);
         if (!coclea.length) return;
-        disableLeafletClustering();
-        hideCluster(candidate);
         renderCoclea(coclea, cluster.getLatLng());
       });
     }
 
-  function disableLeafletClustering() {
-  map.removeLayer(markersCluster);
-}
-
-  function enableLeafletClustering() {
-  if (!map.hasLayer(markersCluster)) {
-    map.addLayer(markersCluster);
-  }
-}
   
   // ***** FINE NUOVO MOTORE ***** //
 
