@@ -1263,6 +1263,7 @@ OK
   });
         
         if (!canExplodeCluster(candidate, visibleClusters, timelineMode)) return;
+  console.log('COCLEA PASSATO CANEXPLODE', candidate.count);
         const cluster = Object.values(markersCluster._featureGroup._layers)
           .find(layer => layer.getChildCount?.() === candidate.count &&
             layer._icon === candidate.element);
