@@ -1069,7 +1069,6 @@ OK
   // Se la nostra composizione non è rappresentabile, il cluster deve rimanere disponibile
   // e continuare a comportarsi secondo la logica nativa di Leaflet.markercluster, inclusa la spiderizzazione al click.
 
-
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 108, // → scala spaziale di prossimità del clustering, espressa in pixel allo zoom corrente.
   // disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster./* Funzione prevista da CANCELLARE con la nuova logica */    
@@ -1078,6 +1077,25 @@ OK
   });
 
   map.addLayer(markersCluster); // Espone i cluster sulla mappa nella loro posizione con il numero di elementi presenti.
+
+  // ***** NUOVO motore di rappresentazione grafica dei markers ***** //
+  function getVisibleClusters() {
+  const visibleClusters = [...document.querySelectorAll('.marker-cluster')]
+    .filter(el => {
+      const rect = el.getBoundingClientRect();
+      const style = window.getComputedStyle(el);
+      return (style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0);
+    })
+    .map((el, index) => {
+      const rect = el.getBoundingClientRect();
+      return {index: index + 1, element: el, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, count: Number(el.querySelector('span')?.textContent) || 0};
+    });
+  console.log('[Cluster analysis] Cluster visibili:', visibleClusters);
+  visibleClusters.forEach(cluster => {
+    console.log(`Cluster #${cluster.index} → count: ${cluster.count} → posizione: (${cluster.x.toFixed(1)}, ${cluster.y.toFixed(1)})`);
+  });
+  return visibleClusters;  // richiamo : getVisibleClusters();
+}
   
   map.attributionControl.setPosition('topright'); // può essere 'topleft', 'topright', 'bottomleft', 'bottomright'
   map.attributionControl.setPrefix(''); // rimuove "Leaflet"
