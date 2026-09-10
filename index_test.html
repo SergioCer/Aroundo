@@ -1092,8 +1092,6 @@ OK
       return visibleClusters;
     }
 
-
-  
     // Determina la geometria teorica in base a count e modalità.
     function calcGeometry(count, mode) {
       const reducedGeometry = mode === 'past' || mode === 'day';
@@ -1191,14 +1189,6 @@ OK
     buildSequence(pastSequence, 'PAST', -1);
     return result;
   }
-
-    // Rimuove i markers dal layer.
-    function detachCocleaMarkers(coclea) {
-      coclea.forEach(item => {
-        markersCluster.removeLayer(item.marker);
-        map.addLayer(item.marker);
-      });
-    }
     
     // Nasconde i cluster da leaflet.
     function hideCluster(cluster) {
@@ -1213,18 +1203,6 @@ OK
         const state = getEventState(item.start, item.end).state;
         const point = map.latLngToLayerPoint(center).add([item.x, item.y]);
         item.marker.setLatLng(map.layerPointToLatLng(point));
-console.log('COCLEA MARKER POSITION', {
-  id: item.id,
-  role: item.role,
-  ring: item.ring,
-  x: item.x,
-  y: item.y,
-  lat: item.marker.getLatLng().lat,
-  lng: item.marker.getLatLng().lng,
-  onMap: map.hasLayer(item.marker),
-  inCluster: markersCluster.hasLayer(item.marker)
-});
-        
         item.marker.setIcon(createIcon(item.color, state));
         updateMarkerState(item.marker, state, center);
       });
@@ -1232,72 +1210,32 @@ console.log('COCLEA MARKER POSITION', {
 
     function runCocleaEngine() {
       const visibleClusters = getVisibleClusters();
-console.log('COCLEA CLUSTERS', visibleClusters.map(c => ({
-  count: c.count,
-  x: Math.round(c.x),
-  y: Math.round(c.y)
-})));      
       visibleClusters.forEach(candidate => {
-console.log('COCLEA CANDIDATE', {
-    count: candidate.count,
-    explodable: canExplodeCluster(candidate, visibleClusters, timelineMode)
-  });
-        
         if (!canExplodeCluster(candidate, visibleClusters, timelineMode)) return;
-  console.log('COCLEA PASSATO CANEXPLODE', candidate.count);
         const cluster = Object.values(markersCluster._featureGroup._layers)
           .find(layer => layer.getChildCount?.() === candidate.count &&
             layer._icon === candidate.element);
-console.log('COCLEA LEAFLET CLUSTER', {
-  trovato: !!cluster,
-  count: cluster?.getChildCount?.(),
-  icon: !!cluster?._icon,
-  stessoElemento: cluster?._icon === candidate.element
-});          
         if (!cluster) return;
         const data = getClusterData(cluster, markers);
-console.log('COCLEA DATA', {
-      count: data.length
-    });        
         if (!data.length) return;
         const geometry = calcGeometry(data.length, timelineMode);
         const coclea = buildCoclea(data, geometry, getAppTime(), timelineMode);
-    console.log('COCLEA BUILD', {
-      input: data.length,
-      output: coclea.length,
-      geometry: geometry.type
-    });  
-      if (!coclea.length) return;
-      detachCocleaMarkers(coclea);        
-console.log('COCLEA HIDE');        
+        if (!coclea.length) return;
+        disableLeafletClustering();
         hideCluster(candidate);
-        hideCluster(candidate);
-
-console.log('COCLEA HIDE CHECK', {
-  display: candidate.element.style.display,
-  computed: getComputedStyle(candidate.element).display,
-  connected: candidate.element.isConnected
-});
-        
-console.log('COCLEA RENDER', {
-  center: cluster.getLatLng(),
-  items: coclea.map(x => ({
-    id: x.id,
-    role: x.role,
-    ring: x.ring,
-    angle: x.angle,
-    radius: x.radius,
-    x: x.x,
-    y: x.y,
-    size: x.size,
-    state: x.state
-  }))
-});        
         renderCoclea(coclea, cluster.getLatLng());
       });
-console.log('COCLEA DONE');      
     }
- 
+
+  function disableLeafletClustering() {
+  map.removeLayer(markersCluster);
+}
+
+  function enableLeafletClustering() {
+  if (!map.hasLayer(markersCluster)) {
+    map.addLayer(markersCluster);
+  }
+}
   
   // ***** FINE NUOVO MOTORE ***** //
 
@@ -1691,26 +1629,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.openBasePopup(e, this.getLatLng());});
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
-
-console.log('COCLEA START', {
-        mode: timelineMode,
-        markers: markers.length,
-        leafletClusters: document.querySelectorAll('.marker-cluster').length
-      });
 runCocleaEngine();
-console.log('COCLEA LAYERS AFTER RENDER',
-  Object.values(markersCluster._featureGroup._layers).map(layer => ({
-    type: layer.constructor?.name,
-    childCount: layer.getChildCount?.(),
-    hasIcon: !!layer._icon,
-    lat: layer.getLatLng?.()?.lat,
-    lng: layer.getLatLng?.()?.lng
-  }))
-);
-      
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
-
     }
 
     // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
