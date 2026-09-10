@@ -1218,12 +1218,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   checkGeoStatus();
   setupTimeline();
   renderEvents();
-  console.log('markers dopo renderEvents:', markers.length);  // ***** CANCELLARE è una prova per verifica da console *****
   updateMarkerVisibility();
   updateDateUI();
   updateTicker();
-    window.__markers = markers;  // ***** CANCELLARE è una prova per verifica da console *****
-
 });
       
     const SHARE_URL = "https://aroundo.it/?src=share";
@@ -1554,6 +1551,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
+  window.__markers = markers;  // ***** CANCELLARE è una prova per verifica da console *****
     }
 
     /* Funzione prevista da CANCELLARE con la nuova logica */
