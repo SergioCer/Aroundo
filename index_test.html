@@ -1078,7 +1078,10 @@ OK
 
   map.addLayer(markersCluster); // Espone i cluster sulla mappa nella loro posizione con il numero di elementi presenti.
 
+  
   // ***** NUOVO motore di rappresentazione grafica dei markers ***** //
+  
+  
     // Legge i cluster visibili dal DOM.
     function getVisibleClusters() {
       const visibleClusters = [...document.querySelectorAll('.marker-cluster')]
@@ -1148,6 +1151,7 @@ OK
       const el = cluster?.element;
       if (el) el.style.display = 'none';
     }
+
   
   // ***** FINE NUOVO MOTORE ***** //
 
