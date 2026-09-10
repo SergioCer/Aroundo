@@ -1240,6 +1240,35 @@ OK
       if (el) el.style.display = 'none';
     }
 
+    // Rappresenta la geometria della coclea senza modificarne la logica temporale.
+    // Gli effetti grafici vengono applicati dopo la creazione dei Marker.
+    function renderCoclea(coclea, center) {
+      coclea.forEach(item => {
+        const state = getEventState(item.start, item.end).state;
+        const point = map.latLngToLayerPoint(center).add([item.x, item.y]);
+        item.marker.setLatLng(map.layerPointToLatLng(point));
+        item.marker.setIcon(createIcon(item.color, state));
+        updateMarkerState(item.marker, state, center);
+      });
+    }
+
+    function runCocleaEngine() {
+      const visibleClusters = getVisibleClusters();
+      visibleClusters.forEach(candidate => {
+        if (!canExplodeCluster(candidate, visibleClusters, timelineMode)) return;
+        const cluster = Object.values(markersCluster._featureGroup._layers)
+          .find(layer => layer.getChildCount?.() === candidate.count &&
+            layer._icon === candidate.element);
+        if (!cluster) return;
+        const data = getClusterData(cluster, markers);
+        if (!data.length) return;
+        const geometry = calcGeometry(data.length, timelineMode);
+        const coclea = buildCoclea(data, geometry, getAppTime());
+        hideCluster(candidate);
+        renderCoclea(coclea, cluster.getLatLng());
+      });
+    }
+ 
   
   // ***** FINE NUOVO MOTORE ***** //
 
@@ -1340,6 +1369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href="pages/why-aroundo.html";
       };
 
+    // Giorno Precedente //
     document.getElementById("prev-day").addEventListener("click", async () => {
       if (timelineMode === 'live') {
         timelineMode = 'past';
@@ -1360,7 +1390,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderEvents();
       updateMarkerVisibility();
     });
-  
+
+    // Giorno Successivo
     document.getElementById("next-day").addEventListener("click", async () => {
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -1380,7 +1411,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderEvents();
       updateMarkerVisibility();
     });
-  
+
+    // Reset del giorno, riporta ad adesso.
     document.getElementById("reset-day").addEventListener("click", async () => {
       currentDate = new Date(); // oggi
       updateTimelineMode();
@@ -1632,9 +1664,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
-    
-    window.__testMarkers = markers; //***** CANCELLARE ***** //
-    window.__testMarkersCluster = markersCluster; //***** CANCELLARE ***** //
+
+    runCocleaEngine();
     }
 
     // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
