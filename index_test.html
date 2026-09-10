@@ -1271,6 +1271,14 @@ console.log('COCLEA DATA', {
       detachCocleaMarkers(coclea);        
 console.log('COCLEA HIDE');        
         hideCluster(candidate);
+        hideCluster(candidate);
+
+console.log('COCLEA HIDE CHECK', {
+  display: candidate.element.style.display,
+  computed: getComputedStyle(candidate.element).display,
+  connected: candidate.element.isConnected
+});
+        
 console.log('COCLEA RENDER', {
   center: cluster.getLatLng(),
   items: coclea.map(x => ({
