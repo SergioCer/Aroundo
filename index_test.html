@@ -1146,6 +1146,94 @@ OK
         return {marker, event: data.event, id: data.event?.id_evento, start: data.start, end: data.end, category: data.category, color: category?.mc_colore || '#999'};}).filter(Boolean);
     }
 
+    // Costruisce la geometria temporale a coclea.
+    // A resta al centro; il futuro procede in senso orario, il passato in senso antiorario.
+    // Le corone sono contenitori della stessa sequenza temporale.
+    function buildCoclea(clusterData, geometry, referenceTime) {
+      if (!clusterData?.length || !geometry || !referenceTime) return [];
+      const GAP = 4;
+      const SLOTS = 6;
+      const STEP = 360 / SLOTS;
+      const data = clusterData
+        .map(item => {
+          const state = getEventState(item.start, item.end).state;
+          const size = markerSizes[state] ?? geometry.markerDiameter;
+          return { ...item, state, size, radius: size / 2 };
+        })
+        .filter(item => item.start instanceof Date && !isNaN(item.start));
+      if (!data.length) return [];
+      // Futuro: dal più vicino al più lontano.
+      const future = data
+        .filter(item => item.start >= referenceTime)
+        .sort((a, b) => a.start - b.start);
+      // Passato: dal più recente al più remoto.
+      const past = data
+        .filter(item => item.start < referenceTime)
+        .sort((a, b) => b.start - a.start);
+      // A: primo futuro; se non esiste, ultimo evento iniziato.
+      const A = future[0] || past[0];
+      if (!A) return [];
+      const result = [{
+        ...A,
+        role: 'A',
+        ring: 0,
+        angle: null,
+        radius: 0,
+        x: 0,
+        y: 0
+      }];
+      const futureSequence = future.slice(1);
+      const pastSequence = past.filter(item => item !== A);
+      /* Costruisce una sequenza.
+       * La prima corona parte dal bordo di A.
+       * La seconda corona parte dal bordo massimo
+       * della prima corona, mantenendo lo stesso principio. */
+      const buildSequence = (items, role, direction) => {
+        let index = 0;
+        let previousOuterRadius = A.radius;
+        for (let ring = 1; index < items.length; ring++) {
+          const ringItems = items.slice(index, index + SLOTS);
+          ringItems.forEach((item, slot) => {
+            const angle = direction > 0
+              ? slot * STEP
+              : 300 - slot * STEP;
+        /* La prima posizione di ogni nuova corona riparte dal contenitore precedente.
+         * La distanza del centro del marker è: bordo precedente + gap + raggio corrente */
+        const radius = previousOuterRadius + GAP + item.radius;
+        const radians = angle * Math.PI / 180;
+        result.push({
+          ...item,
+          role,
+          ring,
+          angle,
+          radius,
+          x: Math.sin(radians) * radius,
+          y: -Math.cos(radians) * radius
+        });
+        /*
+         * L'ingombro raggiunto da questo marker diventa
+         * il riferimento per il successivo.
+         */
+        previousOuterRadius = radius + item.radius;
+      });
+      index += ringItems.length;
+    }
+  };
+    // Futuro: prima corona → seconda corona, senso orario.
+    buildSequence(futureSequence, 'FUTURE', 1);
+    // Passato: con DOUBLE la seconda corona ha priorità.
+    // L'ordine temporale rimane comunque invariato.
+    if (geometry.type === 'DOUBLE') {
+      // Per ora costruiamo la sequenza completa antioraria:
+      // la gestione della priorità della seconda corona
+      // viene mantenuta come proprietà geometrica della sequenza.
+      buildSequence(pastSequence, 'PAST', -1);
+    } else {
+      buildSequence(pastSequence, 'PAST', -1);
+    }
+    return result;
+  }
+  
     // Nasconde i cluster da leaflet.
     function hideCluster(cluster) {
       const el = cluster?.element;
@@ -1544,6 +1632,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
+    
+    window.__testMarkers = markers; //***** CANCELLARE ***** //
+    window.__testMarkersCluster = markersCluster; //***** CANCELLARE ***** //
     }
 
     // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
