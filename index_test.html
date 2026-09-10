@@ -1205,6 +1205,18 @@ OK
         const state = getEventState(item.start, item.end).state;
         const point = map.latLngToLayerPoint(center).add([item.x, item.y]);
         item.marker.setLatLng(map.layerPointToLatLng(point));
+console.log('COCLEA MARKER POSITION', {
+  id: item.id,
+  role: item.role,
+  ring: item.ring,
+  x: item.x,
+  y: item.y,
+  lat: item.marker.getLatLng().lat,
+  lng: item.marker.getLatLng().lng,
+  onMap: map.hasLayer(item.marker),
+  inCluster: markersCluster.hasLayer(item.marker)
+});
+        
         item.marker.setIcon(createIcon(item.color, state));
         updateMarkerState(item.marker, state, center);
       });
@@ -1668,7 +1680,15 @@ console.log('COCLEA START', {
         leafletClusters: document.querySelectorAll('.marker-cluster').length
       });
 runCocleaEngine();
-
+console.log('COCLEA LAYERS AFTER RENDER',
+  Object.values(markersCluster._featureGroup._layers).map(layer => ({
+    type: layer.constructor?.name,
+    childCount: layer.getChildCount?.(),
+    hasIcon: !!layer._icon,
+    lat: layer.getLatLng?.()?.lat,
+    lng: layer.getLatLng?.()?.lng
+  }))
+);
       
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
