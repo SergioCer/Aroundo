@@ -1090,8 +1090,23 @@ OK
         .map((el, index) => {const rect = el.getBoundingClientRect();
           return {index: index + 1, element: el, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, count: Number(el.querySelector('span')?.textContent) || 0};});
       return visibleClusters;
+      
+      
+      console.log('COCLEA', {
+  mode: timelineMode,
+  referenceTime: getAppTime(),
+  clusters: visibleClusters.map(c => ({
+    count: c.count,
+    x: c.x,
+    y: c.y
+  }))
+});
+
+      
     }
 
+
+  
     // Determina la geometria teorica in base a count e modalità.
     function calcGeometry(count, mode) {
       const reducedGeometry = mode === 'PAST' || mode === 'DAY_FUTURE';
