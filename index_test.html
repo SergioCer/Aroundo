@@ -1090,19 +1090,6 @@ OK
         .map((el, index) => {const rect = el.getBoundingClientRect();
           return {index: index + 1, element: el, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, count: Number(el.querySelector('span')?.textContent) || 0};});
       return visibleClusters;
-      
-      
-      console.log('COCLEA', {
-  mode: timelineMode,
-  referenceTime: getAppTime(),
-  clusters: visibleClusters.map(c => ({
-    count: c.count,
-    x: c.x,
-    y: c.y
-  }))
-});
-
-      
     }
 
 
@@ -1270,6 +1257,11 @@ OK
     function runCocleaEngine() {
       const visibleClusters = getVisibleClusters();
       visibleClusters.forEach(candidate => {
+  console.log('COCLEA CANDIDATE', {
+    count: candidate.count,
+    explodable: canExplodeCluster(candidate, visibleClusters, timelineMode)
+  });
+        
         if (!canExplodeCluster(candidate, visibleClusters, timelineMode)) return;
         const cluster = Object.values(markersCluster._featureGroup._layers)
           .find(layer => layer.getChildCount?.() === candidate.count &&
@@ -1282,6 +1274,11 @@ OK
         hideCluster(candidate);
         renderCoclea(coclea, cluster.getLatLng());
       });
+    console.log('COCLEA CLUSTERS', visibleClusters.map(c => ({
+  count: c.count,
+  x: Math.round(c.x),
+  y: Math.round(c.y)
+})));  
     }
  
   
@@ -1677,6 +1674,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
 
+console.log('COCLEA START', {
+        mode: timelineMode,
+        markers: markers.length,
+        leafletClusters: document.querySelectorAll('.marker-cluster').length
+      });
+runCocleaEngine();
+
+      
     /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
        {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
 
@@ -1730,7 +1735,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
           }
         });
-    runCocleaEngine();
     }
 
     /* Costruisce e inizializza il menu categorie.
