@@ -1241,7 +1241,7 @@ console.log('COCLEA DATA', {
     });        
         if (!data.length) return;
         const geometry = calcGeometry(data.length, timelineMode);
-        const coclea = buildCoclea(data, geometry, getAppTime());
+        const coclea = buildCoclea(data, geometry, getAppTime(), timelineMode);
     console.log('COCLEA BUILD', {
       input: data.length,
       output: coclea.length,
