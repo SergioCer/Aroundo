@@ -2022,7 +2022,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           map.setView([userLat, userLng], zoomLevel); // GPS accettato
           },
           (err) => {if(err.code === 1){analyticsGPS(false); // Utente ha rifiutato
-            }else{analyticsGPS(null); // Stato non determinabile}
+            }else{analyticsGPS(null);} // Stato non determinabile
             updateGeoError();
             map.setView([defaultLat, defaultLng], defaultZoom);});
         } else {
