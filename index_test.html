@@ -1276,11 +1276,22 @@ OK
     window.addEventListener('resize', resizeCanvas);
     map.on('move zoom resize', resizeCanvas);
 
-    map.on('zoomend', () => {markers.forEach(eventMarker => {
-      if (markersSingle.hasLayer(eventMarker.marker)) {
-        markersSingle.removeLayer(eventMarker.marker);
-        markersCluster.addLayer(eventMarker.marker);}});
-    runCocleaEngine();});
+map.on('zoomend', () => {
+  markers.forEach(eventMarker => {
+    if (markersSingle.hasLayer(eventMarker.marker)) {
+      // Ripristina la posizione originale dell'evento.
+      eventMarker.marker.setLatLng([
+        eventMarker.event.luoghi.lu_lat,
+        eventMarker.event.luoghi.lu_lng
+      ]);
+      // Riporta il marker nel sistema di clustering.
+      markersSingle.removeLayer(eventMarker.marker);
+      markersCluster.addLayer(eventMarker.marker);
+    }
+  });
+  // Ricalcola la nuova rappresentazione Coclea.
+  runCocleaEngine();
+});
 
   // Aggiorna lo stato visivo dei marker ogni 5 minuti 
   setInterval(() => {renderEvents(); updateMarkerVisibility();}, 5 * 60 * 1000);
