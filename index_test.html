@@ -1264,16 +1264,23 @@ OK
   const canvas = document.getElementById('fx-canvas');
   const ctx = canvas.getContext('2d');
 
-  function resizeCanvas() {
-     const rect = map.getContainer().getBoundingClientRect();
-     canvas.width = rect.width;
-     canvas.height = rect.height;
-     canvas.style.width = rect.width + 'px';
-     canvas.style.height = rect.height + 'px';
-   }
-   resizeCanvas();
-   window.addEventListener('resize', resizeCanvas);
-   map.on('move zoom resize', resizeCanvas);
+    function resizeCanvas() {
+      const rect = map.getContainer().getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+    }
+  
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    map.on('move zoom resize', resizeCanvas);
+
+    map.on('zoomend', () => {markers.forEach(eventMarker => {
+      if (markersSingle.hasLayer(eventMarker.marker)) {
+        markersSingle.removeLayer(eventMarker.marker);
+        markersCluster.addLayer(eventMarker.marker);}});
+    runCocleaEngine();});
 
   // Aggiorna lo stato visivo dei marker ogni 5 minuti 
   setInterval(() => {renderEvents(); updateMarkerVisibility();}, 5 * 60 * 1000);
