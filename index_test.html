@@ -1312,6 +1312,12 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     }
 
     function runCocleaEngine() {
+      markers.forEach(eventMarker => {
+        if (!markersSingle.hasLayer(eventMarker.marker)) return;
+        eventMarker.marker.setLatLng([eventMarker.event.luoghi.lu_lat, eventMarker.event.luoghi.lu_lng]);
+        markersSingle.removeLayer(eventMarker.marker);
+        markersCluster.addLayer(eventMarker.marker);
+      });
       const visibleClusters = getVisibleClusters();
       visibleClusters.forEach(candidate => {
         if (!canExplodeCluster(candidate, visibleClusters, timelineMode)) return;
@@ -1379,22 +1385,9 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     window.addEventListener('resize', resizeCanvas);
     map.on('move zoom resize', resizeCanvas);
 
-map.on('zoomend', () => {
-  markers.forEach(eventMarker => {
-    if (markersSingle.hasLayer(eventMarker.marker)) {
-      // Ripristina la posizione originale dell'evento.
-      eventMarker.marker.setLatLng([
-        eventMarker.event.luoghi.lu_lat,
-        eventMarker.event.luoghi.lu_lng
-      ]);
-      // Riporta il marker nel sistema di clustering.
-      markersSingle.removeLayer(eventMarker.marker);
-      markersCluster.addLayer(eventMarker.marker);
-    }
-  });
-  // Ricalcola la nuova rappresentazione Coclea.
-  runCocleaEngine();
-});
+    map.on('zoomend', () => {
+      runCocleaEngine();
+    });
 
   // Aggiorna lo stato visivo dei marker ogni 5 minuti 
   setInterval(() => {renderEvents(); updateMarkerVisibility();}, 5 * 60 * 1000);
@@ -1728,7 +1721,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (m.marker.fireworkInterval) {clearInterval(m.marker.fireworkInterval); m.marker.fireworkInterval = null;}
       // Rimuove tutti i markers dalla visualizzazione della mappa
       markersCluster.removeLayer(m.marker);
-      markersSingle.removeLayer(m.marker);
       });
       // Cancella tutto
       markers = [];
@@ -1782,8 +1774,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       start = range.start;
       end = range.end;
       }
-      // Rimuove da markersSingle i marker attualmente gestiti singolarmente.
-      markers.forEach(eventMarker => {markersSingle.removeLayer(eventMarker.marker);});
       // Recupera le checkbox delle categorie disponibili.
       const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
       // Ricava gli ID delle categorie attualmente attive.
@@ -1807,7 +1797,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           updateMarkerState(
             eventMarker.marker,
             eventMarker.marker.state,
-            eventMarker.marker.getLatLng()
+            eventMarker.marker.getLatLng() // {lat: eventMarker.event.luoghi.lu_lat, lng: eventMarker.event.luoghi.lu_lng}  DUBBIO ?????
             );
         } else {
           // Rimuove dal cluster il marker che non soddisfa i filtri.
