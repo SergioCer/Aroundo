@@ -1237,90 +1237,67 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
   const A = future[0] || past[0];
   if (!A) return [];
 
-  const result = [{
-    ...A,
-    role: 'A',
-    ring: 0,
-    angle: null,
-    radius: 0,
-    x: 0,
-    y: 0,
-    realLatLng: A.realLatLng
-  }];
+  const result = [{ ...A, role: 'A', ring: 0, angle: null, radius: 0, x: 0, y: 0, realLatLng: A.realLatLng }];
 
   const futureSequence = future.slice(1);
   const pastSequence = past.filter(item => item !== A);
 
   const addMarker = (item, role, ring, angle, radius) => {
     const radians = angle * Math.PI / 180;
-    result.push({
-      ...item,
-      role,
-      ring,
-      angle,
-      radius,
-      x: Math.sin(radians) * radius,
-      y: -Math.cos(radians) * radius,
-      realLatLng: item.realLatLng
-    });
+    result.push({ ...item, role, ring, angle, radius, x: Math.sin(radians) * radius, y: -Math.cos(radians) * radius, realLatLng: item.realLatLng });
   };
 
-  // Prima corona: ogni marker ha il proprio raggio rispetto ad A.
-  const buildFirstRing = (items, role, direction) => {
-    items.forEach((item, index) => {
-      const angle = direction > 0
-        ? index * FIRST_STEP
-        : (360 - index * FIRST_STEP) % 360;
-      const radius = A.radius + GAP + item.radius;
-      addMarker(item, role, 1, angle, radius);
-    });
-  };
-
-  // Seconda corona: 12 slot a 30°, raggio esterno comune.
-  const buildSecondRing = (items, role, direction) => {
-    if (!items.length) return;
+  const getSecondRadius = items => {
+    if (!items.length) return 0;
 
     const maxRadius = Math.max(...items.map(item => item.radius));
+    const tangentRadius = (2 * maxRadius + GAP) / (2 * Math.sin(Math.PI / SECOND_SLOTS));
+    const firstOuterRadius = A.radius + GAP + Math.max(...items.map(item => item.radius));
 
-    // 12 marker a 30° devono avere almeno questa distanza
-    // centro-centro per rispettare diametro + gap.
-    const tangentRadius =
-      (2 * maxRadius + GAP) / (2 * Math.sin(Math.PI / SECOND_SLOTS));
+    return Math.max(firstOuterRadius + GAP + maxRadius, tangentRadius);
+  };
 
-    // La seconda corona deve inoltre rimanere oltre la prima.
-    const firstOuterRadius =
-      A.radius + GAP + Math.max(...items.map(item => item.radius));
-
-    const radius = Math.max(
-      firstOuterRadius + GAP + maxRadius,
-      tangentRadius
-    );
-
+  const buildRing = (items, role, direction, ring, step, startAngle, radius) => {
     items.forEach((item, index) => {
-      const angle = direction > 0
-        ? index * SECOND_STEP
-        : (360 - index * SECOND_STEP) % 360;
-      addMarker(item, role, 2, angle, radius);
+      const angle = direction > 0 ? (startAngle + index * step) % 360 : (startAngle - index * step + 360) % 360;
+      addMarker(item, role, ring, angle, radius(item));
     });
   };
 
-  const buildSequence = (items, role, direction) => {
-    if (!items.length) return;
+  const firstItems = [];
+  const secondItems = [];
 
-    buildFirstRing(items.slice(0, FIRST_SLOTS), role, direction);
+  if (futureSequence.length + pastSequence.length <= FIRST_SLOTS) {
+    firstItems.push(...futureSequence.map(item => ({ item, role: 'FUTURE', direction: 1 })));
+    firstItems.push(...pastSequence.map(item => ({ item, role: 'PAST', direction: -1 })));
+  } else {
+    firstItems.push(...futureSequence.slice(0, FIRST_SLOTS).map(item => ({ item, role: 'FUTURE', direction: 1 })));
+    secondItems.push(...pastSequence.slice(0, SECOND_SLOTS).map(item => ({ item, role: 'PAST', direction: -1 })));
 
-    if (items.length > FIRST_SLOTS) {
-      buildSecondRing(items.slice(FIRST_SLOTS, FIRST_SLOTS + SECOND_SLOTS), role, direction);
-    }
-  };
+    const remainingFuture = futureSequence.slice(FIRST_SLOTS);
+    const remainingPast = pastSequence.slice(SECOND_SLOTS);
 
-  buildSequence(futureSequence, 'FUTURE', 1);
-  buildSequence(pastSequence, 'PAST', -1);
+    secondItems.push(...remainingFuture.map(item => ({ item, role: 'FUTURE', direction: 1 })));
+    firstItems.push(...remainingPast.map(item => ({ item, role: 'PAST', direction: -1 })));
+  }
+
+  const firstRadius = item => A.radius + GAP + item.radius;
+  const secondRadius = getSecondRadius(secondItems.map(entry => entry.item));
+
+  const futureFirst = firstItems.filter(entry => entry.role === 'FUTURE');
+  const pastFirst = firstItems.filter(entry => entry.role === 'PAST');
+  const pastSecond = secondItems.filter(entry => entry.role === 'PAST');
+  const futureSecond = secondItems.filter(entry => entry.role === 'FUTURE');
+
+  buildRing(futureFirst.map(entry => entry.item), 'FUTURE', 1, 1, FIRST_STEP, 0, firstRadius);
+  buildRing(pastFirst.map(entry => entry.item), 'PAST', -1, 1, FIRST_STEP, 300, firstRadius);
+
+  buildRing(pastSecond.map(entry => entry.item), 'PAST', -1, 2, SECOND_STEP, 330, () => secondRadius);
+  buildRing(futureSecond.map(entry => entry.item), 'FUTURE', 1, 2, SECOND_STEP, 0, () => secondRadius);
 
   return result;
 }
-
-  
+ 
     
     // Rappresenta la geometria della coclea senza modificarne la logica temporale.
     // Gli effetti grafici vengono applicati dopo la creazione dei Marker.
