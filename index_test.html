@@ -2199,7 +2199,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           const vx = Math.cos(angle) * speed;
           const vy = Math.sin(angle) * speed;
           const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-          this.particles.push(new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20)}); // Quanti frame vive una particella
+          this.particles.push(new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20));  // Quanti frame vive una particella
+        }
       }
     /* Disegna il fuoco d'artificio sul canvas.
        Azioni: disegna scia, razzo e particelle esplose.
@@ -2221,8 +2222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.arc(this.x, this.currentY, 3, 0, Math.PI * 2);
         ctx.fill();}
       // Stelline esplose
-      this.particles.forEach(p => p.draw(ctx));
-    }
+      this.particles.forEach(p => p.draw(ctx));}
   }
     
     /* Avvia un nuovo fuoco d'artificio nella posizione indicata.
