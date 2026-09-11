@@ -1606,7 +1606,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ferma eventuali fireworks attivi
       if (m.marker.fireworkInterval) {clearInterval(m.marker.fireworkInterval); m.marker.fireworkInterval = null;}
       // Rimuove tutti i markers dalla visualizzazione della mappa
-      markersCluster.removeLayer(m.marker);});
+      markersCluster.removeLayer(m.marker);
+      markersSingle.removeLayer(m.marker);
+      });
       // Cancella tutto
       markers = [];
       // Ordina gli eventi
@@ -1651,7 +1653,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        Azioni: ricava categorie attive, verifica sovrapposizione temporale
        e aggiunge/rimuove i marker dal cluster e arresta eventuali fireworks
        dei marker nascosti.
-       Chiamata da: updateHandles(), renderEvents(), filtro categorie. */
+       Chiamata da: DOM, updateHandles(), filtro categorie. */
     function updateMarkerVisibility(start, end) {
       // Se non vengono passati parametri, usa il range corrente della timeline
       if (!start || !end) {
@@ -1659,6 +1661,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       start = range.start;
       end = range.end;
       }
+      // Rimuove da markersSingle i marker attualmente gestiti singolarmente.
+      markers.forEach(eventMarker => {markersSingle.removeLayer(eventMarker.marker);});
       // Recupera le checkbox delle categorie disponibili.
       const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
       // Ricava gli ID delle categorie attualmente attive.
@@ -1694,6 +1698,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
       });
+    runCocleaEngine()  
     }
 
     /* Costruisce e inizializza il menu categorie.
