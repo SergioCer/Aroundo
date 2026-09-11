@@ -2121,7 +2121,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.radiusInner = 2;
         this.spikes = 5; // punte della stella
       }
-
     /* Aggiorna lo stato fisico della particella.
        Azioni: aggiorna posizione, gravità, durata e trasparenza.
        Chiamata da: Firework.update(). */
@@ -2132,7 +2131,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       this.life -= 1;
       this.alpha = Math.max(0, this.life / 60);
     }
-
   /* Disegna la particella sul canvas.
      Azioni: applica trasparenza/colore e disegna la stella.
      Chiamata da: Firework.draw(). */
@@ -2185,7 +2183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.trail.push({ x: this.x, y: this.currentY }); 
         if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
         // esplode quando raggiunge maxHeight o inizia la discesa
-        if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } 
+        if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) {this.exploded = true; this.createParticles();} 
       }
       this.particles.forEach(p => p.update()); // aggiorna le particelle esplose
       this.particles = this.particles.filter(p => p.life > 0); // elimina particelle morte
@@ -2201,7 +2199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const vx = Math.cos(angle) * speed;
           const vy = Math.sin(angle) * speed;
           const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-          this.particles.push(new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20)} // Quanti frame vive una particella);
+          this.particles.push(new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20)}); // Quanti frame vive una particella
       }
     /* Disegna il fuoco d'artificio sul canvas.
        Azioni: disegna scia, razzo e particelle esplose.
