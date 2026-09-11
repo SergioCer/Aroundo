@@ -1594,31 +1594,39 @@ document.addEventListener('DOMContentLoaded', async () => {
        collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
        Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchEvents 30'; setinterval updateMarkerVisibility 2'.*/
     function renderEvents() {
-      // pulizia markers precedenti
+      // Verifica tutti i markers e se.. 
       markers.forEach(m => {
       // ferma eventuali fireworks attivi
-      if (m.marker.fireworkInterval) {
-        clearInterval(m.marker.fireworkInterval);
-        m.marker.fireworkInterval = null;
-      }
-      markersCluster.removeLayer(m.marker);
-      });
+      if (m.marker.fireworkInterval) {clearInterval(m.marker.fireworkInterval); m.marker.fireworkInterval = null;}
+      // Rimuove tutti i markers dalla visualizzazione della mappa
+      markersCluster.removeLayer(m.marker);});
+      // Cancella tutto
       markers = [];
+      // Ordina gli eventi
       events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
+      // Per ogni evento presente
       events.forEach(e => {
         const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
         const stateClass = stateData.state;
         // 🎨 Creazione delle icone dei Marker sulla mappa
         const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)})
-        markersCluster.addLayer(marker); // Visualizzazione/Gestione dei marker
-        updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng}); // Effetti grafici e Fuochi d'artificio
+        
+        // Visualizzazione i marker sulla mappa
+        markersCluster.addLayer(marker);
+        // Applica effetti grafici e Fuochi d'artificio
+        updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng});
+        // Intercetta azione utente
         marker.on('click', function () {analyticsMarker();
+        // Apre il popup con le informazioni sull'evento
         window.openBasePopup(e, this.getLatLng());});
+        // ???
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
-runCocleaEngine();
-    /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
-       {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
+        // Applica effetto cocleare sui markers esplodibili
+        runCocleaEngine();
+        // Visualizza le schermate di presentazione: Onboarding 
+        /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
+           {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
     }
 
     // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
@@ -1654,21 +1662,21 @@ runCocleaEngine();
       // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
       const inTimeRange = eventStart <= end &&  eventEnd >= start;
       // disattiva il timeriterval del marker per i fireworks
-        const visible = categoryVisible && inTimeRange;
-          if (visible) {markersCluster.addLayer(marker.marker);
-            updateMarkerState(
-              marker.marker,
-              marker.marker.state,
-              marker.marker.getLatLng()
-              );
-          } else {
-            markersCluster.removeLayer(marker.marker);
-            if (marker.marker.fireworkInterval) {
-              clearInterval(marker.marker.fireworkInterval);
-              marker.marker.fireworkInterval = null;
-            }
+      const visible = categoryVisible && inTimeRange;
+        if (visible) {markersCluster.addLayer(marker.marker);
+          updateMarkerState(
+            marker.marker,
+            marker.marker.state,
+            marker.marker.getLatLng()
+            );
+        } else {
+          markersCluster.removeLayer(marker.marker);
+          if (marker.marker.fireworkInterval) {
+            clearInterval(marker.marker.fireworkInterval);
+            marker.marker.fireworkInterval = null;
           }
-        });
+        }
+      });
     }
 
     /* Costruisce e inizializza il menu categorie.
@@ -1826,109 +1834,61 @@ runCocleaEngine();
               dayLabel = `Domani ${daysLong[startDate.getDay()]} ${startDate.getDate()}`;
           else
               dayLabel = `${daysLong[startDate.getDay()]} ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
-      const content = `
-        <div style="min-width:180px; font-size:12px; line-height:1.3;">
+      const content = `<div style="min-width:180px; font-size:12px; line-height:1.3;">
         <!-- DATA -->
-        <div style="text-align:center; font-weight:700; margin-bottom:6px; color:${color};">
-        ${dayLabel}
-        </div>
+          <div style="text-align:center; font-weight:700; margin-bottom:6px; color:${color};">${dayLabel}</div>
         <!-- ORARIO -->
-        <div style="display:flex; flex-direction:column; align-items:${align}; color:${color}; font-weight:600; margin-bottom:6px;">
-          ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}
-        </div>
+          <div style="display:flex; flex-direction:column; align-items:${align}; color:${color}; font-weight:600; margin-bottom:6px;">
+            ${formatTime(e.ev_inizio)} ${e.ev_fine ? ' - ' + formatTime(e.ev_fine) : ''}</div>
         <!-- TITOLO -->
-        <div style="text-align:center; font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
+          <div style="text-align:center; font-weight: 700;font-size: 14px;margin-bottom: 4px;"> ${e.ev_titolo} </div>
         <!-- DESCRIZIONE -->
         <!-- Organizzatore -->
-        <div style="font-size: 12px; color:#555; line-height:1.35;">
-          By:
-          <a class="organizzatore-link"
-              style="color:#3b82f6; font-weight:600;"
-              href="pages/organizzatore.html?id=${e.id_organizzatore}">
-            ${e.organizzatori?.or_nome || ''}
-          </a>
-        </div>
+          <div style="font-size: 12px; color:#555; line-height:1.35;">
+            By: <a class="organizzatore-link" style="color:#3b82f6; font-weight:600;" href="pages/organizzatore.html?id=${e.id_organizzatore}">
+            ${e.organizzatori?.or_nome || ''}</a></div>
         <!-- BOTTONE DETTAGLI e relativo POPUP -->
-        <button onclick="window.openDetailPopup(window.currentEvent, window.currentLatLng)"
-          style="margin-top:6px; background:#3b82f6; color:white; border:none; border-radius:6px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer;">
-          More...</button>
-        </div>
-       `;
-        window.currentEvent = e;  // passa evento e coordinate al POPUP More...
-        window.currentLatLng = latlng;
+          <button onclick="window.openDetailPopup(window.currentEvent, window.currentLatLng)" style="margin-top:6px; background:#3b82f6; 
+          color:white; border:none; border-radius:6px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer;">More...</button></div>`;
+      window.currentEvent = e;  // passa evento e coordinate al POPUP More...
+      window.currentLatLng = latlng;
       const markerPoint = map.latLngToContainerPoint(latlng);
         markerPoint.x += 0;
         markerPoint.y -= 20;
       const popupLatLng = map.containerPointToLatLng(markerPoint);
-    L.popup()
-      .setLatLng(popupLatLng)
-      .setContent(content)
-      .openOn(map);
-    };
-
-    /* Costruisce e apre il popup dettagli dell'evento.
-       Azioni: prepara informazioni su luogo, immagine, descrizione, prezzo e azioni disponibili; apre il popup sulla mappa.
-       Chiamata da: pulsante "More..." di openBasePopup(). */
-    window.openDetailPopup = function(e, latlng) {
+      L.popup()
+        .setLatLng(popupLatLng)
+        .setContent(content)
+        .openOn(map);
+      };
+      /* Costruisce e apre il popup dettagli dell'evento.
+         Azioni: prepara informazioni su luogo, immagine, descrizione, prezzo e azioni disponibili; apre il popup sulla mappa.
+         Chiamata da: pulsante "More..." di openBasePopup(). */
+      window.openDetailPopup = function(e, latlng) {
       analyticsMore();
       const content = `<div style="text-align:center;min-width:220px;font-size:12px;">
-          <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:6px;">
-            ${e.ev_titolo}</div>
-          <hr>
+          <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:6px;">${e.ev_titolo}</div><hr>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
             <div style="text-align:left;"><div style="font-weight:600;">
-                ${[e.luoghi?.comuni?.co_descrizione, e.luoghi?.lu_location]
-                .filter(Boolean)
-                .join(' • ')}
+              ${[e.luoghi?.comuni?.co_descrizione, e.luoghi?.lu_location] .filter(Boolean) .join(' • ')}
               </div>${e.luoghi?.lu_descrizione ? `
-                <div style="font-size:12px;color:#555;margin-top:2px;">
-                  ${e.luoghi.lu_descrizione}
-                </div>`:''}
-            </div>
-            <a
-              href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
-              target="_blank"
-              class="action-btn map-btn" onclick="analyticsMap()">Map</a>
-          </div>
-          ${e.ev_copertina ? `
-            <div style="text-align:center;">
-              <img
-                src="https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${e.ev_copertina}"
-                style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;">
-            </div>
-            <hr> ` : '' }
-          <div style="text-align:left; margin-top:8px; line-height:1.35;">
-            ${e.ev_descrizione || ''}
-          </div>
-        <hr>
+              <div style="font-size:12px;color:#555;margin-top:2px;">${e.luoghi.lu_descrizione}</div>`:''}
+            </div><a href="https://www.google.com/maps/dir/?api=1&destination=${e.luoghi.lu_lat},${e.luoghi.lu_lng}"
+              target="_blank" class="action-btn map-btn" onclick="analyticsMap()">Map</a></div>
+          ${e.ev_copertina ? `<div style="text-align:center;"><img
+              src="https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${e.ev_copertina}"
+              style="width:100%;max-width:180px;border-radius:6px;margin-bottom:8px;"></div><hr> ` : '' }
+          <div style="text-align:left; margin-top:8px; line-height:1.35;">${e.ev_descrizione || ''}</div><hr>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
           ${e.ev_costo === null || e.ev_costo === undefined || e.ev_costo === '' ? `
-              <div style="width:100%;text-align:center;color:#6b7280;font-weight:600;font-size:14px;">Price: TBA</div>
+            <div style="width:100%;text-align:center;color:#6b7280;font-weight:600;font-size:14px;">Price: TBA</div>
             ` : Number(e.ev_costo) === 0 ? `
-              <div style="width:100%;text-align:center;color:#16a34a;font-weight:700;font-size:14px;">Free Entry</div>
-            ` : `
-              <div>Price: €<span style="font-weight:700;">${e.ev_costo}</span>
-              </div>
-              <a
-                href="#"
-                class="action-btn buy-btn"
-                onclick="analyticsBuy(); showMessage('In Progress!'); return false;">
-                Buy
-              </a>
-            `
-          }          
-        </div>
+            <div style="width:100%;text-align:center;color:#16a34a;font-weight:700;font-size:14px;">Free Entry</div>
+            ` : ` <div>Price: €<span style="font-weight:700;">${e.ev_costo}</span></div>
+            <a href="#" class="action-btn buy-btn" onclick="analyticsBuy(); showMessage('In Progress!'); return false;">Buy</a>`}</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-            <div>I'll be there!</div>
-            <a
-              href="#"
-              class="action-btn book-btn"
-              onclick="analyticsBook(); showMessage('In Progress!'); return false;">
-              Book
-            </a>
-          </div>
-        </div>
-      `;
+            <div>I'll be there!</div><a href="#" class="action-btn book-btn"
+            onclick="analyticsBook(); showMessage('In Progress!'); return false;">Book</a></div></div>`;
       const markerPoint = map.latLngToContainerPoint(latlng);
         markerPoint.x += 0;
         markerPoint.y -= 20;
@@ -1945,74 +1905,67 @@ runCocleaEngine();
     // mostra il pulsante di installazione.
     // Chiamata da: browser tramite evento beforeinstallprompt.
     // Gestisce separatamente l'installazione manuale su iOS.
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById("installBtn").style.display = "block";
-  });
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById("installBtn").style.display = "block";
+    });
 
-  // Click su Installazione.
-  // Chiamata da: click su installBtn; usa deferredPrompt impostato da beforeinstallprompt.
-  document.getElementById("installBtn").onclick = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    document.getElementById("installBtn").style.display = "none";
-  };
+    // Click su Installazione.
+    // Chiamata da: click su installBtn; usa deferredPrompt impostato da beforeinstallprompt.
+    document.getElementById("installBtn").onclick = async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById("installBtn").style.display = "none";
+    };
 
-  // Quando l'app viene effettivamente installata.
-  // Azioni: registra l'installazione e nasconde il pulsante.
-  // Chiamata da: browser tramite evento appinstalled.
-  window.addEventListener('appinstalled', () => {
-    analyticsInstall();
-    document.getElementById("installBtn").style.display = "none";
-  });
+    // Quando l'app viene effettivamente installata.
+    // Azioni: registra l'installazione e nasconde il pulsante.
+    // Chiamata da: browser tramite evento appinstalled.
+    window.addEventListener('appinstalled', () => {
+      analyticsInstall();
+      document.getElementById("installBtn").style.display = "none";
+    });
  
-  // Installazione iOS Safari.
-  // Azioni: rileva i dispositivi iOS non ancora installati come PWA,
-  // mostra il pulsante Install e fornisce le istruzioni manuali.
-  // Chiamata da: inizializzazione dello script.
-  const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-  const isStandalone = window.navigator.standalone === true;
-    if (isIOS && !isStandalone) {
-      const installBtn = document.getElementById("installBtn");
-    if (installBtn) {
-      installBtn.style.display = "block";
-      installBtn.onclick = () => {
-        alert(
-          "Per installare Aroundo:\n\n" +
-          "1. Premi il pulsante Condividi ⬆️\n" +
-          "2. Seleziona 'Aggiungi alla schermata Home'\n\n" +
-          "Aroundo sarà disponibile come App."
-        );
-      };
+    // Installazione iOS Safari.
+    // Azioni: rileva i dispositivi iOS non ancora installati come PWA,
+    // mostra il pulsante Install e fornisce le istruzioni manuali.
+    // Chiamata da: inizializzazione dello script.
+    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true;
+      if (isIOS && !isStandalone) {const installBtn = document.getElementById("installBtn");
+      if (installBtn) {installBtn.style.display = "block"; installBtn.onclick = () => {alert(
+            "Per installare Aroundo:\n\n" +
+            "1. Premi il pulsante Condividi ⬆️\n" +
+            "2. Seleziona 'Aggiungi alla schermata Home'\n\n" +
+            "Aroundo sarà disponibile come App.");};}
     }
-  }
 
     /* Aggiorna lo stato visivo della geolocalizzazione.
        Azioni: modifica colore, testo e stile dell'indicatore GPS in base allo stato attivo/non attivo.
        Chiamata da: checkGeoStatus(); requestUserLocation(). */
-    const geoStatus = document.getElementById("geoStatus");
-    const geoDot = document.getElementById("geoDot");
-    const geoText = document.getElementById("geoText");
-    function updateGeoStatus(active) {
-      if (active) {
-        geoDot.style.background = "#22c55e";
-        geoText.textContent = "Location enabled";
-        geoText.style.color = "#22c55e";
-        geoText.style.textDecoration = "none";
-        geoText.style.cursor = "default";
-        geoText.style.fontSize = "12px";
-      } else {
-        geoDot.style.background = "#f59e0b";
-        geoText.textContent = "Enable location...";
-        geoText.style.color = "#f59e0b";
-        geoText.style.textDecoration = "underline";
-        geoText.style.cursor = "pointer";
-        geoText.style.fontSize = "12px";
+      const geoStatus = document.getElementById("geoStatus");
+      const geoDot = document.getElementById("geoDot");
+      const geoText = document.getElementById("geoText");
+      function updateGeoStatus(active) {
+        if (active) {
+          geoDot.style.background = "#22c55e";
+          geoText.textContent = "Location enabled";
+          geoText.style.color = "#22c55e";
+          geoText.style.textDecoration = "none";
+          geoText.style.cursor = "default";
+          geoText.style.fontSize = "12px";
+        } else {
+          geoDot.style.background = "#f59e0b";
+          geoText.textContent = "Enable location...";
+          geoText.style.color = "#f59e0b";
+          geoText.style.textDecoration = "underline";
+          geoText.style.cursor = "pointer";
+          geoText.style.fontSize = "12px";
+        }
       }
-    }
 
     /* Rappresenta lo stato di errore della geolocalizzazione.
        Azioni: imposta colore, testo e stile dell'indicatore GPS in caso di errore.
@@ -2049,7 +2002,7 @@ runCocleaEngine();
     /* Acquisisce la posizione dell'utente e aggiorna la mappa.
        Azioni: richiede il GPS, registra l'esito, aggiorna lo stato GPS, calcola la densità degli eventi vicini e centra/scala la mappa.
        Chiamata da: click su geoStatus quando la posizione non è disponibile. */
-  function requestUserLocation() {
+    function requestUserLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
           (pos) => {
@@ -2068,15 +2021,10 @@ runCocleaEngine();
           else zoomLevel = 9; // Regione
           map.setView([userLat, userLng], zoomLevel); // GPS accettato
           },
-          (err) => {
-            if(err.code === 1){
-              analyticsGPS(false); // Utente ha rifiutato
-            }else{
-              analyticsGPS(null); // Stato non determinabile
-            }
+          (err) => {if(err.code === 1){analyticsGPS(false); // Utente ha rifiutato
+            }else{analyticsGPS(null); // Stato non determinabile}
             updateGeoError();
-            map.setView([defaultLat, defaultLng], defaultZoom);
-            });
+            map.setView([defaultLat, defaultLng], defaultZoom);});
         } else {
           analyticsGPS(null); // Geolocalizzazione non disponibile
           updateGeoError();
@@ -2102,16 +2050,13 @@ runCocleaEngine();
        Azioni: calcola la luminosità del colore e restituisce nero o bianco
        per garantire un contrasto leggibile.
        Chiamata da: buildCategoryMenu(), per ogni categoria. */
-  function getContrastColor(hex) {
+    function getContrastColor(hex) {
       hex = hex.replace('#', '');
       const r = parseInt(hex.substr(0,2),16);
       const g = parseInt(hex.substr(2,2),16);
       const b = parseInt(hex.substr(4,2),16);
-      const brightness =
-      (r * 299 + g * 587 + b * 114) / 1000;
-      return brightness > 150
-      ? '#111'
-      : '#fff';
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 150 ? '#111' : '#fff';
     }
 
     /* Aggiorna il ticker degli eventi imminenti.
@@ -2120,9 +2065,8 @@ runCocleaEngine();
     function updateTicker(){
     const list = getUpcomingEvents(12).slice(0, 20); // Eventi nelle prossime 12 ore, massimo 20 elementi.
     const html = list.map(e => {
-    const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
-    return `
-        <span style="margin-right:20px;
+      const color = categories.find(c => c.id_categoria == e.id_categoria)?.mc_colore || '#999999';
+      return `<span style="margin-right:20px;
             padding:2px 8px;
             border-radius:12px;
             background:${color}33;
@@ -2135,9 +2079,7 @@ runCocleaEngine();
           • ${e.luoghi.lu_location}
           • ${e.ev_titolo}
           • ${e.ev_descrizione}
-        </span>
-      `;
-    }).join('');
+        </span>`;}).join('');
     document.getElementById('eventTickerContent').innerHTML = html;
   }
 
@@ -2153,9 +2095,7 @@ runCocleaEngine();
       return events.filter(e => {
         const start = new Date(e.ev_inizio);
         return start > now && start <= limit;
-      }).sort((a,b)=>
-        new Date(a.ev_inizio) - new Date(b.ev_inizio)
-      );
+      }).sort((a,b)=> new Date(a.ev_inizio) - new Date(b.ev_inizio));
     }
 
     /* Converte coordinate geografiche in coordinate del canvas.
@@ -2169,8 +2109,7 @@ runCocleaEngine();
     /* Inizializza una particella del fuoco d'artificio.
        Azioni: memorizza posizione, colore, velocità e durata e inizializza i parametri grafici della particella.
        Chiamata da: Firework.createParticles(). */
-    class Particle {
-      constructor(x, y, color, vx, vy, life) {
+    class Particle {constructor(x, y, color, vx, vy, life) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -2204,13 +2143,11 @@ runCocleaEngine();
       ctx.translate(this.x, this.y);
       ctx.beginPath();
       for (let i = 0; i < this.spikes * 2; i++) {
-        const r = i % 2 === 0 ? this.radiusOuter : this.radiusInner;
-        const angle = (Math.PI / this.spikes) * i;
-        const px = Math.cos(angle) * r;
-        const py = Math.sin(angle) * r;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }  
+          const r = i % 2 === 0 ? this.radiusOuter : this.radiusInner;
+          const angle = (Math.PI / this.spikes) * i;
+          const px = Math.cos(angle) * r;
+          const py = Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);}  
       ctx.closePath();
       ctx.fill();
       ctx.restore();
@@ -2220,106 +2157,95 @@ runCocleaEngine();
     /* Inizializza un fuoco d'artificio.
        Azioni: imposta posizione, traiettoria, stato di esplosione, particelle e parametri grafici.
        Chiamata da: triggerFirework(). */
-class Firework {
-  constructor(x, y) {
-    this.x = x; // coordinata orizzontale
-    this.y = y; // posizione iniziale
-    this.startY = y; // quota di partenza
-    this.maxHeight = 26; // quota massima raggiungibile
-    this.particles = []; // perticelle dopo esplosione
-    this.exploded = false; // esploso si/no
-    this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    this.vy = -8 - Math.random() * 3; // velocità verticale
-    this.vx = (Math.random() - 0.5) * 2; // deriva laterale
-    this.currentY = y; // quota corrente
-    this.trail = []; // punti della scia
-  }
-
-  /* Verifica se il fuoco d'artificio è terminato.
-     Azioni: restituisce true quando è esploso e non ha più particelle.
-     Chiamata da: animateFX(). */
-  isDead() { return this.exploded && this.particles.length === 0;}
-
-  /* Aggiorna lo stato del fuoco d'artificio.
-     Azioni: aggiorna il razzo durante la salita, gestisce l'esplosione, aggiorna le particelle e rimuove quelle terminate.
-     Chiamata da: animateFX(). */
-  update() {
-    if (!this.exploded) {
-      this.x += this.vx; 
-      this.currentY += this.vy; // Salita del razzo
-      this.vy += 0.35; // gravità
-      this.trail.push({ x: this.x, y: this.currentY }); 
-      if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
-      // esplode quando raggiunge maxHeight o inizia la discesa
-      if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } 
+    class Firework {
+      constructor(x, y) {
+        this.x = x; // coordinata orizzontale
+        this.y = y; // posizione iniziale
+        this.startY = y; // quota di partenza
+        this.maxHeight = 26; // quota massima raggiungibile
+        this.particles = []; // perticelle dopo esplosione
+        this.exploded = false; // esploso si/no
+        this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        this.vy = -8 - Math.random() * 3; // velocità verticale
+        this.vx = (Math.random() - 0.5) * 2; // deriva laterale
+        this.currentY = y; // quota corrente
+        this.trail = []; // punti della scia
+      }
+    /* Verifica se il fuoco d'artificio è terminato.
+       Azioni: restituisce true quando è esploso e non ha più particelle.
+       Chiamata da: animateFX(). */
+    isDead() { return this.exploded && this.particles.length === 0;}
+    /* Aggiorna lo stato del fuoco d'artificio.
+       Azioni: aggiorna il razzo durante la salita, gestisce l'esplosione, aggiorna le particelle e rimuove quelle terminate.
+       Chiamata da: animateFX(). */
+    update() {if (!this.exploded) {
+        this.x += this.vx; 
+        this.currentY += this.vy; // Salita del razzo
+        this.vy += 0.35; // gravità
+        this.trail.push({ x: this.x, y: this.currentY }); 
+        if (this.trail.length > 4) this.trail.shift(); // quanti punti di scia vengono mantenuti 
+        // esplode quando raggiunge maxHeight o inizia la discesa
+        if (this.startY - this.currentY >= this.maxHeight || this.vy >= 0) { this.exploded = true; this.createParticles(); } 
+      }
+      this.particles.forEach(p => p.update()); // aggiorna le particelle esplose
+      this.particles = this.particles.filter(p => p.life > 0); // elimina particelle morte
     }
-    this.particles.forEach(p => p.update()); // aggiorna le particelle esplose
-    this.particles = this.particles.filter(p => p.life > 0); // elimina particelle morte
-  }
-
-  /* Crea le particelle dell'esplosione.
-     Azioni: genera particelle con direzione, velocità, colore e durata casuali.
-     Chiamata da: Firework.update(). */
-  createParticles() {
-    const count = 10 + Math.floor(Math.random() * 10); // Numero di stelline che esplodono
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * 2 * Math.PI;
-      const speed = Math.random() * 4 + 2;
-      const vx = Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed;
-      const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-      this.particles.push(
-        new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20) // Quanti frame vive una particella
-      );
+    /* Crea le particelle dell'esplosione.
+       Azioni: genera particelle con direzione, velocità, colore e durata casuali.
+       Chiamata da: Firework.update(). */
+    createParticles() {
+      const count = 10 + Math.floor(Math.random() * 10); // Numero di stelline che esplodono
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * 2 * Math.PI;
+          const speed = Math.random() * 4 + 2;
+          const vx = Math.cos(angle) * speed;
+          const vy = Math.sin(angle) * speed;
+          const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+          this.particles.push(new Particle(this.x, this.currentY, color, vx, vy, 30 + Math.random() * 20)} // Quanti frame vive una particella);
+      }
+    /* Disegna il fuoco d'artificio sul canvas.
+       Azioni: disegna scia, razzo e particelle esplose.
+       Chiamata da: animateFX(). */
+    draw(ctx) {ctx.save();
+      for (let i = 0; i < this.trail.length; i++) {
+        const p = this.trail[i];
+        ctx.globalAlpha = i / this.trail.length * 0.25; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
+        ctx.fillStyle = this.color; // colore della scia
+        ctx.beginPath(); // disegna punto luminoso
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fill();}
+      ctx.restore();
+      ctx.globalAlpha = 1;
+      // Razzo prima dell’esplosione
+      if (!this.exploded) {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.currentY, 3, 0, Math.PI * 2);
+        ctx.fill();}
+      // Stelline esplose
+      this.particles.forEach(p => p.draw(ctx));
     }
   }
+    
+    /* Avvia un nuovo fuoco d'artificio nella posizione indicata.
+       Azioni: converte la posizione geografica in coordinate canvas e crea un nuovo Firework.
+       Chiamata da: updateMarkerState(). */
+    function triggerFirework(latLng) {
+    const { x, y } = latLngToCanvasXY(latLng.lat, latLng.lng);
+    fireworks.push(new Firework(x, y));
+  }
 
-  /* Disegna il fuoco d'artificio sul canvas.
-     Azioni: disegna scia, razzo e particelle esplose.
-     Chiamata da: animateFX(). */
-  draw(ctx) {
-    ctx.save();
-    for (let i = 0; i < this.trail.length; i++) {
-      const p = this.trail[i];
-      ctx.globalAlpha = i / this.trail.length * 0.25; // opacità crescente verso il razzo ( 1 = Opaco 0.5= semi trasparente 0 = invisibile)
-      ctx.fillStyle = this.color; // colore della scia
-      ctx.beginPath(); // disegna punto luminoso
-      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-      ctx.fill();
+    /* Esegue il ciclo di animazione dei fireworks.
+       Azioni: pulisce il canvas, aggiorna e disegna tutti i fireworks, elimina quelli terminati e richiede il frame successivo.
+       Chiamata da: avvio dello script; richiama sé stessa tramite requestAnimationFrame(). */
+    function animateFX() {ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fireworks.forEach(fw => {fw.update(); fw.draw(ctx);});
+      // elimina fuochi terminati
+      for (let i = fireworks.length - 1; i >= 0; i--) {if (fireworks[i].isDead()) {fireworks.splice(i, 1);}}
+      requestAnimationFrame(animateFX);
     }
-    ctx.restore();
-    ctx.globalAlpha = 1;
-    // Razzo prima dell’esplosione
-    if (!this.exploded) {
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.arc(this.x, this.currentY, 3, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // Stelline esplose
-    this.particles.forEach(p => p.draw(ctx));
-  }
-  }
-  
-  /* Avvia un nuovo fuoco d'artificio nella posizione indicata.
-     Azioni: converte la posizione geografica in coordinate canvas e crea un nuovo Firework.
-     Chiamata da: updateMarkerState(). */
-  function triggerFirework(latLng) {
-  const { x, y } = latLngToCanvasXY(latLng.lat, latLng.lng);
-  fireworks.push(new Firework(x, y));
-}
-
-  /* Esegue il ciclo di animazione dei fireworks.
-     Azioni: pulisce il canvas, aggiorna e disegna tutti i fireworks, elimina quelli terminati e richiede il frame successivo.
-     Chiamata da: avvio dello script; richiama sé stessa tramite requestAnimationFrame(). */
-function animateFX() {ctx.clearRect(0, 0, canvas.width, canvas.height);
-  fireworks.forEach(fw => {fw.update(); fw.draw(ctx);});
-    // elimina fuochi terminati
-  for (let i = fireworks.length - 1; i >= 0; i--) {if (fireworks[i].isDead()) {fireworks.splice(i, 1);}
-  }
-requestAnimationFrame(animateFX);
-}
-animateFX();
+    
+    animateFX();
 
     /* Aggiorna lo stato visivo e i fireworks del marker.
        Azioni: imposta lo stato e avvia/interrompe i fireworks in base allo stato ricevuto.
@@ -2327,48 +2253,35 @@ animateFX();
     function updateMarkerState(marker, state, latLng) {
       marker.state = state;
       if (state === 'countdown' && !marker.fireworkInterval) {triggerFirework(latLng); // Evento in countdown: avvia subito un firework e poi uno ogni 2,5 secondi
-      marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2000); // Un fuoco ogni X secondi 1''=1000
-    }
-    if (state !== 'countdown' && marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
+        marker.fireworkInterval = setInterval(() => triggerFirework(latLng), 2000);} // Un fuoco ogni X secondi 1''=1000
+      if (state !== 'countdown' && marker.fireworkInterval) {clearInterval(marker.fireworkInterval); marker.fireworkInterval = null;}
       return;
     }
 
-/* Gestione Overlay */
-const overlay = document.getElementById('mapOverlay');
-const toggle = document.getElementById('overlayToggle');
-let timeout = 3 * 1000; // dopo 3 secondi minimizza l'Overlay 'minimizeOverlay()'
+    /* Gestione Overlay */
+    const overlay = document.getElementById('mapOverlay');
+    const toggle = document.getElementById('overlayToggle');
+    let timeout = 3 * 1000; // dopo 3 secondi minimizza l'Overlay 'minimizeOverlay()'
 
-/* Minimizza l'overlay principale.
-   Azioni: applica lo stato CSS minimizzato e mostra il pulsante di riapertura.
-   Chiamata da: click esterno; timer iniziale. */  
-function minimizeOverlay() {
-  overlay.classList.add('minimized');
-  toggle.style.display = 'flex';
-}
+    /* Minimizza l'overlay principale.
+       Azioni: applica lo stato CSS minimizzato e mostra il pulsante di riapertura.
+       Chiamata da: click esterno; timer iniziale. */  
+    function minimizeOverlay() {overlay.classList.add('minimized'); toggle.style.display = 'flex';}
       
-/* Apre l'overlay principale.
-   Azioni: rimuove lo stato minimizzato e nasconde il pulsante di riapertura.
-   Chiamata da: click sul pulsante toggle. */
-function openOverlay() {
-  overlay.classList.remove('minimized');
-  toggle.style.display = 'none';
-}
-// click fuori → chiude
-document.addEventListener('click', (e) => {
-  if (!overlay.contains(e.target) && !toggle.contains(e.target) && !overlay.classList.contains('minimized')) {minimizeOverlay();
-  }
-});
-// evita chiusura cliccando dentro
-overlay.addEventListener('click', (e) => {e.stopPropagation();
-});
-// click icona → riapre
-toggle.addEventListener('click', openOverlay);
-// Minimizza l'overlay dopo 3 secondi
-setTimeout(() => { minimizeOverlay(); }, timeout);
-/* Registra il Service Worker dell'app, se supportato dal browser. */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js');
-}
+    /* Apre l'overlay principale.
+       Azioni: rimuove lo stato minimizzato e nasconde il pulsante di riapertura.
+       Chiamata da: click sul pulsante toggle. */
+    function openOverlay() {overlay.classList.remove('minimized'); toggle.style.display = 'none';}
+    // click fuori → chiude
+    document.addEventListener('click', (e) => {if (!overlay.contains(e.target) && !toggle.contains(e.target) && !overlay.classList.contains('minimized')) {minimizeOverlay();}});
+    // evita chiusura cliccando dentro
+    overlay.addEventListener('click', (e) => {e.stopPropagation();});
+    // click icona → riapre
+    toggle.addEventListener('click', openOverlay);
+    // Minimizza l'overlay dopo 3 secondi
+    setTimeout(() => { minimizeOverlay(); }, timeout);
+    /* Registra il Service Worker dell'app, se supportato dal browser. */
+    if ('serviceWorker' in navigator) {navigator.serviceWorker.register('./service-worker.js');}
 
 </script>
 </body>
