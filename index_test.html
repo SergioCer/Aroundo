@@ -1069,15 +1069,21 @@ OK
   // Se la nostra composizione non è rappresentabile, il cluster deve rimanere disponibile
   // e continuare a comportarsi secondo la logica nativa di Leaflet.markercluster, inclusa la spiderizzazione al click.
 
+  // Crea il MarkerClusterGroup e definisce i parametri di clusterizzazione e comportamento.
   const markersCluster = L.markerClusterGroup({
   maxClusterRadius: 108, // → scala spaziale di prossimità del clustering, espressa in pixel allo zoom corrente.
   // disableClusteringAtZoom: 10, // al livello di zoom 10 disabilita i cluster.
-  showCoverageOnHover: false,
-  zoomToBoundsOnClick: true
+  showCoverageOnHover: false,  // Non mostra l'area di copertura del cluster al passaggio del mouse.
+  zoomToBoundsOnClick: true  // Al click sul cluster, adatta lo zoom e l'area della mappa ai marker contenuti.
   });
+  
+  map.addLayer(markersCluster); // Collega il MarkerClusterGroup alla mappa e ne abilita la gestione e visualizzazione dei marker e dei cluster.
 
-  map.addLayer(markersCluster); // Espone i cluster sulla mappa nella loro posizione con il numero di elementi presenti.
-
+  // Crea il gruppo dei marker che devono essere visualizzati singolarmente.
+  const markersSingle = L.layerGroup();
+  
+  map.addLayer(markersSingle); // Visualizza i marker degli eventi Coclea.
+  
   
   // ***** NUOVO motore di rappresentazione grafica dei markers ***** //
   
@@ -1213,8 +1219,9 @@ OK
         const data = getClusterData(cluster, markers);
         if (!data.length) return;
         data.forEach(item => {
-  markersCluster.removeLayer(item.marker);
-  map.addLayer(item.marker);
+        markersCluster.removeLayer(item.marker);
+        markersSingle.addLayer(item.marker); 
+        // map.addLayer(item.marker);
 });
         const geometry = calcGeometry(data.length, timelineMode);
         const coclea = buildCoclea(data, geometry, getAppTime(), timelineMode);
@@ -1591,7 +1598,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* Funzione prevista da MODIFICARE con la nuova logica */
     /* RICOSTRUISCE I MARKER — ricrea la rappresentazione grafica di tutti gli eventi.
        Azioni: rimuove i marker esistenti, calcola lo stato degli eventi, crea e registra i nuovi marker, 
-       collega popup/spiderizzazione, aggiorna i fireworks e applica il filtro temporale finale.
+       gestisce la Coclea, applica gli effetti grafici.
        Chiamata da: DOM; next-day (mopde=day); prev-day (mode=live e mode=past); reset-day; visibilitychange; setinterval fetchEvents 30'; setinterval updateMarkerVisibility 2'.*/
     function renderEvents() {
       // Verifica tutti i markers e se.. 
@@ -1604,22 +1611,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       markers = [];
       // Ordina gli eventi
       events.sort((a, b) => new Date(a.ev_inizio) - new Date(b.ev_inizio));
-      // Per ogni evento presente
+      // Per ogni 'events' presente:
       events.forEach(e => {
+        //  prende la data di inizio e fine dell'evento e le passa a getEventState(). Il risultato viene memorizzato in stateData.
         const stateData = getEventState( new Date(e.ev_inizio), e.ev_fine ? new Date(e.ev_fine) : null);
+        // Estrae la classe grafica corrispondente allo stato.
         const stateClass = stateData.state;
-        // 🎨 Creazione delle icone dei Marker sulla mappa
+        // 🎨 Crea l'icona in base a categoria e stato e il relativo marker alle coordinate dell'evento.
         const marker = L.marker([e.luoghi.lu_lat, e.luoghi.lu_lng], {icon: createIcon(categories.find(c => c.id_categoria === e.id_categoria)?.mc_colore || '#999', stateClass)})
-        
-        // Visualizzazione i marker sulla mappa
+        // Aggiunge il marker al MarkerClusterGroup, affidandogli la gestione del marker e della sua eventuale clusterizzazione.
         markersCluster.addLayer(marker);
-        // Applica effetti grafici e Fuochi d'artificio
+        // Aggiorna lo stato grafico del marker e gli eventuali effetti associati.
         updateMarkerState(marker, stateClass, {lat: e.luoghi?.lu_lat, lng: e.luoghi?.lu_lng});
-        // Intercetta azione utente
+        // Intercetta l'interazione dell'utente con il marker.
         marker.on('click', function () {analyticsMarker();
         // Apre il popup con le informazioni sull'evento
         window.openBasePopup(e, this.getLatLng());});
-        // ???
+        // Registra il marker con evento, categoria e intervallo temporale.
         markers.push({marker, event: e, category: parseInt(e.id_categoria), start: new Date(e.ev_inizio), end: e.ev_fine ? new Date(e.ev_fine) : null,});
       });
         // Applica effetto cocleare sui markers esplodibili
@@ -1638,9 +1646,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     /* Funzione prevista da MODIFICARE con la nuova logica */
-    /* FILTRA I MARKER — determina quali marker devono essere visibili.
+    /* FILTRA I MARKER — determina quali eventi soddisfano i filtri
+       e gestisce di conseguenza la presenza dei relativi marker nel cluster.
        Azioni: ricava categorie attive, verifica sovrapposizione temporale
-       e aggiunge/rimuove i marker dal cluster; arresta eventuali fireworks
+       e aggiunge/rimuove i marker dal cluster e arresta eventuali fireworks
        dei marker nascosti.
        Chiamata da: updateHandles(), renderEvents(), filtro categorie. */
     function updateMarkerVisibility(start, end) {
@@ -1650,30 +1659,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       start = range.start;
       end = range.end;
       }
+      // Recupera le checkbox delle categorie disponibili.
       const checkboxes = document.querySelectorAll('#menu-items input[type="checkbox"]');
+      // Ricava gli ID delle categorie attualmente attive.
       const activeCategories = [];
       checkboxes.forEach(cb => {const catId = parseInt(cb.id.replace('cat-', ''));
       if (cb.checked) { activeCategories.push(catId); }});
-      // Preleva eventStart ed eventEnd dai markers      
-      markers.forEach(marker => {
-      const categoryVisible = activeCategories.includes(marker.category);
-      const eventStart = new Date(marker.start);
-      const eventEnd = marker.end ? new Date(marker.end) : eventStart;
-      // Seleziona il range dei markers da visualizzare tra eventStart ed eventEnd
+      // Per ciascuna associazione evento-marker registrata:
+      markers.forEach(eventMarker => {
+      // Controlla se la categoria dell'evento è presente nell'elenco delle categorie attive.
+      const categoryVisible = activeCategories.includes(eventMarker.category);
+      // Recupera l'intervallo temporale dell'evento dal record evento-marker. 
+      const eventStart = new Date(eventMarker.start);
+      const eventEnd = eventMarker.end ? new Date(eventMarker.end) : eventStart;
+      // Verifica la sovrapposizione tra l'intervallo dell'evento e il range temporale selezionato.
       const inTimeRange = eventStart <= end &&  eventEnd >= start;
-      // disattiva il timeriterval del marker per i fireworks
+      // Determina la visibilità in base a categoria attiva e intervallo temporale.
       const visible = categoryVisible && inTimeRange;
-        if (visible) {markersCluster.addLayer(marker.marker);
+      // Aggiunge il marker al cluster se risulta visibile.
+        if (visible) {markersCluster.addLayer(eventMarker.marker);
+          // Aggiorna lo stato grafico e gli eventuali effetti del marker.
           updateMarkerState(
-            marker.marker,
-            marker.marker.state,
-            marker.marker.getLatLng()
+            eventMarker.marker,
+            eventMarker.marker.state,
+            eventMarker.marker.getLatLng()
             );
         } else {
-          markersCluster.removeLayer(marker.marker);
-          if (marker.marker.fireworkInterval) {
-            clearInterval(marker.marker.fireworkInterval);
-            marker.marker.fireworkInterval = null;
+          // Rimuove dal cluster il marker che non soddisfa i filtri.
+          markersCluster.removeLayer(eventMarker.marker);
+          // Arresta eventuali fireworks attivi sul marker nascosto.
+          if (eventMarker.marker.fireworkInterval) {
+            clearInterval(eventMarker.marker.fireworkInterval);
+            eventMarker.marker.fireworkInterval = null;
           }
         }
       });
