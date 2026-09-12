@@ -1220,12 +1220,13 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
   const firstRingByAngle = new Map();
   futureFirst.forEach((entry, index) => firstRingByAngle.set((index * FIRST_STEP) % 360, entry.item));
   pastFirst.forEach((entry, index) => firstRingByAngle.set((300 - index * FIRST_STEP + 360) % 360, entry.item));
+  const maxFirstRadius = Math.max(A.radius, ...firstItems.map(entry => entry.item.radius));
   const buildSecondRing = (items, role, direction, startAngle) => {
     let inheritedRadius = null;
     items.forEach((item, index) => {
       const angle = direction > 0 ? (startAngle + index * SECOND_STEP) % 360 : (startAngle - index * SECOND_STEP + 360) % 360;
       const reference = firstRingByAngle.get(angle);
-      const radius = reference ? A.radius + GAP + reference.radius * 2 + GAP + item.radius : inheritedRadius ?? A.radius + GAP + item.radius;
+      const radius = reference ? A.radius + GAP + reference.radius * 2 + GAP + item.radius : inheritedRadius ?? A.radius + GAP + maxFirstRadius * 2 + GAP + item.radius;
       addMarker(item, role, 2, angle, radius);
       inheritedRadius = radius;
     });
