@@ -1149,53 +1149,9 @@ OK
         const data = markers.find(item => item.marker === marker);
         if (!data) return null;
         const category = categories.find(c => c.id_categoria === data.category);
-        return {marker, event: data.event, id: data.event?.id_evento, start: data.start, end: data.end, category: data.category, color: category?.mc_colore || '#999'};}).filter(Boolean);
+        return {marker, event: data.event, id: data.event?.id_evento, start: data.start, end: data.end, category: data.category, color: category?.mc_colore || '#999',
+                realLatLng: {lat: data.event.luoghi.lu_lat, lng: data.event.luoghi.lu_lng}};}).filter(Boolean);
     }
-
-/*     // Costruisce la geometria temporale a coclea.
-    // A resta al centro; il futuro procede in senso orario, il passato in senso antiorario.
-    // Le corone sono contenitori della stessa sequenza temporale.
-    function buildCoclea(clusterData, geometry, referenceTime, mode) {
-      if (!clusterData?.length || !geometry || !referenceTime) return [];
-      const GAP = 4;
-      const SLOTS = 6;
-      const STEP = 360 / SLOTS;
-      const data = clusterData
-        .map(item => {
-          const state = getEventState(item.start, item.end).state;
-          const size = markerSizes[state] ?? geometry.markerDiameter;
-          return { ...item, state, size, radius: size / 2 };
-        })
-        .filter(item => item.start instanceof Date && !isNaN(item.start));
-      if (!data.length) return [];
-    let future;
-    let past;
-    if (mode === 'past') {future = []; past = [...data].sort((a, b) => b.start - a.start);
-    } else if (mode === 'day') {future = [...data].sort((a, b) => a.start - b.start); past = [];
-    } else {future = data .filter(item => item.start >= referenceTime) .sort((a, b) => a.start - b.start);
-      past = data .filter(item => item.start < referenceTime) .sort((a, b) => b.start - a.start);}
-      const A = future[0] || past[0];
-      if (!A) return [];
-      const result = [{...A, role: 'A', ring: 0, angle: null, radius: 0, x: 0, y: 0}];
-      const futureSequence = future.slice(1);
-      const pastSequence = past.filter(item => item !== A);
-      const buildSequence = (items, role, direction) => {
-        let index = 0;
-        let previousOuterRadius = A.radius;
-        for (let ring = 1; index < items.length; ring++) {
-        const ringItems = items.slice(index, index + SLOTS);
-        ringItems.forEach((item, slot) => {const angle = direction > 0 ? slot * STEP : 300 - slot * STEP;
-        const radius = previousOuterRadius + GAP + item.radius;
-        const radians = angle * Math.PI / 180;
-        result.push({...item, role, ring, angle, radius, x: Math.sin(radians) * radius, y: -Math.cos(radians) * radius});
-        previousOuterRadius = radius + item.radius;});
-      index += ringItems.length;}
-  };
-    buildSequence(futureSequence, 'FUTURE', 1);
-    buildSequence(pastSequence, 'PAST', -1);
-    return result;
-  }
-*/  
 
 // Costruisce la geometria temporale a coclea.
 // A resta al centro.
@@ -1209,20 +1165,15 @@ OK
 // tra i marker della stessa corona.
 function buildCoclea(clusterData, geometry, referenceTime, mode) {
   if (!clusterData?.length || !geometry || !referenceTime) return [];
-
   const GAP = 4, FIRST_SLOTS = 6, SECOND_SLOTS = 12;
   const FIRST_STEP = 60, SECOND_STEP = 30;
-
   const data = clusterData.map(item => {
     const state = getEventState(item.start, item.end).state;
     const size = markerSizes[state] ?? geometry.markerDiameter;
     return { ...item, state, size, radius: size / 2 };
   }).filter(item => item.start instanceof Date && !isNaN(item.start));
-
   if (!data.length) return [];
-
   let future, past;
-
   if (mode === 'past') {
     future = [];
     past = [...data].sort((a, b) => b.start - a.start);
@@ -1233,81 +1184,67 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     future = data.filter(item => item.start >= referenceTime).sort((a, b) => a.start - b.start);
     past = data.filter(item => item.start < referenceTime).sort((a, b) => b.start - a.start);
   }
-
   const A = future[0] || past[0];
   if (!A) return [];
-
   const result = [{ ...A, role: 'A', ring: 0, angle: null, radius: 0, x: 0, y: 0, realLatLng: A.realLatLng }];
-
   const futureSequence = future.slice(1);
   const pastSequence = past.filter(item => item !== A);
-
   const addMarker = (item, role, ring, angle, radius) => {
     const radians = angle * Math.PI / 180;
     result.push({ ...item, role, ring, angle, radius, x: Math.sin(radians) * radius, y: -Math.cos(radians) * radius, realLatLng: item.realLatLng });
   };
-
   const getSecondRadius = items => {
     if (!items.length) return 0;
 
     const maxRadius = Math.max(...items.map(item => item.radius));
     const tangentRadius = (2 * maxRadius + GAP) / (2 * Math.sin(Math.PI / SECOND_SLOTS));
     const firstOuterRadius = A.radius + GAP + Math.max(...items.map(item => item.radius));
-
     return Math.max(firstOuterRadius + GAP + maxRadius, tangentRadius);
   };
-
   const buildRing = (items, role, direction, ring, step, startAngle, radius) => {
     items.forEach((item, index) => {
       const angle = direction > 0 ? (startAngle + index * step) % 360 : (startAngle - index * step + 360) % 360;
       addMarker(item, role, ring, angle, radius(item));
     });
   };
-
   const firstItems = [];
   const secondItems = [];
-
   if (futureSequence.length + pastSequence.length <= FIRST_SLOTS) {
     firstItems.push(...futureSequence.map(item => ({ item, role: 'FUTURE', direction: 1 })));
     firstItems.push(...pastSequence.map(item => ({ item, role: 'PAST', direction: -1 })));
   } else {
     firstItems.push(...futureSequence.slice(0, FIRST_SLOTS).map(item => ({ item, role: 'FUTURE', direction: 1 })));
     secondItems.push(...pastSequence.slice(0, SECOND_SLOTS).map(item => ({ item, role: 'PAST', direction: -1 })));
-
     const remainingFuture = futureSequence.slice(FIRST_SLOTS);
     const remainingPast = pastSequence.slice(SECOND_SLOTS);
-
     secondItems.push(...remainingFuture.map(item => ({ item, role: 'FUTURE', direction: 1 })));
     firstItems.push(...remainingPast.map(item => ({ item, role: 'PAST', direction: -1 })));
   }
-
   const firstRadius = item => A.radius + GAP + item.radius;
   const secondRadius = getSecondRadius(secondItems.map(entry => entry.item));
-
   const futureFirst = firstItems.filter(entry => entry.role === 'FUTURE');
   const pastFirst = firstItems.filter(entry => entry.role === 'PAST');
   const pastSecond = secondItems.filter(entry => entry.role === 'PAST');
   const futureSecond = secondItems.filter(entry => entry.role === 'FUTURE');
-
   buildRing(futureFirst.map(entry => entry.item), 'FUTURE', 1, 1, FIRST_STEP, 0, firstRadius);
   buildRing(pastFirst.map(entry => entry.item), 'PAST', -1, 1, FIRST_STEP, 300, firstRadius);
-
   buildRing(pastSecond.map(entry => entry.item), 'PAST', -1, 2, SECOND_STEP, 330, () => secondRadius);
   buildRing(futureSecond.map(entry => entry.item), 'FUTURE', 1, 2, SECOND_STEP, 0, () => secondRadius);
-
   return result;
 }
  
-    
     // Rappresenta la geometria della coclea senza modificarne la logica temporale.
     // Gli effetti grafici vengono applicati dopo la creazione dei Marker.
-    function renderCoclea(coclea, center) {
+    function renderCoclea(coclea) {
+      const A = coclea.find(item => item.role === 'A');
+      if (!A?.realLatLng) return;
+      const center = A.realLatLng;
       coclea.forEach(item => {
         const state = getEventState(item.start, item.end).state;
         const point = map.latLngToLayerPoint(center).add([item.x, item.y]);
         item.marker.setLatLng(map.layerPointToLatLng(point));
         item.marker.setIcon(createIcon(item.color, state));
-        updateMarkerState(item.marker, state, center);
+        updateMarkerState(item.marker, state, item.marker.getLatLng());
       });
     }
 
@@ -1335,7 +1272,7 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
         const geometry = calcGeometry(data.length, timelineMode);
         const coclea = buildCoclea(data, geometry, getAppTime(), timelineMode);
         if (!coclea.length) return;
-        renderCoclea(coclea, cluster.getLatLng());
+        renderCoclea(coclea);
       });
     }
 
