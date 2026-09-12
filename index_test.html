@@ -17,7 +17,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>Fbuildc
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1273,7 +1273,7 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
         // map.addLayer(item.marker);
 });
         const geometry = calcGeometry(data.length, timelineMode);
-        const coclea = buildCoclea(data, geometry, getAppTime(), timelineMode);
+        const coclea = buildCoclea(data, geometry, timelineMode === 'live' ? getAppTime('live') : getAppTime('startOfDay'), timelineMode);
         if (!coclea.length) return;
         renderCoclea(coclea);
       });
