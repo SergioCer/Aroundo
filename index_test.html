@@ -1721,6 +1721,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (m.marker.fireworkInterval) {clearInterval(m.marker.fireworkInterval); m.marker.fireworkInterval = null;}
       // Rimuove tutti i markers dalla visualizzazione della mappa
       markersCluster.removeLayer(m.marker);
+      markersSingle.removeLayer(m.marker);
       });
       // Cancella tutto
       markers = [];
