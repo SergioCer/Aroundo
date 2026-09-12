@@ -1166,54 +1166,73 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     return { ...item, state, size, radius: size / 2 };
   }).filter(item => item.start instanceof Date && !isNaN(item.start));
   if (!data.length) return [];
+
   let future = [], past = [];
-  if (mode === 'past') {past = [...data].sort((a, b) => b.start - a.start);
-  } else if (mode === 'day') {future = [...data].sort((a, b) => a.start - b.start);
-  } else {future = data.filter(item => item.start >= referenceTime).sort((a, b) => a.start - b.start);
-    past = data.filter(item => item.start < referenceTime).sort((a, b) => b.start - a.start);}
+  if (mode === 'past') {
+    past = [...data].sort((a, b) => b.start - a.start);
+  } else if (mode === 'day') {
+    future = [...data].sort((a, b) => a.start - b.start);
+  } else {
+    future = data.filter(item => item.start >= referenceTime).sort((a, b) => a.start - b.start);
+    past = data.filter(item => item.start < referenceTime).sort((a, b) => b.start - a.start);
+  }
+
   const A = future[0] || past[0];
   if (!A) return [];
+
   const result = [{ ...A, role: 'A', ring: 0, angle: null, radius: 0, x: 0, y: 0, realLatLng: A.realLatLng }];
   const futureSequence = future.slice(1), pastSequence = past.filter(item => item !== A);
-  const addMarker = (item, role, ring, angle, radius) => {const radians = angle * Math.PI / 180;
-    result.push({ ...item, role, ring, angle, radius, x: Math.sin(radians) * radius, y: -Math.cos(radians) * radius, realLatLng: item.realLatLng });};
+
+  const addMarker = (item, role, ring, angle, radius) => {
+    const radians = angle * Math.PI / 180;
+    result.push({ ...item, role, ring, angle, radius, x: Math.sin(radians) * radius, y: -Math.cos(radians) * radius, realLatLng: item.realLatLng });
+  };
+
   const firstRadius = item => A.radius + GAP + item.radius;
-  const firstRingByAngle = new Map();
-  const placeFirstRing = (items, role, direction, startAngle) => {items.slice(0, FIRST_SLOTS).forEach((item, index) => {
+
+  const placeFirstRing = (items, role, direction, startAngle) => {
+    items.slice(0, FIRST_SLOTS).forEach((item, index) => {
       const angle = direction > 0 ? (startAngle + index * FIRST_STEP) % 360 : (startAngle - index * FIRST_STEP + 360) % 360;
-      firstRingByAngle.set(angle, item);
-      addMarker(item, role, 1, angle, firstRadius(item));});};
-  const placeSecondRing = (items, role, direction, startAngle) => {let previousRadius = null;
+      addMarker(item, role, 1, angle, firstRadius(item));
+    });
+  };
+
+  const placeSecondRing = (items, role, direction, startAngle, references) => {
+    let inheritedRadius = null;
     items.slice(0, SECOND_SLOTS).forEach((item, index) => {
       const angle = direction > 0 ? (startAngle + index * SECOND_STEP) % 360 : (startAngle - index * SECOND_STEP + 360) % 360;
-      const reference = firstRingByAngle.get(angle);
-      let radius;
-      if (reference) {radius = A.radius + GAP + reference.radius * 2 + GAP + item.radius;
-      } else if (previousRadius !== null) {radius = previousRadius + GAP + item.radius * 2 + GAP;
-      } else {radius = A.radius + GAP + item.radius;}
+      const reference = references[Math.floor(index / 2)];
+      const radius = reference ? A.radius + GAP + reference.radius * 2 + GAP + item.radius : inheritedRadius ?? firstRadius(item);
       addMarker(item, role, 2, angle, radius);
-      previousRadius = radius;});};
+      inheritedRadius = radius;
+    });
+  };
+
   const total = data.length;
   const twoRings = total > FIRST_SLOTS + 1;
+
   if (mode === 'past') {
-    if (!twoRings) {placeFirstRing(pastSequence, 'PAST', -1, 300);
-    } else {placeFirstRing(pastSequence.slice(0, FIRST_SLOTS), 'PAST', -1, 300);
-      placeSecondRing(pastSequence.slice(FIRST_SLOTS), 'PAST', -1, 330);}
+    const firstPast = pastSequence.slice(0, FIRST_SLOTS);
+    placeFirstRing(firstPast, 'PAST', -1, 300);
+    if (twoRings) placeSecondRing(pastSequence.slice(FIRST_SLOTS), 'PAST', -1, 330, firstPast);
   } else if (mode === 'day') {
-    if (!twoRings) {placeFirstRing(futureSequence, 'FUTURE', 1, 0);
-    } else {placeFirstRing(futureSequence.slice(0, FIRST_SLOTS), 'FUTURE', 1, 0);
-      placeSecondRing(futureSequence.slice(FIRST_SLOTS), 'FUTURE', 1, 0);}
+    const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
+    placeFirstRing(firstFuture, 'FUTURE', 1, 0);
+    if (twoRings) placeSecondRing(futureSequence.slice(FIRST_SLOTS), 'FUTURE', 1, 0, firstFuture);
   } else {
     if (!twoRings) {
-      const futureFirst = futureSequence.slice(0, FIRST_SLOTS);
-      const remainingSlots = FIRST_SLOTS - futureFirst.length;
-      const pastFirst = pastSequence.slice(0, remainingSlots);
-      placeFirstRing(futureFirst, 'FUTURE', 1, 0);
-      placeFirstRing(pastFirst, 'PAST', -1, 300);
+      const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
+      const firstPast = pastSequence.slice(0, FIRST_SLOTS - firstFuture.length);
+      placeFirstRing(firstFuture, 'FUTURE', 1, 0);
+      placeFirstRing(firstPast, 'PAST', -1, 300);
     } else {
-      placeFirstRing(futureSequence.slice(0, FIRST_SLOTS), 'FUTURE', 1, 0);
-      placeSecondRing(futureSequence.slice(FIRST_SLOTS), 'FUTURE', 1, 0);
-      placeSecondRing(pastSequence, 'PAST', -1, 330);}}
+      const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
+      placeFirstRing(firstFuture, 'FUTURE', 1, 0);
+      placeSecondRing(futureSequence.slice(FIRST_SLOTS), 'FUTURE', 1, 0, firstFuture);
+      placeSecondRing(pastSequence, 'PAST', -1, 330, firstFuture);
+    }
+  }
+
   return result;
 }
  
