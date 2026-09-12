@@ -1286,17 +1286,13 @@ function renderCocleaGuides(coclea) {
   cocleaGuides.clearLayers();
   const A = coclea.find(item => item.role === 'A');
   if (!A?.marker) return;
-  const a = map.latLngToLayerPoint(A.marker.getLatLng());
+  const a = A.marker.getLatLng();
   coclea.filter(item => item.ring === 1 && item.marker && item !== A).forEach(item => {
-    const b = map.latLngToLayerPoint(item.marker.getLatLng());
-    const dx = b.x - a.x, dy = b.y - a.y, distance = Math.hypot(dx, dy);
-    if (!distance) return;
-    const ux = dx / distance, uy = dy / distance;
-    const start = a.add([ux * A.radius, uy * A.radius]);
-    const end = b.subtract([ux * item.radius, uy * item.radius]);
-    L.polyline([map.layerPointToLatLng(start), map.layerPointToLatLng(end)], {color: '#777', weight: 1, opacity: 0.45, interactive: false}).addTo(cocleaGuides);
+    const b = item.marker.getLatLng();
+    L.polyline([a, b], {color: 'red', weight: 2, opacity: 0.9, interactive: false}).addTo(cocleaGuides);
   });
 }
+
                      
   
   // ***** FINE NUOVO MOTORE ***** //
