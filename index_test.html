@@ -1193,18 +1193,10 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     const radians = angle * Math.PI / 180;
     result.push({ ...item, role, ring, angle, radius, x: Math.sin(radians) * radius, y: -Math.cos(radians) * radius, realLatLng: item.realLatLng });
   };
-  const getSecondRadius = items => {
-    if (!items.length) return 0;
-
-    const maxRadius = Math.max(...items.map(item => item.radius));
-    const tangentRadius = (2 * maxRadius + GAP) / (2 * Math.sin(Math.PI / SECOND_SLOTS));
-    const firstOuterRadius = A.radius + GAP + Math.max(...items.map(item => item.radius));
-    return Math.max(firstOuterRadius + GAP + maxRadius, tangentRadius);
-  };
   const buildRing = (items, role, direction, ring, step, startAngle, radius) => {
     items.forEach((item, index) => {
       const angle = direction > 0 ? (startAngle + index * step) % 360 : (startAngle - index * step + 360) % 360;
-      addMarker(item, role, ring, angle, radius(item));
+      addMarker(item, role, ring, angle, radius(item, index));
     });
   };
   const firstItems = [];
@@ -1221,15 +1213,27 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     firstItems.push(...remainingPast.map(item => ({ item, role: 'PAST', direction: -1 })));
   }
   const firstRadius = item => A.radius + GAP + item.radius;
-  const secondRadius = getSecondRadius(secondItems.map(entry => entry.item));
   const futureFirst = firstItems.filter(entry => entry.role === 'FUTURE');
   const pastFirst = firstItems.filter(entry => entry.role === 'PAST');
   const pastSecond = secondItems.filter(entry => entry.role === 'PAST');
   const futureSecond = secondItems.filter(entry => entry.role === 'FUTURE');
+  const firstRingByAngle = new Map();
+  futureFirst.forEach((entry, index) => firstRingByAngle.set((index * FIRST_STEP) % 360, entry.item));
+  pastFirst.forEach((entry, index) => firstRingByAngle.set((300 - index * FIRST_STEP + 360) % 360, entry.item));
+  const buildSecondRing = (items, role, direction, startAngle) => {
+    let inheritedRadius = null;
+    items.forEach((item, index) => {
+      const angle = direction > 0 ? (startAngle + index * SECOND_STEP) % 360 : (startAngle - index * SECOND_STEP + 360) % 360;
+      const reference = firstRingByAngle.get(angle);
+      const radius = reference ? A.radius + GAP + reference.radius * 2 + GAP + item.radius : inheritedRadius ?? A.radius + GAP + item.radius;
+      addMarker(item, role, 2, angle, radius);
+      inheritedRadius = radius;
+    });
+  };
   buildRing(futureFirst.map(entry => entry.item), 'FUTURE', 1, 1, FIRST_STEP, 0, firstRadius);
   buildRing(pastFirst.map(entry => entry.item), 'PAST', -1, 1, FIRST_STEP, 300, firstRadius);
-  buildRing(pastSecond.map(entry => entry.item), 'PAST', -1, 2, SECOND_STEP, 330, () => secondRadius);
-  buildRing(futureSecond.map(entry => entry.item), 'FUTURE', 1, 2, SECOND_STEP, 0, () => secondRadius);
+  buildSecondRing(pastSecond.map(entry => entry.item), 'PAST', -1, 330);
+  buildSecondRing(futureSecond.map(entry => entry.item), 'FUTURE', 1, 0);
   return result;
 }
  
