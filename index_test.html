@@ -1802,6 +1802,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
           // Rimuove dal cluster il marker che non soddisfa i filtri.
           markersCluster.removeLayer(eventMarker.marker);
+          markersSingle.removeLayer(eventMarker.marker);
           // Arresta eventuali fireworks attivi sul marker nascosto.
           if (eventMarker.marker.fireworkInterval) {
             clearInterval(eventMarker.marker.fireworkInterval);
