@@ -1276,9 +1276,28 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
         const coclea = buildCoclea(data, geometry, timelineMode === 'live' ? getAppTime('live') : getAppTime('startOfDay'), timelineMode);
         if (!coclea.length) return;
         renderCoclea(coclea);
+        renderCocleaGuides(coclea);
       });
     }
 
+let cocleaGuides = L.layerGroup().addTo(map);
+
+function renderCocleaGuides(coclea) {
+  cocleaGuides.clearLayers();
+  const A = coclea.find(item => item.role === 'A');
+  if (!A?.marker) return;
+  const a = map.latLngToLayerPoint(A.marker.getLatLng());
+  coclea.filter(item => item.ring === 1 && item.marker && item !== A).forEach(item => {
+    const b = map.latLngToLayerPoint(item.marker.getLatLng());
+    const dx = b.x - a.x, dy = b.y - a.y, distance = Math.hypot(dx, dy);
+    if (!distance) return;
+    const ux = dx / distance, uy = dy / distance;
+    const start = a.add([ux * A.radius, uy * A.radius]);
+    const end = b.subtract([ux * item.radius, uy * item.radius]);
+    L.polyline([map.layerPointToLatLng(start), map.layerPointToLatLng(end)], {color: '#777', weight: 1, opacity: 0.45, interactive: false}).addTo(cocleaGuides);
+  });
+}
+                     
   
   // ***** FINE NUOVO MOTORE ***** //
 
