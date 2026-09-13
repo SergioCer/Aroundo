@@ -1327,7 +1327,8 @@ let cocleaEngineTimer = null;
           if (!coclea.length) return;
           renderCoclea(coclea);
           renderCocleaGuides(coclea);
-      }, 100);}
+        });
+      }, 100);
     }
 
 let cocleaGuides = L.layerGroup().addTo(map);
