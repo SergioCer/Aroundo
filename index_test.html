@@ -1268,13 +1268,12 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
         if (!cluster) return;
         const data = getClusterData(cluster, markers);
         if (!data.length) return;
-        data.forEach(item => {
-        markersCluster.removeLayer(item.marker);
-        markersSingle.addLayer(item.marker); 
-        // map.addLayer(item.marker);
-});
+          data.forEach(item => {
+          markersCluster.removeLayer(item.marker);
+          markersSingle.addLayer(item.marker); 
+        });
         const geometry = calcGeometry(data.length, timelineMode);
-        const coclea = buildCoclea(data, geometry, timelineMode === 'live' ? getAppTime('live') : getAppTime('startOfDay'), timelineMode);
+        const coclea = buildCoclea(data, geometry, getAppTime('live'), timelineMode);
         if (!coclea.length) return;
         renderCoclea(coclea);
         renderCocleaGuides(coclea);
