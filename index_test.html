@@ -979,8 +979,6 @@ OK
   let midnightPercent = 0; // Posizione barra della Mezzanotte
   let totalHours; // Ore totali della Slidebar
   let deferredPrompt = null; // Verifica se è stata installata l'APP sui sistemi che accedono
-  let initialMapCenter = null;
-  let initialMapZoom = null;
   window.gpsReady = false; // Verifica scelta GPS per avviare onboarding.
 
   window.APP_VERSION = "1.0.0";
@@ -1501,7 +1499,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateTimelineMode();
       updateDateUI();
       setupTimeline();
-      if (initialMapCenter && initialMapZoom !== null) {map.setView(initialMapCenter, initialMapZoom);}
       await loadEvents();
       renderEvents();
       updateMarkerVisibility();
