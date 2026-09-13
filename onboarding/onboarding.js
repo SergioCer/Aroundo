@@ -452,7 +452,8 @@ en: {
     
     cardShow(t.finalTitle, t.finalText, t.restartText);
     await onboardingNext("card");
-    
+    resetDay.click();
+
     if (onboardingRestart) {onboardingRestart = false; finish(mapInstance); await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
 
