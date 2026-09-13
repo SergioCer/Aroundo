@@ -317,13 +317,13 @@ en: {
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
-    const category12 = highlight(categoryGet(12).nextElementSibling);
+    const category6 = highlight(categoryGet(6).nextElementSibling);
     await wait(500);
-    clickSim(categoryGet(12));
+    clickSim(categoryGet(6));
     await wait(500);
-    categorySelect(12);
+    categorySelect(6);
     await wait(500);
-    highlightRemove(category12);
+    highlightRemove(category6);
     await wait(500);
     
     const category3 = highlight(categoryGet(3).nextElementSibling);
