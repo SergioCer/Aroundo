@@ -1749,8 +1749,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Applica effetto cocleare sui markers esplodibili
         runCocleaEngine();
         // Visualizza le schermate di presentazione: Onboarding 
-        /* if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
-           {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);} */
+        if (window.aroundoOnboardingStart && markers.length > 0 && !window.aroundoOnboardingStarted)
+           {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);}
     }
 
     // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
