@@ -126,13 +126,13 @@ en: {
       setTimeout(() => {card.remove();}, 500);
     }
   
-    function bubbleShow(title, text, marker, mapInstance) {
+    function bubbleShow(title, text, marker, mapInstance, position = "marker") {
       bubble = document.createElement('div');
       bubble.className = 'onboarding-card onboarding-bubble';
       bubble.innerHTML = `<div class="onboarding-title">${title}</div><div class="onboarding-subtitle">${text}</div><button class="onboarding-next" disabled aria-label="Continua">&rarr;</button>`;
       layer.appendChild(bubble);
       onboardingNextReadyAt = Date.now() + onboardingReadingTime(title, text);
-      bubblePosition(marker, mapInstance);
+      bubblePosition(marker, mapInstance, position);
       requestAnimationFrame(() => {bubble.classList.add('visible');});
     }
 
@@ -148,14 +148,19 @@ en: {
     }
     
     /* Posiziona fumetto vicino al marker */
-    function bubblePosition(marker, mapInstance) {
+    function bubblePosition(marker, mapInstance, position = "marker") {
       if (!bubble) {return;}
+      const margin = 12;
+      // Solo mobile: bubble fissata in basso allo schermo 
+      if (window.innerWidth <= 520 && position === "bottom") 
+          { const left = (window.innerWidth - bubble.offsetWidth) / 2; 
+         const top = window.innerHeight - bubble.offsetHeight - margin; bubble.style.left = `${left}px`; bubble.style.top = `${top}px`; 
+         return; }
       const latlng = marker.getLatLng();
       const point = mapInstance.latLngToContainerPoint(latlng);
       const mapRect = mapInstance.getContainer().getBoundingClientRect();
       const x = mapRect.left + point.x;
       const y = mapRect.top + point.y;
-      const margin = 12;
       let left = x - bubble.offsetWidth / 2;
       let top = y + 40; // Spostamento in basso rispetto all'elemento selezionato
       if (window.innerWidth <= 520) {left = (window.innerWidth - bubble.offsetWidth) / 2;
@@ -309,11 +314,11 @@ en: {
     await onboardingNext("card");
     highlightRemove(categoryHighlight);
     
-    bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle1, t.categoriesText1, markerData.marker, mapInstance, "bottom");
     if (categoryButton) {categoryButton.click();}
     await onboardingNext();
     
-    bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle2, t.categoriesText2, markerData.marker, mapInstance, "bottom");
     if (categoryButton) {categoryButton.click();}
     await wait(2000);
     
@@ -355,7 +360,7 @@ en: {
     const selectAllHighlight = highlight(selectAllButton.parentElement);
     await onboardingNext();
     
-    bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle3, t.categoriesText3, markerData.marker, mapInstance, "bottom");
     if (categoryButton) {categoryButton.click();}
     await wait(5000);
     await wait(500);
@@ -367,7 +372,7 @@ en: {
 
     if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 2.0, easeLinearity: 0.25});}
 
-    bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
+    bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance, "bottom");
     await wait(3000);
     await onboardingNext();
 
