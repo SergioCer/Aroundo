@@ -1499,6 +1499,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateTimelineMode();
       updateDateUI();
       setupTimeline();
+      if (onboardingOriginalCenter && onboardingOriginalZoom !== null) {map.setView(onboardingOriginalCenter, onboardingOriginalZoom);}
       await loadEvents();
       renderEvents();
       updateMarkerVisibility();
