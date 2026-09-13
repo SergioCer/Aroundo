@@ -1252,6 +1252,7 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     }
 
     function runCocleaEngine() {
+      cocleaGuides.clearLayers();
       markers.forEach(eventMarker => {
         if (!markersSingle.hasLayer(eventMarker.marker)) return;
         eventMarker.marker.setLatLng([eventMarker.event.luoghi.lu_lat, eventMarker.event.luoghi.lu_lng]);
@@ -1282,8 +1283,8 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
 
 let cocleaGuides = L.layerGroup().addTo(map);
 
+// Espone delle linee rosse di collegamento tra il centro A ed i markers della prima corona. 
 function renderCocleaGuides(coclea) {
-  cocleaGuides.clearLayers();
   const A = coclea.find(item => item.role === 'A');
   if (!A?.marker) return;
   const a = A.marker.getLatLng();
@@ -1292,7 +1293,6 @@ function renderCocleaGuides(coclea) {
     L.polyline([a, b], {color: 'red', weight: 2, opacity: 0.9, interactive: false}).addTo(cocleaGuides);
   });
 }
-
                      
   
   // ***** FINE NUOVO MOTORE ***** //
