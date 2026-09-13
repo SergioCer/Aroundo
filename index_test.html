@@ -1166,16 +1166,33 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     return { ...item, state, size, radius: size / 2 };
   }).filter(item => item.start instanceof Date && !isNaN(item.start));
   if (!data.length) return [];
-
   let future = [], past = [];
-  if (mode === 'past') {
-    past = [...data].sort((a, b) => b.start - a.start);
-  } else if (mode === 'day') {
-    future = [...data].sort((a, b) => a.start - b.start);
-  } else {
-    future = data.filter(item => item.start >= referenceTime).sort((a, b) => a.start - b.start);
-    past = data.filter(item => item.start < referenceTime).sort((a, b) => b.start - a.start);
-  }
+
+const currentDay = new Date(currentDate);
+currentDay.setHours(0, 0, 0, 0);
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+if (mode === 'past' && currentDay.getTime() < today.getTime()) {
+  // Giorno realmente passato: tutti gli eventi sono PASSATI.
+  past = [...data].sort((a, b) => b.start - a.start);
+
+} else if (mode === 'day') {
+  // Giorno futuro: tutti gli eventi sono FUTURI.
+  future = [...data].sort((a, b) => a.start - b.start);
+
+} else {
+  // Oggi visualizzato per intero (Home-1) oppure LIVE:
+  // separa passato e futuro rispetto all'ora reale.
+  future = data
+    .filter(item => item.start >= referenceTime)
+    .sort((a, b) => a.start - b.start);
+
+  past = data
+    .filter(item => item.start < referenceTime)
+    .sort((a, b) => b.start - a.start);
+}
 
   const A = future[0] || past[0];
   if (!A) return [];
@@ -1208,31 +1225,60 @@ function buildCoclea(clusterData, geometry, referenceTime, mode) {
     });
   };
 
-  const total = data.length;
-  const twoRings = total > FIRST_SLOTS + 1;
-
-  if (mode === 'past') {
-    const firstPast = pastSequence.slice(0, FIRST_SLOTS);
+ const total = data.length;
+const twoRings = total > FIRST_SLOTS + 1;
+const isRealPastDay = mode === 'past' && currentDay.getTime() < today.getTime();
+if (isRealPastDay) {
+  const firstPast = pastSequence.slice(0, FIRST_SLOTS);
+  placeFirstRing(firstPast, 'PAST', -1, 300);
+  if (twoRings) {
+    placeSecondRing(
+      pastSequence.slice(FIRST_SLOTS),
+      'PAST',
+      -1,
+      330,
+      firstPast
+    );
+  }
+} else if (mode === 'day') {
+  const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
+  placeFirstRing(firstFuture, 'FUTURE', 1, 0);
+  if (twoRings) {
+    placeSecondRing(
+      futureSequence.slice(FIRST_SLOTS),
+      'FUTURE',
+      1,
+      0,
+      firstFuture
+    );
+  }
+} else {
+  // LIVE oppure HOME-1:
+  // futuro e passato convivono.
+  if (!twoRings) {
+    const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
+    const firstPast = pastSequence.slice(0, FIRST_SLOTS - firstFuture.length);
+    placeFirstRing(firstFuture, 'FUTURE', 1, 0);
     placeFirstRing(firstPast, 'PAST', -1, 300);
-    if (twoRings) placeSecondRing(pastSequence.slice(FIRST_SLOTS), 'PAST', -1, 330, firstPast);
-  } else if (mode === 'day') {
+  } else {
     const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
     placeFirstRing(firstFuture, 'FUTURE', 1, 0);
-    if (twoRings) placeSecondRing(futureSequence.slice(FIRST_SLOTS), 'FUTURE', 1, 0, firstFuture);
-  } else {
-    if (!twoRings) {
-      const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
-      const firstPast = pastSequence.slice(0, FIRST_SLOTS - firstFuture.length);
-      placeFirstRing(firstFuture, 'FUTURE', 1, 0);
-      placeFirstRing(firstPast, 'PAST', -1, 300);
-    } else {
-      const firstFuture = futureSequence.slice(0, FIRST_SLOTS);
-      placeFirstRing(firstFuture, 'FUTURE', 1, 0);
-      placeSecondRing(futureSequence.slice(FIRST_SLOTS), 'FUTURE', 1, 0, firstFuture);
-      placeSecondRing(pastSequence, 'PAST', -1, 330, firstFuture);
-    }
+    placeSecondRing(
+      futureSequence.slice(FIRST_SLOTS),
+      'FUTURE',
+      1,
+      0,
+      firstFuture
+    );
+    placeSecondRing(
+      pastSequence,
+      'PAST',
+      -1,
+      330,
+      firstFuture
+    );
   }
-
+}
   return result;
 }
  
