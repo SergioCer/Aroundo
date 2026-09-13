@@ -1297,6 +1297,8 @@ if (isRealPastDay) {
       });
     }
 
+let cocleaEngineTimer = null;  
+  
     function runCocleaEngine() {
       cocleaGuides.clearLayers();
       markers.forEach(eventMarker => {
@@ -1305,25 +1307,27 @@ if (isRealPastDay) {
         markersSingle.removeLayer(eventMarker.marker);
         markersCluster.addLayer(eventMarker.marker);
       });
-      const visibleClusters = getVisibleClusters();
-      visibleClusters.forEach(candidate => {
-        if (!canExplodeCluster(candidate, visibleClusters, timelineMode)) return;
-        const cluster = Object.values(markersCluster._featureGroup._layers)
-          .find(layer => layer.getChildCount?.() === candidate.count &&
-            layer._icon === candidate.element);
-        if (!cluster) return;
-        const data = getClusterData(cluster, markers);
-        if (!data.length) return;
-          data.forEach(item => {
-          markersCluster.removeLayer(item.marker);
-          markersSingle.addLayer(item.marker); 
-        });
-        const geometry = calcGeometry(data.length, timelineMode);
-        const coclea = buildCoclea(data, geometry, getAppTime('live'), timelineMode);
-        if (!coclea.length) return;
-        renderCoclea(coclea);
-        renderCocleaGuides(coclea);
-      });
+      clearTimeout(cocleaEngineTimer);
+      cocleaEngineTimer = setTimeout(() => {
+        const visibleClusters = getVisibleClusters();
+        visibleClusters.forEach(candidate => {
+          if (!canExplodeCluster(candidate, visibleClusters, timelineMode)) return;
+          const cluster = Object.values(markersCluster._featureGroup._layers)
+            .find(layer => layer.getChildCount?.() === candidate.count &&
+              layer._icon === candidate.element);
+          if (!cluster) return;
+          const data = getClusterData(cluster, markers);
+          if (!data.length) return;
+            data.forEach(item => {
+            markersCluster.removeLayer(item.marker);
+            markersSingle.addLayer(item.marker); 
+          });
+          const geometry = calcGeometry(data.length, timelineMode);
+          const coclea = buildCoclea(data, geometry, getAppTime('live'), timelineMode);
+          if (!coclea.length) return;
+          renderCoclea(coclea);
+          renderCocleaGuides(coclea);
+      }, 100);}
     }
 
 let cocleaGuides = L.layerGroup().addTo(map);
