@@ -1753,13 +1753,20 @@ document.addEventListener('DOMContentLoaded', async () => {
            {window.aroundoOnboardingStarted = true; window.aroundoOnboardingStart(markers[0], map);}
     }
 
-    // Creazione dei Markers, dimensione, Classe e Colore dei Markers  
+    // Creazione dei Markers, dimensione, Classe e Colore dei Markers. Aggiunta di 2px in tutto il diametro come area cliccabile. 
+    function createIcon(color, state) {
+      const size = markerSizes[state] || 10, hitSize = size + 4;
+      return L.divIcon({className: '', html: `<div style="width:${hitSize}px;height:${hitSize}px;display:flex;align-items:center;justify-content:center;">
+      <div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div></div>`, iconSize: [hitSize, hitSize], iconAnchor: [hitSize / 2, hitSize / 2]});
+    }
+    /*  VECCHIA DA CANCELLARE
     function createIcon(color, state) {
       const size = markerSizes[state] || 10;
       return L.divIcon({ className: '', html: `<div class="pulse ${state}" style="--c:${color};width:${size}px;height:${size}px;"></div>`,
       iconSize: [size, size]
       });
     }
+    */ 
 
     /* Funzione prevista da MODIFICARE con la nuova logica */
     /* FILTRA I MARKER — determina quali eventi soddisfano i filtri
