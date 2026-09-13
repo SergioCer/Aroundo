@@ -365,7 +365,7 @@ en: {
     await onboardingNext();
     highlightRemove(selectAllHighlight);
 
-    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 3.5, easeLinearity: 0.25});}
+    if (onboardingOriginalCenter !== null) {mapInstance.flyTo(onboardingOriginalCenter, onboardingOriginalZoom, {duration: 2.0, easeLinearity: 0.25});}
 
     bubbleShow(t.categoriesTitle4, t.categoriesText4, markerData.marker, mapInstance);
     await wait(3000);
@@ -410,6 +410,7 @@ en: {
     
 
     bubbleShow(t.timelineTitle1, t.timelineText1, markerData.marker, mapInstance);
+    resetDay.click();
     let startHighlight = null;
     let endHighlight = null;
     let startHighlight1 = null;
@@ -451,7 +452,6 @@ en: {
     
     cardShow(t.finalTitle, t.finalText, t.restartText);
     await onboardingNext("card");
-    resetDay.click();
     
     if (onboardingRestart) {onboardingRestart = false; finish(mapInstance); await start(onboardingMarkerData, mapInstance);} else {finish(mapInstance);}
   }
