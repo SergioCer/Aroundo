@@ -202,7 +202,15 @@ input, textarea {
 
   <div class="section-title">Descrizione</div>
   <textarea id="or_descrizione" oninput="markDirty()"></textarea>
+  
+  <div class="section-title">Comune</div>
+  <select id="id_comune" onchange="markDirty()">
+    <option value="">Seleziona comune</option>
+  </select>
 
+  <div class="section-title">Indirizzo</div>
+  <input id="or_indirizzo" oninput="markDirty()">
+  
   <div class="section-title">Email</div>
   <input id="or_email" oninput="markDirty()">
 
@@ -397,6 +405,8 @@ async function load() {
   original = JSON.stringify(data);
   or_nome.value = data.or_nome || '';
   or_descrizione.value = data.or_descrizione || '';
+  id_comune.value = data.id_comune || '';
+  or_indirizzo.value = data.or_indirizzo || '';
   or_email.value = data.or_email || '';
   or_telefono.value = data.or_telefono || '';
   or_sito_web.value = data.or_sito_web || '';
@@ -412,6 +422,24 @@ document.getElementById("eventiArrow").textContent = "▶";
 document.getElementById("luoghiArrow").textContent = "▶";  
 }
 
+async function loadComuni() {
+  const { data, error } = await supabase
+    .from('comuni')
+    .select('id_comune, co_descrizione')
+    .order('co_descrizione');
+  if (error) {
+    console.error("Errore caricamento comuni:", error);
+    return;
+  }
+  const select = document.getElementById('id_comune');
+  data.forEach(comune => {
+    const option = document.createElement('option');
+    option.value = comune.id_comune;
+    option.textContent = comune.co_descrizione;
+    select.appendChild(option);
+  });
+}
+  
 function sortEventi(list){
 return [...list].sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio));
 }
@@ -584,6 +612,8 @@ async function save() {
   const payload = {
     or_nome: or_nome.value,
     or_descrizione: or_descrizione.value,
+    id_comune: id_comune.value ? Number(id_comune.value) : null,
+    or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
@@ -640,6 +670,8 @@ window.markDirty = () => {
   const current = JSON.stringify({
     or_nome: or_nome.value,
     or_descrizione: or_descrizione.value,
+    id_comune: id_comune.value ? Number(id_comune.value) : null,
+    or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
@@ -700,6 +732,7 @@ window.toggleSection = (sec) => {
   }
 };
 
+await loadComuni();  
 await load();
 
 if (!isNew) {
