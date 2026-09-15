@@ -183,61 +183,61 @@ input, textarea {
 .link-cell:hover{
   text-decoration:underline;
 }
+
+.form-row {display: grid;
+  gap: 10px;
+}
+
+.form-row.three-cols {grid-template-columns: 1fr 1fr 1fr;
+}
+
+.form-row.address-row {grid-template-columns: 2fr 90px 1.5fr;
+}
+
+.form-row input {box-sizing: border-box;
+}
+
+@media (max-width: 600px) {.form-row.three-cols {grid-template-columns: 1fr;
+  }
+
+.form-row.address-row {grid-template-columns: 1fr 90px 1.5fr;}
+}
   
 </style>
 </head>
-
 <body>
 
-<div class="topbar">
-  <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
-  Organizzatore
-</div>
+<div class="topbar"><button id="backBtn" class="back-btn" onclick="requestBack()">←</button>Organizzatore</div>
 
-<div class="hero">
-  <input id="or_nome" placeholder="Inserisci nuovo nome" oninput="markDirty()">
-</div>
+<div class="hero"><input id="or_nome" placeholder="Inserisci nuovo nome" oninput="markDirty()"></div>
 
-<div class="card">
-
-  <div class="section-title">Logo (URL)</div>
-  <input id="or_logo" oninput="markDirty()">
+<div class="card"><div class="section-title">Logo (URL)</div><input id="or_logo" oninput="markDirty()">
 
   <div class="section-title">Slogan</div>
   <input id="or_slogan" maxlength="120" placeholder="Breve frase identificativa" oninput="markDirty()">
 
-  <div class="section-title">Anno di fondazione</div>
-  <input id="or_fondazione" type="number" min="1800" max="2200" placeholder="AAAA" oninput="markDirty()">
-  <div id="fondazioneError" style=" display:none; color:#ef4444; font-size:11px; margin-top:4px; "> Inserisci un anno valido. </div>
+<div class="form-row three-cols"><div>
+    <div class="section-title">Fondazione</div><input id="or_fondazione" type="number" inputmode="numeric" min="1800" max="2026" step="1" placeholder="AAAA" oninput="validateFondazione(); markDirty()">
+    <div id="fondazioneError" style="display:none; color:#ef4444; font-size:11px; margin-top:4px;">Inserisci un anno valido.</div></div><div>
+    <div class="section-title">Fiscale</div><input id="tax_code" oninput="markDirty()"></div>
+  <div><div class="section-title">RUNTS</div><input id="runts" oninput="markDirty()"></div>
+</div>
 
-  <div class="section-title">Identificativo fiscale</div>
-  <input id="tax_code" oninput="markDirty()">
-
-  <div class="section-title">RUNTS</div>
-  <input id="runts" oninput="markDirty()">
-
-  <div class="section-title">Descrizione</div>
-  <textarea id="or_descrizione" oninput="markDirty()"></textarea>
+  <div class="section-title">Descrizione</div><textarea id="or_descrizione" oninput="markDirty()"></textarea>
   
-  <div class="section-title">Comune</div>
-  <select id="id_comune" onchange="markDirty()">
-    <option value="">Seleziona comune</option>
-  </select>
+  <div class="form-row address-row">
+  <div><div class="section-title">Indirizzo</div><input id="or_indirizzo" placeholder="Via, piazza, numero..." oninput="markDirty()" ></div>
+  <div><div class="section-title">CAP</div><input id="or_cap" readonly style="background:#f3f4f6;" ></div>
+  <div><div class="section-title">Città</div><input id="or_citta" readonly style="background:#f3f4f6;" ></div>
+  </div>
 
-  <div class="section-title">Indirizzo</div>
-  <input id="or_indirizzo" oninput="markDirty()">
-  
-  <div class="section-title">Email</div>
-  <input id="or_email" oninput="markDirty()">
+  <div class="section-title">Email</div><input id="or_email" oninput="markDirty()">
 
-  <div class="section-title">Telefono</div>
-  <input id="or_telefono" oninput="markDirty()">
+  <div class="section-title">Telefono</div><input id="or_telefono" oninput="markDirty()">
 
-  <div class="section-title">Sito web</div>
-  <input id="or_sito_web" oninput="markDirty()">
+  <div class="section-title">Sito web</div><input id="or_sito_web" oninput="markDirty()">
 
-  <div class="section-title">Note</div>
-  <textarea id="or_note" oninput="markDirty()"></textarea>
+  <div class="section-title">Note</div><textarea id="or_note" oninput="markDirty()"></textarea>
 
   <!-- STATO -->
   <div class="section-title">Stato</div>
@@ -247,14 +247,8 @@ input, textarea {
   </div>
 
   <!-- COPERTINA -->
-  <div class="section-title">Copertina (URL)</div>
-  <input id="or_copertina" oninput="markDirty(); updatePreview()">
-
-  <div class="preview">
-    <div id="copertina_url" style="font-size:10px; color:#666;">
-  </div>
-    <img id="copertina_img" />
-  </div>
+  <div class="section-title">Copertina (URL)</div><input id="or_copertina" oninput="markDirty(); updatePreview()">
+  <div class="preview"><div id="copertina_url" style="font-size:10px; color:#666;"></div><img id="copertina_img" /></div>
   </div>
 
 <div class="section-box">
@@ -389,6 +383,7 @@ let eventiOpen=false;
 let luoghiOpen=false;
 let serieList = [];
 let serieOpen = false;
+let idComune = null;
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -409,11 +404,7 @@ async function load() {
     updateStatus(false);
     return;
   }
-  const { data, error } = await supabase
-    .from('organizzatori')
-    .select('*')
-    .eq('id_organizzatore', id)
-    .single();
+  const { data, error } = await supabase .from('organizzatori') .select(` *, comuni ( co_descrizione, co_cap ) `) .eq('id_organizzatore', id) .single();
   if (error) {
     console.error(error);
     return;
@@ -426,8 +417,10 @@ async function load() {
   tax_code.value = data.tax_code || '';
   runts.value = data.runts || '';
   or_descrizione.value = data.or_descrizione || '';
-  id_comune.value = data.id_comune || '';
+  idComune = data.id_comune || null;
   or_indirizzo.value = data.or_indirizzo || '';
+  or_cap.value = data.comuni?.co_cap || ''; 
+  or_citta.value = data.comuni?.co_descrizione || '';
   or_email.value = data.or_email || '';
   or_telefono.value = data.or_telefono || '';
   or_sito_web.value = data.or_sito_web || '';
@@ -441,24 +434,6 @@ eventiOpen = false;
 luoghiOpen = false;
 document.getElementById("eventiArrow").textContent = "▶";
 document.getElementById("luoghiArrow").textContent = "▶";  
-}
-
-async function loadComuni() {
-  const { data, error } = await supabase
-    .from('comuni')
-    .select('id_comune, co_descrizione')
-    .order('co_descrizione');
-  if (error) {
-    console.error("Errore caricamento comuni:", error);
-    return;
-  }
-  const select = document.getElementById('id_comune');
-  data.forEach(comune => {
-    const option = document.createElement('option');
-    option.value = comune.id_comune;
-    option.textContent = comune.co_descrizione;
-    select.appendChild(option);
-  });
 }
 
 function validateFondazione() {
@@ -660,7 +635,7 @@ if (!validateFondazione()) {alert("Controlla l'anno di fondazione."); return fal
     or_fondazione: or_fondazione.value ? Number(or_fondazione.value) : null,
     tax_code: tax_code.value,
     runts: runts.value,
-    id_comune: id_comune.value ? Number(id_comune.value) : null,
+    id_comune: idComune,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
     or_telefono: or_telefono.value,
@@ -723,7 +698,7 @@ window.markDirty = () => {
     or_fondazione: or_fondazione.value ? Number(or_fondazione.value) : null,
     tax_code: tax_code.value,
     runts: runts.value,
-    id_comune: id_comune.value ? Number(id_comune.value) : null,
+    id_comune: idComune,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
     or_telefono: or_telefono.value,
@@ -785,7 +760,6 @@ window.toggleSection = (sec) => {
   }
 };
 
-await loadComuni();  
 await load();
 
 if (!isNew) {
