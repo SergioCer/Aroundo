@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>MyAroundo</title>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7f9;
+      color: #1f2937;
+    }
+
+    .box {
+      width: min(90%, 500px);
+      padding: 30px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      text-align: center;
+    }
+
+    .slug {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f1f5f9;
+      font-family: monospace;
+      font-weight: bold;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div class="box">
+  <h1>MyAroundo</h1>
+  <div id="message">Caricamento...</div>
+  <div id="slug" class="slug"></div>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+
+  let slug = params.get("slug");
+
+  /*
+   * Supporto anche per il percorso pulito.
+   *
+   * /MyAroundo/pro_loco_trapani
+   */
+  if (!slug) {
+    const path = location.pathname;
+
+    const marker = "/MyAroundo/";
+
+    if (path.startsWith(marker)) {
+      slug = path.substring(marker.length).replace(/\/+$/, "");
+    }
+  }
+
+  const message = document.getElementById("message");
+  const slugBox = document.getElementById("slug");
+
+  if (!slug) {
+    message.textContent = "Nessuno slug specificato.";
+    slugBox.style.display = "none";
+  } else {
+    message.textContent = "Slug ricevuto correttamente:";
+    slugBox.textContent = slug;
+  }
+</script>
+
+</body>
+</html>
