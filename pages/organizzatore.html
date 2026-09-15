@@ -234,11 +234,19 @@ input, textarea {
       <div id="comuniOrganizzatoreResults" class="search-results"></div></div>
 </div>
   
-  <div class="section-title">Email</div><input id="or_email" oninput="markDirty()">
+<div class="form-row three-cols">
+  <div><div class="section-title">Email</div><input id="or_email" oninput="markDirty()"></div>
+  <div><div class="section-title">PEC</div><input id="or_pec" oninput="markDirty()"></div>
+  <div><div class="section-title">Telefono</div><input id="or_telefono" oninput="markDirty()"></div>
+</div>
 
-  <div class="section-title">Telefono</div><input id="or_telefono" oninput="markDirty()">
-
-  <div class="section-title">Sito web</div><input id="or_sito_web" oninput="markDirty()">
+<div class="form-row three-cols">
+  <div><div class="section-title">Sito web</div><input id="or_sito_web" oninput="markDirty()"></div>
+  <div><div class="section-title">Slug</div><input id="slug" maxlength="100" autocomplete="off" spellcheck="false" 
+    placeholder="es. pro_loco_trapani_98" oninput="normalizeSlug(this); markDirty()"></div>
+  <div><div class="section-title">Slug alias</div><input id="slug_alias" maxlength="100" autocomplete="off" spellcheck="false"
+    placeholder="eventuale vecchio slug" oninput="normalizeSlug(this); markDirty()"></div>
+</div>
 
   <div class="section-title">Note</div><textarea id="or_note" oninput="markDirty()"></textarea>
 
@@ -276,12 +284,13 @@ input, textarea {
     </table>
   </div>
 </div>
+  
 <!-- DIALOG SOCIAL -->
 <div id="socialDialog" style="
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.4);
+  background:rgba(0,0,0,.40);
   z-index:99999;
   align-items:center;
   justify-content:center;
@@ -290,94 +299,92 @@ input, textarea {
     background:white;
     padding:22px;
     border-radius:12px;
-    width:320px;
-    max-width:calc(100% - 40px);
-    box-shadow:0 10px 30px rgba(0,0,0,.2);
+    width:340px;
+    max-width:calc(100vw - 30px);
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
   ">
-    <div style="
-      margin-bottom:18px;
-      font-weight:600;
-      text-align:center;
-    ">
-      Aggiungi social
+    <div
+      id="socialDialogTitle"
+      style="
+        text-align:center;
+        font-weight:700;
+        margin-bottom:18px;
+      ">
+      Nuovo social
     </div>
     <div class="section-title">Social</div>
-    <select id="socialSelect" style="
-      width:100%;
-      box-sizing:border-box;
-      padding:10px;
-      border:1px solid #d1d5db;
-      border-radius:8px;
-      font-size:15px;
-      margin-bottom:12px;
-    ">
-      <option value="">Seleziona social...</option>
-    </select>
-    <div class="section-title">URL</div>
-    <input
-      id="socialUrl"
-      type="url"
-      placeholder="https://..."
+    <select
+      id="socialSelect"
       style="
         width:100%;
         box-sizing:border-box;
-        padding:10px;
+        padding:9px;
         border:1px solid #d1d5db;
         border-radius:8px;
         font-size:15px;
         margin-bottom:12px;
-      "
-    >
-    <div class="section-title">
-      Descrizione
-      <span style="
-        float:right;
-        color:#9ca3af;
-        font-size:11px;
-        font-weight:normal;
-      ">max 60</span>
-    </div>
+      ">
+    </select>
+    <div class="section-title">Link</div>
+    <input
+      id="socialUrl"
+      type="text"
+      autocomplete="off"
+      spellcheck="false"
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:9px;
+        border:1px solid #d1d5db;
+        border-radius:8px;
+        font-size:15px;
+        margin-bottom:12px;
+      ">
+    <div class="section-title">Descrizione</div>
     <input
       id="socialDescription"
       type="text"
       maxlength="60"
-      placeholder="es. Prenotazioni, informazioni..."
+      placeholder="Prenotazioni, informazioni..."
       style="
         width:100%;
         box-sizing:border-box;
-        padding:10px;
+        padding:9px;
         border:1px solid #d1d5db;
         border-radius:8px;
         font-size:15px;
-      "
-    >
+      ">
     <div style="
       display:flex;
       gap:10px;
       margin-top:20px;
     ">
-      <button onclick="saveSocial()" style="
-        flex:1;
-        background:#22c55e;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">
+      <button
+        onclick="saveSocial()"
+        style="
+          flex:1;
+          background:#22c55e;
+          color:white;
+          border:none;
+          border-radius:8px;
+          padding:10px;
+          cursor:pointer;
+          font-weight:bold;
+        ">
         Salva
       </button>
-      <button onclick="closeSocialDialog()" style="
-        flex:1;
-        background:#9ca3af;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">
+      <button
+        onclick="closeSocialDialog()"
+        style="
+          flex:1;
+          background:#9ca3af;
+          color:white;
+          border:none;
+          border-radius:8px;
+          padding:10px;
+          cursor:pointer;
+          font-weight:bold;
+        ">
         Annulla
       </button>
     </div>
@@ -564,10 +571,13 @@ async function load() {
     document.getElementById('id_comune_organizzatore_hidden').value = data.id_comune || '';
     or_cap.value = data.comuni?.co_cap || '';
   or_email.value = data.or_email || '';
+  or_pec.value = data.or_pec || '';
   or_telefono.value = data.or_telefono || '';
   or_sito_web.value = data.or_sito_web || '';
   or_copertina.value = data.or_copertina || '';
   or_note.value = data.or_note || '';
+  slug.value = data.slug || '';
+  slug_alias.value = data.slug_alias || '';
   updateStatus(data.or_attivo);
   updatePreview();
   or_created.textContent = data.or_created ? new Date(data.or_created).toLocaleString() : 'New';
@@ -641,7 +651,7 @@ window.searchComuniOrganizzatore = async (text) => {
 async function loadSocialCatalog(){
   const { data, error } = await supabase
     .from('social')
-    .select('id_social, so_img, so_description')
+    .select('id_social, so_img, so_description, so_prefix')
     .order('so_description', { ascending:true });
   if(error){
     console.error("ERRORE CATALOGO SOCIAL:", error);
@@ -663,7 +673,8 @@ async function loadSocialOrganizzatore(idOrg){
       social(
         id_social,
         so_img,
-        so_description
+        so_description,
+        so_prefix
       )
     `)
     .eq('id_organizzatore', idOrg)
@@ -674,7 +685,7 @@ async function loadSocialOrganizzatore(idOrg){
   }
   socialList = data || [];
   renderSocial();
-}  
+}
 
 function renderSocial(){
   const body = document.getElementById("socialBody");
@@ -685,10 +696,8 @@ function renderSocial(){
     socialOpen ? "▼" : "▶";
   const section =
     document.querySelector("#socialPanel").previousElementSibling;
-  if(socialList.length === 0){
-    section.classList.add("disabled");
-    return;
-  }
+  /* Se non ci sono social, la sezione resta comunque visibile
+     perché dobbiamo poter utilizzare il pulsante +. */
   section.classList.remove("disabled");
   socialList.forEach(s => {
     const tr = document.createElement("tr");
@@ -702,31 +711,45 @@ function renderSocial(){
       ">
         ☰
       </td>
-      <td style="width:34px;text-align:center;">
+      <td style="
+        width:38px;
+        text-align:center;
+      ">
         <img
           src="${s.social?.so_img || ""}"
           style="
-            width:24px;
-            height:24px;
+            width:26px;
+            height:26px;
             object-fit:contain;
             display:block;
             margin:auto;
+            cursor:pointer;
           "
+          title="Apri collegamento"
         >
       </td>
-      <td style="font-weight:600;">
+      <td
+        class="link-cell social-edit-cell"
+        style="
+          font-weight:600;
+          cursor:pointer;
+        "
+      >
         ${s.social?.so_description || ""}
       </td>
-      <td style="
-        color:#6b7280;
-        max-width:120px;
-        overflow:hidden;
-        white-space:nowrap;
-        text-overflow:ellipsis;
-      ">
+      <td
+        class="social-edit-cell"
+        style="
+          color:#6b7280;
+          max-width:150px;
+          overflow:hidden;
+          white-space:nowrap;
+          text-overflow:ellipsis;
+          cursor:pointer;
+        "
+      >
         ${s.so_description || ""}
       </td>
-
       <td style="
         width:34px;
         text-align:center;
@@ -746,10 +769,28 @@ function renderSocial(){
         >−</button>
       </td>
     `;
+    /* ICONA = APRE LINK */
+    tr.cells[1].querySelector("img").onclick = (e) => {
+      e.stopPropagation();
+      if(!s.so_url) return;
+      window.open(
+        s.so_url,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    };
+    /* NOME SOCIAL = MODIFICA */
+    tr.cells[2].onclick = () => {
+      openEditSocial(s.id_social_organizer);
+    };
+    /* DESCRIZIONE = MODIFICA */
+    tr.cells[3].onclick = () => {
+      openEditSocial(s.id_social_organizer);
+    };
     body.appendChild(tr);
   });
   initSocialSortable();
-}  
+}
 
 function initSocialSortable(){
   const body = document.getElementById("socialBody");
@@ -761,7 +802,8 @@ function initSocialSortable(){
     handle:"td:first-child",
     draggable:"tr",
     onEnd: async () => {
-      const rows = [...body.querySelectorAll("tr")];
+      const rows =
+        [...body.querySelectorAll("tr")];
       for(let i = 0; i < rows.length; i++){
         await supabase
           .from("social_organizzatori")
@@ -778,7 +820,7 @@ function initSocialSortable(){
   });
 }
 
- function populateSocialSelect(){
+function populateSocialSelect(selectedId = ""){
   const select =
     document.getElementById("socialSelect");
   select.innerHTML =
@@ -787,75 +829,192 @@ function initSocialSortable(){
     const option =
       document.createElement("option");
     option.value = s.id_social;
-    option.textContent = s.so_description;
+    option.textContent =
+      s.so_description;
+    option.dataset.prefix =
+      s.so_prefix || "";
     select.appendChild(option);
   });
-} 
+  select.value = selectedId || "";
+}
 
-  window.createSocial = async (e) => {
+/* NUOVO SOCIAL */
+window.createSocial = async (e) => {
   e.stopPropagation();
   editingSocialId = null;
   populateSocialSelect();
-  document.getElementById("socialSelect").value = "";
   document.getElementById("socialUrl").value = "";
   document.getElementById("socialDescription").value = "";
-  document.getElementById("socialDialog").style.display = "flex";
+  document.getElementById("socialDialogTitle").textContent =
+    "Nuovo social";
+  document.getElementById("socialDialog").style.display =
+    "flex";
 };
 
+/* Quando seleziono un social, precompilo il prefisso ma lascio l'URL completamente modificabile. */
+document.getElementById("socialSelect")
+  .addEventListener("change", function(){
+    const selected =
+      this.options[this.selectedIndex];
+    const prefix =
+      selected?.dataset?.prefix || "";
+    const urlInput =
+      document.getElementById("socialUrl");
+    if(prefix){
+      urlInput.value = prefix;
+      urlInput.focus();
+      /* Cursore alla fine. */
+      urlInput.setSelectionRange(
+        urlInput.value.length,
+        urlInput.value.length
+      );
+    }
+  });
+
+/* MODIFICA SOCIAL */
+window.openEditSocial = (socialOrganizerId) => {
+  const s =
+    socialList.find(
+      x => x.id_social_organizer == socialOrganizerId
+    );
+  if(!s) return;
+  editingSocialId =
+    socialOrganizerId;
+  populateSocialSelect(
+    s.id_social
+  );
+  document.getElementById("socialUrl").value =
+    s.so_url || "";
+  document.getElementById("socialDescription").value =
+    s.so_description || "";
+  document.getElementById("socialDialogTitle").textContent =
+    "Modifica social";
+  document.getElementById("socialDialog").style.display =
+    "flex";
+  /* Cursore alla fine dell'URL. */
+  const urlInput =
+    document.getElementById("socialUrl");
+  urlInput.focus();
+  urlInput.setSelectionRange(
+    urlInput.value.length,
+    urlInput.value.length
+  );
+};
+
+/* SALVA NUOVO / MODIFICA */
 window.saveSocial = async () => {
   const idSocial =
     document.getElementById("socialSelect").value;
   const url =
-    document.getElementById("socialUrl").value.trim();
+    document.getElementById("socialUrl")
+      .value
+      .trim();
   const description =
-    document.getElementById("socialDescription").value.trim();
+    document.getElementById("socialDescription")
+      .value
+      .trim();
   if(!idSocial){
     alert("Seleziona un social.");
     return;
   }
   if(!url){
-    alert("Inserisci l'URL.");
+    alert("Inserisci il collegamento.");
     return;
   }
-  const maxOrder =
-    socialList.length
-      ? Math.max(...socialList.map(s => s.so_order))
-      : 0;
-  const { error } = await supabase
-    .from("social_organizzatori")
-    .insert({
-      id_organizzatore:id,
-      id_social:Number(idSocial),
-      so_url:url,
-      so_description:description || null,
-      so_order:maxOrder + 1
-    });
-  if(error){
-    console.error("ERRORE SALVATAGGIO SOCIAL:", error);
-    alert("Errore nel salvataggio del social.");
+  if(description.length > 60){
+    alert("La descrizione non può superare 60 caratteri.");
     return;
+  }
+
+  /* MODIFICA */
+  if(editingSocialId){
+
+    const { error } =
+      await supabase
+        .from("social_organizzatori")
+        .update({
+          id_social:Number(idSocial),
+          so_url:url,
+          so_description:
+            description || null
+        })
+        .eq(
+          "id_social_organizer",
+          editingSocialId
+        );
+    if(error){
+      console.error(
+        "ERRORE MODIFICA SOCIAL:",
+        error
+      );
+      alert("Errore nella modifica del social.");
+      return;
+   }
+  }
+  /* NUOVO */
+  else {
+    const maxOrder =
+      socialList.length
+        ? Math.max(
+            ...socialList.map(
+              s => s.so_order
+            )
+          )
+        : 0;
+    const { error } =
+      await supabase
+        .from("social_organizzatori")
+        .insert({
+          id_organizzatore:id,
+          id_social:Number(idSocial),
+          so_url:url,
+          so_description:
+            description || null,
+          so_order:maxOrder + 1
+        });
+    if(error){
+      console.error(
+        "ERRORE SALVATAGGIO SOCIAL:",
+        error
+      );
+      alert(
+        "Errore nel salvataggio del social."
+      );
+      return;
+    }
   }
   closeSocialDialog();
   await loadSocialOrganizzatore(id);
   markDirty();
 };
 
-window.deleteSocial = async (e, socialOrganizerId) => {
+/* ELIMINA RIFERIMENTO */
+window.deleteSocial = async (
+  e,
+  socialOrganizerId
+) => {
   e.stopPropagation();
-  const ok = confirm(
-    "Vuoi rimuovere questo riferimento social dall'organizzatore?"
-  );
-  if(!ok) return;
-  const { error } = await supabase
-    .from("social_organizzatori")
-    .delete()
-    .eq(
-      "id_social_organizer",
-      socialOrganizerId
+  const ok =
+    confirm(
+      "Vuoi rimuovere questo riferimento social dall'organizzatore?"
     );
+  if(!ok) return;
+  const { error } =
+    await supabase
+      .from("social_organizzatori")
+      .delete()
+      .eq(
+        "id_social_organizer",
+        socialOrganizerId
+      );
   if(error){
-    console.error("ERRORE ELIMINAZIONE SOCIAL:", error);
-    alert("Errore nella rimozione del social.");
+    console.error(
+      "ERRORE ELIMINAZIONE SOCIAL:",
+      error
+    );
+    alert(
+      "Errore nella rimozione del social."
+    );
     return;
   }
   await loadSocialOrganizzatore(id);
@@ -863,10 +1022,12 @@ window.deleteSocial = async (e, socialOrganizerId) => {
 };
 
 window.closeSocialDialog = () => {
-  document.getElementById("socialDialog").style.display = "none";
+  document.getElementById(
+    "socialDialog"
+  ).style.display = "none";
   editingSocialId = null;
 };
-  
+ 
 function sortEventi(list){
 return [...list].sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio));
 }
@@ -1033,6 +1194,11 @@ const dd=String(d.getDate()).padStart(2,"0");
 return `${yy}/${mm}/${dd}`;
 }
 
+function normalizeSlug(input){
+  input.value = input.value
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, '');
+}  
 
 /* SAVE */
 async function save() {
@@ -1048,10 +1214,13 @@ if (!validateFondazione()) {alert("Controlla l'anno di fondazione."); return fal
     id_comune: document.getElementById('id_comune_organizzatore_hidden').value ? Number(document.getElementById('id_comune_organizzatore_hidden').value) : null,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
+    or_pec: or_pec.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
     or_note: or_note.value,
     or_copertina: or_copertina.value,
+    slug: slug.value,
+    slug_alias: slug_alias.value,
     or_attivo: document.body.dataset.attivo === 'true'
   };
   let result;
@@ -1111,10 +1280,13 @@ window.markDirty = () => {
     id_comune: document.getElementById('id_comune_organizzatore_hidden').value ? Number(document.getElementById('id_comune_organizzatore_hidden').value) : null,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
+    or_pec: or_pec.value,
     or_telefono: or_telefono.value,
     or_sito_web: or_sito_web.value,
     or_note: or_note.value,
     or_copertina: or_copertina.value,
+    slug: slug.value,
+    slug_alias: slug_alias.value,
     or_attivo: document.body.dataset.attivo === 'true'
   });
   dirty = current !== original;
