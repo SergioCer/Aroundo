@@ -243,9 +243,9 @@ input, textarea {
 <div class="form-row three-cols">
   <div><div class="section-title">Sito web</div><input id="or_sito_web" oninput="markDirty()"></div>
   <div><div class="section-title">Slug</div><input id="slug" maxlength="100" autocomplete="off" spellcheck="false" 
-    placeholder="es. pro_loco_trapani_98" oninput="normalizeSlug(this); markDirty()"></div>
+    placeholder="es. pro_loco_trapani_98" oninput="markDirty()"></div>
   <div><div class="section-title">Slug alias</div><input id="slug_alias" maxlength="100" autocomplete="off" spellcheck="false"
-    placeholder="eventuale vecchio slug" oninput="normalizeSlug(this); markDirty()"></div>
+    placeholder="eventuale vecchio slug" oninput="markDirty()"></div>
 </div>
 
   <div class="section-title">Note</div><textarea id="or_note" oninput="markDirty()"></textarea>
@@ -530,6 +530,31 @@ let socialList = [];
 let socialCatalog = [];
 let socialOpen = false;
 let editingSocialId = null;  
+
+const slugInput = document.getElementById('slug');
+const slugAliasInput = document.getElementById('slug_alias');
+
+slugInput.addEventListener('input', () => {
+  const pos = slugInput.selectionStart;
+  const oldLength = slugInput.value.length;
+  const newLength = slugInput.value.length;
+  slugInput.setSelectionRange(
+    pos + (newLength - oldLength),
+    pos + (newLength - oldLength)
+  );
+  markDirty();
+});
+
+slugAliasInput.addEventListener('input', () => {
+  const pos = slugAliasInput.selectionStart;
+  const oldLength = slugAliasInput.value.length;
+  const newLength = slugAliasInput.value.length;
+  slugAliasInput.setSelectionRange(
+    pos + (newLength - oldLength),
+    pos + (newLength - oldLength)
+  );
+  markDirty();
+});
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -1194,12 +1219,6 @@ const dd=String(d.getDate()).padStart(2,"0");
 return `${yy}/${mm}/${dd}`;
 }
 
-function normalizeSlug(input){
-  input.value = input.value
-    .toLowerCase()
-    .replace(/[^a-z0-9_]/g, '');
-}  
-
 /* SAVE */
 async function save() {
 if (!validateFondazione()) {alert("Controlla l'anno di fondazione."); return false;}  
@@ -1219,8 +1238,8 @@ if (!validateFondazione()) {alert("Controlla l'anno di fondazione."); return fal
     or_sito_web: or_sito_web.value,
     or_note: or_note.value,
     or_copertina: or_copertina.value,
-    slug: slug.value,
-    slug_alias: slug_alias.value,
+    slug: slug.value.trim() || null,
+    slug_alias: slug_alias.value.trim() || null,
     or_attivo: document.body.dataset.attivo === 'true'
   };
   let result;
