@@ -1168,6 +1168,13 @@ window.toggleSection = (sec) => {
     document.getElementById("seriePanel").style.display = serieOpen ? "block" : "none";
     document.getElementById("serieArrow").textContent = serieOpen ? "▼" : "▶";
   }
+    if (sec === "social") {
+    if (socialList.length === 0) return;
+    socialOpen = !socialOpen;
+    document.getElementById("socialPanel").style.display = socialOpen ? "block" : "none";
+    document.getElementById("socialArrow").textContent = socialOpen ? "▼" : "▶";
+    return;
+  }
 };
 
 await load();
