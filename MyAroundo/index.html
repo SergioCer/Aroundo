@@ -1,5 +1,5 @@
-
 <!DOCTYPE html>
+
 <html lang="it">
 <head>
 
@@ -7,10 +7,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>MyAroundo</title>
+
 <style>
+
 *{
     box-sizing:border-box;
 }
+
 body{
     margin:0;
     font-family:Arial,Helvetica,sans-serif;
@@ -226,145 +229,182 @@ body{
 }
 
 </style>
+
 </head>
+
 <body>
 
 <div class="page">
 
-    <!-- COPERTINA -->
+```
+<!-- COPERTINA -->
 
-    <div id="cover" class="cover hidden">
-        <img id="coverImg" src="" alt="">
-        <div class="cover-overlay"></div>
+<div id="cover" class="cover hidden">
+
+    <img
+        id="coverImg"
+        src=""
+        alt=""
+    >
+
+    <div class="cover-overlay"></div>
+
+</div>
+
+
+<!-- IDENTITA -->
+
+<section class="identity">
+
+    <div class="logo-wrap">
+
+        <img
+            id="logoImg"
+            class="logo"
+            src=""
+            alt=""
+        >
+
     </div>
 
-    <!-- IDENTITA -->
-
-    <section class="identity">
-
-        <div class="logo-wrap">
-            <img
-                id="logoImg"
-                class="logo"
-                src=""
-                alt=""
-            >
-        </div>
-
-        <div
-            id="organizerName"
-            class="name">
-        </div>
-
-        <div
-            id="organizerSlogan"
-            class="slogan hidden">
-        </div>
-
-        <div
-            id="organizerDescription"
-            class="description hidden">
-        </div>
-
-    </section>
-
-    <!-- SOCIAL -->
 
     <div
-        id="social"
-        class="social">
+        id="organizerName"
+        class="name">
     </div>
 
-    <!-- CONTATTI -->
 
-    <section
-        id="contacts"
-        class="section">
-
-        <div class="section-title">
-            Contatti
-        </div>
-
-        <div
-            id="emailRow"
-            class="contact-row hidden">
-
-            <div class="contact-label">
-                Email
-            </div>
-
-            <div
-                id="email"
-                class="contact-value">
-            </div>
-
-        </div>
-
-        <div
-            id="pecRow"
-            class="contact-row hidden">
-
-            <div class="contact-label">
-                PEC
-            </div>
-
-            <div
-                id="pec"
-                class="contact-value">
-            </div>
-
-        </div>
-
-        <div
-            id="phoneRow"
-            class="contact-row hidden">
-
-            <div class="contact-label">
-                Telefono
-            </div>
-
-            <div
-                id="phone"
-                class="contact-value">
-            </div>
-
-        </div>
-
-        <div
-            id="websiteRow"
-            class="contact-row hidden">
-
-            <div class="contact-label">
-                Sito web
-            </div>
-
-            <div
-                id="website"
-                class="contact-value">
-            </div>
-
-        </div>
-
-        <div
-            id="addressRow"
-            class="contact-row hidden">
-
-            <div class="contact-label">
-                Indirizzo
-            </div>
-
-            <div
-                id="address"
-                class="contact-value">
-            </div>
-
-        </div>
-
-    </section>
-
-    <div class="footer">
-        MyAroundo
+    <div
+        id="organizerSlogan"
+        class="slogan hidden">
     </div>
+
+
+    <div
+        id="organizerDescription"
+        class="description hidden">
+    </div>
+
+</section>
+
+
+<!-- SOCIAL -->
+
+<div
+    id="social"
+    class="social">
+</div>
+
+
+<!-- CONTATTI -->
+
+<section
+    id="contacts"
+    class="section">
+
+    <div class="section-title">
+        Contatti
+    </div>
+
+
+    <!-- EMAIL -->
+
+    <div
+        id="emailRow"
+        class="contact-row hidden">
+
+        <div class="contact-label">
+            Email
+        </div>
+
+        <div
+            id="email"
+            class="contact-value">
+        </div>
+
+    </div>
+
+
+    <!-- PEC -->
+
+    <div
+        id="pecRow"
+        class="contact-row hidden">
+
+        <div class="contact-label">
+            PEC
+        </div>
+
+        <div
+            id="pec"
+            class="contact-value">
+        </div>
+
+    </div>
+
+
+    <!-- TELEFONO -->
+
+    <div
+        id="phoneRow"
+        class="contact-row hidden">
+
+        <div class="contact-label">
+            Telefono
+        </div>
+
+        <div
+            id="phone"
+            class="contact-value">
+        </div>
+
+    </div>
+
+
+    <!-- SITO WEB -->
+
+    <div
+        id="websiteRow"
+        class="contact-row hidden">
+
+        <div class="contact-label">
+            Sito web
+        </div>
+
+        <div
+            id="website"
+            class="contact-value">
+        </div>
+
+    </div>
+
+
+    <!-- INDIRIZZO -->
+
+    <div
+        id="addressRow"
+        class="contact-row hidden">
+
+        <div class="contact-label">
+            Indirizzo
+        </div>
+
+        <div
+            id="address"
+            class="contact-value">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<div class="footer">
+    MyAroundo
+</div>
+```
 
 </div>
 
@@ -372,37 +412,60 @@ body{
 
 import { supabase } from "../supabase.js";
 
+
 /* =========================================================
    SLUG
 ========================================================= */
 
 const params = new URLSearchParams(location.search);
-const slug = params.get("slug");
+
+const slug = (params.get("slug") || "").trim();
+
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
 function show(id){
-    document.getElementById(id)?.classList.remove("hidden");
+
+    document
+        .getElementById(id)
+        ?.classList
+        .remove("hidden");
+
 }
+
 
 function hide(id){
-    document.getElementById(id)?.classList.add("hidden");
+
+    document
+        .getElementById(id)
+        ?.classList
+        .add("hidden");
+
 }
+
 
 function setText(id,value){
-    const el = document.getElementById(id);
+
+    const el =
+        document.getElementById(id);
+
     if(!el) return;
 
-    el.textContent = value || "";
+    el.textContent =
+        value || "";
+
 }
+
 
 function safeUrl(url){
 
-    if(!url) return "";
+    if(!url)
+        return "";
 
-    const value = url.trim();
+    const value =
+        String(url).trim();
 
     if(
         value.startsWith("https://") ||
@@ -410,11 +473,15 @@ function safeUrl(url){
         value.startsWith("mailto:") ||
         value.startsWith("tel:")
     ){
+
         return value;
+
     }
 
     return "";
+
 }
+
 
 /* =========================================================
    CARICAMENTO ORGANIZZATORE
@@ -430,9 +497,20 @@ async function loadOrganizer(){
         );
 
         return;
+
     }
 
-    const { data, error } = await supabase
+
+    /*
+       Prima cerchiamo lo slug principale.
+       Se non esiste, proviamo lo slug_alias.
+
+       Questo permette di mantenere temporaneamente
+       operativo un vecchio indirizzo distribuito
+       tramite QR, volantini, adesivi, ecc.
+    */
+
+    let { data, error } = await supabase
 
         .from("organizzatori")
 
@@ -441,6 +519,7 @@ async function loadOrganizer(){
             or_nome,
             or_descrizione,
             or_email,
+            or_pec,
             or_telefono,
             or_sito_web,
             or_copertina,
@@ -460,12 +539,60 @@ async function loadOrganizer(){
 
         .eq("or_attivo",true)
 
-        .single();
+        .maybeSingle();
+
+
+    /*
+       Se lo slug principale non viene trovato,
+       cerchiamo nell'alias.
+    */
+
+    if(!data && !error){
+
+        const result =
+            await supabase
+
+                .from("organizzatori")
+
+                .select(`
+                    id_organizzatore,
+                    or_nome,
+                    or_descrizione,
+                    or_email,
+                    or_pec,
+                    or_telefono,
+                    or_sito_web,
+                    or_copertina,
+                    or_logo,
+                    or_slogan,
+                    or_indirizzo,
+                    slug,
+                    slug_alias,
+                    id_comune,
+                    comuni(
+                        co_descrizione,
+                        co_cap
+                    )
+                `)
+
+                .eq("slug_alias",slug)
+
+                .eq("or_attivo",true)
+
+                .maybeSingle();
+
+        data = result.data;
+        error = result.error;
+
+    }
 
 
     if(error || !data){
 
-        console.error(error);
+        console.error(
+            "Errore caricamento MyAroundo:",
+            error
+        );
 
         renderError(
             "MyAroundo non disponibile",
@@ -473,12 +600,18 @@ async function loadOrganizer(){
         );
 
         return;
+
     }
+
 
     renderOrganizer(data);
 
-    await loadSocial(data.id_organizzatore);
+    await loadSocial(
+        data.id_organizzatore
+    );
+
 }
+
 
 /* =========================================================
    ORGANIZZATORE
@@ -501,6 +634,7 @@ function renderOrganizer(data){
 
     }
 
+
     /* LOGO */
 
     if(data.or_logo){
@@ -515,12 +649,14 @@ function renderOrganizer(data){
 
     }
 
+
     /* NOME */
 
     setText(
         "organizerName",
         data.or_nome
     );
+
 
     /* SLOGAN */
 
@@ -535,6 +671,7 @@ function renderOrganizer(data){
 
     }
 
+
     /* DESCRIZIONE */
 
     if(data.or_descrizione){
@@ -548,22 +685,46 @@ function renderOrganizer(data){
 
     }
 
+
     /* EMAIL */
 
     if(data.or_email){
 
-        const el =
-            document.getElementById("email");
+        const email =
+            data.or_email.trim();
 
-        el.innerHTML = `
-            <a href="mailto:${encodeURIComponent(data.or_email)}">
-                ${escapeHtml(data.or_email)}
+        document.getElementById("email").innerHTML = `
+
+            <a href="mailto:${encodeURIComponent(email)}">
+                ${escapeHtml(email)}
             </a>
+
         `;
 
         show("emailRow");
 
     }
+
+
+    /* PEC */
+
+    if(data.or_pec){
+
+        const pec =
+            data.or_pec.trim();
+
+        document.getElementById("pec").innerHTML = `
+
+            <a href="mailto:${encodeURIComponent(pec)}">
+                ${escapeHtml(pec)}
+            </a>
+
+        `;
+
+        show("pecRow");
+
+    }
+
 
     /* TELEFONO */
 
@@ -573,16 +734,19 @@ function renderOrganizer(data){
             data.or_telefono.trim();
 
         document.getElementById("phone").innerHTML = `
+
             <a href="tel:${escapeHtml(phone)}">
                 ${escapeHtml(phone)}
             </a>
+
         `;
 
         show("phoneRow");
 
     }
 
-    /* SITO */
+
+    /* SITO WEB */
 
     if(data.or_sito_web){
 
@@ -592,12 +756,16 @@ function renderOrganizer(data){
         if(url){
 
             document.getElementById("website").innerHTML = `
+
                 <a
                     href="${escapeHtml(url)}"
                     target="_blank"
                     rel="noopener noreferrer">
+
                     ${escapeHtml(data.or_sito_web)}
+
                 </a>
+
             `;
 
             show("websiteRow");
@@ -606,18 +774,38 @@ function renderOrganizer(data){
 
     }
 
+
     /* INDIRIZZO */
 
     const addressParts = [];
 
-    if(data.or_indirizzo)
-        addressParts.push(data.or_indirizzo);
 
-    if(data.comuni?.co_descrizione)
-        addressParts.push(data.comuni.co_descrizione);
+    if(data.or_indirizzo){
 
-    if(data.comuni?.co_cap)
-        addressParts.push(data.comuni.co_cap);
+        addressParts.push(
+            data.or_indirizzo
+        );
+
+    }
+
+
+    if(data.comuni?.co_descrizione){
+
+        addressParts.push(
+            data.comuni.co_descrizione
+        );
+
+    }
+
+
+    if(data.comuni?.co_cap){
+
+        addressParts.push(
+            data.comuni.co_cap
+        );
+
+    }
+
 
     if(addressParts.length){
 
@@ -630,23 +818,29 @@ function renderOrganizer(data){
 
     }
 
+
     /* NASCONDE CONTATTI VUOTI */
 
     const contactRows = [
+
         "emailRow",
         "pecRow",
         "phoneRow",
         "websiteRow",
         "addressRow"
+
     ];
+
 
     const visible =
         contactRows.some(
+
             id =>
                 !document
                     .getElementById(id)
                     .classList
                     .contains("hidden")
+
         );
 
 
@@ -654,6 +848,7 @@ function renderOrganizer(data){
         hide("contacts");
 
 }
+
 
 /* =========================================================
    SOCIAL
@@ -685,8 +880,11 @@ async function loadSocial(idOrganizzatore){
 
         .order(
             "so_order",
-            { ascending:true }
+            {
+                ascending:true
+            }
         );
+
 
     if(error){
 
@@ -696,7 +894,9 @@ async function loadSocial(idOrganizzatore){
         );
 
         return;
+
     }
+
 
     const container =
         document.getElementById("social");
@@ -709,32 +909,59 @@ async function loadSocial(idOrganizzatore){
         const url =
             safeUrl(s.so_url);
 
-        if(!url || !s.social?.so_img)
+
+        if(
+            !url ||
+            !s.social?.so_img
+        ){
+
             return;
+
+        }
+
 
         const link =
             document.createElement("a");
 
+
         link.className =
             "social-link";
+
 
         link.href =
             url;
 
+
         link.target =
             "_blank";
+
 
         link.rel =
             "noopener noreferrer";
 
+
+        /*
+           L'icona è il vero pulsante del social.
+           La descrizione rimane un dato amministrativo
+           e sarà eventualmente utilizzata in una futura
+           evoluzione grafica.
+        */
+
         const img =
             document.createElement("img");
+
 
         img.src =
             s.social.so_img;
 
+
         img.alt =
-            s.social.so_description || "Social";
+            s.social.so_description ||
+            "Social";
+
+
+        img.loading =
+            "lazy";
 
 
         link.appendChild(img);
@@ -744,10 +971,14 @@ async function loadSocial(idOrganizzatore){
     });
 
 
-    if(!container.children.length)
+    if(!container.children.length){
+
         hide("social");
 
+    }
+
 }
+
 
 /* =========================================================
    ERRORE
@@ -773,14 +1004,19 @@ function renderError(title,message){
                     font-weight:700;
                     margin-bottom:10px;
                 ">
+
                     ${escapeHtml(title)}
+
                 </div>
+
 
                 <div style="
                     color:#6b7280;
                     font-size:15px;
                 ">
+
                     ${escapeHtml(message)}
+
                 </div>
 
             </div>
@@ -791,6 +1027,7 @@ function renderError(title,message){
 
 }
 
+
 /* =========================================================
    HTML ESCAPE
 ========================================================= */
@@ -798,6 +1035,7 @@ function renderError(title,message){
 function escapeHtml(value){
 
     return String(value ?? "")
+
         .replace(/&/g,"&amp;")
         .replace(/</g,"&lt;")
         .replace(/>/g,"&gt;")
@@ -806,6 +1044,7 @@ function escapeHtml(value){
 
 }
 
+
 /* =========================================================
    START
 ========================================================= */
@@ -813,5 +1052,6 @@ function escapeHtml(value){
 loadOrganizer();
 
 </script>
+
 </body>
 </html>
