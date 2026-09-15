@@ -254,6 +254,136 @@ input, textarea {
   </div>
 
 <div class="section-box">
+  <div class="section-header" onclick="toggleSection('social')">
+    <span id="socialArrow">▶</span>
+    <span id="socialTitle">Social (0)</span>
+    <button onclick="createSocial(event)" style="
+      margin-left:auto;
+      width:26px;
+      height:26px;
+      border-radius:13px;
+      border:none;
+      background:#22c55e;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+    ">+</button>
+  </div>
+  <div class="section-panel" id="socialPanel" style="display:none;">
+    <table class="mini-table">
+      <tbody id="socialBody"></tbody>
+    </table>
+  </div>
+</div>
+<!-- DIALOG SOCIAL -->
+<div id="socialDialog" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  z-index:99999;
+  align-items:center;
+  justify-content:center;
+">
+  <div style="
+    background:white;
+    padding:22px;
+    border-radius:12px;
+    width:320px;
+    max-width:calc(100% - 40px);
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+  ">
+    <div style="
+      margin-bottom:18px;
+      font-weight:600;
+      text-align:center;
+    ">
+      Aggiungi social
+    </div>
+    <div class="section-title">Social</div>
+    <select id="socialSelect" style="
+      width:100%;
+      box-sizing:border-box;
+      padding:10px;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      font-size:15px;
+      margin-bottom:12px;
+    ">
+      <option value="">Seleziona social...</option>
+    </select>
+    <div class="section-title">URL</div>
+    <input
+      id="socialUrl"
+      type="url"
+      placeholder="https://..."
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:10px;
+        border:1px solid #d1d5db;
+        border-radius:8px;
+        font-size:15px;
+        margin-bottom:12px;
+      "
+    >
+    <div class="section-title">
+      Descrizione
+      <span style="
+        float:right;
+        color:#9ca3af;
+        font-size:11px;
+        font-weight:normal;
+      ">max 60</span>
+    </div>
+    <input
+      id="socialDescription"
+      type="text"
+      maxlength="60"
+      placeholder="es. Prenotazioni, informazioni..."
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:10px;
+        border:1px solid #d1d5db;
+        border-radius:8px;
+        font-size:15px;
+      "
+    >
+    <div style="
+      display:flex;
+      gap:10px;
+      margin-top:20px;
+    ">
+      <button onclick="saveSocial()" style="
+        flex:1;
+        background:#22c55e;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">
+        Salva
+      </button>
+      <button onclick="closeSocialDialog()" style="
+        flex:1;
+        background:#9ca3af;
+        color:white;
+        border:none;
+        padding:10px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:600;
+      ">
+        Annulla
+      </button>
+    </div>
+  </div>
+</div>
+  
+<div class="section-box">
 <div class="section-header" onclick="toggleSection('eventi')">
 <span id="eventiArrow">▶</span>
 <span id="eventiTitle">Eventi (0)</span>
@@ -385,7 +515,11 @@ let eventiOpen=false;
 let luoghiOpen=false;
 let serieList = [];
 let serieOpen = false;
-let idComune = null;  
+let idComune = null;
+let socialList = [];
+let socialCatalog = [];
+let socialOpen = false;
+let editingSocialId = null;  
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -404,6 +538,8 @@ async function load() {
   if (isNew) {
     original = JSON.stringify({});
     updateStatus(false);
+    socialList = []; 
+    renderSocial();
     return;
   }
   const { data, error } = await supabase .from('organizzatori') .select(` *, comuni ( co_descrizione, co_cap ) `) .eq('id_organizzatore', id) .single();
@@ -435,7 +571,11 @@ async function load() {
 eventiOpen = false;
 luoghiOpen = false;
 document.getElementById("eventiArrow").textContent = "▶";
-document.getElementById("luoghiArrow").textContent = "▶";  
+document.getElementById("luoghiArrow").textContent = "▶";
+  await loadEventiOrganizzatore(id);
+  await loadSerieOrganizzatore(id);
+  await loadSocialCatalog();
+  await loadSocialOrganizzatore(id);
 }
 
 function validateFondazione() {
@@ -494,7 +634,235 @@ window.searchComuniOrganizzatore = async (text) => {
     box.appendChild(div);
   });
 };
-  
+
+async function loadSocialCatalog(){
+  const { data, error } = await supabase
+    .from('social')
+    .select('id_social, so_img, so_description')
+    .order('so_description', { ascending:true });
+  if(error){
+    console.error("ERRORE CATALOGO SOCIAL:", error);
+    return;
+  }
+  socialCatalog = data || [];
+}
+
+async function loadSocialOrganizzatore(idOrg){
+  const { data, error } = await supabase
+    .from('social_organizzatori')
+    .select(`
+      id_social_organizer,
+      id_organizzatore,
+      id_social,
+      so_url,
+      so_description,
+      so_order,
+      social(
+        id_social,
+        so_img,
+        so_description
+      )
+    `)
+    .eq('id_organizzatore', idOrg)
+    .order('so_order', { ascending:true });
+  if(error){
+    console.error("ERRORE SOCIAL:", error);
+    return;
+  }
+  socialList = data || [];
+  renderSocial();
+}  
+
+function renderSocial(){
+  const body = document.getElementById("socialBody");
+  body.innerHTML = "";
+  document.getElementById("socialTitle").textContent =
+    `Social (${socialList.length})`;
+  document.getElementById("socialArrow").textContent =
+    socialOpen ? "▼" : "▶";
+  const section =
+    document.querySelector("#socialPanel").previousElementSibling;
+  if(socialList.length === 0){
+    section.classList.add("disabled");
+    return;
+  }
+  section.classList.remove("disabled");
+  socialList.forEach(s => {
+    const tr = document.createElement("tr");
+    tr.dataset.id = s.id_social_organizer;
+    tr.innerHTML = `
+      <td style="
+        width:30px;
+        color:#6b7280;
+        cursor:grab;
+        font-size:18px;
+      ">
+        ☰
+      </td>
+      <td style="width:34px;text-align:center;">
+        <img
+          src="${s.social?.so_img || ""}"
+          style="
+            width:24px;
+            height:24px;
+            object-fit:contain;
+            display:block;
+            margin:auto;
+          "
+        >
+      </td>
+      <td style="font-weight:600;">
+        ${s.social?.so_description || ""}
+      </td>
+      <td style="
+        color:#6b7280;
+        max-width:120px;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+      ">
+        ${s.so_description || ""}
+      </td>
+
+      <td style="
+        width:34px;
+        text-align:center;
+      ">
+        <button
+          onclick="deleteSocial(event, ${s.id_social_organizer})"
+          style="
+            width:26px;
+            height:26px;
+            border:none;
+            border-radius:13px;
+            background:#ef4444;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+          "
+        >−</button>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+  initSocialSortable();
+}  
+
+function initSocialSortable(){
+  const body = document.getElementById("socialBody");
+  if(body._sortable){
+    body._sortable.destroy();
+  }
+  body._sortable = new Sortable(body, {
+    animation:150,
+    handle:"td:first-child",
+    draggable:"tr",
+    onEnd: async () => {
+      const rows = [...body.querySelectorAll("tr")];
+      for(let i = 0; i < rows.length; i++){
+        await supabase
+          .from("social_organizzatori")
+          .update({
+            so_order:i + 1
+          })
+          .eq(
+            "id_social_organizer",
+            rows[i].dataset.id
+          );
+      }
+      await loadSocialOrganizzatore(id);
+    }
+  });
+}
+
+ function populateSocialSelect(){
+  const select =
+    document.getElementById("socialSelect");
+  select.innerHTML =
+    `<option value="">Seleziona social...</option>`;
+  socialCatalog.forEach(s => {
+    const option =
+      document.createElement("option");
+    option.value = s.id_social;
+    option.textContent = s.so_description;
+    select.appendChild(option);
+  });
+} 
+
+  window.createSocial = async (e) => {
+  e.stopPropagation();
+  editingSocialId = null;
+  populateSocialSelect();
+  document.getElementById("socialSelect").value = "";
+  document.getElementById("socialUrl").value = "";
+  document.getElementById("socialDescription").value = "";
+  document.getElementById("socialDialog").style.display = "flex";
+};
+
+window.saveSocial = async () => {
+  const idSocial =
+    document.getElementById("socialSelect").value;
+  const url =
+    document.getElementById("socialUrl").value.trim();
+  const description =
+    document.getElementById("socialDescription").value.trim();
+  if(!idSocial){
+    alert("Seleziona un social.");
+    return;
+  }
+  if(!url){
+    alert("Inserisci l'URL.");
+    return;
+  }
+  const maxOrder =
+    socialList.length
+      ? Math.max(...socialList.map(s => s.so_order))
+      : 0;
+  const { error } = await supabase
+    .from("social_organizzatori")
+    .insert({
+      id_organizzatore:id,
+      id_social:Number(idSocial),
+      so_url:url,
+      so_description:description || null,
+      so_order:maxOrder + 1
+    });
+  if(error){
+    console.error("ERRORE SALVATAGGIO SOCIAL:", error);
+    alert("Errore nel salvataggio del social.");
+    return;
+  }
+  closeSocialDialog();
+  await loadSocialOrganizzatore(id);
+  markDirty();
+};
+
+window.deleteSocial = async (e, socialOrganizerId) => {
+  e.stopPropagation();
+  const ok = confirm(
+    "Vuoi rimuovere questo riferimento social dall'organizzatore?"
+  );
+  if(!ok) return;
+  const { error } = await supabase
+    .from("social_organizzatori")
+    .delete()
+    .eq(
+      "id_social_organizer",
+      socialOrganizerId
+    );
+  if(error){
+    console.error("ERRORE ELIMINAZIONE SOCIAL:", error);
+    alert("Errore nella rimozione del social.");
+    return;
+  }
+  await loadSocialOrganizzatore(id);
+  markDirty();
+};
+
+window.closeSocialDialog = () => {
+  document.getElementById("socialDialog").style.display = "none";
+  editingSocialId = null;
+};
   
 function sortEventi(list){
 return [...list].sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio));
@@ -799,13 +1167,7 @@ window.toggleSection = (sec) => {
   }
 };
 
-await load();
-
-if (!isNew) {
-  await loadEventiOrganizzatore(id);
-  await loadSerieOrganizzatore(id);
-}
-  
+ 
 </script>
 </body>
 </html>
