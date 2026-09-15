@@ -30,17 +30,31 @@ body{
     position:relative;
     width:100%;
     height:220px;
-    background:#e5e7eb;
     overflow:hidden;
+    background:#e5e7eb;
+}
+
+.cover::before{
+    content:"";
+    position:absolute;
+    inset:-20px;
+    background-image:var(--cover-bg);
+    background-size:cover;
+    background-position:center;
+    filter:blur(18px);
+    transform:scale(1.08);
+    opacity:.35;
 }
 
 .cover img{
+    position:relative;
+    z-index:1;
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:contain;
     display:block;
 }
-
+    
 .cover-overlay{
     position:absolute;
     inset:0;
@@ -475,7 +489,11 @@ function renderOrganizer(data){
         `${data.or_nome || "MyAroundo"} — MyAroundo`;
     /* COVER */
     if(data.or_copertina){
-        document.getElementById("coverImg").src = `https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${data.or_copertina}`;
+        const cover = document.getElementById("cover");
+        const coverImg = document.getElementById("coverImg");
+        const coverUrl = `https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${data.or_copertina}`;
+        coverImg.src = coverUrl;
+        cover.style.setProperty("--cover-bg", `url("${coverUrl}")`);
         show("cover");
     }
     /* LOGO */
