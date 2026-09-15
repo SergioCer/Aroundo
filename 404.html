@@ -5,40 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyAroundo</title>
   <script>
-    /* GitHub Pages ci ha portato qui perché l'URL
-     * richiesto non corrisponde ad un file fisico.
-     * Intercettiamo soltanto:
-     * /MyAroundo/SLUG */
-    const path = location.pathname;
-    const marker = "/MyAroundo/";
-    if (path.startsWith(marker)) {
-      const slug = path
-        .substring(marker.length)
-        .replace(/^\/+|\/+$/g, "");
-      if (slug && !slug.includes("/")) {
-        const target =
-          "/MyAroundo/index.html?slug=" +
-          encodeURIComponent(slug);
-        location.replace(target);
-      } else {
-        location.replace("/404.html");
-      }
+  /*  GitHub Pages usa questa pagina quando l'URL richiesto
+      non corrisponde ad un file fisico.
+      Esempio: /pro_loco_trapani
+      diventa: /MyAroundo/index.html?slug=pro_loco_trapani */
+    const path = window.location.pathname;
+    /* Eliminiamo eventuali slash iniziali/finali. */
+    const slug = path
+      .replace(/^\/+|\/+$/g, '');
+    /* Se non c'è uno slug, torniamo alla home del sito. */
+    if (!slug) {
+      window.location.replace('/');
     } else {
-      document.addEventListener("DOMContentLoaded", () => {
-        document.body.innerHTML = `
-          <div style="
-            font-family:Arial,Helvetica,sans-serif;
-            text-align:center;
-            padding:60px 20px;
-          ">
-            <h1>404</h1>
-            <p>Pagina non trovata.</p>
-          </div>
-        `;
-      });
+   /*  Evitiamo di intercettare eventuali percorsi reali che appartengono alla struttura del sito. */
+      window.location.replace(
+        '/MyAroundo/index.html?slug=' +
+        encodeURIComponent(slug)
+      );
     }
   </script>
 </head>
 <body>
+  <p>Caricamento MyAroundo...</p>
 </body>
 </html>
