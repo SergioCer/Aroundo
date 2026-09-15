@@ -377,9 +377,6 @@ input, select, textarea {
 <select id="id_luogo" hidden></select>    
   <div style="display:flex; gap:10px;">    
   <button id="mapBtn" class="btn-icon" onclick="openMapByComune()" title="View Map">📍</button>
-  <!-- CANCELLARE
-  <button id="addPlaceBtn" type="button" class="btn-icon" onclick="window.location.href='luogo.html?new=1&id_comune='+ id_comune_evento_hidden.value" title="Add Place">+</button>
-  -->
   <button id="addPlaceBtn" type="button" class="btn-icon" onclick="newPlace()" title="Add Place">+</button>    
     </div>
   </div>
@@ -408,9 +405,6 @@ input, select, textarea {
   <div style="display:flex; gap:10px; align-items:center;">
   <input id="id_organizzatore" class="guide-field" autocomplete="off" placeholder="Organizer, min 3 chars to search..." oninput="searchOrganizzatori(this.value)" style="flex:1;">
   <input type="hidden" id="id_organizzatore_hidden">
-  <!-- CANCELLARE    
-  <button type="button" class="btn-icon btn-green" onclick="window.location.href='organizzatore.html?new=1'" title="Add Organizer">+</button>
-  -->
   <button type="button" class="btn-icon btn-green" onclick="newOrganizer()" title="Add Organizer">+</button>    
   </div>
   <div id="organizzatoriResults" class="search-results"></div>
