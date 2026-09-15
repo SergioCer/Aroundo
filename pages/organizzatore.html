@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
 <title>Organizzatore</title>
 
 <style>
@@ -495,8 +496,10 @@ input, textarea {
 </div>
   
 </div>
-
+  
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>  
 <script type="module">
+  
 import { requireAuth } from './auth-check.js';
 await requireAuth();  
   
@@ -535,6 +538,7 @@ function dialogAction(type) {
 
 /* LOAD */
 async function load() {
+  await loadSocialCatalog();
   if (isNew) {
     original = JSON.stringify({});
     updateStatus(false);
@@ -574,7 +578,6 @@ document.getElementById("eventiArrow").textContent = "▶";
 document.getElementById("luoghiArrow").textContent = "▶";
   await loadEventiOrganizzatore(id);
   await loadSerieOrganizzatore(id);
-  await loadSocialCatalog();
   await loadSocialOrganizzatore(id);
 }
 
@@ -1167,7 +1170,8 @@ window.toggleSection = (sec) => {
   }
 };
 
- 
+await load();
+  
 </script>
 </body>
 </html>
