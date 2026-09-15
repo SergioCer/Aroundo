@@ -200,6 +200,22 @@ input, textarea {
 
 <div class="card">
 
+  <div class="section-title">Logo (URL)</div>
+  <input id="or_logo" oninput="markDirty()">
+
+  <div class="section-title">Slogan</div>
+  <input id="or_slogan" maxlength="120" placeholder="Breve frase identificativa" oninput="markDirty()">
+
+  <div class="section-title">Anno di fondazione</div>
+  <input id="or_fondazione" type="number" min="1800" max="2200" placeholder="AAAA" oninput="markDirty()">
+  <div id="fondazioneError" style=" display:none; color:#ef4444; font-size:11px; margin-top:4px; "> Inserisci un anno valido. </div>
+
+  <div class="section-title">Identificativo fiscale</div>
+  <input id="tax_code" oninput="markDirty()">
+
+  <div class="section-title">RUNTS</div>
+  <input id="runts" oninput="markDirty()">
+
   <div class="section-title">Descrizione</div>
   <textarea id="or_descrizione" oninput="markDirty()"></textarea>
   
@@ -404,6 +420,11 @@ async function load() {
   }
   original = JSON.stringify(data);
   or_nome.value = data.or_nome || '';
+  or_logo.value = data.or_logo || '';
+  or_slogan.value = data.or_slogan || '';
+  or_fondazione.value = data.or_fondazione || '';
+  tax_code.value = data.tax_code || '';
+  runts.value = data.runts || '';
   or_descrizione.value = data.or_descrizione || '';
   id_comune.value = data.id_comune || '';
   or_indirizzo.value = data.or_indirizzo || '';
@@ -438,6 +459,27 @@ async function loadComuni() {
     option.textContent = comune.co_descrizione;
     select.appendChild(option);
   });
+}
+
+function validateFondazione() {
+  const input = document.getElementById('or_fondazione');
+  const error = document.getElementById('fondazioneError');
+  const value = input.value.trim();
+  // Campo facoltativo
+  if (value === '') {
+    input.style.borderColor = '#ddd';
+    error.style.display = 'none';
+    return true;
+  }
+  const year = Number(value);
+  const currentYear = new Date().getFullYear();
+  const valid =
+    Number.isInteger(year) &&
+    year >= 1800 &&
+    year <= currentYear;
+  input.style.borderColor = valid ? '#ddd' : '#ef4444';
+  error.style.display = valid ? 'none' : 'block';
+  return valid;
 }
   
 function sortEventi(list){
@@ -609,9 +651,15 @@ return `${yy}/${mm}/${dd}`;
 
 /* SAVE */
 async function save() {
+if (!validateFondazione()) {alert("Controlla l'anno di fondazione."); return false;}  
   const payload = {
     or_nome: or_nome.value,
     or_descrizione: or_descrizione.value,
+    or_logo: or_logo.value,
+    or_slogan: or_slogan.value,
+    or_fondazione: or_fondazione.value ? Number(or_fondazione.value) : null,
+    tax_code: tax_code.value,
+    runts: runts.value,
     id_comune: id_comune.value ? Number(id_comune.value) : null,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
@@ -670,6 +718,11 @@ window.markDirty = () => {
   const current = JSON.stringify({
     or_nome: or_nome.value,
     or_descrizione: or_descrizione.value,
+    or_logo: or_logo.value,
+    or_slogan: or_slogan.value,
+    or_fondazione: or_fondazione.value ? Number(or_fondazione.value) : null,
+    tax_code: tax_code.value,
+    runts: runts.value,
     id_comune: id_comune.value ? Number(id_comune.value) : null,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
