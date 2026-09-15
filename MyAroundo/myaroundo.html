@@ -1,0 +1,817 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MyAroundo</title>
+<style>
+*{
+    box-sizing:border-box;
+}
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f2f4f7;
+    color:#1f2937;
+}
+
+.page{
+    width:100%;
+    max-width:680px;
+    margin:0 auto;
+    min-height:100vh;
+    background:white;
+}
+
+/* HEADER */
+
+.cover{
+    position:relative;
+    width:100%;
+    height:220px;
+    background:#e5e7eb;
+    overflow:hidden;
+}
+
+.cover img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.cover-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.05),
+        rgba(0,0,0,0.35)
+    );
+}
+
+/* IDENTITA */
+
+.identity{
+    position:relative;
+    padding:0 22px 24px;
+    text-align:center;
+}
+
+.logo-wrap{
+    width:108px;
+    height:108px;
+    margin:-54px auto 14px;
+    position:relative;
+    z-index:2;
+    background:white;
+    border-radius:54px;
+    padding:6px;
+    box-shadow:0 4px 18px rgba(0,0,0,.15);
+}
+
+.logo{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    border-radius:50%;
+    background:white;
+}
+
+.name{
+    font-size:26px;
+    font-weight:700;
+    margin:4px 0 6px;
+}
+
+.slogan{
+    font-size:15px;
+    color:#6b7280;
+    margin-bottom:16px;
+}
+
+.description{
+    font-size:15px;
+    line-height:1.55;
+    color:#374151;
+    max-width:570px;
+    margin:0 auto;
+}
+
+/* SOCIAL */
+
+.social{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    padding:0 22px 24px;
+}
+
+.social-link{
+    width:46px;
+    height:46px;
+    border-radius:23px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#f8fafc;
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.social-link:hover{
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+
+.social-link img{
+    width:30px;
+    height:30px;
+    object-fit:contain;
+    display:block;
+}
+
+/* CONTATTI */
+
+.section{
+    margin:0 18px 18px;
+    border-radius:18px;
+    background:#f8fafc;
+    padding:18px;
+}
+
+.section-title{
+    font-size:14px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:#6b7280;
+    margin-bottom:12px;
+}
+
+.contact-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:7px 0;
+    font-size:14px;
+}
+
+.contact-label{
+    width:80px;
+    flex:0 0 80px;
+    color:#6b7280;
+}
+
+.contact-value{
+    flex:1;
+    color:#1f2937;
+    word-break:break-word;
+}
+
+.contact-value a{
+    color:inherit;
+    text-decoration:none;
+}
+
+.contact-value a:hover{
+    text-decoration:underline;
+}
+
+/* FOOTER */
+
+.footer{
+    text-align:center;
+    padding:24px 15px 30px;
+    color:#9ca3af;
+    font-size:11px;
+}
+
+.hidden{
+    display:none;
+}
+
+/* MOBILE */
+
+@media(max-width:480px){
+
+    .cover{
+        height:190px;
+    }
+
+    .identity{
+        padding-left:18px;
+        padding-right:18px;
+    }
+
+    .name{
+        font-size:23px;
+    }
+
+    .social{
+        gap:12px;
+    }
+
+    .section{
+        margin-left:12px;
+        margin-right:12px;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- COPERTINA -->
+
+    <div id="cover" class="cover hidden">
+        <img id="coverImg" src="" alt="">
+        <div class="cover-overlay"></div>
+    </div>
+
+    <!-- IDENTITA -->
+
+    <section class="identity">
+
+        <div class="logo-wrap">
+            <img
+                id="logoImg"
+                class="logo"
+                src=""
+                alt=""
+            >
+        </div>
+
+        <div
+            id="organizerName"
+            class="name">
+        </div>
+
+        <div
+            id="organizerSlogan"
+            class="slogan hidden">
+        </div>
+
+        <div
+            id="organizerDescription"
+            class="description hidden">
+        </div>
+
+    </section>
+
+    <!-- SOCIAL -->
+
+    <div
+        id="social"
+        class="social">
+    </div>
+
+    <!-- CONTATTI -->
+
+    <section
+        id="contacts"
+        class="section">
+
+        <div class="section-title">
+            Contatti
+        </div>
+
+        <div
+            id="emailRow"
+            class="contact-row hidden">
+
+            <div class="contact-label">
+                Email
+            </div>
+
+            <div
+                id="email"
+                class="contact-value">
+            </div>
+
+        </div>
+
+        <div
+            id="pecRow"
+            class="contact-row hidden">
+
+            <div class="contact-label">
+                PEC
+            </div>
+
+            <div
+                id="pec"
+                class="contact-value">
+            </div>
+
+        </div>
+
+        <div
+            id="phoneRow"
+            class="contact-row hidden">
+
+            <div class="contact-label">
+                Telefono
+            </div>
+
+            <div
+                id="phone"
+                class="contact-value">
+            </div>
+
+        </div>
+
+        <div
+            id="websiteRow"
+            class="contact-row hidden">
+
+            <div class="contact-label">
+                Sito web
+            </div>
+
+            <div
+                id="website"
+                class="contact-value">
+            </div>
+
+        </div>
+
+        <div
+            id="addressRow"
+            class="contact-row hidden">
+
+            <div class="contact-label">
+                Indirizzo
+            </div>
+
+            <div
+                id="address"
+                class="contact-value">
+            </div>
+
+        </div>
+
+    </section>
+
+    <div class="footer">
+        MyAroundo
+    </div>
+
+</div>
+
+<script type="module">
+
+import { supabase } from "../supabase.js";
+
+/* =========================================================
+   SLUG
+========================================================= */
+
+const params = new URLSearchParams(location.search);
+const slug = params.get("slug");
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function show(id){
+    document.getElementById(id)?.classList.remove("hidden");
+}
+
+function hide(id){
+    document.getElementById(id)?.classList.add("hidden");
+}
+
+function setText(id,value){
+    const el = document.getElementById(id);
+    if(!el) return;
+
+    el.textContent = value || "";
+}
+
+function safeUrl(url){
+
+    if(!url) return "";
+
+    const value = url.trim();
+
+    if(
+        value.startsWith("https://") ||
+        value.startsWith("http://") ||
+        value.startsWith("mailto:") ||
+        value.startsWith("tel:")
+    ){
+        return value;
+    }
+
+    return "";
+}
+
+/* =========================================================
+   CARICAMENTO ORGANIZZATORE
+========================================================= */
+
+async function loadOrganizer(){
+
+    if(!slug){
+
+        renderError(
+            "MyAroundo non disponibile",
+            "Nessuno slug specificato."
+        );
+
+        return;
+    }
+
+    const { data, error } = await supabase
+
+        .from("organizzatori")
+
+        .select(`
+            id_organizzatore,
+            or_nome,
+            or_descrizione,
+            or_email,
+            or_telefono,
+            or_sito_web,
+            or_copertina,
+            or_logo,
+            or_slogan,
+            or_indirizzo,
+            slug,
+            slug_alias,
+            id_comune,
+            comuni(
+                co_descrizione,
+                co_cap
+            )
+        `)
+
+        .eq("slug",slug)
+
+        .eq("or_attivo",true)
+
+        .single();
+
+
+    if(error || !data){
+
+        console.error(error);
+
+        renderError(
+            "MyAroundo non disponibile",
+            "L'organizzatore richiesto non è stato trovato."
+        );
+
+        return;
+    }
+
+    renderOrganizer(data);
+
+    await loadSocial(data.id_organizzatore);
+}
+
+/* =========================================================
+   ORGANIZZATORE
+========================================================= */
+
+function renderOrganizer(data){
+
+    document.title =
+        `${data.or_nome || "MyAroundo"} — MyAroundo`;
+
+
+    /* COVER */
+
+    if(data.or_copertina){
+
+        document.getElementById("coverImg").src =
+            data.or_copertina;
+
+        show("cover");
+
+    }
+
+    /* LOGO */
+
+    if(data.or_logo){
+
+        document.getElementById("logoImg").src =
+            data.or_logo;
+
+    }else{
+
+        document.getElementById("logoImg").style.display =
+            "none";
+
+    }
+
+    /* NOME */
+
+    setText(
+        "organizerName",
+        data.or_nome
+    );
+
+    /* SLOGAN */
+
+    if(data.or_slogan){
+
+        setText(
+            "organizerSlogan",
+            data.or_slogan
+        );
+
+        show("organizerSlogan");
+
+    }
+
+    /* DESCRIZIONE */
+
+    if(data.or_descrizione){
+
+        setText(
+            "organizerDescription",
+            data.or_descrizione
+        );
+
+        show("organizerDescription");
+
+    }
+
+    /* EMAIL */
+
+    if(data.or_email){
+
+        const el =
+            document.getElementById("email");
+
+        el.innerHTML = `
+            <a href="mailto:${encodeURIComponent(data.or_email)}">
+                ${escapeHtml(data.or_email)}
+            </a>
+        `;
+
+        show("emailRow");
+
+    }
+
+    /* TELEFONO */
+
+    if(data.or_telefono){
+
+        const phone =
+            data.or_telefono.trim();
+
+        document.getElementById("phone").innerHTML = `
+            <a href="tel:${escapeHtml(phone)}">
+                ${escapeHtml(phone)}
+            </a>
+        `;
+
+        show("phoneRow");
+
+    }
+
+    /* SITO */
+
+    if(data.or_sito_web){
+
+        const url =
+            safeUrl(data.or_sito_web);
+
+        if(url){
+
+            document.getElementById("website").innerHTML = `
+                <a
+                    href="${escapeHtml(url)}"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    ${escapeHtml(data.or_sito_web)}
+                </a>
+            `;
+
+            show("websiteRow");
+
+        }
+
+    }
+
+    /* INDIRIZZO */
+
+    const addressParts = [];
+
+    if(data.or_indirizzo)
+        addressParts.push(data.or_indirizzo);
+
+    if(data.comuni?.co_descrizione)
+        addressParts.push(data.comuni.co_descrizione);
+
+    if(data.comuni?.co_cap)
+        addressParts.push(data.comuni.co_cap);
+
+    if(addressParts.length){
+
+        setText(
+            "address",
+            addressParts.join(" — ")
+        );
+
+        show("addressRow");
+
+    }
+
+    /* NASCONDE CONTATTI VUOTI */
+
+    const contactRows = [
+        "emailRow",
+        "pecRow",
+        "phoneRow",
+        "websiteRow",
+        "addressRow"
+    ];
+
+    const visible =
+        contactRows.some(
+            id =>
+                !document
+                    .getElementById(id)
+                    .classList
+                    .contains("hidden")
+        );
+
+
+    if(!visible)
+        hide("contacts");
+
+}
+
+/* =========================================================
+   SOCIAL
+========================================================= */
+
+async function loadSocial(idOrganizzatore){
+
+    const { data, error } = await supabase
+
+        .from("social_organizzatori")
+
+        .select(`
+            id_social_organizer,
+            id_social,
+            so_url,
+            so_description,
+            so_order,
+            social(
+                id_social,
+                so_img,
+                so_description
+            )
+        `)
+
+        .eq(
+            "id_organizzatore",
+            idOrganizzatore
+        )
+
+        .order(
+            "so_order",
+            { ascending:true }
+        );
+
+    if(error){
+
+        console.error(
+            "Errore caricamento social:",
+            error
+        );
+
+        return;
+    }
+
+    const container =
+        document.getElementById("social");
+
+    container.innerHTML = "";
+
+
+    (data || []).forEach(s => {
+
+        const url =
+            safeUrl(s.so_url);
+
+        if(!url || !s.social?.so_img)
+            return;
+
+        const link =
+            document.createElement("a");
+
+        link.className =
+            "social-link";
+
+        link.href =
+            url;
+
+        link.target =
+            "_blank";
+
+        link.rel =
+            "noopener noreferrer";
+
+        const img =
+            document.createElement("img");
+
+        img.src =
+            s.social.so_img;
+
+        img.alt =
+            s.social.so_description || "Social";
+
+
+        link.appendChild(img);
+
+        container.appendChild(link);
+
+    });
+
+
+    if(!container.children.length)
+        hide("social");
+
+}
+
+/* =========================================================
+   ERRORE
+========================================================= */
+
+function renderError(title,message){
+
+    document.querySelector(".page").innerHTML = `
+
+        <div style="
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            padding:30px;
+        ">
+
+            <div>
+
+                <div style="
+                    font-size:28px;
+                    font-weight:700;
+                    margin-bottom:10px;
+                ">
+                    ${escapeHtml(title)}
+                </div>
+
+                <div style="
+                    color:#6b7280;
+                    font-size:15px;
+                ">
+                    ${escapeHtml(message)}
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+/* =========================================================
+   START
+========================================================= */
+
+loadOrganizer();
+
+</script>
+</body>
+</html>
