@@ -475,8 +475,7 @@ function renderOrganizer(data){
         `${data.or_nome || "MyAroundo"} — MyAroundo`;
     /* COVER */
     if(data.or_copertina){
-        document.getElementById("coverImg").src =
-            data.or_copertina;
+        document.getElementById("coverImg").src = `https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${data.or_copertina}`;
         show("cover");
     }
     /* LOGO */
