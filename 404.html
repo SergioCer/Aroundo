@@ -1,31 +1,71 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyAroundo</title>
-  <script>
-  /*  GitHub Pages usa questa pagina quando l'URL richiesto
-      non corrisponde ad un file fisico.
-      Esempio: /pro_loco_trapani
-      diventa: /MyAroundo/index.html?slug=pro_loco_trapani */
-    const path = window.location.pathname;
-    /* Eliminiamo eventuali slash iniziali/finali. */
-    const slug = path
-      .replace(/^\/+|\/+$/g, '');
-    /* Se non c'è uno slug, torniamo alla home del sito. */
-    if (!slug) {
-      window.location.replace('/');
-    } else {
-   /*  Evitiamo di intercettare eventuali percorsi reali che appartengono alla struttura del sito. */
-      window.location.replace(
-        '/MyAroundo/index.html?slug=' +
-        encodeURIComponent(slug)
-      );
-    }
-  </script>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0">
+
+<title>MyAroundo</title>
+
+<script>
+
+const path =
+  window.location.pathname
+    .replace(/^\/+|\/+$/g, '');
+
+const parts =
+  path
+    .split('/')
+    .filter(Boolean);
+
+/*
+  Prendiamo sempre l'ultima parte del percorso.
+
+  /MyAroundo/pro_loco_trapani
+        ↓
+  pro_loco_trapani
+
+  /pro_loco_trapani
+        ↓
+  pro_loco_trapani
+*/
+
+const slug =
+  parts.length
+    ? parts[parts.length - 1]
+    : '';
+
+if (!slug) {
+
+  window.location.replace('/');
+
+} else {
+
+  window.location.replace(
+    '/MyAroundo/index.html?slug=' +
+    encodeURIComponent(slug)
+  );
+
+}
+
+</script>
+
 </head>
+
 <body>
-  <p>Caricamento MyAroundo...</p>
+
+<p
+  style="
+    font-family:Arial,Helvetica,sans-serif;
+    text-align:center;
+    padding:40px;
+  "
+>
+  Caricamento MyAroundo...
+</p>
+
 </body>
 </html>
