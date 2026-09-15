@@ -2,83 +2,126 @@
 
 <html lang="it">
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>MyAroundo</title>
 
   <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      background: #f2f4f7;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f5f7f9;
-      color: #1f2937;
     }
 
     .box {
+
       width: min(90%, 500px);
-      padding: 30px;
+
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+
+      border-radius: 24px;
+
+      padding: 32px;
+
       text-align: center;
+
+      box-shadow:
+        0 10px 30px rgba(0,0,0,.08);
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      color: #111827;
+    }
+
+    .label {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 8px;
     }
 
     .slug {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #f1f5f9;
-      font-family: monospace;
-      font-weight: bold;
+
+      display: inline-block;
+
+      padding: 10px 16px;
+
+      border-radius: 12px;
+
+      background: #e6fafc;
+
+      color: #0f766e;
+
+      font-weight: 700;
+
+      word-break: break-all;
     }
+
+    .status {
+
+      margin-top: 24px;
+
+      color: #16a34a;
+
+      font-weight: 600;
+    }
+
   </style>
 
 </head>
 
 <body>
 
-<div class="box">
-  <h1>MyAroundo</h1>
-  <div id="message">Caricamento...</div>
-  <div id="slug" class="slug"></div>
+  <div class="box">
+
+<h1>MyAroundo</h1>
+
+<div class="label">
+  Slug ricevuto correttamente:
 </div>
 
-<script>
-  const params = new URLSearchParams(location.search);
+<div id="slug" class="slug">
+  ...
+</div>
 
-  let slug = params.get("slug");
+<div class="status">
+  ✓ Routing funzionante
+</div>
 
-  /*
-   * Supporto anche per il percorso pulito.
-   *
-   * /MyAroundo/pro_loco_trapani
-   */
-  if (!slug) {
-    const path = location.pathname;
+  </div>
 
-    const marker = "/MyAroundo/";
+  <script>
 
-    if (path.startsWith(marker)) {
-      slug = path.substring(marker.length).replace(/\/+$/, "");
-    }
-  }
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
 
-  const message = document.getElementById("message");
-  const slugBox = document.getElementById("slug");
+    const slug =
+      params.get('slug');
 
-  if (!slug) {
-    message.textContent = "Nessuno slug specificato.";
-    slugBox.style.display = "none";
-  } else {
-    message.textContent = "Slug ricevuto correttamente:";
-    slugBox.textContent = slug;
-  }
-</script>
+    document.getElementById('slug')
+      .textContent =
+        slug || 'nessuno slug';
+
+  </script>
 
 </body>
 </html>
