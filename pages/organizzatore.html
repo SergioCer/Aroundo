@@ -258,7 +258,7 @@ input, textarea {
   </div>
 
   <!-- COPERTINA -->
-  <div class="section-title">Copertina (URL)</div><input id="or_copertina" oninput="markDirty(); updatePreview()">
+  <div class="section-title">Copertina (nome file)</div><input id="or_copertina" oninput="markDirty(); updatePreview()">
   <div class="preview"><div id="copertina_url" style="font-size:10px; color:#666;"></div><img id="copertina_img" /></div>
   </div>
 
@@ -1281,9 +1281,9 @@ window.toggleAttivo = () => {
   
 /* PREVIEW */
 window.updatePreview = () => {
-  const url = or_copertina.value;
-  copertina_url.textContent = url || '';
-  copertina_img.src = url || '';
+  const filename = or_copertina.value.trim();
+  copertina_url.textContent = filename || '';
+  copertina_img.src = filename ? `https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/${filename}` : '';
 };
 
 /* DIRTY */
