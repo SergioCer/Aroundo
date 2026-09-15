@@ -228,9 +228,11 @@ input, textarea {
   <div class="form-row address-row">
   <div><div class="section-title">Indirizzo</div><input id="or_indirizzo" placeholder="Via, piazza, numero..." oninput="markDirty()" ></div>
   <div><div class="section-title">CAP</div><input id="or_cap" readonly style="background:#f3f4f6;" ></div>
-  <div><div class="section-title">Città</div><input id="or_citta" readonly style="background:#f3f4f6;" ></div>
-  </div>
-
+  <div><div class="section-title">Città</div><input id="id_comune_organizzatore" autocomplete="off" placeholder="City, min 3 chars to search..."
+      oninput="searchComuniOrganizzatore(this.value)"><input type="hidden" id="id_comune_organizzatore_hidden">
+      <div id="comuniOrganizzatoreResults" class="search-results"></div></div>
+</div>
+  
   <div class="section-title">Email</div><input id="or_email" oninput="markDirty()">
 
   <div class="section-title">Telefono</div><input id="or_telefono" oninput="markDirty()">
@@ -383,7 +385,7 @@ let eventiOpen=false;
 let luoghiOpen=false;
 let serieList = [];
 let serieOpen = false;
-let idComune = null;
+let idComune = null;  
   
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
@@ -417,10 +419,10 @@ async function load() {
   tax_code.value = data.tax_code || '';
   runts.value = data.runts || '';
   or_descrizione.value = data.or_descrizione || '';
-  idComune = data.id_comune || null;
   or_indirizzo.value = data.or_indirizzo || '';
-  or_cap.value = data.comuni?.co_cap || ''; 
-  or_citta.value = data.comuni?.co_descrizione || '';
+    document.getElementById('id_comune_organizzatore').value = data.comuni?.co_descrizione || '';
+    document.getElementById('id_comune_organizzatore_hidden').value = data.id_comune || '';
+    or_cap.value = data.comuni?.co_cap || '';
   or_email.value = data.or_email || '';
   or_telefono.value = data.or_telefono || '';
   or_sito_web.value = data.or_sito_web || '';
@@ -456,6 +458,43 @@ function validateFondazione() {
   error.style.display = valid ? 'none' : 'block';
   return valid;
 }
+
+window.searchComuniOrganizzatore = async (text) => {
+  const box = document.getElementById('comuniOrganizzatoreResults');
+  if (text.length < 3) {
+    box.innerHTML = '';
+    document.getElementById('id_comune_organizzatore_hidden').value = '';
+    document.getElementById('or_cap').value = '';
+    markDirty();
+    return;
+  }
+  const { data, error } = await supabase
+    .from('comuni')
+    .select('id_comune, co_descrizione, co_cap')
+    .ilike('co_descrizione', text + '%')
+    .limit(10);
+  if (error) {
+    console.error("Errore ricerca comuni:", error);
+    return;
+  }
+  box.innerHTML = '';
+  (data || []).forEach(c => {
+    const div = document.createElement('div');
+    div.className = "search-item";
+    div.innerText = c.co_descrizione;
+    div.onclick = () => {
+      document.getElementById('id_comune_organizzatore').value = c.co_descrizione;
+      document.getElementById('id_comune_organizzatore_hidden').value =
+        c.id_comune;
+      document.getElementById('or_cap').value =
+        c.co_cap || '';
+      box.innerHTML = '';
+      markDirty();
+    };
+    box.appendChild(div);
+  });
+};
+  
   
 function sortEventi(list){
 return [...list].sort((a,b)=>new Date(b.ev_inizio)-new Date(a.ev_inizio));
@@ -635,7 +674,7 @@ if (!validateFondazione()) {alert("Controlla l'anno di fondazione."); return fal
     or_fondazione: or_fondazione.value ? Number(or_fondazione.value) : null,
     tax_code: tax_code.value,
     runts: runts.value,
-    id_comune: idComune,
+    id_comune: document.getElementById('id_comune_organizzatore_hidden').value ? Number(document.getElementById('id_comune_organizzatore_hidden').value) : null,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
     or_telefono: or_telefono.value,
@@ -698,7 +737,7 @@ window.markDirty = () => {
     or_fondazione: or_fondazione.value ? Number(or_fondazione.value) : null,
     tax_code: tax_code.value,
     runts: runts.value,
-    id_comune: idComune,
+    id_comune: document.getElementById('id_comune_organizzatore_hidden').value ? Number(document.getElementById('id_comune_organizzatore_hidden').value) : null,
     or_indirizzo: or_indirizzo.value,
     or_email: or_email.value,
     or_telefono: or_telefono.value,
