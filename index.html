@@ -1992,7 +1992,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- DESCRIZIONE -->
         <!-- Organizzatore -->
           <div style="font-size: 12px; color:#555; line-height:1.35;">
-            By: <a class="organizzatore-link" style="color:#3b82f6; font-weight:600;" href="pages/organizzatore.html?id=${e.id_organizzatore}">
+            By: <a class="organizzatore-link" style="color:#3b82f6; font-weight:600;" href="/MyAroundo/index.html?slug=${e.id_organizzatore}"target="_blank" rel="noopener noreferrer">
             ${e.organizzatori?.or_nome || ''}</a></div>
         <!-- BOTTONE DETTAGLI e relativo POPUP -->
           <button onclick="window.openDetailPopup(window.currentEvent, window.currentLatLng)" style="margin-top:6px; background:#3b82f6; 
