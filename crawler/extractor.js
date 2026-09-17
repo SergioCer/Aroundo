@@ -18,24 +18,15 @@ function extract(url) {
   });
 }
 
-http.createServer(async (req, res) => {if (req.method === "OPTIONS") {
-  res.writeHead(204, {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type"}); return res.end();}
+http.createServer(async (req, res) => {
   const requestUrl = new URL(req.url, "http://localhost:3000");
-
   if (requestUrl.pathname === "/" && !requestUrl.searchParams.has("url")) {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     return res.end(fs.readFileSync(__dirname + "/crawler.html"));
   }
-
-  const url = requestUrl.searchParams.get("url");
-  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-
+  const url = requestUrl.searchParams.get("url");
   if (!url) return res.end(JSON.stringify({ error: "URL mancante" }));
-
   try {
     res.end(JSON.stringify(await extract(url)));
   } catch (error) {
