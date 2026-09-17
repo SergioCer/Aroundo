@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aroundo — Crawler</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:1200px;margin:40px auto;padding:0 20px;color:#222}h1{margin-bottom:25px}.row{display:flex;gap:10px}input{flex:1;padding:12px;border:1px solid #ccc;border-radius:6px;font-size:16px}button{padding:12px 22px;border:0;border-radius:6px;background:#1976d2;color:#fff;font-weight:bold;cursor:pointer}button:hover{background:#125ca1}#status{margin-top:20px;padding:12px;background:#f4f4f4;border-radius:6px}#result{margin-top:15px;background:#111;color:#ddd;padding:20px;border-radius:6px;white-space:pre-wrap;overflow:auto;max-height:600px;font-family:monospace;font-size:13px}
+</style>
+</head>
+<body>
+<h1>Aroundo — Crawler</h1>
+<div class="row"><input id="url" type="url" placeholder="https://www.lugliomusicale.it/"><button id="extract">ACQUISISCI</button></div>
+<div id="status">Pronto.</div>
+<pre id="result"></pre>
+<script>
+document.getElementById("extract").addEventListener("click",()=>{const url=document.getElementById("url").value.trim();if(!url){document.getElementById("status").textContent="Inserisci un URL.";return;}document.getElementById("status").textContent=`URL da acquisire: ${url}`;document.getElementById("result").textContent="In attesa del collegamento con extractor.js...";});
+</script>
+</body>
+</html>
