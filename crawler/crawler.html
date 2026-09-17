@@ -14,7 +14,8 @@ body{font-family:Arial,sans-serif;max-width:1200px;margin:40px auto;padding:0 20
 <div id="status">Pronto.</div>
 <pre id="result"></pre>
 <script>
-document.getElementById("extract").addEventListener("click",async()=>{const url=document.getElementById("url").value.trim(),status=document.getElementById("status"),result=document.getElementById("result");if(!url){status.textContent="Inserisci un URL.";return;}status.textContent="Acquisizione in corso...";result.textContent="";try{const response=await fetch(`http://localhost:3000/?url=${encodeURIComponent(url)}`);const data=await response.json();if(data.error){status.textContent="Errore";result.textContent=data.error;return;}status.textContent=`HTTP ${data.status} — ${data.contentType||"tipo sconosciuto"}`;result.textContent=data.content;}catch(error){status.textContent="Errore di connessione";result.textContent=error.message;}});
+const extractor="https://laughing-doodle-w66rp6vv94x2vjr-3000.app.github.dev/";
+document.getElementById("extract").addEventListener("click",async()=>{const url=document.getElementById("url").value.trim(),status=document.getElementById("status"),result=document.getElementById("result");if(!url){status.textContent="Inserisci un URL.";return;}status.textContent="Acquisizione in corso...";result.textContent="";try{const response=await fetch(`${extractor}?url=${encodeURIComponent(url)}`);const data=await response.json();if(data.error)throw new Error(data.error);status.textContent=`HTTP ${data.status} — ${data.contentType||"tipo sconosciuto"}`;result.textContent=data.content;}catch(error){status.textContent="Errore di acquisizione";result.textContent=error.message;}});
 </script>
 </body>
 </html>
