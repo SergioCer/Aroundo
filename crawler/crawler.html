@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Aroundo — Crawler</title>
 <style>
-body{font-family:Arial,sans-serif;max-width:1200px;margin:40px auto;padding:0 20px;color:#222}h1{margin-bottom:25px}.row{display:flex;gap:10px}input{flex:1;padding:12px;border:1px solid #ccc;border-radius:6px;font-size:16px}button{padding:12px 22px;border:0;border-radius:6px;background:#1976d2;color:#fff;font-weight:bold;cursor:pointer}button:hover{background:#125ca1}#status{margin-top:20px;padding:12px;background:#f4f4f4;border-radius:6px}#result{margin-top:15px;background:#111;color:#ddd;padding:20px;border-radius:6px;white-space:pre-wrap;overflow:auto;max-height:600px;font-family:monospace;font-size:13px}
+body{font-family:Arial,sans-serif;max-width:1200px;margin:40px auto;padding:0 20px;color:#222}h1{margin-bottom:25px}.row{display:flex;gap:10px}input{flex:1;
+padding:12px;border:1px solid #ccc;border-radius:6px;font-size:16px}button{padding:12px 22px;border:0;border-radius:6px;
+background:#1976d2;color:#fff;font-weight:bold;cursor:pointer}button:hover{background:#125ca1}button:disabled{background:#999;cursor:wait}#status{margin-top:20px;padding:12px;
+background:#f4f4f4;border-radius:6px}#result{margin-top:15px;background:#111;color:#ddd;padding:20px;border-radius:6px;
+white-space:pre-wrap;overflow:auto;max-height:600px;font-family:monospace;font-size:13px}
 </style>
 </head>
 <body>
@@ -14,7 +18,15 @@ body{font-family:Arial,sans-serif;max-width:1200px;margin:40px auto;padding:0 20
 <div id="status">Pronto.</div>
 <pre id="result"></pre>
 <script>
-document.getElementById("extract").addEventListener("click",async()=>{const url=document.getElementById("url").value.trim(),status=document.getElementById("status"),result=document.getElementById("result");if(!url){status.textContent="Inserisci un URL.";return;}status.textContent="Acquisizione in corso...";result.textContent="";try{const response=await fetch(`/?url=${encodeURIComponent(url)}`),data=await response.json();if(data.error)throw new Error(data.error);status.textContent=`HTTP ${data.status} — ${data.contentType||"tipo sconosciuto"}`;result.textContent=data.content;}catch(error){status.textContent="Errore di acquisizione";result.textContent=error.message;}});
+const input=document.getElementById("url"),button=document.getElementById("extract"),status=document.getElementById("status"),result=document.getElementById("result");
+
+button.addEventListener("click",async()=>{const url=input.value.trim();if(!url){status.textContent="Inserisci un URL.";input.focus();
+return;}try{new URL(url);}catch{status.textContent="URL non valido.";return;}button.disabled=true;status.textContent="Acquisizione in corso...";result.textContent="";
+try{const response=await fetch(`/?url=${encodeURIComponent(url)}`),data=await response.json();
+if(data.error)throw new Error(data.error);status.textContent=`HTTP ${data.status} — ${data.contentType||"tipo sconosciuto"} — ${data.url}`;result.textContent=data.content;}
+catch(error){status.textContent="Errore di acquisizione";result.textContent=error.message;}finally{button.disabled=false;}});
+
+input.addEventListener("keydown",event=>{if(event.key==="Enter")button.click();});
 </script>
 </body>
 </html>
