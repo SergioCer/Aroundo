@@ -18,7 +18,11 @@ function extract(url) {
   });
 }
 
-http.createServer(async (req, res) => {
+http.createServer(async (req, res) => {if (req.method === "OPTIONS") {
+  res.writeHead(204, {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type"}); return res.end();}
   const requestUrl = new URL(req.url, "http://localhost:3000");
 
   if (requestUrl.pathname === "/" && !requestUrl.searchParams.has("url")) {
