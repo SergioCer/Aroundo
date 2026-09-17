@@ -4,89 +4,271 @@ const fs = require("fs");
 const { URL } = require("url");
 
 function clean(value) {
-return value ? value.replace(/\s+/g, " ").trim() : null;
+if (!value) return null;
+return value.replace(/\s+/g, " ").trim();
 }
 
-function getMeta(html, attribute, name) {
-const regex = new RegExp(
-`<meta[^>]+${attribute}=["']${name}["'][^>]+content=["']([^"']*)["']`,
-"i"
-);
-const match = html.match(regex);
-return match ? clean(match[1]) : null;
+function getAttribute(tag, attribute) {
+const lower = tag.toLowerCase();
+const name = attribute.toLowerCase();
+
+let position = 0;
+
+while (position < lower.length) {
+const found = lower.indexOf(name, position);
+
+
+if (found === -1) return null;
+
+const before = found > 0 ? lower[found - 1] : " ";
+
+if (
+  /[\s<]/.test(before) &&
+  lower.slice(found + name.length).match(/^\s*=/)
+) {
+  let i = found + name.length;
+
+  while (i < tag.length && /\s/.test(tag[i])) i++;
+
+  if (tag[i] !== "=") {
+    position = found + name.length;
+    continue;
+  }
+
+  i++;
+
+  while (i < tag.length && /\s/.test(tag[i])) i++;
+
+  const quote = tag[i];
+
+  if (quote === '"' || quote === "'") {
+    const end = tag.indexOf(quote, i + 1);
+
+    if (end !== -1) {
+      return tag.slice(i + 1, end);
+    }
+  }
+
+  let end = i;
+
+  while (
+    end < tag.length &&
+    !/\s/.test(tag[end]) &&
+    tag[end] !== ">"
+  ) {
+    end++;
+  }
+
+  return tag.slice(i, end);
+}
+
+position = found + name.length;
+
+}
+
+return null;
 }
 
 function getTitle(html) {
-const match = html.match(/<title[^>]*>([\s\S]*?)</title>/i);
-return match ? clean(match[1]) : null;
+const lower = html.toLowerCase();
+
+const start = lower.indexOf("<title");
+
+if (start === -1) return null;
+
+const startEnd = lower.indexOf(">", start);
+
+if (startEnd === -1) return null;
+
+const end = lower.indexOf("</title>", startEnd);
+
+if (end === -1) return null;
+
+return clean(
+html.slice(startEnd + 1, end)
+);
+}
+
+function getMeta(html, attribute, name) {
+const lower = html.toLowerCase();
+
+let position = 0;
+
+while (true) {
+const start = lower.indexOf("<meta", position);
+
+
+if (start === -1) return null;
+
+const end = lower.indexOf(">", start);
+
+if (end === -1) return null;
+
+const tag = html.slice(start, end + 1);
+
+const tagValue = getAttribute(tag, attribute);
+
+if (
+  tagValue &&
+  tagValue.toLowerCase() === name.toLowerCase()
+) {
+  return clean(
+    getAttribute(tag, "content")
+  );
+}
+
+position = end + 1;
+
+
+}
 }
 
 function getCanonical(html) {
-const match = html.match(
-/<link[^>]+rel=["']canonical["'][^>]+href=["']([^%22']*)["']/i
-);
-return match ? clean(match[1]) : null;
+const lower = html.toLowerCase();
+
+let position = 0;
+
+while (true) {
+const start = lower.indexOf("<link", position);
+
+
+if (start === -1) return null;
+
+const end = lower.indexOf(">", start);
+
+if (end === -1) return null;
+
+const tag = html.slice(start, end + 1);
+
+const rel = getAttribute(tag, "rel");
+
+if (
+  rel &&
+  rel.toLowerCase().split(/\s+/).includes("canonical")
+) {
+  return clean(
+    getAttribute(tag, "href")
+  );
+}
+
+position = end + 1;
+
+
+}
 }
 
 function getImages(html) {
+const lower = html.toLowerCase();
 const results = [];
-const regex = /<img[^>]+src=["']([^%22']+)["']/gi;
-let match;
 
-while ((match = regex.exec(html)) !== null) {
-const value = clean(match[1]);
-if (value && !results.includes(value)) {
-results.push(value);
+let position = 0;
+
+while (true) {
+const start = lower.indexOf("<img", position);
+
+
+if (start === -1) break;
+
+const end = lower.indexOf(">", start);
+
+if (end === -1) break;
+
+const tag = html.slice(start, end + 1);
+
+const src = clean(
+  getAttribute(tag, "src")
+);
+
+if (src && !results.includes(src)) {
+  results.push(src);
 }
+
+position = end + 1;
+
+
 }
 
 return results;
 }
 
 function getJsonLd(html) {
+const lower = html.toLowerCase();
 const results = [];
 
-const regex =
-/<script[^>]*type=["']application/ld+json["'][^>]*>([\s\S]*?)</script>/gi;
+let position = 0;
 
-let match;
-
-while ((match = regex.exec(html)) !== null) {
-const raw = match[1].trim();
+while (true) {
+const start = lower.indexOf("<script", position);
 
 
-try {
-  results.push(JSON.parse(raw));
-} catch {
+if (start === -1) break;
+
+const openEnd = lower.indexOf(">", start);
+
+if (openEnd === -1) break;
+
+const openingTag = html.slice(
+  start,
+  openEnd + 1
+);
+
+const type = getAttribute(
+  openingTag,
+  "type"
+);
+
+const close = lower.indexOf(
+  "</script>",
+  openEnd + 1
+);
+
+if (close === -1) break;
+
+if (
+  type &&
+  type.toLowerCase() ===
+    "application/ld+json"
+) {
+  const raw = html
+    .slice(openEnd + 1, close)
+    .trim();
+
   try {
-    results.push(JSON.parse(raw.replace(/<!--/g, "").replace(/-->/g, "").trim()));
+    results.push(
+      JSON.parse(raw)
+    );
   } catch {
-    results.push({
-      raw: raw
-    });
+    try {
+      const cleaned = raw
+        .replace(/<!--/g, "")
+        .replace(/-->/g, "")
+        .trim();
+
+      results.push(
+        JSON.parse(cleaned)
+      );
+    } catch {
+      results.push({
+        raw: raw
+      });
+    }
   }
 }
+
+position = close + 9;
+
 
 }
 
 return results;
 }
 
-/*
-Cerca tutti gli oggetti Event dentro:
-
-* oggetti
-* array
-* @graph
-* strutture annidate
-
-NON modifica lo schema originale.
-*/
 function collectEvents(value, events = []) {
 if (Array.isArray(value)) {
 for (const item of value) {
 collectEvents(item, events);
 }
+
 
 return events;
 
@@ -98,11 +280,18 @@ return events;
 
 const type = value["@type"];
 
-if (
+const isEvent =
 type === "Event" ||
-(Array.isArray(type) &&
-type.some(item => String(item).toLowerCase() === "event"))
-) {
+(
+Array.isArray(type) &&
+type.some(
+item =>
+String(item).toLowerCase() ===
+"event"
+)
+);
+
+if (isEvent) {
 events.push(value);
 }
 
@@ -112,9 +301,16 @@ if (key === "@type") continue;
 
 const child = value[key];
 
-if (child && typeof child === "object") {
-  collectEvents(child, events);
+if (
+  child &&
+  typeof child === "object"
+) {
+  collectEvents(
+    child,
+    events
+  );
 }
+
 
 }
 
@@ -154,20 +350,25 @@ html,
 "og:url"
 );
 
-const canonical = getCanonical(html);
+const canonical =
+getCanonical(html);
 
-const immagini = getImages(html);
-
-/*
-SCHEMA RESTA INTEGRALE.
-*/
-const schema = getJsonLd(html);
+const immagini =
+getImages(html);
 
 /*
-EVENTI È UNA VISTA DERIVATA DALLO SCHEMA.
-NON MODIFICA SCHEMA.
+SCHEMA ORIGINALE:
+viene conservato integralmente.
 */
-const eventi = collectEvents(schema);
+const schema =
+getJsonLd(html);
+
+/*
+EVENTI:
+vista derivata dallo schema.
+*/
+const eventi =
+collectEvents(schema);
 
 return {
 pagina: {
@@ -175,7 +376,6 @@ url: url,
 canonical: canonical,
 title: title
 },
-
 
 metadata: {
   title: title,
@@ -192,86 +392,120 @@ schema: schema,
 
 eventi: eventi
 
+
 };
 }
 
 function extract(url) {
-return new Promise((resolve, reject) => {
-const target = new URL(url);
+return new Promise(
+(resolve, reject) => {
 
-const client =
-  target.protocol === "https:"
-    ? https
-    : http;
+  const target =
+    new URL(url);
 
-const request = client.get(
-  target,
-  {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 AroundoCrawler/1.0"
+  const client =
+    target.protocol === "https:"
+      ? https
+      : http;
+
+  const request =
+    client.get(
+      target,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 AroundoCrawler/1.0"
+        }
+      },
+      response => {
+
+        let content = "";
+
+        response.setEncoding(
+          "utf8"
+        );
+
+        response.on(
+          "data",
+          chunk => {
+            content += chunk;
+          }
+        );
+
+        response.on(
+          "end",
+          () => {
+
+            resolve({
+              acquisizione: {
+                status:
+                  response.statusCode,
+
+                contentType:
+                  response.headers[
+                    "content-type"
+                  ] || null,
+
+                url: url
+              },
+
+              normalizzazione:
+                normalize(
+                  url,
+                  content
+                ),
+
+              content:
+                content
+            });
+          }
+        );
+      }
+    );
+
+  request.setTimeout(
+    20000,
+    () => {
+      request.destroy(
+        new Error("Timeout")
+      );
     }
-  },
-  response => {
-    let content = "";
-
-    response.setEncoding("utf8");
-
-    response.on("data", chunk => {
-      content += chunk;
-    });
-
-    response.on("end", () => {
-      resolve({
-        acquisizione: {
-          status: response.statusCode,
-          contentType:
-            response.headers["content-type"] || null,
-          url: url
-        },
-
-        normalizzazione: normalize(
-          url,
-          content
-        ),
-
-        content: content
-      });
-    });
-  }
-);
-
-request.setTimeout(20000, () => {
-  request.destroy(
-    new Error("Timeout")
   );
-});
 
-request.on("error", reject);
+  request.on(
+    "error",
+    reject
+  );
+}
 
-});
+
+);
 }
 
 http.createServer(
 async (req, res) => {
 
-const requestUrl = new URL(
-  req.url,
-  "http://localhost:3000"
-);
+
+const requestUrl =
+  new URL(
+    req.url,
+    "http://localhost:3000"
+  );
 
 const url =
-  requestUrl.searchParams.get("url");
+  requestUrl.searchParams.get(
+    "url"
+  );
 
 /*
-  Se viene aperto direttamente il server
-  senza ?url=...
-  mostriamo crawler.html.
+  Apertura diretta del server:
+  mostra crawler.html
 */
 if (
   requestUrl.pathname === "/" &&
   !url
 ) {
+
   res.writeHead(
     200,
     {
@@ -282,7 +516,8 @@ if (
 
   return res.end(
     fs.readFileSync(
-      __dirname + "/crawler.html"
+      __dirname +
+      "/crawler.html"
     )
   );
 }
@@ -298,33 +533,43 @@ res.setHeader(
 );
 
 if (!url) {
+
   return res.end(
     JSON.stringify({
-      error: "URL mancante"
+      error:
+        "URL mancante"
     })
   );
 }
 
 try {
-  const result = await extract(url);
+
+  const result =
+    await extract(url);
 
   res.end(
-    JSON.stringify(result)
+    JSON.stringify(
+      result
+    )
   );
 
 } catch (error) {
 
   res.end(
     JSON.stringify({
-      error: error.message
+      error:
+        error.message
     })
   );
 }
 
+
 }
 ).listen(
 3000,
-() => console.log(
+() => {
+console.log(
 "Crawler attivo sulla porta 3000"
-)
+);
+}
 );
