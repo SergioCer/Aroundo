@@ -1,5 +1,6 @@
 const http = require("http");
 const https = require("https");
+const fs = require("fs");
 const { URL } = require("url");
 
 function extract(url) {
@@ -18,10 +19,22 @@ function extract(url) {
 }
 
 http.createServer(async (req, res) => {
-  const query = new URL(req.url, "http://localhost").searchParams;
-  const url = query.get("url");
+  const requestUrl = new URL(req.url, "http://localhost:3000");
+
+  if (requestUrl.pathname === "/" && !requestUrl.searchParams.has("url")) {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    return res.end(fs.readFileSync(__dirname + "/crawler.html"));
+  }
+
+  const url = requestUrl.searchParams.get("url");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Content-Type", "application/json; charset=utf-8");
+
   if (!url) return res.end(JSON.stringify({ error: "URL mancante" }));
-  try { res.end(JSON.stringify(await extract(url))); } catch (error) { res.end(JSON.stringify({ error: error.message })); }
+
+  try {
+    res.end(JSON.stringify(await extract(url)));
+  } catch (error) {
+    res.end(JSON.stringify({ error: error.message }));
+  }
 }).listen(3000, () => console.log("Crawler attivo sulla porta 3000"));
