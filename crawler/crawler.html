@@ -1,32 +1,83 @@
 <!DOCTYPE html>
+
 <html lang="it">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Aroundo — Crawler</title>
 <style>
-body{font-family:Arial,sans-serif;max-width:1200px;margin:40px auto;padding:0 20px;color:#222}h1{margin-bottom:25px}.row{display:flex;gap:10px}input{flex:1;
-padding:12px;border:1px solid #ccc;border-radius:6px;font-size:16px}button{padding:12px 22px;border:0;border-radius:6px;
-background:#1976d2;color:#fff;font-weight:bold;cursor:pointer}button:hover{background:#125ca1}button:disabled{background:#999;cursor:wait}#status{margin-top:20px;padding:12px;
-background:#f4f4f4;border-radius:6px}#result{margin-top:15px;background:#111;color:#ddd;padding:20px;border-radius:6px;
-white-space:pre-wrap;overflow:auto;max-height:600px;font-family:monospace;font-size:13px}
+body{font-family:Arial,sans-serif;max-width:1400px;margin:35px auto;padding:0 20px;color:#222;background:#fafafa}
+h1{margin:0 0 22px}.row{display:flex;gap:10px}.url{flex:1;padding:12px;border:1px solid #ccc;border-radius:6px;font-size:16px}button{padding:12px 22px;border:0;border-radius:6px;background:#1976d2;color:#fff;font-weight:bold;cursor:pointer}button:hover{background:#125ca1}button:disabled{background:#999;cursor:wait}
+#status{margin-top:18px;padding:12px;background:#f0f0f0;border-radius:6px}.summary{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.badge{background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px}
+#events{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px;margin-top:18px}.event{background:#fff;border:1px solid #ddd;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px #0000000d}.event img{width:100%;height:210px;object-fit:cover;background:#eee}.event-body{padding:16px}.event h2{font-size:20px;margin:0 0 12px}.description{color:#555;white-space:pre-line;margin-bottom:15px}.data{font-size:14px;line-height:1.6}.label{font-weight:bold;color:#333}.event a{display:inline-block;margin-top:12px;color:#1976d2;text-decoration:none}.event a:hover{text-decoration:underline}
+details{margin-top:20px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px}summary{cursor:pointer;font-weight:bold}pre{margin-top:12px;background:#111;color:#ddd;padding:18px;border-radius:6px;white-space:pre-wrap;overflow:auto;max-height:600px;font-family:monospace;font-size:12px}
+.empty{padding:25px;background:#fff;border:1px dashed #bbb;border-radius:8px;color:#666}
 </style>
 </head>
 <body>
+
 <h1>Aroundo — Crawler</h1>
-<div class="row"><input id="url" type="url" placeholder="https://www.lugliomusicale.it/"><button id="extract">ACQUISISCI</button></div>
+
+<div class="row">
+<input id="url" class="url" type="url" placeholder="https://www.lugliomusicale.it/">
+<button id="extract">ACQUISISCI</button>
+</div>
+
 <div id="status">Pronto.</div>
-<pre id="result"></pre>
+<div id="summary" class="summary"></div>
+<div id="events"></div>
+
+<details>
+<summary>JSON normalizzato</summary>
+<pre id="normalized"></pre>
+</details>
+
+<details>
+<summary>HTML originale acquisito</summary>
+<pre id="raw"></pre>
+</details>
+
 <script>
-const input=document.getElementById("url"),button=document.getElementById("extract"),status=document.getElementById("status"),result=document.getElementById("result");
+const input=document.getElementById("url"),button=document.getElementById("extract"),status=document.getElementById("status"),summary=document.getElementById("summary"),events=document.getElementById("events"),normalized=document.getElementById("normalized"),raw=document.getElementById("raw");
 
-button.addEventListener("click",async()=>{const url=input.value.trim();if(!url){status.textContent="Inserisci un URL.";input.focus();
-return;}try{new URL(url);}catch{status.textContent="URL non valido.";return;}button.disabled=true;status.textContent="Acquisizione in corso...";result.textContent="";
-try{const response=await fetch(`/?url=${encodeURIComponent(url)}`),data=await response.json();
-if(data.error)throw new Error(data.error);status.textContent=`HTTP ${data.status} — ${data.contentType||"tipo sconosciuto"} — ${data.url}`;result.textContent=data.content;}
-catch(error){status.textContent="Errore di acquisizione";result.textContent=error.message;}finally{button.disabled=false;}});
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
 
-input.addEventListener("keydown",event=>{if(event.key==="Enter")button.click();});
-</script>
+function formatDate(value){if(!value)return "Non indicato";const date=new Date(value.replace(" ","T"));return isNaN(date) ? value : date.toLocaleString("it-IT",{dateStyle:"short",timeStyle:"short"});}
+
+function renderEvents(list){
+  events.innerHTML="";
+  if(!list||!list.length){events.innerHTML='<div class="empty">Nessun evento schema.org rilevato.</div>';return;}
+  list.forEach((event,index)=>{
+    const location=event.location||{},address=location.address||{},image=event.image||null,url=event.url||null;
+    const card=document.createElement("article");
+    card.className="event";
+    card.innerHTML=`${image?`<img src="${escapeHtml(image)}" alt="">`:""}<div class="event-body"><h2>${escapeHtml(event.name||"Evento senza titolo")}</h2>${event.description?`<div class="description">${escapeHtml(event.description)}</div>`:""}<div class="data"><div><span class="label">Inizio:</span> ${escapeHtml(formatDate(event.startDate))}</div><div><span class="label">Fine:</span> ${escapeHtml(formatDate(event.endDate))}</div><div><span class="label">Luogo:</span> ${escapeHtml(location.name||"Non indicato")}</div>${address.streetAddress?`<div><span class="label">Indirizzo:</span> ${escapeHtml(address.streetAddress)}</div>`:""}${address.addressLocality?`<div><span class="label">Comune:</span> ${escapeHtml(address.addressLocality)}</div>`:""}${address.postalCode?`<div><span class="label">CAP:</span> ${escapeHtml(address.postalCode)}</div>`:""}${address.addressRegion?`<div><span class="label">Provincia/Regione:</span> ${escapeHtml(address.addressRegion)}</div>`:""}${address.addressCountry?`<div><span class="label">Paese:</span> ${escapeHtml(address.addressCountry)}</div>`:""}</div>${url?`<a href="${escapeHtml(url)}" target="_blank" rel="noopener">Apri pagina evento ↗</a>`:""}<details><summary>Schema originale</summary><pre>${escapeHtml(JSON.stringify(event,null,2))}</pre></details></div>`;
+
+events.appendChild(card);
+
+});
+}
+
+button.addEventListener("click",async()=>{
+const value=input.value.trim();
+if(!value){status.textContent="Inserisci un URL.";input.focus();return;}
+try{new URL(value);}catch{status.textContent="URL non valido.";return;}
+button.disabled=true;status.textContent="Acquisizione e normalizzazione in corso...";summary.innerHTML="";events.innerHTML="";normalized.textContent="";raw.textContent="";
+try{
+const response=await fetch(`/?url=${encodeURIComponent(value)}`);
+const data=await response.json();
+if(data.error)throw new Error(data.error);
+const normal=data.normalizzazione||{},schema=normal.schema||[],list=normal.eventi||[];
+status.textContent=`HTTP ${data.acquisizione?.status??"?"} — ${data.acquisizione?.contentType||"tipo sconosciuto"}`;
+summary.innerHTML=`<div class="badge"><strong>Eventi trovati:</strong> ${list.length}</div><div class="badge"><strong>Schema:</strong> ${schema.length}</div><div class="badge"><strong>Immagini:</strong> ${(normal.immagini||[]).length}</div><div class="badge"><strong>URL:</strong> ${escapeHtml(value)}</div>`;
+renderEvents(list);
+normalized.textContent=JSON.stringify(normal,null,2);
+raw.textContent=data.content||"";
+}catch(error){status.textContent="Errore di acquisizione";events.innerHTML=`<div class="empty">${escapeHtml(error.message)}</div>`;}
+finally{button.disabled=false;}
+});
+
+input.addEventListener("keydown",event=>{if(event.key==="Enter")button.click();}); </script>
+
 </body>
 </html>
