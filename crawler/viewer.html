@@ -171,9 +171,9 @@ body{
 
 <script>
 const endpoints = {
-  3000: "https://solid-palm-tree-pvvj4v7jv4ph67g9-3000.app.github.dev",
-  3002: "https://solid-palm-tree-pvvj4v7jv4ph67g9-3002.app.github.dev",
-  3003: "https://solid-palm-tree-pvvj4v7jv4ph67g9-3003.app.github.dev"
+  3000: "https://super-system-pvvj4v777rw2rxwg-3000.app.github.dev",
+  3002: "https://super-system-pvvj4v777rw2rxwg-3002.app.github.dev",
+  3003: "https://super-system-pvvj4v777rw2rxwg-3003.app.github.dev"
 };
 
 
@@ -389,7 +389,6 @@ const requiredFields = [
   "name",
   "startDate",
   "location",
-  "organizer"
 ];
 
 
@@ -409,9 +408,6 @@ function validateEvent(e){
     missing.push("luogo");
   }
 
-  if(!eventOrganizer(e)){
-    missing.push("organizzatore");
-  }
 
   return {
     complete: missing.length === 0,
