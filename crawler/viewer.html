@@ -1,264 +1,779 @@
-<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Aroundo Extractor Viewer</title><style>body{font-family:Arial,sans-serif;margin:0;background:#f4f6f8;color:#222}.top{background:#17202a;color:white;padding:20px}.top input{width:70%;padding:12px;border:0;border-radius:6px}.top button{padding:12px 18px;margin-left:8px;border:0;border-radius:6px;background:#2ecc71;color:white;font-weight:bold}.wrap{padding:20px;max-width:1400px;margin:auto}.structure{background:white;border-radius:10px;margin-bottom:20px;padding:18px;box-shadow:0 2px 8px #0001}.structure h2{margin-top:0}.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:6px;color:white;font-size:12px;font-weight:bold}.yes{background:#27ae60}.no{background:#c0392b}.engine{background:white;border-radius:10px;margin-bottom:20px;padding:18px;box-shadow:0 2px 8px #0001}.engine h2{margin-top:0}.event{border:1px solid #ddd;border-radius:8px;padding:12px;margin:10px 0;background:#fafafa}.event img{max-width:180px;max-height:110px;object-fit:cover;float:right}.count{font-weight:bold;color:#167c4a}</style></head><body><div class="top"><input id="url" placeholder="https://www.esempio.it/"><button onclick="run()">ANALIZZA</button></div><div class="wrap" id="results"></div>
-    <script>
-const endpoints={
-  3000:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3000.app.github.dev",
-  3002:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3002.app.github.dev",
-  3003:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3003.app.github.dev"
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Aroundo Extractor Viewer</title>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  margin:0;
+  background:#f4f6f8;
+  color:#222
+}
+
+.top{
+  background:#17202a;
+  color:white;
+  padding:20px
+}
+
+.top input{
+  width:70%;
+  padding:12px;
+  border:0;
+  border-radius:6px
+}
+
+.top button{
+  padding:12px 18px;
+  margin-left:8px;
+  border:0;
+  border-radius:6px;
+  background:#2ecc71;
+  color:white;
+  font-weight:bold;
+  cursor:pointer
+}
+
+.wrap{
+  padding:20px;
+  max-width:1400px;
+  margin:auto
+}
+
+.structure{
+  background:white;
+  border-radius:10px;
+  margin-bottom:20px;
+  padding:18px;
+  box-shadow:0 2px 8px #0001
+}
+
+.structure h2{
+  margin-top:0
+}
+
+.badges{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap
+}
+
+.badge{
+  padding:7px 10px;
+  border-radius:5px;
+  color:white;
+  font-size:13px;
+  font-weight:bold
+}
+
+.yes{
+  background:#27ae60
+}
+
+.no{
+  background:#c0392b
+}
+
+.engine{
+  background:white;
+  border-radius:10px;
+  margin-bottom:20px;
+  padding:18px;
+  box-shadow:0 2px 8px #0001
+}
+
+.engine h2{
+  margin-top:0
+}
+
+.summary{
+  display:flex;
+  gap:10px;
+  margin:10px 0 18px
+}
+
+.marker{
+  color:white;
+  border-radius:5px;
+  padding:7px 12px;
+  font-weight:bold;
+  font-size:13px
+}
+
+.complete-marker{
+  background:#27ae60
+}
+
+.incomplete-marker{
+  background:#c0392b
+}
+
+.event{
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:14px;
+  margin:10px 0;
+  background:#fafafa;
+  overflow:auto
+}
+
+.event img{
+  max-width:180px;
+  max-height:110px;
+  object-fit:cover;
+  float:right;
+  margin-left:15px
+}
+
+.event h3{
+  margin-top:0
+}
+
+.event .field{
+  margin:5px 0
+}
+
+.event .label{
+  font-weight:bold
+}
+
+.incomplete{
+  border-left:5px solid #c0392b
+}
+
+.complete{
+  border-left:5px solid #27ae60
+}
+
+.missing{
+  color:#c0392b;
+  font-weight:bold
+}
+
+.source{
+  color:#777;
+  font-size:12px;
+  margin-top:10px
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <input id="url" placeholder="https://www.esempio.it/">
+  <button onclick="run()">ANALIZZA</button>
+</div>
+
+<div class="wrap" id="results"></div>
+
+<script>
+const endpoints = {
+  3000: "https://solid-palm-tree-pvvj4v7jv4ph67g9-3000.app.github.dev",
+  3002: "https://solid-palm-tree-pvvj4v7jv4ph67g9-3002.app.github.dev",
+  3003: "https://solid-palm-tree-pvvj4v7jv4ph67g9-3003.app.github.dev"
 };
 
-const requiredFields=[
-  "title",
-  "date",
-  "startTime",
+
+/*
+ * Il Viewer non decide come gli estrattori acquisiscono i dati.
+ *
+ * Ogni motore può avere una propria risposta tecnica.
+ * Qui la risposta viene ricondotta al solo contratto comune:
+ *
+ *             Schema.org Event
+ */
+
+
+/* ---------------------------------------------------------
+   Acquisizione
+--------------------------------------------------------- */
+
+async function call(port){
+
+  const u = document.getElementById("url").value.trim();
+
+  if(!u) return null;
+
+  try{
+
+    const r = await fetch(
+      endpoints[port] + "/?url=" + encodeURIComponent(u)
+    );
+
+    return await r.json();
+
+  }catch(e){
+
+    return {
+      error:e.message
+    };
+  }
+}
+
+
+/* ---------------------------------------------------------
+   Conversione output motori -> Schema.org Event
+--------------------------------------------------------- */
+
+function extractEvents(data, port){
+
+  if(!data || data.error){
+    return [];
+  }
+
+
+  /*
+   * SCHEMA / JSON-LD
+   *
+   * schema.js attualmente restituisce:
+   *
+   * data.normalizzazione.schema
+   *
+   * che può contenere array annidati.
+   */
+
+  if(port === 3000){
+
+    const schema = data.normalizzazione &&
+                   data.normalizzazione.schema;
+
+    if(Array.isArray(schema)){
+
+      const flat = schema.flat(Infinity);
+
+      return flat.filter(item =>
+        item &&
+        typeof item === "object" &&
+        item["@type"] === "Event"
+      );
+    }
+
+    return [];
+  }
+
+
+  /*
+   * STRUCTURED e HTML
+   *
+   * Il contratto attuale espone direttamente eventi[].
+   *
+   * In futuro potranno convergere direttamente
+   * sullo stesso contratto Schema.org.
+   */
+
+  if(Array.isArray(data.eventi)){
+
+    return data.eventi.filter(item =>
+      item &&
+      typeof item === "object"
+    );
+  }
+
+  return [];
+}
+
+
+/* ---------------------------------------------------------
+   Lettura campi Schema.org
+--------------------------------------------------------- */
+
+function value(v){
+
+  if(v === null || v === undefined){
+    return "";
+  }
+
+  if(typeof v === "string"){
+    return v.trim();
+  }
+
+  if(typeof v === "object"){
+
+    if(v.name){
+      return value(v.name);
+    }
+
+    if(v["@value"]){
+      return value(v["@value"]);
+    }
+
+    return JSON.stringify(v);
+  }
+
+  return String(v);
+}
+
+
+function eventTitle(e){
+
+  return value(e.name) ||
+         value(e.title);
+}
+
+
+function eventStart(e){
+
+  return value(e.startDate);
+}
+
+
+function eventLocation(e){
+
+  const l = e.location;
+
+  if(!l){
+    return "";
+  }
+
+  if(typeof l === "string"){
+    return l;
+  }
+
+  const parts = [];
+
+  if(l.name){
+    parts.push(value(l.name));
+  }
+
+  const a = l.address;
+
+  if(a){
+
+    if(typeof a === "string"){
+      parts.push(a);
+    }else{
+
+      [
+        "streetAddress",
+        "postalCode",
+        "addressLocality",
+        "addressRegion",
+        "addressCountry"
+      ].forEach(k => {
+
+        if(a[k]){
+          parts.push(value(a[k]));
+        }
+
+      });
+    }
+  }
+
+  return parts.join(", ");
+}
+
+
+function eventOrganizer(e){
+
+  return value(e.organizer);
+}
+
+
+/* ---------------------------------------------------------
+   Validazione Viewer
+--------------------------------------------------------- */
+
+/*
+ * Questi sono criteri del Viewer.
+ *
+ * Gli estrattori NON devono sapere cosa significa
+ * "completo" o "incompleto".
+ *
+ * Se domani cambiamo i criteri, modifichiamo solo qui.
+ */
+
+const requiredFields = [
+  "name",
+  "startDate",
   "location",
   "organizer"
 ];
 
-const fieldLabels={
-  title:"titolo",
-  date:"data evento",
-  startTime:"ora di inizio",
-  location:"luogo",
-  organizer:"organizzatore"
-};
 
-async function call(port){
-  const u=document.getElementById("url").value.trim();
-  if(!u)return null;
+function validateEvent(e){
 
-  try{
-    const r=await fetch(
-      endpoints[port]+"/?url="+encodeURIComponent(u)
-    );
-    return await r.json();
-  }catch(e){
-    return{error:e.message};
+  const missing = [];
+
+  if(!eventTitle(e)){
+    missing.push("titolo");
   }
-}
 
-function getValue(data,names){
-  for(const name of names){
-    if(
-      data[name]!==undefined &&
-      data[name]!==null &&
-      String(data[name]).trim()
-    ){
-      return String(data[name]).trim();
-    }
+  if(!eventStart(e)){
+    missing.push("data/ora");
   }
-  return null;
-}
 
-/*
-  NORMALIZZAZIONE CENTRALE
+  if(!eventLocation(e)){
+    missing.push("luogo");
+  }
 
-  Gli estrattori non decidono se un evento
-  è completo oppure incompleto.
+  if(!eventOrganizer(e)){
+    missing.push("organizzatore");
+  }
 
-  Il Viewer riceve i dati e li interpreta.
-*/
-function normalizeEvent(event,source){
-  const d=event.data||event;
-
-  return{
-    title:getValue(d,[
-      "name",
-      "title",
-      "headline",
-      "itemName"
-    ]),
-
-    date:getValue(d,[
-      "startDate",
-      "date",
-      "eventDate"
-    ]),
-
-    startTime:getValue(d,[
-      "startTime",
-      "time",
-      "start_time"
-    ]),
-
-    location:getValue(d,[
-      "location",
-      "place",
-      "venue",
-      "address"
-    ]),
-
-    organizer:getValue(d,[
-      "organizer",
-      "organization",
-      "author"
-    ]),
-
-    description:getValue(d,[
-      "description",
-      "text",
-      "summary"
-    ]),
-
-    image:getValue(d,[
-      "image",
-      "imageUrl",
-      "thumbnail"
-    ]),
-
-    url:event.url||d.url||null,
-
-    source:source
+  return {
+    complete: missing.length === 0,
+    missing
   };
 }
 
-/*
-  QUESTA È L'UNICA REGOLA CHE DECIDE
-  SE UN EVENTO È COMPLETO.
-*/
-function isComplete(event){
-  return requiredFields.every(
-    field=>event[field]
-  );
+
+/* ---------------------------------------------------------
+   Deduplicazione
+--------------------------------------------------------- */
+
+function eventKey(e){
+
+  return [
+    eventTitle(e),
+    eventStart(e),
+    eventLocation(e)
+  ].join("|").toLowerCase();
 }
 
-function missingFields(event){
-  return requiredFields
-    .filter(field=>!event[field])
-    .map(field=>fieldLabels[field]);
-}
 
-function structure(html){
-  const tests=[
-    [
-      "JSON-LD",
-      /<script\b[^>]*type\s*=\s*["']application\/ld\+json["']/i.test(html)
-    ],
-    [
-      "Microdata",
-      /\bitemscope\b|\bitemprop\s*=/i.test(html)
-    ],
-    [
-      "RDFa",
-      /\btypeof\s*=|\bproperty\s*=/i.test(html)
-    ],
-    [
-      "OpenGraph",
-      /<meta\b[^>]*(?:property\s*=\s*["']og:|name\s*=\s*["']og:)/i.test(html)
-    ],
-    [
-      "Twitter Card",
-      /<meta\b[^>]*name\s*=\s*["']twitter:/i.test(html)
-    ],
-    [
-      "Meta",
-      /<meta\b/i.test(html)
-    ],
-    [
-      "HTML",
-      /<html\b/i.test(html)
-    ],
-    [
-      "Card",
-      /\b(card|event|evento|eventi|appuntamenti|programma)\b/i.test(html)
-    ],
-    [
-      "Link",
-      /<a\b[^>]*href\s*=/i.test(html)
-    ],
-    [
-      "Immagini",
-      /<img\b/i.test(html)
-    ]
-  ];
+function uniqueEvents(events){
 
-  return "<div class='structure'><h2>STRUTTURE RILEVATE</h2><div class='badges'>"+
-    tests.map(x=>
-      "<span class='badge "+(x[1]?"yes":"no")+"'>"+
-      x[0]+
-      "</span>"
-    ).join("")+
-    "</div></div>";
-}
+  const seen = new Set();
+  const result = [];
 
-function show(name,data){
+  for(const e of events){
 
-  let h="<div class='engine'><h2>"+name+"</h2>";
+    const key = eventKey(e);
 
-  if(!data){
-    return h+"<p>Nessun risultato</p></div>";
-  }
-
-  if(data.error){
-    return h+"<p>Errore: "+data.error+"</p></div>";
-  }
-
-  const events=data.eventi||[];
-
-  h+="<p class='count'>Eventi trovati: "+events.length+"</p>";
-
-  for(const event of events){
-
-    const e=normalizeEvent(event,name);
-
-    h+="<div class='event'>";
-
-    if(e.image){
-      h+="<img src='"+e.image+"'>";
+    if(seen.has(key)){
+      continue;
     }
 
-    h+="<strong>"+
-      (e.title||"Evento senza titolo")+
-      "</strong>";
-
-    h+="<br><small>"+
-      (e.date||"")+
-      "</small>";
-
-    h+="<p>"+
-      (e.description||"")+
-      "</p>";
-
-    /*
-      SOLO PER ORA mostriamo anche
-      lo stato calcolato dal Viewer,
-      senza cambiare ancora la grafica.
-    */
-    h+="<small>"+
-      (isComplete(e)
-        ?"COMPLETO"
-        :"INCOMPLETO — mancano: "+missingFields(e).join(", ")
-      )+
-      "</small>";
-
-    h+="</div>";
+    seen.add(key);
+    result.push(e);
   }
 
-  return h+"</div>";
+  return result;
 }
+
+
+/* ---------------------------------------------------------
+   Visualizzazione evento completo
+--------------------------------------------------------- */
+
+function showCompleteEvent(e){
+
+  const title = eventTitle(e);
+  const start = eventStart(e);
+  const location = eventLocation(e);
+  const organizer = eventOrganizer(e);
+  const description = value(e.description);
+  const image = value(e.image);
+
+  return `
+    <div class="event complete">
+
+      ${image ? `<img src="${escapeHtml(image)}">` : ""}
+
+      <h3>${escapeHtml(title || "Evento senza titolo")}</h3>
+
+      <div class="field">
+        <span class="label">Data/ora:</span>
+        ${escapeHtml(start || "—")}
+      </div>
+
+      <div class="field">
+        <span class="label">Luogo:</span>
+        ${escapeHtml(location || "—")}
+      </div>
+
+      <div class="field">
+        <span class="label">Organizzatore:</span>
+        ${escapeHtml(organizer || "—")}
+      </div>
+
+      ${
+        description
+        ? `<p>${escapeHtml(description)}</p>`
+        : ""
+      }
+
+    </div>
+  `;
+}
+
+
+/* ---------------------------------------------------------
+   Visualizzazione evento incompleto
+--------------------------------------------------------- */
+
+function showIncompleteEvent(e, validation){
+
+  const title = eventTitle(e);
+
+  return `
+    <div class="event incomplete">
+
+      <strong>
+        ${escapeHtml(title || "Evento senza titolo")}
+      </strong>
+
+      <div class="field">
+        Evento rilevato ma incompleto.
+      </div>
+
+      <div class="missing">
+        Dati fondamentali mancanti:
+        ${escapeHtml(validation.missing.join(", "))}
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* ---------------------------------------------------------
+   Visualizzazione motore
+--------------------------------------------------------- */
+
+function showEngine(name, events){
+
+  const complete = [];
+  const incomplete = [];
+
+  for(const e of events){
+
+    const validation = validateEvent(e);
+
+    if(validation.complete){
+      complete.push(e);
+    }else{
+      incomplete.push({
+        event:e,
+        validation
+      });
+    }
+  }
+
+
+  let h = `
+    <div class="engine">
+
+      <h2>${name}</h2>
+
+      <div class="summary">
+
+        <span class="marker complete-marker">
+          COMPLETI: ${complete.length}
+        </span>
+
+        <span class="marker incomplete-marker">
+          INCOMPLETI: ${incomplete.length}
+        </span>
+
+      </div>
+  `;
+
+
+  for(const e of complete){
+    h += showCompleteEvent(e);
+  }
+
+
+  for(const item of incomplete){
+
+    h += showIncompleteEvent(
+      item.event,
+      item.validation
+    );
+  }
+
+
+  if(!events.length){
+
+    h += `
+      <p>Nessun evento Schema.org rilevato.</p>
+    `;
+  }
+
+
+  h += `</div>`;
+
+  return h;
+}
+
+
+/* ---------------------------------------------------------
+   Strutture rilevate
+--------------------------------------------------------- */
+
+function structure(html){
+
+  if(!html){
+    return "";
+  }
+
+  const tests = [
+
+    [
+      "JSON-LD",
+      /<script\b[^>]*type\s*=\s*["']application\/ld\+json["']/i
+    ],
+
+    [
+      "Microdata",
+      /\bitemscope\b|\bitemprop\s*=/i
+    ],
+
+    [
+      "RDFa",
+      /\btypeof\s*=|\bproperty\s*=/i
+    ],
+
+    [
+      "OpenGraph",
+      /<meta\b[^>]*(?:property\s*=\s*["']og:|name\s*=\s*["']og:)/i
+    ],
+
+    [
+      "Twitter Card",
+      /<meta\b[^>]*name\s*=\s*["']twitter:/i
+    ],
+
+    [
+      "Meta",
+      /<meta\b/i
+    ],
+
+    [
+      "HTML",
+      /<html\b/i
+    ],
+
+    [
+      "Card",
+      /\b(card|event|evento|eventi|appuntamenti|programma)\b/i
+    ],
+
+    [
+      "Link",
+      /<a\b[^>]*href\s*=/i
+    ],
+
+    [
+      "Immagini",
+      /<img\b/i
+    ]
+
+  ];
+
+
+  return `
+    <div class="structure">
+
+      <h2>STRUTTURE RILEVATE</h2>
+
+      <div class="badges">
+
+        ${
+          tests.map(x => `
+            <span class="badge ${x[1].test(html) ? "yes" : "no"}">
+              ${x[0]}
+            </span>
+          `).join("")
+        }
+
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* ---------------------------------------------------------
+   Escape HTML
+--------------------------------------------------------- */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* ---------------------------------------------------------
+   Avvio analisi
+--------------------------------------------------------- */
 
 async function run(){
 
-  const r=document.getElementById("results");
+  const r = document.getElementById("results");
 
-  r.innerHTML="<p>Analisi in corso...</p>";
+  r.innerHTML = "<p>Analisi in corso...</p>";
 
-  const[s,m,h]=await Promise.all([
-    call(3000),
-    call(3002),
-    call(3003)
-  ]);
 
-  let structureData=
-    h&&h.content
-      ?structure(h.content)
-      :s&&s.content
-        ?structure(s.content)
-        :"";
+  const [schemaData, structuredData, htmlData] =
+    await Promise.all([
 
-  r.innerHTML=
-    structureData+
-    show("SCHEMA / JSON-LD",s)+
-    show("MICRODATA / RDFa",m)+
-    show("HTML / CARD",h);
+      call(3000),
+      call(3002),
+      call(3003)
+
+    ]);
+
+
+  /*
+   * La struttura della pagina viene analizzata
+   * sul contenuto HTML acquisito.
+   */
+
+  const sourceHtml =
+    (htmlData && htmlData.content) ||
+    (schemaData && schemaData.content) ||
+    (structuredData && structuredData.content) ||
+    "";
+
+
+  const schemaEvents =
+    uniqueEvents(
+      extractEvents(schemaData,3000)
+    );
+
+
+  const structuredEvents =
+    uniqueEvents(
+      extractEvents(structuredData,3002)
+    );
+
+
+  const htmlEvents =
+    uniqueEvents(
+      extractEvents(htmlData,3003)
+    );
+
+
+  r.innerHTML =
+      structure(sourceHtml)
+
+    + showEngine(
+        "SCHEMA / JSON-LD",
+        schemaEvents
+      )
+
+    + showEngine(
+        "MICRODATA / RDFa",
+        structuredEvents
+      )
+
+    + showEngine(
+        "HTML / CARD",
+        htmlEvents
+      );
 }
-</script></body></html>
+</script>
+
+</body>
+</html>
+
