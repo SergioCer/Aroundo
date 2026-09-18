@@ -99,7 +99,7 @@ body{
   border-radius:5px;
   padding:7px 12px;
   font-weight:bold;
-  font-size:13px
+  font-size:15px
 }
 
 .complete-marker{
@@ -107,7 +107,7 @@ body{
 }
 
 .incomplete-marker{
-  background:#c0392b
+  background:#e67e22
 }
 
 .event{
@@ -530,49 +530,29 @@ function showIncompleteEvent(e, validation){
    Visualizzazione motore
 --------------------------------------------------------- */
 
-function showEngine(name, events){
-
-  const complete = [];
-  const incomplete = [];
-
-  for(const e of events){
-
-    const validation = validateEvent(e);
-
-    if(validation.complete){
-      complete.push(e);
-    }else{
-      incomplete.push({
-        event:e,
-        validation
-      });
-    }
-  }
-
+function showResults(complete, incomplete){
 
   let h = `
     <div class="engine">
 
-      <h2>${name}</h2>
-
-      <div class="summary">
-
-        <span class="marker complete-marker">
-          COMPLETI: ${complete.length}
-        </span>
-
-        <span class="marker incomplete-marker">
-          INCOMPLETI: ${incomplete.length}
-        </span>
-
-      </div>
+      <h2>ELEMENTI COMPLETI</h2>
   `;
-
 
   for(const e of complete){
     h += showCompleteEvent(e);
   }
 
+  if(!complete.length){
+    h += `<p>Nessun elemento completo rilevato.</p>`;
+  }
+
+  h += `
+    </div>
+
+    <div class="engine">
+
+      <h2>ELEMENTI INCOMPLETI</h2>
+  `;
 
   for(const item of incomplete){
 
@@ -582,20 +562,14 @@ function showEngine(name, events){
     );
   }
 
-
-  if(!events.length){
-
-    h += `
-      <p>Nessun evento Schema.org rilevato.</p>
-    `;
+  if(!incomplete.length){
+    h += `<p>Nessun elemento incompleto rilevato.</p>`;
   }
-
 
   h += `</div>`;
 
   return h;
 }
-
 
 /* ---------------------------------------------------------
    Strutture rilevate
@@ -733,40 +707,78 @@ async function run(){
 
 
   const schemaEvents =
-    uniqueEvents(
-      extractEvents(schemaData,3000)
+  extractEvents(schemaData,3000);
+
+const structuredEvents =
+  extractEvents(structuredData,3002);
+
+const htmlEvents =
+  extractEvents(htmlData,3003);
+
+
+/*
+ * Unificazione degli eventi provenienti
+ * dai tre motori.
+ */
+
+const allEvents =
+  uniqueEvents([
+    ...schemaEvents,
+    ...structuredEvents,
+    ...htmlEvents
+  ]);
+
+
+/*
+ * Validazione complessiva.
+ */
+
+const complete = [];
+const incomplete = [];
+
+for(const e of allEvents){
+
+  const validation = validateEvent(e);
+
+  if(validation.complete){
+
+    complete.push(e);
+
+  }else{
+
+    incomplete.push({
+      event:e,
+      validation
+    });
+  }
+}
+
+
+/*
+ * Visualizzazione.
+ */
+
+r.innerHTML =
+    structure(sourceHtml)
+
+  + `
+    <div class="summary">
+
+      <span class="marker complete-marker">
+        ${complete.length}
+      </span>
+
+      <span class="marker incomplete-marker">
+        ${incomplete.length}
+      </span>
+
+    </div>
+  `
+
+  + showResults(
+      complete,
+      incomplete
     );
-
-
-  const structuredEvents =
-    uniqueEvents(
-      extractEvents(structuredData,3002)
-    );
-
-
-  const htmlEvents =
-    uniqueEvents(
-      extractEvents(htmlData,3003)
-    );
-
-
-  r.innerHTML =
-      structure(sourceHtml)
-
-    + showEngine(
-        "SCHEMA / JSON-LD",
-        schemaEvents
-      )
-
-    + showEngine(
-        "MICRODATA / RDFa",
-        structuredEvents
-      )
-
-    + showEngine(
-        "HTML / CARD",
-        htmlEvents
-      );
 }
 </script>
 
