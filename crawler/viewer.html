@@ -1,1 +1,264 @@
-<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Aroundo Extractor Viewer</title><style>body{font-family:Arial,sans-serif;margin:0;background:#f4f6f8;color:#222}.top{background:#17202a;color:white;padding:20px}.top input{width:70%;padding:12px;border:0;border-radius:6px}.top button{padding:12px 18px;margin-left:8px;border:0;border-radius:6px;background:#2ecc71;color:white;font-weight:bold}.wrap{padding:20px;max-width:1400px;margin:auto}.structure{background:white;border-radius:10px;margin-bottom:20px;padding:18px;box-shadow:0 2px 8px #0001}.structure h2{margin-top:0}.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:6px;color:white;font-size:12px;font-weight:bold}.yes{background:#27ae60}.no{background:#c0392b}.engine{background:white;border-radius:10px;margin-bottom:20px;padding:18px;box-shadow:0 2px 8px #0001}.engine h2{margin-top:0}.event{border:1px solid #ddd;border-radius:8px;padding:12px;margin:10px 0;background:#fafafa}.event img{max-width:180px;max-height:110px;object-fit:cover;float:right}.count{font-weight:bold;color:#167c4a}</style></head><body><div class="top"><input id="url" placeholder="https://www.esempio.it/"><button onclick="run()">ANALIZZA</button></div><div class="wrap" id="results"></div><script>const endpoints={3000:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3000.app.github.dev",3002:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3002.app.github.dev",3003:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3003.app.github.dev"};async function call(port){const u=document.getElementById("url").value.trim();if(!u)return null;try{const r=await fetch(endpoints[port]+"/?url="+encodeURIComponent(u));return await r.json()}catch(e){return{error:e.message}}}function structure(html){const tests=[["JSON-LD",/<script\b[^>]*type\s*=\s*["']application\/ld\+json["']/i.test(html)],["Microdata",/\bitemscope\b|\bitemprop\s*=/i.test(html)],["RDFa",/\btypeof\s*=|\bproperty\s*=/i.test(html)],["OpenGraph",/<meta\b[^>]*(?:property\s*=\s*["']og:|name\s*=\s*["']og:)/i.test(html)],["Twitter Card",/<meta\b[^>]*name\s*=\s*["']twitter:/i.test(html)],["Meta",/<meta\b/i.test(html)],["HTML",/<html\b/i.test(html)],["Card",/\b(card|event|evento|eventi|appuntamenti|programma)\b/i.test(html)],["Link",/<a\b[^>]*href\s*=/i.test(html)],["Immagini",/<img\b/i.test(html)]];return "<div class='structure'><h2>STRUTTURE RILEVATE</h2><div class='badges'>"+tests.map(x=>"<span class='badge "+(x[1]?"yes":"no")+"'>"+x[0]+"</span>").join("")+"</div></div>"}function show(name,data){let h="<div class='engine'><h2>"+name+"</h2>";if(!data){h+="<p>Nessun risultato</p></div>";return h}if(data.error){h+="<p>Errore: "+data.error+"</p></div>";return h}const ev=data.eventi||[];h+="<p class='count'>Eventi trovati: "+ev.length+"</p>";for(const e of ev){const d=e.data||{};h+="<div class='event'>"+(d.image?"<img src='"+d.image+"'>":"")+"<strong>"+(d.name||d.title||"Evento senza titolo")+"</strong><br><small>"+(d.startDate||d.date||"")+"</small><p>"+(d.description||d.text||"")+"</p></div>"}return h+"</div>"}async function run(){const r=document.getElementById("results");r.innerHTML="<p>Analisi in corso...</p>";const[s,m,h]=await Promise.all([call(3000),call(3002),call(3003)]);let structureData=h&&h.content?structure(h.content):s&&s.content?structure(s.content):"";r.innerHTML=structureData+show("SCHEMA / JSON-LD",s)+show("MICRODATA / RDFa",m)+show("HTML / CARD",h)}</script></body></html>
+<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Aroundo Extractor Viewer</title><style>body{font-family:Arial,sans-serif;margin:0;background:#f4f6f8;color:#222}.top{background:#17202a;color:white;padding:20px}.top input{width:70%;padding:12px;border:0;border-radius:6px}.top button{padding:12px 18px;margin-left:8px;border:0;border-radius:6px;background:#2ecc71;color:white;font-weight:bold}.wrap{padding:20px;max-width:1400px;margin:auto}.structure{background:white;border-radius:10px;margin-bottom:20px;padding:18px;box-shadow:0 2px 8px #0001}.structure h2{margin-top:0}.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:6px;color:white;font-size:12px;font-weight:bold}.yes{background:#27ae60}.no{background:#c0392b}.engine{background:white;border-radius:10px;margin-bottom:20px;padding:18px;box-shadow:0 2px 8px #0001}.engine h2{margin-top:0}.event{border:1px solid #ddd;border-radius:8px;padding:12px;margin:10px 0;background:#fafafa}.event img{max-width:180px;max-height:110px;object-fit:cover;float:right}.count{font-weight:bold;color:#167c4a}</style></head><body><div class="top"><input id="url" placeholder="https://www.esempio.it/"><button onclick="run()">ANALIZZA</button></div><div class="wrap" id="results"></div>
+    <script>
+const endpoints={
+  3000:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3000.app.github.dev",
+  3002:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3002.app.github.dev",
+  3003:"https://solid-palm-tree-pvvj4v7jv4ph67g9-3003.app.github.dev"
+};
+
+const requiredFields=[
+  "title",
+  "date",
+  "startTime",
+  "location",
+  "organizer"
+];
+
+const fieldLabels={
+  title:"titolo",
+  date:"data evento",
+  startTime:"ora di inizio",
+  location:"luogo",
+  organizer:"organizzatore"
+};
+
+async function call(port){
+  const u=document.getElementById("url").value.trim();
+  if(!u)return null;
+
+  try{
+    const r=await fetch(
+      endpoints[port]+"/?url="+encodeURIComponent(u)
+    );
+    return await r.json();
+  }catch(e){
+    return{error:e.message};
+  }
+}
+
+function getValue(data,names){
+  for(const name of names){
+    if(
+      data[name]!==undefined &&
+      data[name]!==null &&
+      String(data[name]).trim()
+    ){
+      return String(data[name]).trim();
+    }
+  }
+  return null;
+}
+
+/*
+  NORMALIZZAZIONE CENTRALE
+
+  Gli estrattori non decidono se un evento
+  è completo oppure incompleto.
+
+  Il Viewer riceve i dati e li interpreta.
+*/
+function normalizeEvent(event,source){
+  const d=event.data||event;
+
+  return{
+    title:getValue(d,[
+      "name",
+      "title",
+      "headline",
+      "itemName"
+    ]),
+
+    date:getValue(d,[
+      "startDate",
+      "date",
+      "eventDate"
+    ]),
+
+    startTime:getValue(d,[
+      "startTime",
+      "time",
+      "start_time"
+    ]),
+
+    location:getValue(d,[
+      "location",
+      "place",
+      "venue",
+      "address"
+    ]),
+
+    organizer:getValue(d,[
+      "organizer",
+      "organization",
+      "author"
+    ]),
+
+    description:getValue(d,[
+      "description",
+      "text",
+      "summary"
+    ]),
+
+    image:getValue(d,[
+      "image",
+      "imageUrl",
+      "thumbnail"
+    ]),
+
+    url:event.url||d.url||null,
+
+    source:source
+  };
+}
+
+/*
+  QUESTA È L'UNICA REGOLA CHE DECIDE
+  SE UN EVENTO È COMPLETO.
+*/
+function isComplete(event){
+  return requiredFields.every(
+    field=>event[field]
+  );
+}
+
+function missingFields(event){
+  return requiredFields
+    .filter(field=>!event[field])
+    .map(field=>fieldLabels[field]);
+}
+
+function structure(html){
+  const tests=[
+    [
+      "JSON-LD",
+      /<script\b[^>]*type\s*=\s*["']application\/ld\+json["']/i.test(html)
+    ],
+    [
+      "Microdata",
+      /\bitemscope\b|\bitemprop\s*=/i.test(html)
+    ],
+    [
+      "RDFa",
+      /\btypeof\s*=|\bproperty\s*=/i.test(html)
+    ],
+    [
+      "OpenGraph",
+      /<meta\b[^>]*(?:property\s*=\s*["']og:|name\s*=\s*["']og:)/i.test(html)
+    ],
+    [
+      "Twitter Card",
+      /<meta\b[^>]*name\s*=\s*["']twitter:/i.test(html)
+    ],
+    [
+      "Meta",
+      /<meta\b/i.test(html)
+    ],
+    [
+      "HTML",
+      /<html\b/i.test(html)
+    ],
+    [
+      "Card",
+      /\b(card|event|evento|eventi|appuntamenti|programma)\b/i.test(html)
+    ],
+    [
+      "Link",
+      /<a\b[^>]*href\s*=/i.test(html)
+    ],
+    [
+      "Immagini",
+      /<img\b/i.test(html)
+    ]
+  ];
+
+  return "<div class='structure'><h2>STRUTTURE RILEVATE</h2><div class='badges'>"+
+    tests.map(x=>
+      "<span class='badge "+(x[1]?"yes":"no")+"'>"+
+      x[0]+
+      "</span>"
+    ).join("")+
+    "</div></div>";
+}
+
+function show(name,data){
+
+  let h="<div class='engine'><h2>"+name+"</h2>";
+
+  if(!data){
+    return h+"<p>Nessun risultato</p></div>";
+  }
+
+  if(data.error){
+    return h+"<p>Errore: "+data.error+"</p></div>";
+  }
+
+  const events=data.eventi||[];
+
+  h+="<p class='count'>Eventi trovati: "+events.length+"</p>";
+
+  for(const event of events){
+
+    const e=normalizeEvent(event,name);
+
+    h+="<div class='event'>";
+
+    if(e.image){
+      h+="<img src='"+e.image+"'>";
+    }
+
+    h+="<strong>"+
+      (e.title||"Evento senza titolo")+
+      "</strong>";
+
+    h+="<br><small>"+
+      (e.date||"")+
+      "</small>";
+
+    h+="<p>"+
+      (e.description||"")+
+      "</p>";
+
+    /*
+      SOLO PER ORA mostriamo anche
+      lo stato calcolato dal Viewer,
+      senza cambiare ancora la grafica.
+    */
+    h+="<small>"+
+      (isComplete(e)
+        ?"COMPLETO"
+        :"INCOMPLETO — mancano: "+missingFields(e).join(", ")
+      )+
+      "</small>";
+
+    h+="</div>";
+  }
+
+  return h+"</div>";
+}
+
+async function run(){
+
+  const r=document.getElementById("results");
+
+  r.innerHTML="<p>Analisi in corso...</p>";
+
+  const[s,m,h]=await Promise.all([
+    call(3000),
+    call(3002),
+    call(3003)
+  ]);
+
+  let structureData=
+    h&&h.content
+      ?structure(h.content)
+      :s&&s.content
+        ?structure(s.content)
+        :"";
+
+  r.innerHTML=
+    structureData+
+    show("SCHEMA / JSON-LD",s)+
+    show("MICRODATA / RDFa",m)+
+    show("HTML / CARD",h);
+}
+</script></body></html>
