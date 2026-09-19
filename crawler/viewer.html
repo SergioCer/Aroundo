@@ -46,7 +46,7 @@ body{
   background:white;
   border-radius:10px;
   margin-bottom:20px;
-  padding:18px;
+  padding:10px;
   box-shadow:0 2px 8px #0001
 }
 
@@ -56,12 +56,23 @@ body{
 
 .badges{
   display:flex;
-  gap:6px;
-  flex-wrap:wrap
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center
+}
+
+.structure-item{
+  width:100px;
+  text-align:center
 }
 
 .badge{
-  padding:7px 10px;
+  width:100px;
+  height:34px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   border-radius:5px;
   color:white;
   font-size:13px;
@@ -76,7 +87,30 @@ body{
   background:#c0392b
 }
 
-.engine{
+.counts{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+  margin-top:7px
+}
+
+.count{
+  width:50%;
+  font-size:14px;
+  font-weight:bold;
+  text-align:center
+}
+
+.count-complete{
+  color:#27ae60
+}
+
+.count-incomplete{
+  color:#e67e22
+}
+
+.section{
   background:white;
   border-radius:10px;
   margin-bottom:20px;
@@ -84,78 +118,141 @@ body{
   box-shadow:0 2px 8px #0001
 }
 
-.engine h2{
+.section h2{
   margin-top:0
 }
 
-.summary{
-  display:flex;
-  gap:10px;
-  margin:10px 0 18px
-}
-
-.marker{
-  color:white;
-  border-radius:5px;
-  padding:7px 12px;
-  font-weight:bold;
-  font-size:15px
-}
-
-.complete-marker{
-  background:#27ae60
-}
-
-.incomplete-marker{
-  background:#e67e22
+.events-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+  gap:18px;
+  margin-top:15px
 }
 
 .event{
+  background:#fff;
   border:1px solid #ddd;
-  border-radius:8px;
-  padding:14px;
-  margin:10px 0;
-  background:#fafafa;
-  overflow:auto
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 2px 6px #0001
 }
 
-.event img{
-  max-width:180px;
-  max-height:110px;
-  object-fit:cover;
-  float:right;
-  margin-left:15px
-}
-
-.event h3{
-  margin-top:0
-}
-
-.event .field{
-  margin:5px 0
-}
-
-.event .label{
-  font-weight:bold
-}
-
-.incomplete{
-  border-left:5px solid #c0392b
-}
-
-.complete{
+.event.complete{
   border-left:5px solid #27ae60
 }
 
+.event.incomplete{
+  border-left:5px solid #e67e22
+}
+
+.event-image{
+  width:100%;
+  height:220px;
+  background:#eef0f2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden
+}
+
+.event-image img{
+  width:100%;
+  height:100%;
+  object-fit:contain
+}
+
+.event-body{
+  padding:16px
+}
+
+.event h3{
+  margin:0 0 14px;
+  font-size:20px
+}
+
+.event .field{
+  margin:7px 0;
+  line-height:1.45
+}
+
+.event .label{
+  color:#444
+}
+
+.event-description{
+  margin:12px 0;
+  color:#555;
+  line-height:1.5
+}
+
 .missing{
-  color:#c0392b;
+  margin-top:14px;
+  padding:10px;
+  background:#fff4e8;
+  border-radius:6px;
+  color:#b75d00;
+  font-size:13px
+}
+
+.schema-button{
+  margin-top:15px;
+  padding:8px 12px;
+  border:0;
+  border-radius:6px;
+  background:#34495e;
+  color:white;
+  cursor:pointer;
+  font-size:13px;
   font-weight:bold
 }
 
-.source{
-  color:#777;
-  font-size:12px;
-  margin-top:10px
+.schema-button:hover{
+  background:#22313f
+}
+
+.schema-details{
+  display:none;
+  margin-top:14px;
+  border-top:1px solid #ddd;
+  padding-top:14px
+}
+
+.schema-details.open{
+  display:block
+}
+
+.schema-field{
+  padding:8px 0;
+  border-bottom:1px solid #eee
+}
+
+.schema-field:last-child{
+  border-bottom:0
+}
+
+.schema-name{
+  font-weight:bold;
+  color:#34495e;
+  margin-bottom:4px
+}
+
+.schema-value{
+  color:#333;
+  white-space:pre-wrap;
+  word-break:break-word
+}
+
+.schema-missing{
+  color:#999;
+  font-style:italic
+}
+
+.empty{
+  padding:18px;
+  background:#fafafa;
+  border:1px dashed #bbb;
+  border-radius:8px;
+  color:#777
 }
 </style>
 </head>
@@ -452,130 +549,283 @@ function uniqueEvents(events){
 
 
 /* ---------------------------------------------------------
-   Visualizzazione evento completo
+   Visualizzazione valori Schema.org
 --------------------------------------------------------- */
 
-function showCompleteEvent(e){
+const schemaFields = [
+  "@type",
+  "name",
+  "description",
+  "image",
+  "url",
+  "startDate",
+  "endDate",
+  "eventStatus",
+  "eventAttendanceMode",
+  "location",
+  "organizer",
+  "performer",
+  "offers",
+  "audience",
+  "inLanguage",
+  "duration",
+  "eventSchedule",
+  "sameAs"
+];
+
+
+function formatSchemaValue(v){
+
+  if(v === null || v === undefined || v === ""){
+    return "";
+  }
+
+  if(typeof v === "object"){
+    return JSON.stringify(v,null,2);
+  }
+
+  return String(v);
+}
+
+
+function schemaDetails(e, id){
+
+  const fields = [...schemaFields];
+
+  Object.keys(e).forEach(key => {
+
+    if(!fields.includes(key)){
+      fields.push(key);
+    }
+
+  });
+
+
+  return `
+    <div id="${id}" class="schema-details">
+
+      ${fields.map(field => {
+
+        const exists =
+          e[field] !== undefined &&
+          e[field] !== null &&
+          e[field] !== "";
+
+        return `
+          <div class="schema-field">
+
+            <div class="schema-name">
+              ${escapeHtml(field)}
+            </div>
+
+            <div class="schema-value ${exists ? "" : "schema-missing"}">
+              ${
+                exists
+                ? escapeHtml(formatSchemaValue(e[field]))
+                : "non presente"
+              }
+            </div>
+
+          </div>
+        `;
+
+      }).join("")}
+
+    </div>
+  `;
+}
+
+
+/* ---------------------------------------------------------
+   Visualizzazione evento
+--------------------------------------------------------- */
+
+function showEvent(e, validation, index){
 
   const title = eventTitle(e);
   const start = eventStart(e);
+  const end = value(e.endDate);
   const location = eventLocation(e);
   const organizer = eventOrganizer(e);
   const description = value(e.description);
   const image = value(e.image);
 
+  const detailsId =
+    "schema-details-" + index + "-" +
+    Math.random().toString(36).slice(2,8);
+
+
   return `
-    <div class="event complete">
-
-      ${image ? `<img src="${escapeHtml(image)}">` : ""}
-
-      <h3>${escapeHtml(title || "Evento senza titolo")}</h3>
-
-      <div class="field">
-        <span class="label">Data/ora:</span>
-        ${escapeHtml(start || "—")}
-      </div>
-
-      <div class="field">
-        <span class="label">Luogo:</span>
-        ${escapeHtml(location || "—")}
-      </div>
-
-      <div class="field">
-        <span class="label">Organizzatore:</span>
-        ${escapeHtml(organizer || "—")}
-      </div>
+    <article class="event ${validation.complete ? "complete" : "incomplete"}">
 
       ${
-        description
-        ? `<p>${escapeHtml(description)}</p>`
+        image
+        ? `
+          <div class="event-image">
+            <img
+              src="${escapeHtml(image)}"
+              alt=""
+            >
+          </div>
+        `
         : ""
       }
 
-    </div>
+      <div class="event-body">
+
+        <h3>
+          ${escapeHtml(title || "Evento senza titolo")}
+        </h3>
+
+        ${
+          description
+          ? `
+            <div class="event-description">
+              ${escapeHtml(description)}
+            </div>
+          `
+          : ""
+        }
+
+        <div class="field">
+          <span class="label">Inizio:</span>
+          ${escapeHtml(start || "—")}
+        </div>
+
+        ${
+          end
+          ? `
+            <div class="field">
+              <span class="label">Fine:</span>
+              ${escapeHtml(end)}
+            </div>
+          `
+          : ""
+        }
+
+        <div class="field">
+          <span class="label">Luogo:</span>
+          ${escapeHtml(location || "—")}
+        </div>
+
+        ${
+          organizer
+          ? `
+            <div class="field">
+              <span class="label">Organizzatore:</span>
+              ${escapeHtml(organizer)}
+            </div>
+          `
+          : ""
+        }
+
+        ${
+          !validation.complete
+          ? `
+            <div class="missing">
+              Dati fondamentali mancanti:
+              ${escapeHtml(validation.missing.join(", "))}
+            </div>
+          `
+          : ""
+        }
+
+        <button
+          class="schema-button"
+          onclick="toggleSchema('${detailsId}', this)"
+        >
+          → Schema.org
+        </button>
+
+        ${schemaDetails(e,detailsId)}
+
+      </div>
+
+    </article>
   `;
 }
 
 
 /* ---------------------------------------------------------
-   Visualizzazione evento incompleto
+   Visualizzazione sezione eventi
 --------------------------------------------------------- */
 
-function showIncompleteEvent(e, validation){
+function showEventsSection(title, events, incomplete){
 
-  const title = eventTitle(e);
+  let html = `
+    <div class="section">
 
-  return `
-    <div class="event incomplete">
+      <h2>${title} ${events.length}</h2>
 
-      <strong>
-        ${escapeHtml(title || "Evento senza titolo")}
-      </strong>
+      <div class="events-grid">
+  `;
 
-      <div class="field">
-        Evento rilevato ma incompleto.
+
+  if(!events.length){
+
+    html += `
+      <div class="empty">
+        Nessun elemento ${incomplete ? "incompleto" : "completo"}.
       </div>
+    `;
 
-      <div class="missing">
-        Dati fondamentali mancanti:
-        ${escapeHtml(validation.missing.join(", "))}
+  }else{
+
+    events.forEach((item,index) => {
+
+      html += showEvent(
+        item.event,
+        item.validation,
+        title + "-" + index
+      );
+
+    });
+
+  }
+
+
+  html += `
       </div>
 
     </div>
   `;
+
+  return html;
 }
 
 
 /* ---------------------------------------------------------
-   Visualizzazione motore
+   Conteggi per struttura
 --------------------------------------------------------- */
 
-function showResults(complete, incomplete){
+function engineCounts(events){
 
-  let h = `
-    <div class="engine">
+  let complete = 0;
+  let incomplete = 0;
 
-      <h2>ELEMENTI COMPLETI</h2>
-  `;
+  events.forEach(e => {
 
-  for(const e of complete){
-    h += showCompleteEvent(e);
-  }
+    if(validateEvent(e).complete){
+      complete++;
+    }else{
+      incomplete++;
+    }
 
-  if(!complete.length){
-    h += `<p>Nessun elemento completo rilevato.</p>`;
-  }
+  });
 
-  h += `
-    </div>
 
-    <div class="engine">
-
-      <h2>ELEMENTI INCOMPLETI</h2>
-  `;
-
-  for(const item of incomplete){
-
-    h += showIncompleteEvent(
-      item.event,
-      item.validation
-    );
-  }
-
-  if(!incomplete.length){
-    h += `<p>Nessun elemento incompleto rilevato.</p>`;
-  }
-
-  h += `</div>`;
-
-  return h;
+  return {
+    complete,
+    incomplete
+  };
 }
+
 
 /* ---------------------------------------------------------
    Strutture rilevate
 --------------------------------------------------------- */
 
-function structure(html){
+function structure(html, engineEvents){
 
   if(!html){
     return "";
@@ -636,20 +886,127 @@ function structure(html){
   ];
 
 
+  const schemaEvents =
+    engineEvents[3000] || [];
+
+  const structuredEvents =
+    engineEvents[3002] || [];
+
+  const htmlEvents =
+    engineEvents[3003] || [];
+
+
+  const schemaCounts =
+    engineCounts(schemaEvents);
+
+  const structuredCounts =
+    engineCounts(structuredEvents);
+
+  const htmlCounts =
+    engineCounts(htmlEvents);
+
+
+  function structureItem(name, detected, counts){
+
+    return `
+      <div class="structure-item">
+
+        <span class="badge ${detected ? "yes" : "no"}">
+          ${name}
+        </span>
+
+        <div class="counts">
+
+          <span class="count count-complete">
+            ${counts.complete}
+          </span>
+
+          <span class="count count-incomplete">
+            ${counts.incomplete}
+          </span>
+
+        </div>
+
+      </div>
+    `;
+  }
+
+
+  const detection = {};
+
+  tests.forEach(test => {
+
+    detection[test[0]] = test[1].test(html);
+
+  });
+
+
   return `
     <div class="structure">
 
-      <h2>STRUTTURE RILEVATE</h2>
+      <h2>Strutture</h2>
 
       <div class="badges">
 
-        ${
-          tests.map(x => `
-            <span class="badge ${x[1].test(html) ? "yes" : "no"}">
-              ${x[0]}
-            </span>
-          `).join("")
-        }
+        ${structureItem(
+          "JSON-LD",
+          detection["JSON-LD"],
+          schemaCounts
+        )}
+
+        ${structureItem(
+          "Microdata",
+          detection["Microdata"],
+          structuredCounts
+        )}
+
+        ${structureItem(
+          "RDFa",
+          detection["RDFa"],
+          structuredCounts
+        )}
+
+        ${structureItem(
+          "OpenGraph",
+          detection["OpenGraph"],
+          {complete:0,incomplete:0}
+        )}
+
+        ${structureItem(
+          "Twitter Card",
+          detection["Twitter Card"],
+          {complete:0,incomplete:0}
+        )}
+
+        ${structureItem(
+          "Meta",
+          detection["Meta"],
+          {complete:0,incomplete:0}
+        )}
+
+        ${structureItem(
+          "HTML",
+          detection["HTML"],
+          htmlCounts
+        )}
+
+        ${structureItem(
+          "Card",
+          detection["Card"],
+          htmlCounts
+        )}
+
+        ${structureItem(
+          "Link",
+          detection["Link"],
+          {complete:0,incomplete:0}
+        )}
+
+        ${structureItem(
+          "Immagini",
+          detection["Immagini"],
+          {complete:0,incomplete:0}
+        )}
 
       </div>
 
@@ -670,6 +1027,29 @@ function escapeHtml(value){
     .replace(/>/g,"&gt;")
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#039;");
+}
+
+
+/* ---------------------------------------------------------
+   Apertura dettaglio Schema.org
+--------------------------------------------------------- */
+
+function toggleSchema(id,button){
+
+  const element =
+    document.getElementById(id);
+
+  if(!element){
+    return;
+  }
+
+  const open =
+    element.classList.toggle("open");
+
+  button.textContent =
+    open
+    ? "← Chiudi Schema.org"
+    : "→ Schema.org";
 }
 
 
@@ -707,81 +1087,86 @@ async function run(){
 
 
   const schemaEvents =
-  extractEvents(schemaData,3000);
-
-const structuredEvents =
-  extractEvents(structuredData,3002);
-
-const htmlEvents =
-  extractEvents(htmlData,3003);
+    uniqueEvents(
+      extractEvents(schemaData,3000)
+    );
 
 
-/*
- * Unificazione degli eventi provenienti
- * dai tre motori.
- */
+  const structuredEvents =
+    uniqueEvents(
+      extractEvents(structuredData,3002)
+    );
 
-const allEvents =
-  uniqueEvents([
+
+  const htmlEvents =
+    uniqueEvents(
+      extractEvents(htmlData,3003)
+    );
+
+
+  const engineEvents = {
+
+    3000: schemaEvents,
+    3002: structuredEvents,
+    3003: htmlEvents
+
+  };
+
+
+  const allEvents = uniqueEvents([
     ...schemaEvents,
     ...structuredEvents,
     ...htmlEvents
   ]);
 
 
-/*
- * Validazione complessiva.
- */
+  const completeEvents = [];
+  const incompleteEvents = [];
 
-const complete = [];
-const incomplete = [];
 
-for(const e of allEvents){
+  for(const e of allEvents){
 
-  const validation = validateEvent(e);
+    const validation =
+      validateEvent(e);
 
-  if(validation.complete){
+    if(validation.complete){
 
-    complete.push(e);
+      completeEvents.push({
+        event:e,
+        validation
+      });
 
-  }else{
+    }else{
 
-    incomplete.push({
-      event:e,
-      validation
-    });
+      incompleteEvents.push({
+        event:e,
+        validation
+      });
+
+    }
+
   }
-}
 
 
-/*
- * Visualizzazione.
- */
+  r.innerHTML =
+      structure(
+        sourceHtml,
+        engineEvents
+      )
 
-r.innerHTML =
-    structure(sourceHtml)
+    + showEventsSection(
+        "Completi",
+        completeEvents,
+        false
+      )
 
-  + `
-    <div class="summary">
-
-      <span class="marker complete-marker">
-        ${complete.length}
-      </span>
-
-      <span class="marker incomplete-marker">
-        ${incomplete.length}
-      </span>
-
-    </div>
-  `
-
-  + showResults(
-      complete,
-      incomplete
-    );
+    + showEventsSection(
+        "Incompleti",
+        incompleteEvents,
+        true
+      );
 }
 </script>
 
 </body>
 </html>
-
