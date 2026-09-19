@@ -416,7 +416,6 @@ function eventStart(e){
   return value(e.startDate);
 }
 
-
 function eventLocation(e){
 
   const l = e.location;
@@ -440,28 +439,30 @@ function eventLocation(e){
   if(a){
 
     if(typeof a === "string"){
+
       parts.push(a);
+
     }else{
 
-      [
-        "streetAddress",
-        "postalCode",
-        "addressLocality",
-        "addressRegion",
-        "addressCountry"
-      ].forEach(k => {
+      if(a.streetAddress){
+        parts.push(value(a.streetAddress));
+      }
 
-        if(a[k]){
-          parts.push(value(a[k]));
-        }
+      const locality = value(a.addressLocality);
+      const region = value(a.addressRegion);
 
-      });
+      if(locality && region){
+        parts.push(`${locality} (${region})`);
+      }else if(locality){
+        parts.push(locality);
+      }else if(region){
+        parts.push(region);
+      }
     }
   }
 
   return parts.join(", ");
 }
-
 
 function eventOrganizer(e){
 
