@@ -1,7 +1,126 @@
-const http = require("http");
-const https = require("https");
-const fs = require("fs");
-const { URL } = require("url");
+import http from "http";
+import https from "https";
+import fs from "fs";
+import { URL } from "url";
+/* =========================================================
+   DIZIONARIO CATEGORIE — CARICAMENTO DB
+========================================================= */
+
+import { supabase } from "./supabase_node.js";
+
+let CATEGORY_DICTIONARY = null;
+
+
+async function loadCategoryDictionary() {
+
+  if (CATEGORY_DICTIONARY) {
+    return CATEGORY_DICTIONARY;
+  }
+
+   const { data, error } = await supabase
+    .from("categorie")
+    .select(`
+      id_categoria,
+      mc_descrizione,
+      mc_slug,
+      mc_attiva,
+      subcategorie (
+        id_subcategoria,
+        sc_descrizione,
+        sc_slug,
+        sc_attiva
+      )
+    `)
+    .eq("mc_attiva", true);
+
+  if (error) {
+    console.error(
+      "[CATEGORY] Errore caricamento categorie:",
+      error
+    );
+
+    CATEGORY_DICTIONARY = {
+      macro: [],
+      sub: [],
+      excluded: []
+    };
+
+    return CATEGORY_DICTIONARY;
+  }
+
+  const macro = [];
+  const sub = [];
+  const excluded = [];
+
+  for (const categoria of data || []) {
+
+    const mcSlug = clean(categoria.mc_slug || "");
+
+    const macroItem = {
+      id: categoria.id_categoria,
+      descrizione: clean(categoria.mc_descrizione),
+      slug: mcSlug,
+      terms: buildTerms(
+        categoria.mc_descrizione,
+        categoria.mc_slug
+      )
+    };
+
+    macro.push(macroItem);
+
+    /* citizen e infrastructure non sono eventi.
+      Li manteniamo però nel dizionario perché sono
+      segnali semantici utili per l'esclusione. */
+
+    if (
+      mcSlug === "citizen" ||
+      mcSlug === "infrastructure"
+    ) {
+      excluded.push(macroItem);
+    }
+
+    for (const sottocategoria of categoria.subcategorie || []) {
+
+      if (sottocategoria.sc_attiva === false) {
+        continue;
+      }
+
+      const subItem = {
+        id: sottocategoria.id_subcategoria,
+        categoriaId: categoria.id_categoria,
+        descrizione: clean(
+          sottocategoria.sc_descrizione
+        ),
+        slug: clean(
+          sottocategoria.sc_slug || ""
+        ),
+        terms: buildTerms(
+          sottocategoria.sc_descrizione,
+          sottocategoria.sc_slug
+        )
+      };
+
+      sub.push(subItem);
+    }
+  }
+
+  CATEGORY_DICTIONARY = {
+    macro,
+    sub,
+    excluded
+  };
+
+  console.log(
+    "[CATEGORY] Dizionario caricato:",
+    {
+      macro: macro.length,
+      sub: sub.length,
+      excluded: excluded.length
+    }
+  );
+
+  return CATEGORY_DICTIONARY;
+}
 
 /*
 ============================================================
@@ -57,6 +176,7 @@ function decodeHtml(value) {
   if (!value) return "";
 
   return String(value)
+
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&quot;/gi, '"')
@@ -64,9 +184,36 @@ function decodeHtml(value) {
     .replace(/&#39;/gi, "'")
     .replace(/&lt;/gi, "<")
     .replace(/&gt;/gi, ">")
+
+    /* Virgolette */
+    .replace(/&ldquo;/gi, "“")
+    .replace(/&rdquo;/gi, "”")
+    .replace(/&lsquo;/gi, "‘")
+    .replace(/&rsquo;/gi, "’")
+
+    /* Apostrofo */
+    .replace(/&apos;/gi, "'")
+
+    /* Vocali accentate italiane */
+    .replace(/&agrave;/gi, "à")
+    .replace(/&egrave;/gi, "è")
+    .replace(/&eacute;/gi, "é")
+    .replace(/&igrave;/gi, "ì")
+    .replace(/&ograve;/gi, "ò")
+    .replace(/&ugrave;/gi, "ù")
+
+    /* Altre entità utili */
+    .replace(/&ndash;/gi, "–")
+    .replace(/&mdash;/gi, "—")
+    .replace(/&hellip;/gi, "…")
+    .replace(/&bull;/gi, "•")
+
+    /* Numeriche decimali */
     .replace(/&#(\d+);/g, (_, n) =>
       String.fromCharCode(Number(n))
     )
+
+    /* Numeriche esadecimali */
     .replace(/&#x([0-9a-f]+);/gi, (_, n) =>
       String.fromCharCode(parseInt(n, 16))
     );
@@ -353,27 +500,51 @@ function extractDates(text) {
   });
 }
 
-
-/* =========================================================
-   ORA
-========================================================= */
+ /* =========================================================
+    ORA
+ ========================================================= */
 
 function extractTimes(text) {
+
   if (!text) return [];
 
   const result = [];
 
   const patterns = [
+
+    /* "alle 19:00" / "alle 19.00" */
     /\balle\s+(\d{1,2})[:.](\d{2})\b/gi,
+
+    /* "alle 19" */
+    /\balle\s+(\d{1,2})\b/gi,
+
+    /* "ore 19:00" / "ore 19.00" */
     /\bore\s+(\d{1,2})[:.](\d{2})\b/gi,
+
+    /* "ore 19" */
+    /\bore\s+(\d{1,2})\b/gi,
+
+    /* "19:00" */
     /\b(\d{1,2}):(\d{2})\b/g,
+
+    /* "19.00" */
     /\b(\d{1,2})\.(\d{2})\b/g
+
   ];
 
   for (const re of patterns) {
+
     for (const m of text.matchAll(re)) {
+
       const h = Number(m[1]);
-      const min = Number(m[2]);
+
+      /*
+       * Nei pattern "alle 19" / "ore 19"
+       * m[2] non esiste: assumiamo minuto 00.
+       */
+      const min = m[2] !== undefined
+        ? Number(m[2])
+        : 0;
 
       if (
         h >= 0 &&
@@ -381,23 +552,36 @@ function extractTimes(text) {
         min >= 0 &&
         min <= 59
       ) {
+
         result.push({
-          value: `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`,
+
+          value:
+            `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`,
+
           index: m.index,
+
           raw: m[0]
+
         });
+
       }
+
     }
+
   }
 
   const seen = new Set();
 
   return result.filter(x => {
+
     if (seen.has(x.value)) return false;
 
     seen.add(x.value);
+
     return true;
+
   });
+
 }
 
 
@@ -432,36 +616,84 @@ function extractPrice(text) {
   return null;
 }
 
-
 /* =========================================================
    ORGANIZZATORE
 ========================================================= */
 
 function extractOrganizer(text) {
+
   if (!text) return null;
 
   const patterns = [
+
+    /* -----------------------------------------------------
+       FORME ESPLICITE
+    ----------------------------------------------------- */
+
     /\borganizzat[oa]\s+da\s+([^.;\n]{2,150})/i,
+
     /\borganizzatore\s*[:\-]\s*([^.;\n]{2,150})/i,
+
     /\borganizzatrice\s*[:\-]\s*([^.;\n]{2,150})/i,
+
     /\borgani(?:zza|zzato|zzata)\s+(?:da\s+)?([^.;\n]{2,150})/i,
+
     /\bpromoss[oa]\s+da\s+([^.;\n]{2,150})/i,
+
     /\ba\s+cura\s+di\s+([^.;\n]{2,150})/i,
+
     /\brealizzat[oa]\s+da\s+([^.;\n]{2,150})/i,
-    /\bproduzione\s+(?:di|a cura di)\s+([^.;\n]{2,150})/i
+
+    /\bproduzione\s+(?:di|a cura di)\s+([^.;\n]{2,150})/i,
+
+
+    /* -----------------------------------------------------
+       FORME SEMANTICHE INDIRETTE
+
+       Esempio:
+       "opera da camera del Luglio Musicale Trapanese"
+       ----------------------------------------------------- */
+
+    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdel\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
+
+    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdella\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
+
+    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdell['’]\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
+
+    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdi\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u
   ];
 
+
   for (const re of patterns) {
+
     const m = text.match(re);
 
-    if (m && clean(m[1])) {
-      return clean(m[1]);
+    if (!m) continue;
+
+    let value = clean(m[1]);
+
+    if (!value) continue;
+
+
+    /* -----------------------------------------------------
+       EVITA DI TRASCINARE LA FRASE SUCCESSIVA
+       ----------------------------------------------------- */
+
+    value = value
+      .split(/\s+\b(?:con|per|che|dove|quando|sul|sulla|al|alla|allo)\b/i)[0]
+      .trim();
+
+
+    if (
+      value.length >= 3 &&
+      value.length <= 150
+    ) {
+      return value;
     }
   }
 
   return null;
 }
-
 
 /* =========================================================
    CREATOR / PERFORMER
@@ -483,16 +715,41 @@ function extractCreators(text) {
     /\bpresenta(?:to|ta)?\s+(?:da\s+)?([^.;\n]{3,120})/gi
   ];
 
-  for (const re of patterns) {
-    for (const m of text.matchAll(re)) {
-      const value = clean(m[1]);
+  /*
+   * Nome proprio composto:
+   *
+   * Alessio Pizzech
+   * Orazio Sciortino
+   * Guido Barbieri
+   *
+   * Permettiamo anche nomi con più componenti.
+   */
+  const personName =
+    /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
 
-      if (
-        value &&
-        value.length >= 3 &&
-        value.length <= 120
-      ) {
-        result.push(value);
+  for (const re of patterns) {
+
+    for (const m of text.matchAll(re)) {
+
+      const segment = clean(m[1]);
+
+      if (!segment) continue;
+
+      const names = segment.match(personName);
+
+      if (!names) continue;
+
+      for (const name of names) {
+
+        const value = clean(name);
+
+        if (
+          value &&
+          value.length >= 5 &&
+          value.length <= 80
+        ) {
+          result.push(value);
+        }
       }
     }
   }
@@ -517,52 +774,240 @@ function dedupeNames(values) {
   return result;
 }
 
-
 /* =========================================================
-   CATEGORIA
+   UTILITÀ CATEGORIE
 ========================================================= */
 
-const CATEGORIES = [
-  "concerto",
-  "musica",
-  "opera",
-  "teatro",
-  "spettacolo",
-  "festival",
-  "mostra",
-  "presentazione",
-  "conferenza",
-  "incontro",
-  "cinema",
-  "danza",
-  "letteratura",
-  "libro",
-  "sport",
-  "processione",
-  "degustazione",
-  "sagra",
-  "cultura",
-  "poesia"
-];
+function buildTerms(descrizione, slug) {
 
+  const values = [];
 
-function extractCategory(text) {
-  if (!text) return null;
+  if (descrizione) {
+    values.push(descrizione);
+  }
 
-  const lower = text.toLowerCase();
-
-  for (const category of CATEGORIES) {
-    const re = new RegExp(
-      `\\b${escapeRegExp(category)}\\b`,
-      "i"
+  if (slug) {
+    values.push(
+      ...String(slug)
+        .split(";")
+        .map(value => value.trim())
+        .filter(Boolean)
     );
+  }
 
-    if (re.test(lower)) {
-      return category;
+  return [
+    ...new Set(
+      values
+        .map(normalizeCategoryTerm)
+        .filter(Boolean)
+    )
+  ];
+}
+
+
+function normalizeCategoryTerm(value) {
+
+  if (!value) return "";
+
+  return String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+
+function containsCategoryTerm(text, term) {
+
+  if (!text || !term) return false;
+
+  const normalizedText =
+    normalizeCategoryTerm(text);
+
+  const normalizedTerm =
+    normalizeCategoryTerm(term);
+
+  if (!normalizedTerm) return false;
+
+  const escaped =
+    escapeRegExp(normalizedTerm);
+
+  return new RegExp(
+    `\\b${escaped}\\b`,
+    "i"
+  ).test(normalizedText);
+}
+
+
+/* =========================================================
+   CATEGORIA DA DIZIONARIO DB
+========================================================= */
+
+function extractCategory(text, dictionary) {
+
+  if (!text || !dictionary) {
+    return null;
+  }
+
+  const macroMatches = [];
+  const subMatches = [];
+  const excludedMatches = [];
+
+  /*
+    ---------------------------------------------------------
+    MACRO CATEGORIE
+    ---------------------------------------------------------
+  */
+
+  for (const macro of dictionary.macro) {
+
+    for (const term of macro.terms) {
+
+      if (containsCategoryTerm(text, term)) {
+
+        macroMatches.push({
+          id: macro.id,
+          descrizione: macro.descrizione,
+          slug: macro.slug,
+          matchedTerm: term
+        });
+
+        break;
+      }
     }
   }
 
-  return null;
+
+  /*
+    ---------------------------------------------------------
+    SOTTOCATEGORIE
+    ---------------------------------------------------------
+  */
+
+  for (const item of dictionary.sub) {
+
+    for (const term of item.terms) {
+
+      if (containsCategoryTerm(text, term)) {
+
+        subMatches.push({
+          id: item.id,
+          categoriaId: item.categoriaId,
+          descrizione: item.descrizione,
+          slug: item.slug,
+          matchedTerm: term
+        });
+
+        break;
+      }
+    }
+  }
+
+
+  /*
+    ---------------------------------------------------------
+    ESCLUSIONI
+    ---------------------------------------------------------
+  */
+
+  for (const item of dictionary.excluded) {
+
+    for (const term of item.terms) {
+
+      if (containsCategoryTerm(text, term)) {
+
+        excludedMatches.push({
+          id: item.id,
+          descrizione: item.descrizione,
+          slug: item.slug,
+          matchedTerm: term
+        });
+
+        break;
+      }
+    }
+  }
+
+
+  /*
+    ---------------------------------------------------------
+    NESSUN RISULTATO
+    ---------------------------------------------------------
+  */
+
+  if (
+    macroMatches.length === 0 &&
+    subMatches.length === 0 &&
+    excludedMatches.length === 0
+  ) {
+    return null;
+  }
+
+
+  /*
+    ---------------------------------------------------------
+    RISULTATO STRUTTURATO
+
+    Non restituiamo ancora soltanto una stringa.
+    Conserviamo le evidenze perché ci serviranno
+    per la disambiguazione.
+    ---------------------------------------------------------
+  */
+
+  return {
+
+    category: macroMatches.length === 1
+      ? macroMatches[0].descrizione
+      : null,
+
+    categorySlug: macroMatches.length === 1
+      ? macroMatches[0].slug
+      : null,
+
+    macroMatches,
+
+    subMatches,
+
+    excludedMatches,
+
+    /*
+      Rafforzamento semantico:
+      1 macro + 1 sub
+      1 macro + 2+ sub
+      2+ macro
+    */
+
+    macroCount: macroMatches.length,
+
+    subCount: subMatches.length,
+
+    strength:
+      macroMatches.length >= 2
+        ? "disambiguazione"
+        : (
+          macroMatches.length === 1 &&
+          subMatches.length >= 2
+            ? "forte"
+            : (
+              macroMatches.length === 1 &&
+              subMatches.length >= 1
+                ? "confermato"
+                : (
+                  macroMatches.length === 1
+                    ? "base"
+                    : (
+                      subMatches.length >= 1
+                        ? "sottocategoria"
+                        : null
+                    )
+                )
+            )
+        ),
+
+    excluded:
+      excludedMatches.length > 0
+  };
 }
 
 
@@ -628,7 +1073,6 @@ function extractCity(text) {
   return null;
 }
 
-
 /* =========================================================
    LUOGO
 ========================================================= */
@@ -637,30 +1081,98 @@ function extractLocation(text) {
   if (!text) return null;
 
   const patterns = [
+
     /\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+((?:Teatro|Cinema|Auditorium|Sala|Piazza|Via|Villa|Castello|Museo|Chiesa|Complesso|Palazzo|Parco|Largo|Contrada)[^.;\n]{2,150})/i,
 
     /\b((?:Teatro|Cinema|Auditorium|Sala|Piazza|Via|Villa|Castello|Museo|Chiesa|Complesso|Palazzo|Parco|Largo|Contrada)[^.;\n]{2,150})/i
   ];
 
   for (const re of patterns) {
+
     const m = text.match(re);
 
-    if (m) {
-      const value = clean(m[1] || m[0]);
+    if (!m) continue;
 
-      if (
-        value &&
-        value.length >= 4 &&
-        value.length <= 180
-      ) {
-        return value;
-      }
+    let value = clean(m[1] || m[0]);
+
+    if (!value) continue;
+
+
+    /* ---------------------------------------------------------
+       CHIUSURA SEMANTICA DEL LUOGO
+       --------------------------------------------------------- */
+
+    value = value
+      .split(
+        /\s+\b(?:debutta|debutterà|presenta|presenterà|ospita|ospiterà|si\s+svolge|si\s+terrà|si\s+terra|andrà\s+in\s+scena|andra\s+in\s+scena|va\s+in\s+scena|propone|proporrà|accoglie|accoglierà)\b/i
+      )[0]
+      .trim();
+
+
+    /* ---------------------------------------------------------
+       NUOVA INFORMAZIONE EDITORIALE
+
+       Esempio:
+
+       Museo San Rocco di Trapani la mostra
+       “Il mondo è uno”
+
+       diventa:
+
+       Museo San Rocco di Trapani
+       --------------------------------------------------------- */
+
+    value = value
+      .split(
+        /\s+\b(?:la|il|lo|una|un|una)\s+(?:mostra|rassegna|esposizione|esposizioni|manifestazione|manifestazioni|presentazione|presentazioni|collezione|spettacolo|concerto|evento|iniziativa|serata|performance|personale|collettiva)\b/i
+      )[0]
+      .trim();
+
+
+    /* ---------------------------------------------------------
+       ALTRE FORMULE CHE POSSONO INIZIARE LA DESCRIZIONE
+       --------------------------------------------------------- */
+
+    value = value
+      .split(
+        /\s+\b(?:con|per|durante|in\s+occasione\s+di|dal|dalla|dall['’])\b/i
+      )[0]
+      .trim();
+
+
+    /* ---------------------------------------------------------
+       CHIUSURA DOPO VIRGOLA
+       --------------------------------------------------------- */
+
+    value = value
+      .replace(
+        /\s*,\s*(?:dove|qui|con|per|durante|in\s+occasione\s+di)\b[\s\S]*$/i,
+        ""
+      )
+      .trim();
+
+
+    /* ---------------------------------------------------------
+       RIMOZIONE EVENTUALE ENTITÀ HTML
+       --------------------------------------------------------- */
+
+    value = value
+      .replace(/&ldquo;|&rdquo;|&quot;/gi, "")
+      .replace(/&nbsp;/gi, " ")
+      .trim();
+
+
+    if (
+      value &&
+      value.length >= 4 &&
+      value.length <= 180
+    ) {
+      return value;
     }
   }
 
   return null;
 }
-
 
 /* =========================================================
    TITOLO
@@ -692,7 +1204,7 @@ function extractTitle(block) {
   }
 
   for (const candidate of candidates) {
-    const value = clean(candidate);
+    const value = clean(decodeHtml(candidate));
 
     if (!value) continue;
 
@@ -844,7 +1356,7 @@ function extractDescription(text, title) {
    SEGNALI
 ========================================================= */
 
-function analyzeSignals(block) {
+function analyzeSignals(block, categoryDictionary) {
   const text = stripHtml(block);
 
   if (!text) return null;
@@ -855,7 +1367,7 @@ function analyzeSignals(block) {
   const price = extractPrice(text);
   const organizer = extractOrganizer(text);
   const creators = extractCreators(text);
-  const category = extractCategory(text);
+  const category = extractCategory(text, categoryDictionary);
   const location = extractLocation(text);
   const city = extractCity(text);
   const image = extractImage(block, CURRENT_URL);
@@ -885,7 +1397,9 @@ function analyzeSignals(block) {
     prezzo: !!price,
     organizzatore: !!organizer,
     creator: creators.length > 0,
-    categoria: !!category
+    categoria:
+    !!category &&
+    !category.excluded
   };
 
   const reinforcementNames =
@@ -1125,59 +1639,47 @@ function candidateContainers(root) {
 }
 
 
-/* =========================================================
-   FIRMA DI UN CONTENITORE
-========================================================= */
+ /* =========================================================
+    FIRMA DI UN CONTENITORE
+ ========================================================= */
 
-function evaluateContainer(node, html, url) {
-  const block = nodeHtml(node, html);
-
-  if (!block || block.length < 30) {
-    return null;
-  }
-
-  /*
-    Escludiamo solo strutture palesemente tecniche.
-    Non facciamo blacklist di "social", "correlati",
-    "pubblicità", ecc.
-  */
-
-  if (
-    /^<(?:script|style|noscript|svg)\b/i.test(
-      block.trim()
-    )
-  ) {
-    return null;
-  }
-
-  const previousUrl = CURRENT_URL;
-  CURRENT_URL = url;
-
-  const signals = analyzeSignals(block);
-
-  CURRENT_URL = previousUrl;
-
-  if (!signals) return null;
-
-  if (
-    signals.classification === "non-evento"
-  ) {
-    return null;
-  }
-
-  return {
-    node,
-    block,
-    signals
-  };
-}
-
+ function evaluateContainer(node, html, url, categoryDictionary) {
+   const block = nodeHtml(node, html);
+   if (!block || block.length < 30) {
+     return null;
+   }
+   /* Escludiamo solo strutture palesemente tecniche.
+     Non facciamo blacklist di "social", "correlati",
+     "pubblicità", ecc. */
+   if (
+     /^<(?:script|style|noscript|svg)\b/i.test(
+       block.trim()
+     )
+   ) {
+     return null;
+   }
+   const previousUrl = CURRENT_URL;
+   CURRENT_URL = url;
+   const signals = analyzeSignals(block, categoryDictionary);
+   CURRENT_URL = previousUrl;
+   if (!signals) return null;
+   if (
+     signals.classification === "non-evento"
+   ) {
+     return null;
+   }
+   return {
+     node,
+     block,
+     signals
+   };
+ }
 
 /* =========================================================
    TROVA FIRME
 ========================================================= */
 
-function findSemanticCandidates(html, url) {
+function findSemanticCandidates(html, url, categoryDictionary) {
   const root = buildDom(html);
   const nodes = candidateContainers(root);
 
@@ -1185,7 +1687,7 @@ function findSemanticCandidates(html, url) {
 
   for (const node of nodes) {
     const evaluated =
-      evaluateContainer(node, html, url);
+      evaluateContainer(node, html, url, categoryDictionary);
 
     if (!evaluated) continue;
 
@@ -1492,14 +1994,15 @@ function uniqueEvents(events) {
 let CURRENT_URL = null;
 
 
-function findEvents(html, url) {
+function findEvents(html, url, categoryDictionary) {
   CURRENT_URL = url;
 
-  const result =
-    findSemanticCandidates(
-      html,
-      url
-    );
+const result =
+  findSemanticCandidates(
+    html,
+    url,
+    categoryDictionary
+  );
 
   const events =
     result.candidates.map(
@@ -1519,6 +2022,11 @@ function findEvents(html, url) {
 /* =========================================================
    SERVER
 ========================================================= */
+
+let categoryDictionary = null;
+
+async function startServer() {
+  categoryDictionary = await loadCategoryDictionary();
 
 http.createServer(
   async (req, res) => {
@@ -1584,7 +2092,7 @@ http.createServer(
       const eventi =
         findEvents(
           page.content,
-          url
+          url, categoryDictionary
         );
 
       return res.end(
@@ -1629,6 +2137,9 @@ http.createServer(
     )
 );
 
+}
+
+startServer();
 
 /*
 ============================================================
