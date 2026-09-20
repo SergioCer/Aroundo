@@ -132,8 +132,9 @@ body{
 }
 
 .schema-field{
-  padding:8px 0;
-  border-bottom:1px solid #eee
+  padding:5px 0;
+  border-bottom:1px solid #eee;
+  line-height:1.4
 }
 
 .schema-field:last-child{
@@ -141,12 +142,18 @@ body{
 }
 
 .schema-name{
-  font-weight:bold;
-  color:#34495e;
-  margin-bottom:4px
+  display:inline;
+  font-weight:normal;
+  color:#34495e
+}
+
+.schema-name::after{
+  content:" = ";
+  color:#999
 }
 
 .schema-value{
+  display:inline;
   color:#333;
   white-space:pre-wrap;
   word-break:break-word
@@ -408,6 +415,44 @@ function formatSchemaValue(value){
   return String(value);
 }
 
+function displaySchemaValue(v){
+
+  if(v === null || v === undefined){
+    return "";
+  }
+
+  if(Array.isArray(v)){
+    return v
+      .map(item => displaySchemaValue(item))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if(typeof v === "object"){
+
+    if(v.name){
+      return displaySchemaValue(v.name);
+    }
+
+    if(v["@value"]){
+      return displaySchemaValue(v["@value"]);
+    }
+
+    if(v.price !== undefined){
+
+      const currency =
+        v.priceCurrency
+          ? ` ${v.priceCurrency}`
+          : "";
+
+      return `${v.price}${currency}`;
+    }
+
+    return JSON.stringify(v);
+  }
+
+  return String(v);
+}
 
 function schemaDetails(event,id){
 
@@ -501,6 +546,18 @@ function eventCard(row,index){
 
   const organizer =
     value(event.organizer);
+
+  const offers =
+    displaySchemaValue(event.offers);
+
+  const performer =
+    displaySchemaValue(event.performer);
+
+  const category =
+    displaySchemaValue(event.category);
+
+  const creator =
+    displaySchemaValue(event.creator);
 
   const image =
     value(event.image);
@@ -615,6 +672,67 @@ function eventCard(row,index){
 
                 ${escapeHtml(organizer)}
 
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          performer
+            ? `
+              <div class="field">
+
+                <span class="label">
+                  Performer:
+                </span>
+
+                ${escapeHtml(performer)}
+
+              </div>
+            `
+            : ""
+        }   
+
+
+        ${
+        offers
+          ? `
+            <div class="field">
+              <span class="label">Prezzo:</span>
+              ${escapeHtml(offers)}
+            </div>
+          `
+          : ""
+      }
+
+        ${
+          performer
+            ? `
+              <div class="field">
+                <span class="label">Performer:</span>
+                ${escapeHtml(performer)}
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          category
+            ? `
+              <div class="field">
+                <span class="label">Categoria:</span>
+                ${escapeHtml(category)}
+              </div>
+            `
+            : ""
+        }
+
+        ${  
+          creator
+            ? `
+              <div class="field">
+                <span class="label">Creator:</span>
+                ${escapeHtml(creator)}
               </div>
             `
             : ""
