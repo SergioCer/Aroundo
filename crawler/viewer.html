@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+<meta charset="utf-8">
+<title>Aroundo — Eventi acquisiti</title>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  margin:0;
+  background:#f4f6f8;
+  color:#222
+}
+
+.top{
+  background:#17202a;
+  color:white;
+  padding:20px
+}
+
+.top h1{
+  margin:0 0 8px;
+  font-size:24px
+}
+
+.status{
+  color:#bdc3c7;
+  font-size:14px
+}
+
+.wrap{
+  padding:20px;
+  max-width:1400px;
+  margin:auto
+}
+
+.section{
+  background:white;
+  border-radius:10px;
+  margin-bottom:20px;
+  padding:18px;
+  box-shadow:0 2px 8px #0001
+}
+
+.section h2{
+  margin-top:0
+}
+
+.events-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+  gap:18px;
+  margin-top:15px
+}
+
+.event{
+  background:#fff;
+  border:1px solid #ddd;
+  border-left:5px solid #27ae60;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 2px 6px #0001
+}
+
+.event-image{
+  width:100%;
+  height:220px;
+  background:#eef0f2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden
+}
+
+.event-image img{
+  width:100%;
+  height:100%;
+  object-fit:contain
+}
+
+.event-body{
+  padding:16px
+}
+
+.event h3{
+  margin:0 0 14px;
+  font-size:20px
+}
+
+.event .field{
+  margin:7px 0;
+  line-height:1.45
+}
+
+.event .label{
+  color:#444;
+  font-weight:bold
+}
+
+.event-description{
+  margin:12px 0;
+  color:#555;
+  line-height:1.5
+}
+
+.schema-button{
+  margin-top:15px;
+  padding:8px 12px;
+  border:0;
+  border-radius:6px;
+  background:#34495e;
+  color:white;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:bold
+}
+
+.schema-button:hover{
+  background:#22313f
+}
+
+.schema-details{
+  display:none;
+  margin-top:14px;
+  border-top:1px solid #ddd;
+  padding-top:14px
+}
+
+.schema-details.open{
+  display:block
+}
+
+.schema-field{
+  padding:8px 0;
+  border-bottom:1px solid #eee
+}
+
+.schema-field:last-child{
+  border-bottom:0
+}
+
+.schema-name{
+  font-weight:bold;
+  color:#34495e;
+  margin-bottom:4px
+}
+
+.schema-value{
+  color:#333;
+  white-space:pre-wrap;
+  word-break:break-word
+}
+
+.empty{
+  padding:18px;
+  background:#fafafa;
+  border:1px dashed #bbb;
+  border-radius:8px;
+  color:#777
+}
+
+.error{
+  padding:18px;
+  background:#fdecea;
+  border:1px solid #e74c3c;
+  border-radius:8px;
+  color:#c0392b
+}
+
+.source{
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid #eee;
+  font-size:13px;
+  color:#666;
+  word-break:break-all
+}
+
+.source a{
+  color:#2980b9;
+  text-decoration:none
+}
+
+.source a:hover{
+  text-decoration:underline
+}
+
+.timestamp{
+  margin-top:6px;
+  font-size:12px;
+  color:#999
+}
+
+.record-id{
+  float:right;
+  font-size:12px;
+  color:#999;
+  font-weight:normal
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="top">
+
+  <h1>Aroundo — Eventi acquisiti</h1>
+
+  <div class="status" id="status">
+    Caricamento dati...
+  </div>
+
+</div>
+
+
+<div class="wrap">
+
+  <div class="section">
+
+    <h2>Eventi</h2>
+
+    <div id="results">
+      <div class="empty">
+        Caricamento degli eventi da Supabase...
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script type="module">
+
+import { supabase } from "../supabase.js";
+
+
+/* ---------------------------------------------------------
+   UTILITÀ
+--------------------------------------------------------- */
+
+function escapeHtml(value){
+
+  if(value === null || value === undefined){
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+function value(v){
+
+  if(v === null || v === undefined){
+    return "";
+  }
+
+  if(typeof v === "string"){
+    return v.trim();
+  }
+
+  if(typeof v === "object"){
+
+    if(v.name){
+      return value(v.name);
+    }
+
+    if(v["@value"]){
+      return value(v["@value"]);
+    }
+
+    return JSON.stringify(v);
+  }
+
+  return String(v);
+}
+
+
+function formatDate(value){
+
+  if(!value){
+    return "";
+  }
+
+  try{
+
+    return new Date(value).toLocaleString(
+      "it-IT",
+      {
+        dateStyle:"medium",
+        timeStyle:"short"
+      }
+    );
+
+  }catch(e){
+
+    return value;
+  }
+}
+
+
+function eventLocation(event){
+
+  const location = event.location;
+
+  if(!location){
+    return "";
+  }
+
+  if(typeof location === "string"){
+    return location;
+  }
+
+  const parts = [];
+
+  if(location.name){
+    parts.push(value(location.name));
+  }
+
+  const address = location.address;
+
+  if(address){
+
+    if(typeof address === "string"){
+
+      parts.push(address);
+
+    }else{
+
+      if(address.streetAddress){
+        parts.push(value(address.streetAddress));
+      }
+
+      if(address.addressLocality){
+        parts.push(
+          value(address.addressLocality)
+        );
+      }
+
+      if(address.addressRegion){
+        parts.push(
+          value(address.addressRegion)
+        );
+      }
+
+    }
+
+  }
+
+  return parts.join(", ");
+}
+
+
+/* ---------------------------------------------------------
+   SCHEMA.ORG
+--------------------------------------------------------- */
+
+const schemaFields = [
+
+  "@context",
+  "@type",
+  "name",
+  "description",
+  "image",
+  "url",
+  "startDate",
+  "endDate",
+  "eventStatus",
+  "eventAttendanceMode",
+  "location",
+  "organizer",
+  "performer",
+  "offers",
+  "audience",
+  "inLanguage",
+  "duration",
+  "eventSchedule",
+  "sameAs"
+
+];
+
+
+function formatSchemaValue(value){
+
+  if(
+    value === null ||
+    value === undefined ||
+    value === ""
+  ){
+    return "";
+  }
+
+  if(typeof value === "object"){
+    return JSON.stringify(
+      value,
+      null,
+      2
+    );
+  }
+
+  return String(value);
+}
+
+
+function schemaDetails(event,id){
+
+  const fields = [...schemaFields];
+
+  Object.keys(event).forEach(key => {
+
+    if(!fields.includes(key)){
+      fields.push(key);
+    }
+
+  });
+
+
+  return `
+
+    <div
+      id="${id}"
+      class="schema-details"
+    >
+
+      ${fields.map(field => {
+
+        const exists =
+          event[field] !== undefined &&
+          event[field] !== null &&
+          event[field] !== "";
+
+        return `
+
+          <div class="schema-field">
+
+            <div class="schema-name">
+              ${escapeHtml(field)}
+            </div>
+
+            <div class="schema-value ${
+              exists ? "" : "schema-missing"
+            }">
+
+              ${
+                exists
+                  ? escapeHtml(
+                      formatSchemaValue(
+                        event[field]
+                      )
+                    )
+                  : "non presente"
+              }
+
+            </div>
+
+          </div>
+
+        `;
+
+      }).join("")}
+
+    </div>
+
+  `;
+
+}
+
+
+/* ---------------------------------------------------------
+   SCHEDA EVENTO
+--------------------------------------------------------- */
+
+function eventCard(row,index){
+
+  const event =
+    row.se_schema || {};
+
+  const title =
+    value(event.name) ||
+    value(event.title) ||
+    "Evento senza titolo";
+
+  const description =
+    value(event.description);
+
+  const startDate =
+    value(event.startDate);
+
+  const endDate =
+    value(event.endDate);
+
+  const location =
+    eventLocation(event);
+
+  const organizer =
+    value(event.organizer);
+
+  const image =
+    value(event.image);
+
+  const sourceUrl =
+    row.site_pages &&
+    row.site_pages.sp_url
+      ? row.site_pages.sp_url
+      : value(event.url);
+
+  const schemaId =
+    `schema-${row.id_site_event || index}`;
+
+
+  return `
+
+    <article class="event">
+
+      ${
+        image
+          ? `
+            <div class="event-image">
+
+              <img
+                src="${escapeHtml(image)}"
+                alt="${escapeHtml(title)}"
+                loading="lazy"
+              >
+
+            </div>
+          `
+          : ""
+      }
+
+
+      <div class="event-body">
+
+        <h3>
+
+          ${escapeHtml(title)}
+
+          <span class="record-id">
+            #${escapeHtml(row.id_site_event)}
+          </span>
+
+        </h3>
+
+
+        ${
+          startDate
+            ? `
+              <div class="field">
+
+                <span class="label">
+                  Data:
+                </span>
+
+                ${escapeHtml(
+                  formatDate(startDate)
+                )}
+
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          endDate
+            ? `
+              <div class="field">
+
+                <span class="label">
+                  Fine:
+                </span>
+
+                ${escapeHtml(
+                  formatDate(endDate)
+                )}
+
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          location
+            ? `
+              <div class="field">
+
+                <span class="label">
+                  Luogo:
+                </span>
+
+                ${escapeHtml(location)}
+
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          organizer
+            ? `
+              <div class="field">
+
+                <span class="label">
+                  Organizzatore:
+                </span>
+
+                ${escapeHtml(organizer)}
+
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          description
+            ? `
+              <div class="event-description">
+
+                ${escapeHtml(description)}
+
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          sourceUrl
+            ? `
+              <div class="source">
+
+                <span class="label">
+                  Fonte:
+                </span>
+
+                <a
+                  href="${escapeHtml(sourceUrl)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ${escapeHtml(sourceUrl)}
+                </a>
+
+              </div>
+            `
+            : ""
+        }
+
+
+        <div class="timestamp">
+
+          Acquisito:
+          ${escapeHtml(
+            formatDate(row.se_extracted_at)
+          )}
+
+        </div>
+
+
+        <button
+          class="schema-button"
+          onclick="toggleSchema('${schemaId}')"
+        >
+          SCHEMA.ORG
+        </button>
+
+
+        ${schemaDetails(event,schemaId)}
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+/* ---------------------------------------------------------
+   APERTURA / CHIUSURA SCHEMA
+--------------------------------------------------------- */
+
+window.toggleSchema = function(id){
+
+  const element =
+    document.getElementById(id);
+
+  if(!element){
+    return;
+  }
+
+  element.classList.toggle("open");
+
+};
+
+
+/* ---------------------------------------------------------
+   LETTURA SUPABASE
+--------------------------------------------------------- */
+
+async function loadEvents(){
+
+  const status =
+    document.getElementById("status");
+
+  const results =
+    document.getElementById("results");
+
+
+  try{
+
+    /*
+     * site_events
+     *
+     * site_pages viene utilizzata solamente
+     * per recuperare l'URL della pagina origine.
+     */
+
+    const { data, error } =
+
+      await supabase
+
+        .from("site_events")
+
+        .select(`
+          id_site_event,
+          id_site_page,
+          id_evento,
+          se_schema,
+          se_extracted_at,
+          site_pages (
+            sp_url
+          )
+        `)
+
+        .order(
+          "id_site_event",
+          {
+            ascending:false
+          }
+        );
+
+
+    if(error){
+      throw error;
+    }
+
+
+    if(!data || data.length === 0){
+
+      status.textContent =
+        "Nessun evento presente in site_events.";
+
+      results.innerHTML = `
+
+        <div class="empty">
+
+          La tabella site_events
+          non contiene ancora eventi.
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    status.textContent =
+      `${data.length} eventi acquisiti`;
+
+
+    results.innerHTML = `
+
+      <div class="events-grid">
+
+        ${data.map(
+          (row,index) =>
+            eventCard(row,index)
+        ).join("")}
+
+      </div>
+
+    `;
+
+
+  }catch(error){
+
+    console.error(
+      "Errore lettura site_events:",
+      error
+    );
+
+
+    status.textContent =
+      "Errore durante il caricamento.";
+
+
+    results.innerHTML = `
+
+      <div class="error">
+
+        <strong>
+          Errore lettura Supabase
+        </strong>
+
+        <br><br>
+
+        ${escapeHtml(error.message)}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   AVVIO
+--------------------------------------------------------- */
+
+loadEvents();
+
+</script>
+
+</body>
+
+</html>
