@@ -2,21 +2,16 @@ import http from "http";
 import https from "https";
 import fs from "fs";
 import { URL } from "url";
-/* =========================================================
-   DIZIONARIO CATEGORIE — CARICAMENTO DB
-========================================================= */
 
+/* =========================================================
+   DIZIONARI — CARICAMENTO DB
+========================================================= */
 import { supabase } from "./supabase_node.js";
 
+/* categorie */
 let CATEGORY_DICTIONARY = null;
-
-
 async function loadCategoryDictionary() {
-
-  if (CATEGORY_DICTIONARY) {
-    return CATEGORY_DICTIONARY;
-  }
-
+  if (CATEGORY_DICTIONARY) {return CATEGORY_DICTIONARY;}
    const { data, error } = await supabase
     .from("categorie")
     .select(`
@@ -32,30 +27,19 @@ async function loadCategoryDictionary() {
       )
     `)
     .eq("mc_attiva", true);
-
-  if (error) {
-    console.error(
-      "[CATEGORY] Errore caricamento categorie:",
-      error
-    );
-
+  if (error) {console.error("[CATEGORY] Errore caricamento categorie:", error);
     CATEGORY_DICTIONARY = {
       macro: [],
       sub: [],
       excluded: []
     };
-
     return CATEGORY_DICTIONARY;
   }
-
   const macro = [];
   const sub = [];
   const excluded = [];
-
   for (const categoria of data || []) {
-
     const mcSlug = clean(categoria.mc_slug || "");
-
     const macroItem = {
       id: categoria.id_categoria,
       descrizione: clean(categoria.mc_descrizione),
@@ -65,26 +49,20 @@ async function loadCategoryDictionary() {
         categoria.mc_slug
       )
     };
-
     macro.push(macroItem);
-
     /* citizen e infrastructure non sono eventi.
       Li manteniamo però nel dizionario perché sono
       segnali semantici utili per l'esclusione. */
-
     if (
       mcSlug === "citizen" ||
       mcSlug === "infrastructure"
     ) {
       excluded.push(macroItem);
     }
-
     for (const sottocategoria of categoria.subcategorie || []) {
-
       if (sottocategoria.sc_attiva === false) {
         continue;
       }
-
       const subItem = {
         id: sottocategoria.id_subcategoria,
         categoriaId: categoria.id_categoria,
@@ -99,39 +77,62 @@ async function loadCategoryDictionary() {
           sottocategoria.sc_slug
         )
       };
-
       sub.push(subItem);
     }
   }
-
   CATEGORY_DICTIONARY = {
     macro,
     sub,
     excluded
   };
-
-  console.log(
-    "[CATEGORY] Dizionario caricato:",
-    {
-      macro: macro.length,
-      sub: sub.length,
-      excluded: excluded.length
-    }
-  );
-
+  console.log("[CATEGORY] Dizionario caricato:",
+    {macro: macro.length, sub: sub.length, excluded: excluded.length});
   return CATEGORY_DICTIONARY;
 }
 
-/*
-============================================================
+/* Comuni */
+let COMUNI_DICTIONARY = null;
+async function loadComuniDictionary() {
+  if (COMUNI_DICTIONARY) {return COMUNI_DICTIONARY;}
+  const { data, error } = await supabase
+    .from("comuni")
+    .select(`
+      id_comune,
+      co_descrizione,
+      co_cap,
+      id_provincia,
+      co_istat,
+      co_lat,
+      co_lng,
+      co_codice
+    `)
+    .order("co_descrizione");
+  if (error) {console.error("[COMUNI] Errore caricamento comuni:", error);
+    COMUNI_DICTIONARY = [];
+    return COMUNI_DICTIONARY;
+  }
+  COMUNI_DICTIONARY = (data || []).map(comune => ({
+    id: comune.id_comune,
+    descrizione: clean(comune.co_descrizione),
+    cap: comune.co_cap,
+    provinciaId: comune.id_provincia,
+    istat: comune.co_istat,
+    lat: comune.co_lat,
+    lng: comune.co_lng,
+    codice: comune.co_codice,
+    terms: buildTerms(
+      comune.co_descrizione
+    )
+  }));
+  console.log("[COMUNI] Dizionario caricato:", COMUNI_DICTIONARY.length);
+  return COMUNI_DICTIONARY;
+}
+
+/* ======================================================
 AROUNDO - HTML EVENT EXTRACTOR
-============================================================
-
 LOGICA
-
 EVENTO COMPLETO
     TITOLO + DATA + LUOGO
-
 INCOMPLETO
     almeno 2 fondamentali tra:
         TITOLO / DATA / LUOGO
@@ -142,27 +143,19 @@ INCOMPLETO
         ORGANIZZATORE
         CREATOR / PERFORMER
         CATEGORIA
-
 IMG e URL NON sono rafforzativi forti.
-
 La pagina viene analizzata come struttura HTML.
-I segnali possono trovarsi in nodi diversi ma devono
-appartenere allo stesso contenitore semantico.
-
+I segnali possono trovarsi in nodi diversi ma devono appartenere allo stesso contenitore semantico.
 Quando un contenitore viene riconosciuto:
     1. viene estratto
     2. viene consumato
     3. non viene più analizzato
-
 Schema.org è OUTPUT, non criterio di riconoscimento.
-============================================================
-*/
-
+========================================================*/
 
 /* =========================================================
    UTILITA'
 ========================================================= */
-
 function clean(value) {
   if (value === null || value === undefined) return null;
 
@@ -1014,62 +1007,22 @@ function extractCategory(text, dictionary) {
 /* =========================================================
    CITTA'
 ========================================================= */
-
-const SICILIAN_CITIES = [
-  "Trapani",
-  "Marsala",
-  "Erice",
-  "Valderice",
-  "Paceco",
-  "Custonaci",
-  "Favignana",
-  "Palermo",
-  "Alcamo",
-  "Castellammare del Golfo",
-  "Mazara del Vallo",
-  "Petrosino",
-  "Partanna",
-  "Salemi",
-  "Castelvetrano",
-  "San Vito Lo Capo"
-];
-
-
-function extractCity(text) {
-  if (!text) return null;
-
-  for (const city of SICILIAN_CITIES) {
-    const re = new RegExp(
-      `\\b${escapeRegExp(city)}\\b`,
-      "i"
-    );
-
-    if (re.test(text)) {
-      return city;
+function matchComune(text) {
+  if (!text || !COMUNI_DICTIONARY?.length) {
+    return null;
+  }
+  for (const comune of COMUNI_DICTIONARY) {
+    for (const term of comune.terms) {
+      if (!term) continue;
+      const re = new RegExp(
+        `\\b${escapeRegExp(term)}\\b`,
+        "i"
+      );
+      if (re.test(text)) {
+        return comune;
+      }
     }
   }
-
-  /*
-    Pattern prudente:
-    "a Trapani"
-    "di Trapani"
-    "Trapani,"
-  */
-  const match = text.match(
-    /\b(?:a|ad|di|in|da|presso)\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ' -]{2,40})/
-  );
-
-  if (match) {
-    const value = clean(match[1]);
-
-    if (
-      value &&
-      !/\b(?:settembre|ottobre|novembre|dicembre|gennaio)\b/i.test(value)
-    ) {
-      return value;
-    }
-  }
-
   return null;
 }
 
@@ -1369,7 +1322,7 @@ function analyzeSignals(block, categoryDictionary) {
   const creators = extractCreators(text);
   const category = extractCategory(text, categoryDictionary);
   const location = extractLocation(text);
-  const city = extractCity(text);
+  const city = matchComune(text);
   const image = extractImage(block, CURRENT_URL);
 
   const date =
@@ -1788,22 +1741,29 @@ function toSchemaEvent(candidate, url) {
   }
 
   const location =
-    s.location || s.city
-      ? {
-          "@type": "Place",
-          name:
-            s.location ||
-            s.city,
-          ...(s.city
-            ? {
-                address: {
-                  "@type": "PostalAddress",
-                  addressLocality: s.city
-                }
+  s.location || s.city
+    ? {
+        "@type": "Place",
+
+        name:
+          s.location ||
+          s.city?.descrizione,
+
+        ...(s.city
+          ? {
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: s.city.descrizione,
+                ...(s.city.cap
+                  ? {
+                      postalCode: String(s.city.cap)
+                    }
+                  : {})
               }
-            : {})
-        }
-      : null;
+            }
+          : {})
+      }
+    : null;
 
   const organizer =
     s.organizer
@@ -1940,7 +1900,7 @@ function eventKey(event) {
     event.name || "",
     event.startDate || "",
     event.location?.name || "",
-    d.city || ""
+    d.city?.id || ""
   ]
     .join("|")
     .toLowerCase()
