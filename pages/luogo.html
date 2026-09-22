@@ -29,7 +29,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  padding: 12px;
   font-weight: bold;
   gap: 20px;
   font-size: 26px;
@@ -58,17 +58,17 @@ body {
 
 /* HERO LOCATION */
 .hero {
-  margin: 10px 15px 8px;
+  margin: 6px 15px 8px;
   padding: 12px;
   background: white;
-  border-radius: 12px;
+  border-radius: 18px;
 }
 
 /* CARD */
 .card {
   background: white;
-  margin: 0 15px 20px;
-  padding: 15px;
+  margin: 0 12px 12px;
+  padding: 12px;
   border-radius: 12px;
 }
 
@@ -96,7 +96,7 @@ input, select, textarea {
   border: none;
   background: #dbeafe;
   color: #1e3a8a;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -115,7 +115,7 @@ input, select, textarea {
 }
 
 .section-box {
-  margin: 0 15px 15px;
+  margin: 0 12px 12px;
   background: white;
   border-radius: 12px;
   overflow: hidden;
@@ -237,14 +237,10 @@ textarea:disabled {
     <input id="id_comune"
        placeholder=" Comune... obbligatorio (minimo 3 caratteri) "
        oninput="onComuneInput(this.value)"
-       style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;">
+       style="font-size:22px; font-weight:700; text-align:center; width:100%; border:none; background: cyan;;">
     <input type="hidden" id="id_comune_hidden">
     <div id="comuniResults"></div> 
     <div class="card">
-
-    <!-- DESCRIZIONE -->
-    <div class="section-title">Description:</div>
-    <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
 
       <!-- RIGA: LOCALITY + ADDRESS -->
     <div style="display:flex; font-size:11px; gap:20px; margin-bottom:4px;">
@@ -259,6 +255,10 @@ textarea:disabled {
              style="flex:1; font-size:16px; font-weight:600; text-align:left;"
              oninput="markDirty()">
     </div>
+
+    <!-- DESCRIZIONE -->
+    <div class="section-title">Description:</div>
+    <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
 
     <!-- RIGA: PHONE + EMAIL + WEBSITE -->
     <div style="display:flex; font-size:11px; gap:20px; margin-bottom:4px;">
@@ -627,7 +627,7 @@ if (isNew) {
   updatePageState();
   return;
   } else {
-    document.getElementById("mapTitle").textContent =  "Luogo Attuale";
+    document.getElementById("mapTitle").textContent =  "Venue";
   }
   const { data, error } = await supabase
     .from('luoghi')
