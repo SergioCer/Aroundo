@@ -1,6 +1,5 @@
 const http = require("http");
 const https = require("https");
-const fs = require("fs");
 const { URL } = require("url");
 
 const { supabase } = require("./supabase_node.js");
@@ -17,7 +16,7 @@ const MAX_PAGES_PER_SITE = 50;
 const REQUEST_TIMEOUT = 20000;
 
 const USER_AGENT =
-  "Mozilla/5.0 AroundoCrawler/1.0";
+  "Mozilla/5.0 Crawler/1.0";
 
 
 /* =========================================================
@@ -113,6 +112,322 @@ function isIgnoredUrl(url) {
 
 
 /* =========================================================
+   RICERCA DATE FUTURE NEL CONTENUTO
+========================================================= */
+
+const MESI = {
+  gennaio: 0,
+  febbraio: 1,
+  marzo: 2,
+  aprile: 3,
+  maggio: 4,
+  giugno: 5,
+  luglio: 6,
+  agosto: 7,
+  settembre: 8,
+  ottobre: 9,
+  novembre: 10,
+  dicembre: 11
+};
+
+
+function createValidDate(
+  year,
+  month,
+  day
+) {
+
+  const date =
+    new Date(
+      year,
+      month,
+      day
+    );
+
+  date.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  /*
+  Verifica che JavaScript non abbia
+  corretto automaticamente una data
+  non valida.
+
+  Esempio:
+  31 febbraio -> marzo
+  */
+
+  if (
+    date.getFullYear() !== year
+    ||
+    date.getMonth() !== month
+    ||
+    date.getDate() !== day
+  ) {
+
+    return null;
+
+  }
+
+  return date;
+
+}
+
+
+function findFutureDate(html) {
+
+  if (!html) {
+    return null;
+  }
+
+
+  /*
+  =========================================================
+  PULIZIA DEL CONTENUTO
+  =========================================================
+
+  Eliminiamo script e style perché le date presenti
+  nel codice della pagina non devono essere considerate.
+
+  Poi eliminiamo i tag HTML e normalizziamo gli spazi.
+  */
+
+  const text =
+    html
+      .replace(
+        /<script[\s\S]*?<\/script>/gi,
+        " "
+      )
+      .replace(
+        /<style[\s\S]*?<\/style>/gi,
+        " "
+      )
+      .replace(
+        /<[^>]+>/g,
+        " "
+      )
+      .replace(
+        /&nbsp;/gi,
+        " "
+      )
+      .replace(
+        /&amp;/gi,
+        "&"
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
+
+
+  if (!text) {
+    return null;
+  }
+
+
+  /*
+  =========================================================
+  OGGI
+  =========================================================
+  */
+
+  const today =
+    new Date();
+
+  today.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+
+  /*
+  =========================================================
+  1. DATE NUMERICHE CON ANNO
+
+  Esempi:
+
+  26/09/2026
+  26-09-2026
+  26.09.2026
+  */
+
+  const numericDateRegex =
+    /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/g;
+
+
+  let match;
+
+
+  while (
+    (match =
+      numericDateRegex.exec(text)) !== null
+  ) {
+
+    const day =
+      Number(match[1]);
+
+    const month =
+      Number(match[2]) - 1;
+
+    const year =
+      Number(match[3]);
+
+
+    const date =
+      createValidDate(
+        year,
+        month,
+        day
+      );
+
+
+    if (
+      date
+      &&
+      date > today
+    ) {
+
+      return date;
+
+    }
+
+  }
+
+
+  /*
+  =========================================================
+  2. DATE SCRITTE CON ANNO
+
+  Esempi:
+
+  26 settembre 2026
+  10 ottobre 2026
+  21 Settembre 2026
+  */
+
+  const monthNames =
+    Object.keys(MESI)
+      .join("|");
+
+
+  const writtenDateWithYearRegex =
+    new RegExp(
+      `\\b(\\d{1,2})\\s+(${monthNames})\\s+(\\d{4})\\b`,
+      "gi"
+    );
+
+
+  while (
+    (match =
+      writtenDateWithYearRegex.exec(text)) !== null
+  ) {
+
+    const day =
+      Number(match[1]);
+
+    const month =
+      MESI[
+        match[2].toLowerCase()
+      ];
+
+    const year =
+      Number(match[3]);
+
+
+    const date =
+      createValidDate(
+        year,
+        month,
+        day
+      );
+
+
+    if (
+      date
+      &&
+      date > today
+    ) {
+
+      return date;
+
+    }
+
+  }
+
+
+  /*
+  =========================================================
+  3. DATE SCRITTE SENZA ANNO
+
+  Esempi:
+
+  26 settembre
+  27 settembre
+  sabato 26 settembre
+  domenica 27 settembre
+
+  In questo caso utilizziamo l'anno corrente.
+
+  Una data già trascorsa viene ignorata.
+  */
+
+  const writtenDateWithoutYearRegex =
+    new RegExp(
+      `\\b(\\d{1,2})\\s+(${monthNames})\\b`,
+      "gi"
+    );
+
+
+  while (
+    (match =
+      writtenDateWithoutYearRegex.exec(text)) !== null
+  ) {
+
+    const day =
+      Number(match[1]);
+
+    const month =
+      MESI[
+        match[2].toLowerCase()
+      ];
+
+    const year =
+      today.getFullYear();
+
+
+    const date =
+      createValidDate(
+        year,
+        month,
+        day
+      );
+
+
+    if (
+      date
+      &&
+      date > today
+    ) {
+
+      return date;
+
+    }
+
+  }
+
+
+  return null;
+
+}
+
+
+/* =========================================================
    NORMALIZZAZIONE URL
 ========================================================= */
 
@@ -127,7 +442,8 @@ function normalizeUrl(
       return null;
     }
 
-    href = href.trim();
+    href =
+      href.trim();
 
     if (!href) {
       return null;
@@ -139,26 +455,34 @@ function normalizeUrl(
         baseUrl
       );
 
+
     /*
     Per il crawler vogliamo solo HTTP/HTTPS.
     */
+
     if (
       target.protocol !== "http:"
       &&
       target.protocol !== "https:"
     ) {
+
       return null;
+
     }
+
 
     /*
     Il fragment (#sezione) non identifica
     una pagina diversa.
     */
+
     target.hash = "";
+
 
     /*
     Normalizzazione minima.
     */
+
     return target.href;
 
   } catch {
@@ -186,8 +510,10 @@ function extractLinks(
 
   let match;
 
+
   while (
-    (match = regex.exec(html)) !== null
+    (match =
+      regex.exec(html)) !== null
   ) {
 
     const href =
@@ -199,6 +525,7 @@ function extractLinks(
         pageUrl
       );
 
+
     if (
       normalized
       &&
@@ -206,7 +533,9 @@ function extractLinks(
     ) {
 
       if (
-        !results.includes(normalized)
+        !results.includes(
+          normalized
+        )
       ) {
 
         results.push(
@@ -218,6 +547,7 @@ function extractLinks(
     }
 
   }
+
 
   return results;
 
@@ -235,6 +565,7 @@ function fetchPage(url) {
 
       let target;
 
+
       try {
 
         target =
@@ -250,10 +581,12 @@ function fetchPage(url) {
 
       }
 
+
       const client =
         target.protocol === "https:"
           ? https
           : http;
+
 
       const request =
         client.get(
@@ -272,6 +605,7 @@ function fetchPage(url) {
             /*
             Redirect.
             */
+
             if (
               response.statusCode >= 300
               &&
@@ -286,7 +620,9 @@ function fetchPage(url) {
                   url
                 );
 
+
               response.resume();
+
 
               if (!redirectedUrl) {
 
@@ -298,9 +634,13 @@ function fetchPage(url) {
 
               }
 
+
               return resolve({
                 redirect: true,
-                url: redirectedUrl,
+
+                url:
+                  redirectedUrl,
+
                 status:
                   response.statusCode
               });
@@ -315,9 +655,10 @@ function fetchPage(url) {
             const status =
               response.statusCode || 0;
 
+
             /*
-            Per il primo test consideriamo
-            404/410 come pagina non disponibile.
+            404 / 410:
+            pagina non disponibile.
             */
 
             if (
@@ -330,8 +671,12 @@ function fetchPage(url) {
 
               return resolve({
                 available: false,
-                status: status,
-                url: url
+
+                status:
+                  status,
+
+                url:
+                  url
               });
 
             }
@@ -352,8 +697,12 @@ function fetchPage(url) {
 
               return resolve({
                 available: false,
-                status: status,
-                url: url
+
+                status:
+                  status,
+
+                url:
+                  url
               });
 
             }
@@ -362,11 +711,6 @@ function fetchPage(url) {
             const contentType =
               response.headers[
                 "content-type"
-              ] || null;
-
-            const lastModified =
-              response.headers[
-                "last-modified"
               ] || null;
 
 
@@ -383,11 +727,17 @@ function fetchPage(url) {
 
               return resolve({
                 available: false,
+
                 html: false,
-                status: status,
+
+                status:
+                  status,
+
                 contentType:
                   contentType,
-                url: url
+
+                url:
+                  url
               });
 
             }
@@ -395,9 +745,11 @@ function fetchPage(url) {
 
             let content = "";
 
+
             response.setEncoding(
               "utf8"
             );
+
 
             response.on(
               "data",
@@ -408,12 +760,17 @@ function fetchPage(url) {
               }
             );
 
+
             response.on(
               "end",
               () => {
 
                 /*
                 URL finale.
+
+                response.url non è normalmente valorizzato
+                da Node http/https, quindi utilizziamo
+                l'URL originale se non disponibile.
                 */
 
                 const finalUrl =
@@ -422,19 +779,19 @@ function fetchPage(url) {
                     url
                   ) || url;
 
+
                 resolve({
 
                   available: true,
 
-                  status: status,
+                  status:
+                    status,
 
                   contentType:
                     contentType,
 
-                  lastModified:
-                    lastModified,
-
-                  url: finalUrl,
+                  url:
+                    finalUrl,
 
                   content:
                     content
@@ -474,43 +831,13 @@ function fetchPage(url) {
 
 
 /* =========================================================
-   LAST-MODIFIED
-========================================================= */
-
-function parseLastModified(
-  value
-) {
-
-  if (!value) {
-    return null;
-  }
-
-  const date =
-    new Date(value);
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return null;
-
-  }
-
-  return date.toISOString();
-
-}
-
-
-/* =========================================================
    SALVATAGGIO SITE_PAGE
 ========================================================= */
 
 async function saveSitePage(
   siteId,
   pageUrl,
-  lastModified
+  detectedAt
 ) {
 
   /*
@@ -562,7 +889,7 @@ async function saveSitePage(
           pageUrl,
 
         sp_modified:
-          lastModified
+          detectedAt
       });
 
 
@@ -572,13 +899,16 @@ async function saveSitePage(
 
     }
 
+
     crawlerStatus.pagesInserted++;
+
 
     console.log(
       `[INSERT] ${pageUrl}`
       +
-      ` | modified=${lastModified}`
+      ` | detected=${detectedAt}`
     );
+
 
     return;
 
@@ -588,50 +918,44 @@ async function saveSitePage(
   /*
   URL già presente.
 
-  Se abbiamo una nuova data,
-  la aggiorniamo.
-
-  Se la nuova risposta non contiene
-  Last-Modified, NON cancelliamo
-  un eventuale valore precedente.
+  Aggiorniamo il momento di rilevazione
+  della pagina candidata.
   */
 
-  if (lastModified) {
+  if (
+    data.sp_modified !==
+    detectedAt
+  ) {
 
-    if (
-      data.sp_modified !==
-      lastModified
-    ) {
-
-      const {
-        error: updateError
-      } = await supabase
-        .from("site_pages")
-        .update({
-          sp_modified:
-            lastModified
-        })
-        .eq(
-          "id_site_page",
-          data.id_site_page
-        );
-
-
-      if (updateError) {
-
-        throw updateError;
-
-      }
-
-      crawlerStatus.pagesUpdated++;
-
-      console.log(
-        `[UPDATE] ${pageUrl}`
-        +
-        ` | modified=${lastModified}`
+    const {
+      error: updateError
+    } = await supabase
+      .from("site_pages")
+      .update({
+        sp_modified:
+          detectedAt
+      })
+      .eq(
+        "id_site_page",
+        data.id_site_page
       );
 
+
+    if (updateError) {
+
+      throw updateError;
+
     }
+
+
+    crawlerStatus.pagesUpdated++;
+
+
+    console.log(
+      `[UPDATE] ${pageUrl}`
+      +
+      ` | detected=${detectedAt}`
+    );
 
   }
 
@@ -748,7 +1072,9 @@ async function crawlSite(
         currentUrl
       )
     ) {
+
       continue;
+
     }
 
 
@@ -757,6 +1083,7 @@ async function crawlSite(
     */
 
     let current;
+
 
     try {
 
@@ -799,6 +1126,7 @@ async function crawlSite(
 
     let result;
 
+
     try {
 
       result =
@@ -810,11 +1138,13 @@ async function crawlSite(
 
       crawlerStatus.errors++;
 
+
       console.log(
         `[ERROR] ${currentUrl}`
         +
         ` → ${error.message}`
       );
+
 
       continue;
 
@@ -842,6 +1172,7 @@ async function crawlSite(
       ) {
 
         let redirectedUrl;
+
 
         try {
 
@@ -873,14 +1204,15 @@ async function crawlSite(
 
       }
 
+
       continue;
 
     }
 
 
     /*
-    Página não disponível
-    ou recurso não HTML.
+    Pagina non disponibile
+    o risorsa non HTML.
     */
 
     if (
@@ -893,50 +1225,87 @@ async function crawlSite(
         ` ${currentUrl}`
       );
 
+
       continue;
 
     }
 
 
     /*
-    Data Last-Modified.
+    =========================================================
+    PRE-FILTRO TEMPORALE
+    =========================================================
+
+    La pagina viene memorizzata solamente se contiene
+    almeno una data futura rispetto al giorno della scansione.
     */
 
-    const lastModified =
-      parseLastModified(
-        result.lastModified
+    const futureDate =
+      findFutureDate(
+        result.content
       );
 
 
-    /*
-    Salva a página.
-    */
-
-    try {
-
-      await saveSitePage(
-        site.id_site,
-        result.url || currentUrl,
-        lastModified
-      );
-
-    } catch (error) {
-
-      crawlerStatus.errors++;
+    if (futureDate) {
 
       console.log(
-        `[DB ERROR]`
+        `[CANDIDATA] ${currentUrl}`
         +
-        ` ${currentUrl}`
+        ` → data futura:`
         +
-        ` → ${error.message}`
+        ` ${futureDate.toISOString().slice(0, 10)}`
+      );
+
+
+      /*
+      sp_modified NON è la data dell'evento.
+
+      È il momento in cui questa scansione ha
+      individuato una pagina candidata.
+      */
+
+      const detectedAt =
+        new Date().toISOString();
+
+
+      try {
+
+        await saveSitePage(
+          site.id_site,
+          result.url || currentUrl,
+          detectedAt
+        );
+
+      } catch (error) {
+
+        crawlerStatus.errors++;
+
+
+        console.log(
+          `[DB ERROR]`
+          +
+          ` ${currentUrl}`
+          +
+          ` → ${error.message}`
+        );
+
+      }
+
+    } else {
+
+      console.log(
+        `[IGNORATA] ${currentUrl}`
+        +
+        ` → nessuna data futura`
       );
 
     }
 
 
     /*
-    Cerca nuovi link.
+    =========================================================
+    CERCA NUOVI LINK
+    =========================================================
     */
 
     const links =
@@ -963,6 +1332,7 @@ async function crawlSite(
 
 
       let linkUrl;
+
 
       try {
 
