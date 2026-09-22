@@ -272,9 +272,7 @@ async function loadSitePages() {
     .select(`
       id_site_page,
       id_site,
-      sp_url,
-      sp_last_seen_at,
-      sp_last_modified_at
+      sp_url
     `)
     .order(
       "id_site_page",
