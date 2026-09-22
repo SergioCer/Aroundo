@@ -225,7 +225,8 @@ textarea:disabled {
 </head>
 
 <body>
-
+<form autocomplete="off">
+  
 <div class="topbar">
   <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
 <div id="mapTitle" style="font-weight:bold;"></div>
@@ -734,9 +735,9 @@ async function save() {
   const payload = {
     lu_location: lu_location.value,
     lu_address: lu_address.value,
-    lu_phone: lu_phone,value,
-    lu_email: lu_email,value,
-    lu_website: lu_website,value,
+    lu_phone: lu_phone.value,
+    lu_email: lu_email.value,
+    lu_website: lu_website.value,
     id_comune: id_comune_hidden.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
