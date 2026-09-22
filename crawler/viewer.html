@@ -767,7 +767,7 @@ function eventCard(row,index){
 
           Acquisito:
           ${escapeHtml(
-            formatDate(row.se_extracted_at)
+            formatDate(row.se_extracted)
           )}
 
         </div>
@@ -843,7 +843,7 @@ async function loadEvents(){
           id_site_page,
           id_evento,
           se_schema,
-          se_extracted_at,
+          se_extracted,
           site_pages (
             sp_url
           )
