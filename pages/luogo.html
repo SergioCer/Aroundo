@@ -233,20 +233,28 @@ textarea:disabled {
 
 <div class="hero">
 
-  <!-- COMUNE (EDITABILE) -->
-<input id="id_comune"
+    <!-- COMUNE (EDITABILE) -->
+    <input id="id_comune"
        placeholder=" Comune... obbligatorio (minimo 3 caratteri) "
        oninput="onComuneInput(this.value)"
        style="font-size:20px; font-weight:700; text-align:center; width:100%; border:none; background:transparent;">
-<input type="hidden" id="id_comune_hidden">
+    <input type="hidden" id="id_comune_hidden">
+    <div id="comuniResults"></div> 
+    <div class="card">
 
-<div id="comuniResults"></div> 
-<div class="card">
-
-  <!-- LOCATION -->
-  <div class="section-title">Locality:</div>
-  <input id="lu_location"style="font-size:16px; font-weight:600; text-align:left;"
-         oninput="markDirty(); updateMapPopupTitle()">
+    <!-- RIGA: LOCALITY + ADDRESS -->
+    <div style="display:flex; font-size:11px; gap:20px; margin-bottom:4px;">
+      <div style="flex:1;">Locality:</div>
+      <div style="flex:1;">Address:</div>
+    </div>
+    <div style="display:flex; gap:20px; margin-bottom:10px;">
+      <input id="lu_location"
+             style="flex:1; font-size:16px; font-weight:600; text-align:left;"
+             oninput="markDirty(); updateMapPopupTitle()">
+      <input id="lu_address"
+             style="flex:1; font-size:16px; font-weight:600; text-align:left;"
+             oninput="markDirty()">
+    </div>
 
   <!-- DESCRIZIONE -->
   <div class="section-title">Description:</div>
@@ -256,21 +264,21 @@ textarea:disabled {
   <div class="section-title">Notes:</div>
   <textarea id="lu_note" oninput="markDirty()"></textarea>
 
-<!-- RIGA 1: LABEL -->
-<div style="display:flex; font-size: 11px; gap:20px; margin-bottom:4px;">
-  <div style="flex:1;">Capacity:</div>
-  <div style="flex:1;">Environment:</div>
-  <div style="flex:1;">Lat:</div>
-  <div style="flex:1;">Lng:</div>
-  <div style="width:70px;"></div>
-</div>
+    <!-- RIGA 1: LABEL -->
+    <div style="display:flex; font-size: 11px; gap:20px; margin-bottom:4px;">
+      <div style="flex:1;">Capacity:</div>
+      <div style="flex:1;">Environment:</div>
+      <div style="flex:1;">Lat:</div>
+      <div style="flex:1;">Lng:</div>
+      <div style="width:70px;"></div>
+    </div>
 
-<!-- RIGA 2: VALORI + MAP -->
-<div style="display:flex; gap:20px; align-items:center;">
+    <!-- RIGA 2: VALORI + MAP -->
+    <div style="display:flex; gap:20px; align-items:center;">
 
-  <div style="flex:1;">
-    <input id="lu_capienza" oninput="markDirty()">
-  </div>
+    <div style="flex:1;">
+      <input id="lu_capienza" oninput="markDirty()">
+    </div>
 
   <div style="flex:1;">
     <div style="display:flex;align-items:center;gap:8px;">
@@ -614,6 +622,7 @@ if (isNew) {
   }
   original = JSON.stringify(data);
   lu_location.value = data.lu_location || '';
+  lu_address.value = data.lu_address || '';
   updateMapPopupTitle()
   id_comune_hidden.value = data.id_comune || '';
   const com = await supabase
@@ -703,6 +712,7 @@ async function loadOrganizzatoriLuogo(idLuogo) {
 async function save() {
   const payload = {
     lu_location: lu_location.value,
+    lu_address: lu_address.value,
     id_comune: id_comune_hidden.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
@@ -760,6 +770,7 @@ function updatePageState() {
     .classList.toggle("locked", !comuneOk);
   const controls = [
     lu_location,
+    lu_address,
     lu_descrizione,
     lu_note,
     lu_capienza,
@@ -1123,6 +1134,7 @@ window.markDirty = () => {
   }
   const current = JSON.stringify({
     lu_location: lu_location.value,
+    lu_address: lu_address.value,
     id_comune: id_comune_hidden.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
