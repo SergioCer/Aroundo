@@ -242,7 +242,11 @@ textarea:disabled {
     <div id="comuniResults"></div> 
     <div class="card">
 
-    <!-- RIGA: LOCALITY + ADDRESS -->
+    <!-- DESCRIZIONE -->
+    <div class="section-title">Description:</div>
+    <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
+
+      <!-- RIGA: LOCALITY + ADDRESS -->
     <div style="display:flex; font-size:11px; gap:20px; margin-bottom:4px;">
       <div style="flex:1;">Locality:</div>
       <div style="flex:1;">Address:</div>
@@ -256,10 +260,24 @@ textarea:disabled {
              oninput="markDirty()">
     </div>
 
-  <!-- DESCRIZIONE -->
-  <div class="section-title">Description:</div>
-  <textarea id="lu_descrizione" oninput="markDirty()"></textarea>
-
+    <!-- RIGA: PHONE + EMAIL + WEBSITE -->
+    <div style="display:flex; font-size:11px; gap:20px; margin-bottom:4px;">
+      <div style="flex:1;">Phone:</div>
+      <div style="flex:1;">Email:</div>
+      <div style="flex:1;">Website:</div>
+    </div>
+    <div style="display:flex; gap:20px; margin-bottom:10px;">
+      <input id="lu_phone"
+             style="flex:1; font-size:16px; font-weight:600; text-align:left;"
+             oninput="markDirty()">
+      <input id="lu_email"
+             style="flex:1; font-size:16px; font-weight:600; text-align:left;"
+             oninput="markDirty()">
+      <input id="lu_website"
+             style="flex:1; font-size:16px; font-weight:600; text-align:left;"
+             oninput="markDirty()">
+    </div>
+      
   <!-- NOTE -->
   <div class="section-title">Notes:</div>
   <textarea id="lu_note" oninput="markDirty()"></textarea>
@@ -623,6 +641,9 @@ if (isNew) {
   original = JSON.stringify(data);
   lu_location.value = data.lu_location || '';
   lu_address.value = data.lu_address || '';
+  lu_phone.value = data.lu_phone || '';
+  lu_email.value = data.lu_email || '';
+  lu_website.value = data.lu_website || '';
   updateMapPopupTitle()
   id_comune_hidden.value = data.id_comune || '';
   const com = await supabase
@@ -713,6 +734,9 @@ async function save() {
   const payload = {
     lu_location: lu_location.value,
     lu_address: lu_address.value,
+    lu_phone: lu_phone,value,
+    lu_email: lu_email,value,
+    lu_website: lu_website,value,
     id_comune: id_comune_hidden.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
@@ -771,6 +795,9 @@ function updatePageState() {
   const controls = [
     lu_location,
     lu_address,
+    lu_phone,
+    lu_email,
+    lu_website,
     lu_descrizione,
     lu_note,
     lu_capienza,
@@ -1135,6 +1162,9 @@ window.markDirty = () => {
   const current = JSON.stringify({
     lu_location: lu_location.value,
     lu_address: lu_address.value,
+    lu_phone: lu_phone,value,
+    lu_email: lu_email,value,
+    lu_website: lu_website,value,
     id_comune: id_comune_hidden.value,
     lu_descrizione: lu_descrizione.value,
     lu_note: lu_note.value,
