@@ -129,9 +129,7 @@ function fetchPage(url) {
   return new Promise((resolve, reject) => {
       let target;
       try {target = new URL(url);
-      } catch {
-        return reject(new Error("URL non valido"));
-      }
+      } catch {return reject(new Error("URL non valido"));}
       const client = target.protocol === "https:" ? https : http;
       const request = client.get(target,
           {headers: {"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"}},
@@ -178,8 +176,7 @@ async function saveSitePage(siteId, pageUrl, detectedAt) {
     .maybeSingle();
   if (error) {throw error;}
   /* URL nuova. */
-  if (!data) {
-    const {error: insertError} = await supabase
+  if (!data) {const {error: insertError} = await supabase
       .from("site_pages")
       .insert({id_site: siteId, sp_url: pageUrl, sp_modified: detectedAt});
     if (insertError) {throw insertError;}
@@ -188,9 +185,7 @@ async function saveSitePage(siteId, pageUrl, detectedAt) {
       return;
   }
   /* URL già presente. Aggiorniamo il momento di rilevazione della pagina candidata. */
-  if (data.sp_modified !== detectedAt) {
-    const {error: updateError
-    } = await supabase
+  if (data.sp_modified !== detectedAt) {const {error: updateError} = await supabase
       .from("site_pages")
       .update({sp_modified: detectedAt})
       .eq("id_site_page", data.id_site_page);
@@ -225,8 +220,7 @@ async function crawlSite(site) {
   queue.push(startUrl);
   while (queue.length > 0 && visited.size < MAX_PAGES_PER_SITE) {
     const currentUrl = queue.shift();
-    if (visited.has(currentUrl)
-      ) {continue;}
+    if (visited.has(currentUrl)) {continue;}
       /* Controllo dominio. */
       let current;
       try {current = new URL(currentUrl);
@@ -239,8 +233,7 @@ async function crawlSite(site) {
     try {result = await fetchPage(currentUrl);
     } catch (error) {crawlerStatus.errors++; console.log(`[ERROR] ${currentUrl}` + ` → ${error.message}`); continue;}
     /* Redirect. */
-    if (result.redirect) {
-      const redirected = result.url;
+    if (result.redirect) {const redirected = result.url;
       if (redirected && !visited.has(redirected)) {
         let redirectedUrl;
         try {redirectedUrl = new URL(redirected);} 
@@ -250,12 +243,10 @@ async function crawlSite(site) {
     }
     /* Pagina non disponibile o risorsa non HTML. */
     if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
-    /* PRE-FILTRO TEMPORALE
-       La pagina viene memorizzata solamente se contiene almeno una data futura rispetto al giorno della scansione. */
+    /* PRE-FILTRO TEMPORALE: La pagina viene memorizzata solamente se contiene almeno una data futura rispetto al giorno della scansione. */
     const futureDate = findFutureDate(result.content);
     if (futureDate) {console.log(`[CANDIDATA] ${currentUrl}` + ` → data futura:` + ` ${futureDate.toISOString().slice(0, 10)}`);
-      /* sp_modified NON è la data dell'evento.
-      È il momento in cui questa scansione ha individuato una pagina candidata. */
+      /* sp_modified NON è la data dell'evento. È il momento in cui questa scansione ha individuato una pagina candidata. */
       const detectedAt = new Date().toISOString();
       try {await saveSitePage(site.id_site, result.url || currentUrl, detectedAt);
       } catch (error) {crawlerStatus.errors++; console.log(`[DB ERROR]` + ` ${currentUrl}` + ` → ${error.message}`);}
@@ -330,14 +321,12 @@ http.createServer(
       {return res.end(JSON.stringify({crawler: "AroundoCrawler", port: PORT, running: crawlerRunning, maxPagesPerSite: MAX_PAGES_PER_SITE, status: crawlerStatus}, null, 2));}
     /* START */
     if (requestUrl.pathname === "/start") {
-      if (crawlerRunning) {
-        return res.end(JSON.stringify({ok: false, message: "Crawler già in esecuzione.", status: crawlerStatus}, null, 2));}
+      if (crawlerRunning) {return res.end(JSON.stringify({ok: false, message: "Crawler già in esecuzione.", status: crawlerStatus}, null, 2));}
       /* Avvio asincrono. La richiesta HTTP non rimane aperta per tutta la durata della scansione. */
       crawlAllSites();
       return res.end(JSON.stringify({ok: true, message: "Crawler avviato.", status: crawlerStatus}, null, 2));}
     /* STATUS */
-    if (requestUrl.pathname === "/status") {
-      return res.end(JSON.stringify({running: crawlerRunning, status: crawlerStatus}, null, 2));}
+    if (requestUrl.pathname === "/status") {return res.end(JSON.stringify({running: crawlerRunning, status: crawlerStatus}, null, 2));}
     /* 404 */
     res.statusCode = 404;
     return res.end(JSON.stringify({error: "Endpoint non trovato"}));
