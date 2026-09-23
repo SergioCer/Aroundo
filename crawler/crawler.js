@@ -47,7 +47,32 @@ function createValidDate(year, month, day) {
 }
 
 function findFutureDate(html) {if (!html) {return null;}
-  /* PULIZIA DEL CONTENUTO
+  /* 0. SCHEMA.ORG / JSON-LD
+     Cerchiamo "startDate" all'interno dei dati JSON-LD della pagina.
+     Se troviamo una qualsiasi startDate successiva ad oggi, la restituiamo immediatamente.
+     Se non troviamo date future, proseguiamo con i controlli HTML. */
+  const jsonLdRegex = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let jsonLdMatch;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  while ((jsonLdMatch = jsonLdRegex.exec(html)) !== null) {
+    try {const jsonLd = JSON.parse(jsonLdMatch[1]);
+      const stack = Array.isArray(jsonLd) ? [...jsonLd] : [jsonLd];
+      while (stack.length) {const item = stack.pop();
+        if (!item || typeof item !== "object") {continue;}
+        if (Object.prototype.hasOwnProperty.call(item, "startDate")) {const date = new Date(item.startDate);
+          if (!Number.isNaN(date.getTime())) {date.setHours(0, 0, 0, 0);
+            if (date > today) {return date;}}}
+        for (const key of Object.keys(item)) {
+          if (item[key] && typeof item[key] === "object") {
+            if (Array.isArray(item[key])) {stack.push(...item[key]);
+            } else {stack.push(item[key]);}}}
+      }
+    } catch (error) {
+    /* JSON-LD non valido: proseguiamo con i controlli successivi. */
+    }
+  }
+    /* PULIZIA DEL CONTENUTO
   Eliminiamo script e style perché le date presenti nel codice della pagina non devono essere considerate.
   Poi eliminiamo i tag HTML e normalizziamo gli spazi. */
   const text = html .replace(/<script[\s\S]*?<\/script>/gi, " ")
