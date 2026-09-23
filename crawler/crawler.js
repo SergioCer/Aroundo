@@ -83,9 +83,10 @@ function findFutureDate(html) {if (!html) {return null;}
       .replace(/\s+/g, " ")
       .trim();
   if (!text) {return null;}
-  /* OGGI */
+  /* OGGI è duplicato CANCELLARE
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  */
   /* 1. DATE NUMERICHE CON ANNO Esempi: 26/09/2026 26-09-2026 26.09.2026 */
   const numericDateRegex =
     /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/g;
