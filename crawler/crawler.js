@@ -1,30 +1,17 @@
 const http = require("http");
 const https = require("https");
 const { URL } = require("url");
-
 const { supabase } = require("./supabase_node.js");
 
-
-/* =========================================================
-   CONFIGURAZIONE
-========================================================= */
-
+/* CONFIGURAZIONE */
 const PORT = 3001;
-
 const MAX_PAGES_PER_SITE = 50;
-
 const REQUEST_TIMEOUT = 20000;
-
 const USER_AGENT =
   "Mozilla/5.0 Crawler/1.0";
 
-
-/* =========================================================
-   STATO CRAWLER
-========================================================= */
-
+/* STATO CRAWLER */
 let crawlerRunning = false;
-
 const crawlerStatus = {
   startedAt: null,
   finishedAt: null,
@@ -36,28 +23,16 @@ const crawlerStatus = {
   errors: 0
 };
 
-
-/* =========================================================
-   UTILITY
-========================================================= */
-
+/* UTILITY */
 function isHtml(contentType) {
-
-  if (!contentType) {
-    return false;
-  }
-
+  if (!contentType) {return false;}
   return contentType
     .toLowerCase()
     .includes("text/html");
-
 }
 
-
 function isIgnoredUrl(url) {
-
   const lower = url.toLowerCase();
-
   if (
     lower.startsWith("mailto:")
     ||
@@ -71,10 +46,7 @@ function isIgnoredUrl(url) {
   ) {
     return true;
   }
-
-  const pathname =
-    lower.split("?")[0];
-
+  const pathname = lower.split("?")[0];
   const ignoredExtensions = [
     ".jpg",
     ".jpeg",
@@ -102,19 +74,11 @@ function isIgnoredUrl(url) {
     ".ttf",
     ".eot"
   ];
-
-  return ignoredExtensions.some(
-    extension =>
-      pathname.endsWith(extension)
-  );
-
+  return ignoredExtensions.some(extension => pathname.endsWith(extension));
 }
 
 
-/* =========================================================
-   RICERCA DATE FUTURE NEL CONTENUTO
-========================================================= */
-
+/* RICERCA DATE FUTURE NEL CONTENUTO */
 const MESI = {
   gennaio: 0,
   febbraio: 1,
@@ -130,721 +94,212 @@ const MESI = {
   dicembre: 11
 };
 
-
-function createValidDate(
-  year,
-  month,
-  day
-) {
-
-  const date =
-    new Date(
-      year,
-      month,
-      day
-    );
-
-  date.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
-  /*
-  Verifica che JavaScript non abbia
-  corretto automaticamente una data
-  non valida.
-
-  Esempio:
-  31 febbraio -> marzo
-  */
-
-  if (
-    date.getFullYear() !== year
-    ||
-    date.getMonth() !== month
-    ||
-    date.getDate() !== day
-  ) {
-
-    return null;
-
-  }
-
+function createValidDate(year, month, day) {
+  const date = new Date(year, month, day);
+  date.setHours(0, 0, 0, 0);
+   /* Verifica che JavaScript non abbia corretto automaticamente una data non valida.
+     Esempio: 31 febbraio -> marzo */
+  if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {return null;}
   return date;
-
 }
 
-
-function findFutureDate(html) {
-
-  if (!html) {
-    return null;
-  }
-
-
-  /*
-  =========================================================
-  PULIZIA DEL CONTENUTO
-  =========================================================
-
-  Eliminiamo script e style perché le date presenti
-  nel codice della pagina non devono essere considerate.
-
-  Poi eliminiamo i tag HTML e normalizziamo gli spazi.
-  */
-
-  const text =
-    html
-      .replace(
-        /<script[\s\S]*?<\/script>/gi,
-        " "
-      )
-      .replace(
-        /<style[\s\S]*?<\/style>/gi,
-        " "
-      )
-      .replace(
-        /<[^>]+>/g,
-        " "
-      )
-      .replace(
-        /&nbsp;/gi,
-        " "
-      )
-      .replace(
-        /&amp;/gi,
-        "&"
-      )
-      .replace(
-        /\s+/g,
-        " "
-      )
+function findFutureDate(html) {if (!html) {return null;}
+  /* PULIZIA DEL CONTENUTO
+  Eliminiamo script e style perché le date presenti nel codice della pagina non devono essere considerate.
+  Poi eliminiamo i tag HTML e normalizziamo gli spazi. */
+  const text = html .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/\s+/g, " ")
       .trim();
-
-
-  if (!text) {
-    return null;
-  }
-
-
-  /*
-  =========================================================
-  OGGI
-  =========================================================
-  */
-
-  const today =
-    new Date();
-
-  today.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
-
-  /*
-  =========================================================
-  1. DATE NUMERICHE CON ANNO
-
-  Esempi:
-
-  26/09/2026
-  26-09-2026
-  26.09.2026
-  */
-
+  if (!text) {return null;}
+  /* OGGI */
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  /* 1. DATE NUMERICHE CON ANNO Esempi: 26/09/2026 26-09-2026 26.09.2026 */
   const numericDateRegex =
     /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/g;
-
-
   let match;
-
-
-  while (
-    (match =
-      numericDateRegex.exec(text)) !== null
-  ) {
-
-    const day =
-      Number(match[1]);
-
-    const month =
-      Number(match[2]) - 1;
-
-    const year =
-      Number(match[3]);
-
-
-    const date =
-      createValidDate(
-        year,
-        month,
-        day
-      );
-
-
-    if (
-      date
-      &&
-      date > today
-    ) {
-
-      return date;
-
-    }
-
+  while ((match = numericDateRegex.exec(text)) !== null) {
+    const day = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const year = Number(match[3]);
+    const date = createValidDate(year, month, day);
+    if (date && date > today) {return date;}
   }
-
-
-  /*
-  =========================================================
-  2. DATE SCRITTE CON ANNO
-
-  Esempi:
-
-  26 settembre 2026
-  10 ottobre 2026
-  21 Settembre 2026
-  */
-
-  const monthNames =
-    Object.keys(MESI)
-      .join("|");
-
-
-  const writtenDateWithYearRegex =
-    new RegExp(
-      `\\b(\\d{1,2})\\s+(${monthNames})\\s+(\\d{4})\\b`,
-      "gi"
-    );
-
-
-  while (
-    (match =
-      writtenDateWithYearRegex.exec(text)) !== null
-  ) {
-
-    const day =
-      Number(match[1]);
-
-    const month =
-      MESI[
-        match[2].toLowerCase()
-      ];
-
-    const year =
-      Number(match[3]);
-
-
-    const date =
-      createValidDate(
-        year,
-        month,
-        day
-      );
-
-
-    if (
-      date
-      &&
-      date > today
-    ) {
-
-      return date;
-
-    }
-
+  /* 2. DATE SCRITTE CON ANNO Esempi: 26 settembre 2026 10 ottobre 2026 21 Settembre 2026 */
+  const monthNames = Object.keys(MESI) .join("|");
+  const writtenDateWithYearRegex = new RegExp(`\\b(\\d{1,2})\\s+(${monthNames})\\s+(\\d{4})\\b`, "gi");
+  while ((match = writtenDateWithYearRegex.exec(text)) !== null) {
+    const day = Number(match[1]);
+    const month = MESI[match[2].toLowerCase()];
+    const year = Number(match[3]);
+    const date = createValidDate(year, month, day);
+    if (date && date > today) {return date;}
   }
-
-
-  /*
-  =========================================================
-  3. DATE SCRITTE SENZA ANNO
-
-  Esempi:
-
-  26 settembre
-  27 settembre
-  sabato 26 settembre
-  domenica 27 settembre
-
-  In questo caso utilizziamo l'anno corrente.
-
-  Una data già trascorsa viene ignorata.
-  */
-
-  const writtenDateWithoutYearRegex =
-    new RegExp(
-      `\\b(\\d{1,2})\\s+(${monthNames})\\b`,
-      "gi"
-    );
-
-
-  while (
-    (match =
-      writtenDateWithoutYearRegex.exec(text)) !== null
-  ) {
-
-    const day =
-      Number(match[1]);
-
-    const month =
-      MESI[
-        match[2].toLowerCase()
-      ];
-
-    const year =
-      today.getFullYear();
-
-
-    const date =
-      createValidDate(
-        year,
-        month,
-        day
-      );
-
-
-    if (
-      date
-      &&
-      date > today
-    ) {
-
-      return date;
-
-    }
-
+  /* 3. DATE SCRITTE SENZA ANNO Esempi: 26 settembre 27 settembre sabato 26 settembre domenica 27 settembre
+     In questo caso utilizziamo l'anno corrente. Una data già trascorsa viene ignorata. */
+  const writtenDateWithoutYearRegex = new RegExp(`\\b(\\d{1,2})\\s+(${monthNames})\\b`, "gi");
+  while ((match = writtenDateWithoutYearRegex.exec(text)) !== null) {
+    const day = Number(match[1]);
+    const month = MESI[match[2].toLowerCase()];
+    const year = today.getFullYear();
+    const date = createValidDate(year, month, day);
+    if (date && date > today) {return date;}
   }
-
-
   return null;
-
 }
 
-
-/* =========================================================
-   NORMALIZZAZIONE URL
-========================================================= */
-
-function normalizeUrl(
-  href,
-  baseUrl
-) {
-
+/* NORMALIZZAZIONE URL */
+function normalizeUrl(href, baseUrl) {
   try {
-
-    if (!href) {
-      return null;
-    }
-
-    href =
-      href.trim();
-
-    if (!href) {
-      return null;
-    }
-
-    const target =
-      new URL(
-        href,
-        baseUrl
-      );
-
-
-    /*
-    Per il crawler vogliamo solo HTTP/HTTPS.
-    */
-
-    if (
-      target.protocol !== "http:"
-      &&
-      target.protocol !== "https:"
-    ) {
-
-      return null;
-
-    }
-
-
-    /*
-    Il fragment (#sezione) non identifica
-    una pagina diversa.
-    */
-
+    if (!href) {return null;}
+    href = href.trim();
+    if (!href) {return null;}
+    const target = new URL(href, baseUrl);
+    /* Per il crawler vogliamo solo HTTP/HTTPS. */
+    if (target.protocol !== "http:" && target.protocol !== "https:") {return null;}
+    /* Il fragment (#sezione) non identifica una pagina diversa. */
     target.hash = "";
-
-
-    /*
-    Normalizzazione minima.
-    */
-
+    /* Normalizzazione minima. */
     return target.href;
-
-  } catch {
-
-    return null;
-
-  }
-
+  } catch {return null;}
 }
-
-
-/* =========================================================
-   ESTRAZIONE DEGLI HREF
-========================================================= */
-
-function extractLinks(
-  html,
-  pageUrl
-) {
-
+/* ESTRAZIONE DEGLI HREF */
+function extractLinks(html, pageUrl) {
   const results = [];
-
-  const regex =
-    /<a\b[^>]*\bhref\s*=\s*(['"])(.*?)\1/gi;
-
+  const regex = /<a\b[^>]*\bhref\s*=\s*(['"])(.*?)\1/gi;
   let match;
-
-
-  while (
-    (match =
-      regex.exec(html)) !== null
-  ) {
-
-    const href =
-      match[2];
-
-    const normalized =
-      normalizeUrl(
-        href,
-        pageUrl
-      );
-
-
-    if (
-      normalized
-      &&
-      !isIgnoredUrl(normalized)
-    ) {
-
-      if (
-        !results.includes(
-          normalized
-        )
-      ) {
-
-        results.push(
-          normalized
-        );
-
+  while ((match = regex.exec(html)) !== null) {
+    const href = match[2];
+    const normalized = normalizeUrl(href, pageUrl);
+    if (normalized && !isIgnoredUrl(normalized)) {
+      if (!results.includes(normalized)) {
+        results.push( normalized);
       }
-
     }
-
   }
-
-
   return results;
-
 }
-
-
-/* =========================================================
-   RICHIESTA HTTP
-========================================================= */
-
+/* RICHIESTA HTTP */
 function fetchPage(url) {
-
-  return new Promise(
-    (resolve, reject) => {
-
+  return new Promise((resolve, reject) => {
       let target;
-
-
-      try {
-
-        target =
-          new URL(url);
-
+      try {target = new URL(url);
       } catch {
-
-        return reject(
-          new Error(
-            "URL non valido"
-          )
-        );
-
+        return reject(new Error("URL non valido"));
       }
-
-
-      const client =
-        target.protocol === "https:"
-          ? https
-          : http;
-
-
-      const request =
-        client.get(
-          target,
-          {
-            headers: {
-              "User-Agent":
-                USER_AGENT,
-
-              "Accept":
-                "text/html,application/xhtml+xml"
-            }
-          },
+      const client = target.protocol === "https:" ? https : http;
+      const request = client.get(target,
+          {headers: {"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"}},
           response => {
-
-            /*
-            Redirect.
-            */
-
-            if (
-              response.statusCode >= 300
-              &&
-              response.statusCode < 400
-              &&
-              response.headers.location
-            ) {
-
-              const redirectedUrl =
-                normalizeUrl(
-                  response.headers.location,
-                  url
-                );
-
-
+            /* Redirect. */
+            if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+              const redirectedUrl = normalizeUrl(response.headers.location, url);
               response.resume();
-
-
               if (!redirectedUrl) {
-
-                return reject(
-                  new Error(
-                    "Redirect non valido"
-                  )
-                );
-
+                return reject(new Error("Redirect non valido"));
               }
-
-
-              return resolve({
-                redirect: true,
-
-                url:
-                  redirectedUrl,
-
-                status:
-                  response.statusCode
-              });
-
+              return resolve({redirect: true, url: redirectedUrl,
+                status: response.statusCode});
             }
-
-
-            /*
-            Status HTTP.
-            */
-
-            const status =
-              response.statusCode || 0;
-
-
-            /*
-            404 / 410:
-            pagina non disponibile.
-            */
-
-            if (
-              status === 404
-              ||
-              status === 410
-            ) {
-
+            /* Status HTTP. */
+            const status = response.statusCode || 0;
+            /* 404 / 410: pagina non disponibile. */
+            if (status === 404 || status === 410) {
               response.resume();
-
+              return resolve({available: false,
+               status: status,
+               url: url
+              });
+            }
+            /* Anche gli altri status non 2xx non vengono considerati pagine. */
+            if (status < 200 || status >= 300) {
+              response.resume();
+              return resolve({available: false,
+                status: status,
+                url: url
+              });
+            }
+            const contentType = response.headers["content-type"] || null;
+            /* Se non è HTML non lo consideriamo una pagina del crawler. */
+            if (!isHtml(contentType)) {
+              response.resume();
               return resolve({
                 available: false,
-
-                status:
-                  status,
-
-                url:
-                  url
-              });
-
-            }
-
-
-            /*
-            Anche gli altri status non 2xx
-            non vengono considerati pagine.
-            */
-
-            if (
-              status < 200
-              ||
-              status >= 300
-            ) {
-
-              response.resume();
-
-              return resolve({
-                available: false,
-
-                status:
-                  status,
-
-                url:
-                  url
-              });
-
-            }
-
-
-            const contentType =
-              response.headers[
-                "content-type"
-              ] || null;
-
-
-            /*
-            Se non è HTML non lo consideriamo
-            una pagina del crawler.
-            */
-
-            if (
-              !isHtml(contentType)
-            ) {
-
-              response.resume();
-
-              return resolve({
-                available: false,
-
                 html: false,
-
                 status:
                   status,
-
                 contentType:
                   contentType,
-
                 url:
                   url
               });
-
             }
-
-
             let content = "";
-
-
             response.setEncoding(
               "utf8"
             );
-
-
             response.on(
               "data",
               chunk => {
-
                 content += chunk;
-
               }
             );
-
-
             response.on(
               "end",
               () => {
-
-                /*
-                URL finale.
-
+                /* URL finale.
                 response.url non è normalmente valorizzato
                 da Node http/https, quindi utilizziamo
-                l'URL originale se non disponibile.
-                */
-
+                l'URL originale se non disponibile. */
                 const finalUrl =
                   normalizeUrl(
                     response.url || url,
                     url
                   ) || url;
-
-
                 resolve({
-
                   available: true,
-
                   status:
                     status,
-
                   contentType:
                     contentType,
-
                   url:
                     finalUrl,
-
                   content:
                     content
-
                 });
-
               }
             );
-
           }
         );
-
-
       request.setTimeout(
         REQUEST_TIMEOUT,
         () => {
-
           request.destroy(
             new Error(
               "Timeout"
             )
           );
-
         }
       );
-
-
       request.on(
         "error",
         reject
       );
-
     }
   );
-
 }
 
-
-/* =========================================================
-   SALVATAGGIO SITE_PAGE
-========================================================= */
-
+/* SALVATAGGIO SITE_PAGE */
 async function saveSitePage(
   siteId,
   pageUrl,
   detectedAt
 ) {
-
-  /*
-  Prima cerchiamo se la URL esiste
-  già per questo sito.
-  */
-
+  /* Prima cerchiamo se la URL esiste già per questo sito. */
   const {
     data,
     error
@@ -862,21 +317,11 @@ async function saveSitePage(
       pageUrl
     )
     .maybeSingle();
-
-
   if (error) {
-
     throw error;
-
   }
-
-
-  /*
-  URL nuova.
-  */
-
+  /* URL nuova. */
   if (!data) {
-
     const {
       error: insertError
     } = await supabase
@@ -884,49 +329,23 @@ async function saveSitePage(
       .insert({
         id_site:
           siteId,
-
         sp_url:
           pageUrl,
-
         sp_modified:
           detectedAt
       });
-
-
     if (insertError) {
-
       throw insertError;
-
     }
-
-
     crawlerStatus.pagesInserted++;
-
-
-    console.log(
-      `[INSERT] ${pageUrl}`
-      +
-      ` | detected=${detectedAt}`
-    );
-
-
+    console.log(`[INSERT] ${pageUrl}` + ` | detected=${detectedAt}`);
     return;
-
   }
-
-
-  /*
-  URL già presente.
-
-  Aggiorniamo il momento di rilevazione
-  della pagina candidata.
-  */
-
+  /* URL già presente. Aggiorniamo il momento di rilevazione della pagina candidata. */
   if (
     data.sp_modified !==
     detectedAt
   ) {
-
     const {
       error: updateError
     } = await supabase
@@ -939,61 +358,26 @@ async function saveSitePage(
         "id_site_page",
         data.id_site_page
       );
-
-
     if (updateError) {
-
       throw updateError;
-
     }
-
-
     crawlerStatus.pagesUpdated++;
-
-
-    console.log(
-      `[UPDATE] ${pageUrl}`
-      +
-      ` | detected=${detectedAt}`
-    );
-
+    console.log(`[UPDATE] ${pageUrl}` + ` | detected=${detectedAt}`);
   }
-
 }
 
-
-/* =========================================================
-   SCANSIONE DI UN SITO
-========================================================= */
-
+/* SCANSIONE DI UN SITO*/
 async function crawlSite(
   site
 ) {
-
   console.log("");
-  console.log(
-    "================================================="
-  );
-  console.log(
-    `SITE ${site.id_site}`
-  );
-  console.log(
-    site.st_url
-  );
-  console.log(
-    "================================================="
-  );
-
-
-  /*
-  st_crawled viene aggiornato
-  all'inizio della scansione.
-  */
-
+  console.log("=================================================");
+  console.log(`SITE ${site.id_site}`);
+  console.log(site.st_url);
+  console.log("=================================================");
+  /* st_crawled viene aggiornato all'inizio della scansione. */
   const crawlStartedAt =
     new Date().toISOString();
-
-
   const {
     error:
       crawlUpdateError
@@ -1007,162 +391,83 @@ async function crawlSite(
       "id_site",
       site.id_site
     );
-
-
   if (crawlUpdateError) {
-
     throw crawlUpdateError;
-
   }
-
-
-  /*
-  Coda BFS.
-  */
-
+  /* Coda BFS. */
   const queue = [];
-
   const visited =
     new Set();
-
-
   const startUrl =
     normalizeUrl(
       site.st_url,
       site.st_url
     );
-
-
   if (!startUrl) {
-
     throw new Error(
       "st_url non valido"
     );
-
   }
-
-
-  /*
-  Hostname consentito.
-  */
-
+  /* Hostname consentito. */
   const siteHost =
     new URL(
       startUrl
     ).hostname;
-
-
   queue.push(
     startUrl
   );
-
-
   while (
     queue.length > 0
     &&
     visited.size < MAX_PAGES_PER_SITE
   ) {
-
     const currentUrl =
       queue.shift();
-
-
     if (
       visited.has(
         currentUrl
       )
     ) {
-
       continue;
-
     }
-
-
-    /*
-    Controllo dominio.
-    */
-
+    /* Controllo dominio. */
     let current;
-
-
     try {
-
       current =
         new URL(
           currentUrl
         );
-
     } catch {
-
       continue;
-
     }
-
-
     if (
       current.hostname !==
       siteHost
     ) {
-
       continue;
-
     }
-
-
     visited.add(
       currentUrl
     );
-
-
-    console.log(
-      `[${visited.size}/${MAX_PAGES_PER_SITE}]`
-      +
-      ` ${currentUrl}`
-    );
-
-
+    console.log(`[${visited.size}/${MAX_PAGES_PER_SITE}]` + ` ${currentUrl}`);
     crawlerStatus.pagesVisited++;
-
-
     let result;
-
-
     try {
-
       result =
         await fetchPage(
           currentUrl
         );
-
     } catch (error) {
-
       crawlerStatus.errors++;
-
-
-      console.log(
-        `[ERROR] ${currentUrl}`
-        +
-        ` → ${error.message}`
-      );
-
-
+      console.log(`[ERROR] ${currentUrl}` + ` → ${error.message}`);
       continue;
-
     }
-
-
-    /*
-    Redirect.
-    */
-
+    /* Redirect. */
     if (
       result.redirect
     ) {
-
       const redirected =
         result.url;
-
-
       if (
         redirected
         &&
@@ -1170,198 +475,89 @@ async function crawlSite(
           redirected
         )
       ) {
-
         let redirectedUrl;
-
-
         try {
-
           redirectedUrl =
             new URL(
               redirected
             );
-
         } catch {
-
           redirectedUrl =
             null;
-
         }
-
-
         if (
           redirectedUrl
           &&
           redirectedUrl.hostname ===
             siteHost
         ) {
-
           queue.unshift(
             redirected
           );
-
         }
-
       }
-
-
       continue;
-
     }
-
-
-    /*
-    Pagina non disponibile
-    o risorsa non HTML.
-    */
-
-    if (
-      !result.available
-    ) {
-
-      console.log(
-        `[SKIP ${result.status || ""}]`
-        +
-        ` ${currentUrl}`
-      );
-
-
+    /* Pagina non disponibile o risorsa non HTML. */
+    if (!result.available) {
+      console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`);
       continue;
-
     }
-
-
-    /*
-    =========================================================
-    PRE-FILTRO TEMPORALE
-    =========================================================
-
-    La pagina viene memorizzata solamente se contiene
-    almeno una data futura rispetto al giorno della scansione.
-    */
-
-    const futureDate =
-      findFutureDate(
-        result.content
-      );
-
-
+    /* PRE-FILTRO TEMPORALE
+       La pagina viene memorizzata solamente se contiene almeno una data futura rispetto al giorno della scansione. */
+    const futureDate = findFutureDate(result.content);
     if (futureDate) {
-
-      console.log(
-        `[CANDIDATA] ${currentUrl}`
-        +
-        ` → data futura:`
-        +
-        ` ${futureDate.toISOString().slice(0, 10)}`
-      );
-
-
-      /*
-      sp_modified NON è la data dell'evento.
-
-      È il momento in cui questa scansione ha
-      individuato una pagina candidata.
-      */
-
+      console.log(`[CANDIDATA] ${currentUrl}` + ` → data futura:` + ` ${futureDate.toISOString().slice(0, 10)}`);
+      /* sp_modified NON è la data dell'evento.
+      È il momento in cui questa scansione ha individuato una pagina candidata. */
       const detectedAt =
         new Date().toISOString();
-
-
       try {
-
         await saveSitePage(
           site.id_site,
           result.url || currentUrl,
           detectedAt
         );
-
       } catch (error) {
-
         crawlerStatus.errors++;
-
-
-        console.log(
-          `[DB ERROR]`
-          +
-          ` ${currentUrl}`
-          +
-          ` → ${error.message}`
-        );
-
+        console.log(`[DB ERROR]` + ` ${currentUrl}` + ` → ${error.message}`);
       }
-
     } else {
-
-      console.log(
-        `[IGNORATA] ${currentUrl}`
-        +
-        ` → nessuna data futura`
-      );
-
+      console.log(`[IGNORATA] ${currentUrl}` + ` → nessuna data futura`);
     }
-
-
-    /*
-    =========================================================
-    CERCA NUOVI LINK
-    =========================================================
-    */
-
+    /* CERCA NUOVI LINK */
     const links =
       extractLinks(
         result.content,
         result.url ||
           currentUrl
       );
-
-
     for (
       const link of links
     ) {
-
       if (
         visited.size +
         queue.length >=
         MAX_PAGES_PER_SITE
       ) {
-
         break;
-
       }
-
-
       let linkUrl;
-
-
       try {
-
         linkUrl =
           new URL(
             link
           );
-
       } catch {
-
         continue;
-
       }
-
-
-      /*
-      Solo stesso hostname.
-      */
-
+      /* Solo stesso hostname. */
       if (
         linkUrl.hostname !==
         siteHost
       ) {
-
         continue;
-
       }
-
-
       if (
         !visited.has(
           link
@@ -1371,69 +567,32 @@ async function crawlSite(
           link
         )
       ) {
-
         queue.push(
           link
         );
-
       }
-
     }
-
   }
-
-
   console.log("");
-  console.log(
-    `Scansione site ${site.id_site} terminata.`
-  );
-  console.log(
-    `Pagine visitate: ${visited.size}`
-  );
-
+  console.log(`Scansione site ${site.id_site} terminata.`);
+  console.log(`Pagine visitate: ${visited.size}`);
 }
-
-
-/* =========================================================
-   SCANSIONE GENERALE
-========================================================= */
-
+/* SCANSIONE GENERALE */
 async function crawlAllSites() {
-
   if (crawlerRunning) {
-
-    console.log(
-      "Crawler già in esecuzione."
-    );
-
+    console.log("Crawler già in esecuzione.");
     return;
-
   }
-
-
   crawlerRunning = true;
-
-  crawlerStatus.startedAt =
-    new Date().toISOString();
-
-  crawlerStatus.finishedAt =
-    null;
-
+  crawlerStatus.startedAt = new Date().toISOString();
+  crawlerStatus.finishedAt = null;
   crawlerStatus.sitesTotal = 0;
-
   crawlerStatus.sitesCompleted = 0;
-
   crawlerStatus.pagesVisited = 0;
-
   crawlerStatus.pagesInserted = 0;
-
   crawlerStatus.pagesUpdated = 0;
-
   crawlerStatus.errors = 0;
-
-
   try {
-
     const {
       data: sites,
       error
@@ -1448,305 +607,149 @@ async function crawlAllSites() {
           ascending: true
         }
       );
-
-
     if (error) {
-
       throw error;
-
     }
-
-
-    crawlerStatus.sitesTotal =
-      sites.length;
-
-
+    crawlerStatus.sitesTotal = sites.length;
     console.log("");
-    console.log(
-      "==============================================="
-    );
-    console.log(
-      `Siti da scansionare: ${sites.length}`
-    );
-    console.log(
-      "==============================================="
-    );
-
-
+    console.log("===============================================");
+    console.log(`Siti da scansionare: ${sites.length}`);
+    console.log("===============================================");
     for (
       const site of sites
     ) {
-
       try {
-
         await crawlSite(
           site
         );
-
       } catch (error) {
-
         crawlerStatus.errors++;
-
-        console.log(
-          `[SITE ERROR]`
-          +
-          ` site=${site.id_site}`
-          +
-          ` → ${error.message}`
-        );
-
+        console.log(`[SITE ERROR]` + ` site=${site.id_site}` + ` → ${error.message}`);
       }
-
       crawlerStatus.sitesCompleted++;
-
     }
-
-
   } catch (error) {
-
     crawlerStatus.errors++;
-
-    console.log(
-      `[CRAWLER ERROR]`
-      +
-      ` ${error.message}`
-    );
-
+    console.log(`[CRAWLER ERROR]` + ` ${error.message}`);
   } finally {
-
     crawlerStatus.finishedAt =
       new Date().toISOString();
-
     crawlerRunning = false;
-
   }
-
-
   console.log("");
-  console.log(
-    "==============================================="
-  );
-  console.log(
-    "CRAWLER TERMINATO"
-  );
-  console.log(
-    `Siti: ${crawlerStatus.sitesCompleted}`
-    +
-    `/${crawlerStatus.sitesTotal}`
-  );
-  console.log(
-    `Pagine visitate:`
-    +
-    ` ${crawlerStatus.pagesVisited}`
-  );
-  console.log(
-    `Inserite:`
-    +
-    ` ${crawlerStatus.pagesInserted}`
-  );
-  console.log(
-    `Aggiornate:`
-    +
-    ` ${crawlerStatus.pagesUpdated}`
-  );
-  console.log(
-    `Errori:`
-    +
-    ` ${crawlerStatus.errors}`
-  );
-  console.log(
-    "==============================================="
-  );
-
+  console.log("===============================================");
+  console.log("CRAWLER TERMINATO");
+  console.log(`Siti: ${crawlerStatus.sitesCompleted}` + `/${crawlerStatus.sitesTotal}`);
+  console.log(`Pagine visitate:` + ` ${crawlerStatus.pagesVisited}`);
+  console.log(`Inserite:` + ` ${crawlerStatus.pagesInserted}`);
+  console.log(`Aggiornate:` + ` ${crawlerStatus.pagesUpdated}`);
+  console.log(`Errori:` + ` ${crawlerStatus.errors}`);
+  console.log("===============================================");
 }
 
-
-/* =========================================================
-   SERVER HTTP
-========================================================= */
-
+/* SERVER HTTP */
 http.createServer(
   async (req, res) => {
-
     const requestUrl =
       new URL(
         req.url,
         `http://localhost:${PORT}`
       );
-
-
-    /*
-    CORS
-    */
-
+    /* CORS */
     res.setHeader(
       "Access-Control-Allow-Origin",
       "*"
     );
-
-
     res.setHeader(
       "Content-Type",
       "application/json; charset=utf-8"
     );
-
-
-    /* =====================================================
-       HOME
-    ===================================================== */
-
+    /* HOME */
     if (
       requestUrl.pathname === "/"
     ) {
-
       return res.end(
         JSON.stringify({
           crawler:
             "AroundoCrawler",
-
           port:
             PORT,
-
           running:
             crawlerRunning,
-
           maxPagesPerSite:
             MAX_PAGES_PER_SITE,
-
           status:
             crawlerStatus
         },
         null,
         2)
       );
-
     }
-
-
-    /* =====================================================
-       START
-    ===================================================== */
-
+    /* START */
     if (
       requestUrl.pathname ===
       "/start"
     ) {
-
       if (
         crawlerRunning
       ) {
-
         return res.end(
           JSON.stringify({
             ok: false,
-
             message:
               "Crawler già in esecuzione.",
-
             status:
               crawlerStatus
           },
           null,
           2)
         );
-
       }
-
-
-      /*
-      Avvio asincrono.
-
-      La richiesta HTTP non rimane
-      aperta per tutta la durata
-      della scansione.
-      */
-
+      /* Avvio asincrono. La richiesta HTTP non rimane aperta per tutta la durata della scansione. */
       crawlAllSites();
-
-
       return res.end(
         JSON.stringify({
           ok: true,
-
-          message:
-            "Crawler avviato.",
-
-          status:
-            crawlerStatus
+          message: "Crawler avviato.",
+          status: crawlerStatus
         },
         null,
         2)
       );
-
     }
-
-
-    /* =====================================================
-       STATUS
-    ===================================================== */
-
+    /* STATUS */
     if (
       requestUrl.pathname ===
       "/status"
     ) {
-
       return res.end(
         JSON.stringify({
           running:
             crawlerRunning,
-
           status:
             crawlerStatus
         },
         null,
         2)
       );
-
     }
-
-
-    /* =====================================================
-       404
-    ===================================================== */
-
+    /* 404 */
     res.statusCode = 404;
-
     return res.end(
       JSON.stringify({
-        error:
-          "Endpoint non trovato"
+        error: "Endpoint non trovato"
       })
     );
-
   }
 ).listen(
   PORT,
   () => {
-
     console.log("");
-    console.log(
-      "==============================================="
-    );
-
-    console.log(
-      `Crawler attivo sulla porta ${PORT}`
-    );
-
-    console.log(
-      `Massimo ${MAX_PAGES_PER_SITE} pagine per sito`
-    );
-
-    console.log(
-      "Endpoint: /start"
-    );
-
-    console.log(
-      "Endpoint: /status"
-    );
-
-    console.log(
-      "==============================================="
-    );
-
+    console.log("===============================================");
+    console.log(`Crawler attivo sulla porta ${PORT}`);
+    console.log(`Massimo ${MAX_PAGES_PER_SITE} pagine per sito`);
+    console.log("Endpoint: /start");
+    console.log("Endpoint: /status");
+    console.log("===============================================");
   }
 );
