@@ -106,16 +106,13 @@ function decodeHtml(value) {
     .replace(/&#39;/gi, "'")
     .replace(/&lt;/gi, "<")
     .replace(/&gt;/gi, ">")
-
     /* Virgolette */
     .replace(/&ldquo;/gi, "“")
     .replace(/&rdquo;/gi, "”")
     .replace(/&lsquo;/gi, "‘")
     .replace(/&rsquo;/gi, "’")
-
     /* Apostrofo */
     .replace(/&apos;/gi, "'")
-
     /* Vocali accentate italiane */
     .replace(/&agrave;/gi, "à")
     .replace(/&egrave;/gi, "è")
@@ -123,20 +120,16 @@ function decodeHtml(value) {
     .replace(/&igrave;/gi, "ì")
     .replace(/&ograve;/gi, "ò")
     .replace(/&ugrave;/gi, "ù")
-
     /* Altre entità utili */
     .replace(/&ndash;/gi, "–")
     .replace(/&mdash;/gi, "—")
     .replace(/&hellip;/gi, "…")
     .replace(/&bull;/gi, "•")
-
     /* Numeriche decimali */
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-
     /* Numeriche esadecimali */
     .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
 }
-
 
 function stripHtml(value) {
   if (!value) return "";
@@ -149,10 +142,8 @@ function stripHtml(value) {
         .replace(/<svg\b[\s\S]*?<\/svg>/gi, " ")
         .replace(/<template\b[\s\S]*?<\/template>/gi, " ")
         .replace(/<[^>]+>/g, " ")
-    )
-  ) || "";
+    )) || "";
 }
-
 
 function absoluteUrl(value, base) {
   if (!value) return null;
@@ -168,31 +159,18 @@ function escapeRegExp(value) {
 function extractPage(url) {
   return new Promise((resolve, reject) => {
     let u;
-    try {u = new URL(url);
-    } catch {reject(new Error("URL non valido"));
-      return;
-    }
+    try {u = new URL(url);} catch {reject(new Error("URL non valido")); return;}
     const client = u.protocol === "https:" ? https : http;
-    const req = client.get(u, {
-        headers: {
+    const req = client.get(u, {headers: {
           "User-Agent": "Mozilla/5.0 AroundoCrawler/2.0",
-          "Accept": "text/html,application/xhtml+xml"
-        }
-      },
+          "Accept": "text/html,application/xhtml+xml"}},
       res => {
         let html = "";
         res.setEncoding("utf8");
         res.on("data", chunk => {html += chunk;});
         res.on("end", () => {
-          resolve({
-            acquisizione: {
-              status: res.statusCode,
-              contentType: res.headers["content-type"] || null, url
-            },
-            content: html
-          });
-        });
-      }
+          resolve({acquisizione: {status: res.statusCode, contentType: res.headers["content-type"] || null, url}, content: html});
+        });}
     );
     req.setTimeout(20000, () => {
       req.destroy(new Error("Timeout"));
@@ -235,6 +213,7 @@ const MONTHS = {gennaio: 1, febbraio: 2, marzo: 3, aprile: 4, maggio: 5, giugno:
 function normalizeDate(day, month, year) {const d = Number(day); const m = Number(month); const y = Number(year);
   if (!d || !m || !y || d < 1 || d > 31 || m < 1 || m > 12 || y < 1900 || y > 2200) {return null;}
   return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;}
+
 function extractDates(text) {
   const result = [];
   if (!text) return result;
@@ -244,7 +223,6 @@ function extractDates(text) {
     const date = normalizeDate(m[1], m[2], m[3]);
     if (date) {result.push({date, raw: m[0], index: m.index});}
   }
-
   /* 26 settembre 2026 */
   const italian = /\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)(?:\s+(\d{4}))?\b/gi;
   for (const m of text.matchAll(italian)) {
@@ -257,7 +235,6 @@ function extractDates(text) {
       if (date) {result.push({date, raw: m[0], index: m.index });}
     } else {result.push({date: null, raw: m[0], index: m.index, partial: true});}
   }
-
   /* Deduplica */
   const seen = new Set();
   return result.filter(item => {
@@ -338,20 +315,17 @@ function extractOrganizer(text) {
     /\ba\s+cura\s+di\s+([^.;\n]{2,150})/i,
     /\brealizzat[oa]\s+da\s+([^.;\n]{2,150})/i,
     /\bproduzione\s+(?:di|a cura di)\s+([^.;\n]{2,150})/i,
-
     /* FORME SEMANTICHE INDIRETTE Esempio: "opera da camera del Luglio Musicale Trapanese" */
     /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdel\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
     /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdella\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
     /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdell['’]\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
     /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdi\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u
   ];
-
   for (const re of patterns) {
     const m = text.match(re);
     if (!m) continue;
     let value = clean(m[1]);
     if (!value) continue;
-
     /* EVITA DI TRASCINARE LA FRASE SUCCESSIVA */
     value = value
       .split(/\s+\b(?:con|per|che|dove|quando|sul|sulla|al|alla|allo)\b/i)[0]
@@ -375,7 +349,6 @@ function extractCreators(text) {
     /\bcon\s+([^.;\n]{3,120})/gi,
     /\bpresenta(?:to|ta)?\s+(?:da\s+)?([^.;\n]{3,120})/gi
   ];
-
   /* Nome proprio composto:
    * Alessio Pizzech
    * Orazio Sciortino
@@ -679,10 +652,7 @@ function analyzeSignals(block, categoryDictionary) {
 }
 
 /* PARSER DOM SEMPLICE
-Non usiamo una blacklist di classi.
-Costruiamo invece una rappresentazione gerarchica
-minimale dei tag HTML per poter risalire al contenitore
-comune dei segnali. */
+Non usiamo una blacklist di classi. Costruiamo invece una rappresentazione gerarchica minimale dei tag HTML per poter risalire al contenitore comune dei segnali. */
 function buildDom(html) {
   const root = {
     tag: "#root",
@@ -866,23 +836,13 @@ function uniqueEvents(events) {
   const map = new Map();
   for (const event of events) {
     const key = eventKey(event);
-    if (!key.replace(/\|/g, "")) {
-      continue;
-    }
+    if (!key.replace(/\|/g, "")) {continue;}
     const previous = map.get(key);
-    if (!previous) {
-      map.set(key, event);
-      continue;
-    }
+    if (!previous) {map.set(key, event); continue;}
     /* Se abbiamo due rappresentazioni dello stesso evento, conserviamo quella con più segnali. */
     const currentSignals = event.data?.signals?.length || 0;
     const previousSignals = previous.data?.signals?.length || 0;
-    if (
-      currentSignals >
-      previousSignals
-    ) {
-      map.set(key, event);
-    }
+    if (currentSignals > previousSignals) {map.set(key, event);}
   }
   return [...map.values()];
 }
@@ -904,10 +864,7 @@ async function startServer() {
 http.createServer(
   async (req, res) => {
     const requestUrl =
-      new URL(
-        req.url,
-        "http://localhost:3003"
-      );
+      new URL(req.url, "http://localhost:3003");
     const url = requestUrl.searchParams.get("url");
     /* Viewer */
     if (requestUrl.pathname === "/" && !url) {
