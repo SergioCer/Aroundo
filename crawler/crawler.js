@@ -46,6 +46,11 @@ function createValidDate(year, month, day) {
   return date;
 }
 
+function getToday() {const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
 function findFutureDate(html) {if (!html) {return null;}
   /* 0. SCHEMA.ORG / JSON-LD
      Cerchiamo "startDate" all'interno dei dati JSON-LD della pagina.
@@ -53,8 +58,7 @@ function findFutureDate(html) {if (!html) {return null;}
      Se non troviamo date future, proseguiamo con i controlli HTML. */
   const jsonLdRegex = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   let jsonLdMatch;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = getToday();
   while ((jsonLdMatch = jsonLdRegex.exec(html)) !== null) {
     try {const jsonLd = JSON.parse(jsonLdMatch[1]);
       const stack = Array.isArray(jsonLd) ? [...jsonLd] : [jsonLd];
@@ -83,10 +87,6 @@ function findFutureDate(html) {if (!html) {return null;}
       .replace(/\s+/g, " ")
       .trim();
   if (!text) {return null;}
-  /* OGGI è duplicato CANCELLARE
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  */
   /* 1. DATE NUMERICHE CON ANNO Esempi: 26/09/2026 26-09-2026 26.09.2026 */
   const numericDateRegex =
     /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/g;
@@ -239,8 +239,7 @@ function buildDom(html) {
 
 function foundRicorsivity(root, html) {
   const result = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = getToday();
   function walk(node) {
     const groups = new Map();
     for (const child of node.children) {const structure = child.tag + ">" + child.children.map(item => item.tag).join(",");
@@ -269,6 +268,20 @@ function foundRicorsivity(root, html) {
     if (child.tag === "header" || child.tag === "footer") continue;
     walk(child);}
   return result;
+}
+
+async function pageCrawled(href) {
+  const { data, error } = await supabase
+    .from("site_pages")
+    .select("sp_modified")
+    .eq("sp_url", href);
+  if (error) {console.error("Errore controllo pageCrawled:", error); return false;}
+  const today = getToday();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  for (const row of data) {const modified = new Date(row.sp_modified);
+    if (modified >= today && modified < tomorrow) {return true;}}
+  return false;
 }
 
 /* SCANSIONE GENERALE */
@@ -361,6 +374,9 @@ async function crawlSite(site) {
     }
     /* Pagina non disponibile o risorsa non HTML. */
     if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
+    /* ANALISI STRUTTURALE */
+    const root = buildDom(result.content);
+    const ricorsivity = foundRicorsivity(root, result.content);
     /* PRE-FILTRO TEMPORALE: La pagina viene memorizzata solamente se contiene almeno una data futura rispetto al giorno della scansione. */
     const futureDate = findFutureDate(result.content);
     if (futureDate) {console.log(`[CANDIDATA] ${currentUrl}` + ` → data futura:` + ` ${futureDate.toISOString().slice(0, 10)}`);
@@ -369,16 +385,28 @@ async function crawlSite(site) {
       try {await saveSitePage(site.id_site, result.url || currentUrl, detectedAt);
       } catch (error) {crawlerStatus.errors++; console.log(`[DB ERROR]` + ` ${currentUrl}` + ` → ${error.message}`);}
     } else {console.log(`[IGNORATA] ${currentUrl}` + ` → nessuna data futura`);}
-    /* CERCA NUOVI LINK */
-    const links = extractLinks(result.content, result.url || currentUrl);
-    for (const link of links) {
-      if (visited.size + queue.length >= MAX_PAGES_PER_SITE) {break;}
-      let linkUrl;
-      try {linkUrl = new URL(link);
-      } catch {continue;}
-      /* Solo stesso hostname. */
-      if (linkUrl.hostname !== siteHost) {continue;}
-      if (!visited.has(link) && !queue.includes(link)) {queue.push(link);}
+    /* CERCA NUOVI LINK DAI GRUPPI RICORSIVI */
+    for (const group of ricorsivity) {
+      for (const element of group.elements) {
+        const stack = [element];
+        while (stack.length > 0) {
+          const node = stack.pop();
+          const openingTag = result.content.slice(node.start, node.openEnd);
+          const hrefMatch = openingTag.match(/\bhref\s*=\s*["']([^"']+)["']/i);
+          if (hrefMatch) {
+            const link = normalizeUrl(hrefMatch[1], result.url || currentUrl);
+            if (link) {
+              let linkUrl;
+              try {linkUrl = new URL(link);}
+              catch {linkUrl = null;}
+              if (linkUrl && linkUrl.hostname === siteHost) {
+                if (!visited.has(link) && !queue.includes(link) && !(await pageCrawled(link))) {queue.push(link);}
+              }
+            }
+          }
+          for (const child of node.children) {stack.push(child);}
+        }
+      }
     }
   }
   console.log("");
