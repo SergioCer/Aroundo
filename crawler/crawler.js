@@ -21,20 +21,6 @@ function isHtml(contentType) {
     .includes("text/html");
 }
 
-function isIgnoredUrl(url) {
-  const lower = url.toLowerCase();
-  if (lower.startsWith("mailto:") ||
-    lower.startsWith("tel:") ||
-    lower.startsWith("javascript:") ||
-    lower.startsWith("data:") ||
-    lower.startsWith("ftp:")
-  ) {return true;}
-  const pathname = lower.split("?")[0];
-  const ignoredExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".bmp", ".css", ".js", ".json", ".xml", ".pdf",
-    ".zip", ".rar", ".7z", ".mp3", ".mp4", ".avi", ".mov", ".webm", ".woff", ".woff2", ".ttf", ".eot"];
-  return ignoredExtensions.some(extension => pathname.endsWith(extension));
-}
-
 /* RICERCA DATE FUTURE NEL CONTENUTO */
 const MESI = {gennaio: 0, febbraio: 1, marzo: 2, aprile: 3, maggio: 4, giugno: 5, luglio: 6, agosto: 7, settembre: 8, ottobre: 9, novembre: 10, dicembre: 11};
 
@@ -135,6 +121,20 @@ function normalizeUrl(href, baseUrl) {
       /* Normalizzazione minima. */
     return target.href;
   } catch {return null;}
+}
+
+function isIgnoredUrl(url) {
+  const lower = url.toLowerCase();
+  if (lower.startsWith("mailto:") ||
+    lower.startsWith("tel:") ||
+    lower.startsWith("javascript:") ||
+    lower.startsWith("data:") ||
+    lower.startsWith("ftp:")
+  ) {return true;}
+  const pathname = lower.split("?")[0];
+  const ignoredExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".bmp", ".css", ".js", ".json", ".xml", ".pdf",
+    ".zip", ".rar", ".7z", ".mp3", ".mp4", ".avi", ".mov", ".webm", ".woff", ".woff2", ".ttf", ".eot"];
+  return ignoredExtensions.some(extension => pathname.endsWith(extension));
 }
 
 /* ESTRAZIONE DEGLI HREF */
@@ -400,7 +400,7 @@ async function crawlSite(site) {
               try {linkUrl = new URL(link);}
               catch {linkUrl = null;}
               if (linkUrl && linkUrl.hostname === siteHost) {
-                if (!visited.has(link) && !queue.includes(link) && !(await pageCrawled(link))) {queue.push(link);}
+                if (!isIgnoredUrl(link) && !visited.has(link) && !queue.includes(link) && !(await pageCrawled(link))) {queue.push(link);}
               }
             }
           }
