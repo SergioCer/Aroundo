@@ -718,6 +718,34 @@ function nodeHtml(node, html) {
   return html.slice(node.start, Math.min(node.end, html.length));
 }
 
+/* TROVA LISTE RICORSIVE */
+function foundList(root) {
+  const result = [];
+  function walk(node) {
+    const groups = new Map();
+    for (const child of node.children) {
+      const structure = child.tag + ">" + child.children.map(item => item.tag).join(",");
+      if (!groups.has(structure)) {groups.set(structure, []);}
+      groups.get(structure).push(child);
+    }
+    for (const [structure, elements] of groups) {
+      if (elements.length < 2) continue;
+      result.push({
+        structure,
+        elements
+      });
+      /* Un gruppo ricorsivo trovato non viene esplorato ulteriormente. */
+      continue;
+    }
+    for (const child of node.children) {walk(child);}
+  }
+  for (const child of root.children) {
+    if (child.tag === "header" || child.tag === "footer") continue;
+    walk(child);
+  }
+  return result;
+}
+
 /* CONTENITORI POSSIBILI */
 function candidateContainers(root) {
   const nodes = flattenNodes(root);
@@ -850,12 +878,18 @@ function uniqueEvents(events) {
   return [...map.values()];
 }
 
-/* ESTRAZIONE PRINCIPALE */
+ /* ESTRAZIONE PRINCIPALE */
 let CURRENT_URL = null;
 function findEvents(html, url, categoryDictionary) {
   CURRENT_URL = url;
-const result = findSemanticCandidates(html, url, categoryDictionary);
-  const events = result.candidates.map(candidate => toSchemaEvent(candidate, url));
+  const root = buildDom(html);
+  const result = foundList(root);
+  const candidates = result.flatMap(group =>
+    group.elements
+      .map(node => evaluateContainer(node, html, url, categoryDictionary))
+      .filter(Boolean)
+  );
+  const events = candidates.map(candidate => toSchemaEvent(candidate, url));
   CURRENT_URL = null;
   return uniqueEvents(events);
 }
