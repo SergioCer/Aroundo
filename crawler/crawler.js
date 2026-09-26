@@ -191,34 +191,126 @@ function fetchPage(url) {
     });
 }
 
-/* SALVATAGGIO SITE_PAGE */
-async function saveSitePage(siteId, pageUrl, detectedAt) {
-  /* Prima cerchiamo se la URL esiste già per questo sito. */
-  const {data, error} = await supabase
-    .from("site_pages")
-    .select("id_site_page, sp_modified")
-    .eq("id_site", siteId)
-    .eq("sp_url", pageUrl)
-    .maybeSingle();
-  if (error) {throw error;}
-  /* URL nuova. */
-  if (!data) {const {error: insertError} = await supabase
-      .from("site_pages")
-      .insert({id_site: siteId, sp_url: pageUrl, sp_modified: detectedAt});
-    if (insertError) {throw insertError;}
-      crawlerStatus.pagesInserted++;
-      console.log(`[INSERT] ${pageUrl}` + ` | detected=${detectedAt}`);
-      return;
+/* PARSER DOM SEMPLICE: 
+Non usiamo una blacklist di classi. Costruiamo invece una rappresentazione gerarchica minimale dei tag HTML per poter risalire al contenitore comune dei segnali. */
+function buildDom(html) {
+  const root = {
+    tag: "#root",
+    start: 0,
+    end: html.length,
+    openEnd: 0,
+    children: [],
+    parent: null
+  };
+  const stack = [root];
+  const tagRe = /<!--[\s\S]*?-->|<\/?([a-zA-Z][\w:-]*)(?:\s[^>]*)?>/g;
+  for (const match of html.matchAll(tagRe)) {
+    const full = match[0];
+    const tag = match[1];
+    if (!tag) continue;
+    const lower = tag.toLowerCase();
+    if (full.startsWith("</")) {
+      /* chiusura: cerchiamo il tag corrispondente  */
+      for (let i = stack.length - 1; i > 0; i--) {
+        if (stack[i].tag === lower) {
+          const node = stack[i];
+          node.end = match.index + full.length;
+          stack.length = i;
+          break;
+        }
+      }
+      continue;
+    }
+    const node = {
+      tag: lower,
+      start: match.index,
+      end: html.length,
+      openEnd: match.index + full.length,
+      children: [],
+      parent: stack[stack.length - 1]
+    };
+    stack[stack.length - 1].children.push(node);
+    /* tag void */
+    const voidTag =/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i.test(lower);
+    if (!voidTag && !full.endsWith("/>")) {stack.push(node);}
   }
-  /* URL già presente. Aggiorniamo il momento di rilevazione della pagina candidata. */
-  if (data.sp_modified !== detectedAt) {const {error: updateError} = await supabase
-      .from("site_pages")
-      .update({sp_modified: detectedAt})
-      .eq("id_site_page", data.id_site_page);
-    if (updateError) {throw updateError;}
-      crawlerStatus.pagesUpdated++;
-      console.log(`[UPDATE] ${pageUrl}` + ` | detected=${detectedAt}`);
-  }
+  return root;
+}
+
+function foundRicorsivity(root, html) {
+  const result = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  function walk(node) {
+    const groups = new Map();
+    for (const child of node.children) {const structure = child.tag + ">" + child.children.map(item => item.tag).join(",");
+      if (!groups.has(structure)) {groups.set(structure, []);}
+      groups.get(structure).push(child);
+    }
+    for (const [structure, elements] of groups) {
+      if (elements.length < 2) continue;
+      let hasHref = false;
+      let hasFutureDate = false;
+      function inspect(element) {
+        if (hasHref && hasFutureDate) return;
+        if (element.tag === "a") {const match = html.slice(element.openEnd, element.end).match(/\bhref\s*=\s*["']([^"']+)["']/i);
+          if (match) hasHref = true;}
+        const content = html.slice(element.start, element.end);
+        if (findFutureDate(content)) {hasFutureDate = true;}
+        for (const child of element.children) {inspect(child);
+          if (hasHref && hasFutureDate) return;}}
+      for (const element of elements) {inspect(element);
+        if (hasHref && hasFutureDate) break;}
+      if (hasHref || hasFutureDate) {result.push({structure, elements});}
+      // Un gruppo ricorsivo trovato non viene esplorato ulteriormente.
+      continue;}
+    for (const child of node.children) {walk(child);}}
+  for (const child of root.children) {
+    if (child.tag === "header" || child.tag === "footer") continue;
+    walk(child);}
+  return result;
+}
+
+/* SCANSIONE GENERALE */
+async function crawlAllSites() {
+  if (crawlerRunning) {console.log("Crawler già in esecuzione."); return;}
+  crawlerRunning = true;
+  crawlerStatus.startedAt = new Date().toISOString();
+  crawlerStatus.finishedAt = null;
+  crawlerStatus.sitesTotal = 0;
+  crawlerStatus.sitesCompleted = 0;
+  crawlerStatus.pagesVisited = 0;
+  crawlerStatus.pagesInserted = 0;
+  crawlerStatus.pagesUpdated = 0;
+  crawlerStatus.errors = 0;
+  try {const {data: sites, error} = await supabase
+      .from("site")
+      .select("id_site, st_url, st_crawled")
+      .order("id_site", {ascending: true});
+    if (error) {throw error;}
+    crawlerStatus.sitesTotal = sites.length;
+    console.log("");
+    console.log("===============================================");
+    console.log(`Siti da scansionare: ${sites.length}`);
+    console.log("===============================================");
+    for (const site of sites) {
+      try {await crawlSite(site);
+      } catch (error) {crawlerStatus.errors++; 
+      console.log(`[SITE ERROR]` + ` site=${site.id_site}` + ` → ${error.message}`);}
+      crawlerStatus.sitesCompleted++;
+    }
+  } catch (error) {crawlerStatus.errors++;
+    console.log(`[CRAWLER ERROR]` + ` ${error.message}`);
+  } finally {crawlerStatus.finishedAt = new Date().toISOString(); crawlerRunning = false;}
+  console.log("");
+  console.log("===============================================");
+  console.log("CRAWLER TERMINATO");
+  console.log(`Siti: ${crawlerStatus.sitesCompleted}` + `/${crawlerStatus.sitesTotal}`);
+  console.log(`Pagine visitate:` + ` ${crawlerStatus.pagesVisited}`);
+  console.log(`Inserite:` + ` ${crawlerStatus.pagesInserted}`);
+  console.log(`Aggiornate:` + ` ${crawlerStatus.pagesUpdated}`);
+  console.log(`Errori:` + ` ${crawlerStatus.errors}`);
+  console.log("===============================================");
 }
 
 /* SCANSIONE DI UN SITO*/
@@ -294,46 +386,34 @@ async function crawlSite(site) {
   console.log(`Pagine visitate: ${visited.size}`);
 }
 
-/* SCANSIONE GENERALE */
-async function crawlAllSites() {
-  if (crawlerRunning) {console.log("Crawler già in esecuzione."); return;}
-  crawlerRunning = true;
-  crawlerStatus.startedAt = new Date().toISOString();
-  crawlerStatus.finishedAt = null;
-  crawlerStatus.sitesTotal = 0;
-  crawlerStatus.sitesCompleted = 0;
-  crawlerStatus.pagesVisited = 0;
-  crawlerStatus.pagesInserted = 0;
-  crawlerStatus.pagesUpdated = 0;
-  crawlerStatus.errors = 0;
-  try {const {data: sites, error} = await supabase
-      .from("site")
-      .select("id_site, st_url, st_crawled")
-      .order("id_site", {ascending: true});
-    if (error) {throw error;}
-    crawlerStatus.sitesTotal = sites.length;
-    console.log("");
-    console.log("===============================================");
-    console.log(`Siti da scansionare: ${sites.length}`);
-    console.log("===============================================");
-    for (const site of sites) {
-      try {await crawlSite(site);
-      } catch (error) {crawlerStatus.errors++; 
-      console.log(`[SITE ERROR]` + ` site=${site.id_site}` + ` → ${error.message}`);}
-      crawlerStatus.sitesCompleted++;
-    }
-  } catch (error) {crawlerStatus.errors++;
-    console.log(`[CRAWLER ERROR]` + ` ${error.message}`);
-  } finally {crawlerStatus.finishedAt = new Date().toISOString(); crawlerRunning = false;}
-  console.log("");
-  console.log("===============================================");
-  console.log("CRAWLER TERMINATO");
-  console.log(`Siti: ${crawlerStatus.sitesCompleted}` + `/${crawlerStatus.sitesTotal}`);
-  console.log(`Pagine visitate:` + ` ${crawlerStatus.pagesVisited}`);
-  console.log(`Inserite:` + ` ${crawlerStatus.pagesInserted}`);
-  console.log(`Aggiornate:` + ` ${crawlerStatus.pagesUpdated}`);
-  console.log(`Errori:` + ` ${crawlerStatus.errors}`);
-  console.log("===============================================");
+/* SALVATAGGIO SITE_PAGE */
+async function saveSitePage(siteId, pageUrl, detectedAt) {
+  /* Prima cerchiamo se la URL esiste già per questo sito. */
+  const {data, error} = await supabase
+    .from("site_pages")
+    .select("id_site_page, sp_modified")
+    .eq("id_site", siteId)
+    .eq("sp_url", pageUrl)
+    .maybeSingle();
+  if (error) {throw error;}
+  /* URL nuova. */
+  if (!data) {const {error: insertError} = await supabase
+      .from("site_pages")
+      .insert({id_site: siteId, sp_url: pageUrl, sp_modified: detectedAt});
+    if (insertError) {throw insertError;}
+      crawlerStatus.pagesInserted++;
+      console.log(`[INSERT] ${pageUrl}` + ` | detected=${detectedAt}`);
+      return;
+  }
+  /* URL già presente. Aggiorniamo il momento di rilevazione della pagina candidata. */
+  if (data.sp_modified !== detectedAt) {const {error: updateError} = await supabase
+      .from("site_pages")
+      .update({sp_modified: detectedAt})
+      .eq("id_site_page", data.id_site_page);
+    if (updateError) {throw updateError;}
+      crawlerStatus.pagesUpdated++;
+      console.log(`[UPDATE] ${pageUrl}` + ` | detected=${detectedAt}`);
+  }
 }
 
 /* SERVER HTTP */
