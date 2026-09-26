@@ -94,16 +94,6 @@ function findFutureDate(html) {if (!html) {return null;}
     const date = createValidDate(year, month, day);
     if (date && date > today) {return date;}
   }
-  /* 3. DATE SCRITTE SENZA ANNO Esempi: 26 settembre 27 settembre sabato 26 settembre domenica 27 settembre
-     In questo caso utilizziamo l'anno corrente. Una data già trascorsa viene ignorata. */
-  const writtenDateWithoutYearRegex = new RegExp(`\\b(\\d{1,2})\\s+(${monthNames})\\b`, "gi");
-  while ((match = writtenDateWithoutYearRegex.exec(text)) !== null) {
-    const day = Number(match[1]);
-    const month = MESI[match[2].toLowerCase()];
-    const year = today.getFullYear();
-    const date = createValidDate(year, month, day);
-    if (date && date > today) {return date;}
-  }
   return null;
 }
 
