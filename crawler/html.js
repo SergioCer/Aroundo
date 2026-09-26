@@ -624,9 +624,10 @@ function analyzeSignals(block, categoryDictionary) {
   const location = extractLocation(text);
   const city = matchComune(text);
   const image = extractImage(block, CURRENT_URL);
-  const today = getToday();
-  const date = dates.find(x => x.date && x.date > today)?.date || null;
-  console.log("DATE TEST:", dates.map(x => x.date), "TODAY:", today);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayString = today.toISOString().slice(0, 10);
+  const date = dates.find(x => x.date && x.date > todayString)?.date || null;
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
