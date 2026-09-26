@@ -643,10 +643,10 @@ function analyzeSignals(block, categoryDictionary) {
   const reinforcementCount = reinforcementNames.length;
   /* CLASSIFICAZIONE */
   let classification = "non-evento";
-  /* EVENTO COMPLETO */
-  if (fundamentals.titolo && fundamentals.data && fundamentals.luogo) {classification = "evento";}
-  /* INCOMPLETO 2 fondamentali + 2 rafforzativi forti */
-  else if (fundamentalCount >= 2 && reinforcementCount >= 2) {classification = "incompleto";}
+  /* EVENTO COMPLETO: 3 fondamentali + almeno 2 rafforzativi */
+  if (fundamentalCount === 3 && reinforcementCount >= 2) {classification = "evento";}
+  /* EVENTO INCOMPLETO: 3 fondamentali senza almeno 2 rafforzativi */
+  else if (fundamentalCount === 3) {classification = "incompleto";}
   return {text, title, dates, date, times, price, organizer, creators, category,
     location, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
 }
