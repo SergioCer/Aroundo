@@ -390,7 +390,10 @@ async function crawlSite(site) {
               try {linkUrl = new URL(link);}
               catch {linkUrl = null;}
               if (linkUrl && linkUrl.hostname === siteHost) {
-                if (!isIgnoredUrl(link) && !visited.has(link) && !queue.includes(link) && !(await pageCrawled(link))) {queue.push(link);}
+                if (!isIgnoredUrl(link) && !visited.has(link) && !queue.includes(link) && !(await pageCrawled(link))) {
+                  console.log(`[QUEUE] ${currentUrl} → ${link}`);
+                  queue.push(link);
+                }
               }
             }
           }
