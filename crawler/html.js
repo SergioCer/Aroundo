@@ -610,6 +610,67 @@ function extractDescription(text, title) {
   return value;
 }
 
+/* ATTENZIONE : funzione comune con crawler.js, una modifica in uno deve avvenire anche nellaltro */
+function findFutureDate(html) {if (!html) {return null;}
+  /* 0. SCHEMA.ORG / JSON-LD
+     Cerchiamo "startDate" all'interno dei dati JSON-LD della pagina.
+     Se troviamo una qualsiasi startDate successiva ad oggi, la restituiamo immediatamente.
+     Se non troviamo date future, proseguiamo con i controlli HTML. */
+  const jsonLdRegex = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let jsonLdMatch;
+  const today = getToday();
+  while ((jsonLdMatch = jsonLdRegex.exec(html)) !== null) {
+    try {const jsonLd = JSON.parse(jsonLdMatch[1]);
+      const stack = Array.isArray(jsonLd) ? [...jsonLd] : [jsonLd];
+      while (stack.length) {const item = stack.pop();
+        if (!item || typeof item !== "object") {continue;}
+        if (Object.prototype.hasOwnProperty.call(item, "startDate")) {const date = new Date(item.startDate);
+          if (!Number.isNaN(date.getTime())) {date.setHours(0, 0, 0, 0);
+            if (date > today) {return date;}}}
+        for (const key of Object.keys(item)) {
+          if (item[key] && typeof item[key] === "object") {
+            if (Array.isArray(item[key])) {stack.push(...item[key]);
+            } else {stack.push(item[key]);}}}
+      }
+    } catch (error) {
+    /* JSON-LD non valido: proseguiamo con i controlli successivi. */
+    }
+  }
+    /* PULIZIA DEL CONTENUTO
+  Eliminiamo script e style perché le date presenti nel codice della pagina non devono essere considerate.
+  Poi eliminiamo i tag HTML e normalizziamo gli spazi. */
+  const text = html .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/\s+/g, " ")
+      .trim();
+  if (!text) {return null;}
+  /* 1. DATE NUMERICHE CON ANNO Esempi: 26/09/2026 26-09-2026 26.09.2026 */
+  const numericDateRegex =
+    /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/g;
+  let match;
+  while ((match = numericDateRegex.exec(text)) !== null) {
+    const day = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const year = Number(match[3]);
+    const date = createValidDate(year, month, day);
+    if (date && date > today) {return date;}
+  }
+  /* 2. DATE SCRITTE CON ANNO Esempi: 26 settembre 2026 10 ottobre 2026 21 Settembre 2026 */
+  const monthNames = Object.keys(MESI) .join("|");
+  const writtenDateWithYearRegex = new RegExp(`\\b(\\d{1,2})\\s+(${monthNames})\\s+(\\d{4})\\b`, "gi");
+  while ((match = writtenDateWithYearRegex.exec(text)) !== null) {
+    const day = Number(match[1]);
+    const month = MESI[match[2].toLowerCase()];
+    const year = Number(match[3]);
+    const date = createValidDate(year, month, day);
+    if (date && date > today) {return date;}
+  }
+  return null;
+}
+
 /* SEGNALI */
 function analyzeSignals(block, categoryDictionary) {
   const text = stripHtml(block);
@@ -624,7 +685,7 @@ function analyzeSignals(block, categoryDictionary) {
   const location = extractLocation(text);
   const city = matchComune(text);
   const image = extractImage(block, CURRENT_URL);
-  const date = dates.find(x => x.date)?.date || null;
+  const date = findFutureDate(block);
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
