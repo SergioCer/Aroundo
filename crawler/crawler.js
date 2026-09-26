@@ -453,6 +453,41 @@ http.createServer(
     /* HOME */
     if (requestUrl.pathname === "/") 
       {return res.end(JSON.stringify({crawler: "AroundoCrawler", port: PORT, running: crawlerRunning, maxPagesPerSite: MAX_PAGES_PER_SITE, status: crawlerStatus}, null, 2));}
+
+/* TEST SINGOLO SITO */
+if (requestUrl.pathname === "/test") {
+  if (crawlerRunning) {return res.end(JSON.stringify({ok: false, message: "Crawler già in esecuzione.", status: crawlerStatus}, null, 2));}
+  const siteId = Number(requestUrl.searchParams.get("id_site"));
+  if (!siteId) {return res.end(JSON.stringify({ok: false, message: "id_site non valido."}, null, 2));}
+  const {data: site, error} = await supabase
+    .from("site")
+    .select("id_site, st_url, st_crawled")
+    .eq("id_site", siteId)
+    .maybeSingle();
+  if (error) {return res.end(JSON.stringify({ok: false, message: error.message}, null, 2));}
+  if (!site) {return res.end(JSON.stringify({ok: false, message: "Sito non trovato."}, null, 2));}
+  crawlerRunning = true;
+  crawlerStatus.startedAt = new Date().toISOString();
+  crawlerStatus.finishedAt = null;
+  crawlerStatus.sitesTotal = 1;
+  crawlerStatus.sitesCompleted = 0;
+  crawlerStatus.pagesVisited = 0;
+  crawlerStatus.pagesInserted = 0;
+  crawlerStatus.pagesUpdated = 0;
+  crawlerStatus.errors = 0;
+  crawlSite(site)
+    .catch(error => {
+      crawlerStatus.errors++;
+      console.log(`[SITE ERROR]` + ` site=${site.id_site}` + ` → ${error.message}`);
+    })
+    .finally(() => {
+      crawlerStatus.sitesCompleted = 1;
+      crawlerStatus.finishedAt = new Date().toISOString();
+      crawlerRunning = false;
+    });
+  return res.end(JSON.stringify({ok: true, message: `Test avviato per site=${siteId}.`, status: crawlerStatus}, null, 2));
+}                       
+                       
     /* START */
     if (requestUrl.pathname === "/start") {
       if (crawlerRunning) {return res.end(JSON.stringify({ok: false, message: "Crawler già in esecuzione.", status: crawlerStatus}, null, 2));}
@@ -470,6 +505,7 @@ http.createServer(
     console.log("===============================================");
     console.log(`Crawler attivo sulla porta ${PORT}`);
     console.log(`Massimo ${MAX_PAGES_PER_SITE} pagine per sito`);
+    console.log("Endpoint: /test?id_site=1");
     console.log("Endpoint: /start");
     console.log("Endpoint: /status");
     console.log("===============================================");
