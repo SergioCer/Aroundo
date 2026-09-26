@@ -626,6 +626,7 @@ function analyzeSignals(block, categoryDictionary) {
   const image = extractImage(block, CURRENT_URL);
   const today = getToday();
   const date = dates.find(x => x.date && x.date > today)?.date || null;
+  console.log("DATE TEST:", dates.map(x => x.date), "TODAY:", today);
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
