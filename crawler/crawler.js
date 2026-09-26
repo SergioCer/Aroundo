@@ -419,7 +419,7 @@ async function saveSitePage(siteId, pageUrl, detectedAt) {
   /* Prima cerchiamo se la URL esiste già per questo sito. */
   const {data, error} = await supabase
     .from("site_pages")
-    .select("id_site_page, sp_modified")
+    .select("id_site_page, sp_star")
     .eq("id_site", siteId)
     .eq("sp_url", pageUrl)
     .maybeSingle();
@@ -427,21 +427,21 @@ async function saveSitePage(siteId, pageUrl, detectedAt) {
   /* URL nuova. */
   if (!data) {const {error: insertError} = await supabase
       .from("site_pages")
-      .insert({id_site: siteId, sp_url: pageUrl, sp_modified: detectedAt});
+      .insert({id_site: siteId, sp_url: pageUrl, sp_modified: detectedAt, sp_star: 1});
     if (insertError) {throw insertError;}
       crawlerStatus.pagesInserted++;
-      console.log(`[INSERT] ${pageUrl}` + ` | detected=${detectedAt}`);
+      console.log(`[INSERT] ${pageUrl}` + ` | star=1 | detected=${detectedAt}`);
       return;
   }
-  /* URL già presente. Aggiorniamo il momento di rilevazione della pagina candidata. */
-  if (data.sp_modified !== detectedAt) {const {error: updateError} = await supabase
-      .from("site_pages")
-      .update({sp_modified: detectedAt})
-      .eq("id_site_page", data.id_site_page);
-    if (updateError) {throw updateError;}
-      crawlerStatus.pagesUpdated++;
-      console.log(`[UPDATE] ${pageUrl}` + ` | detected=${detectedAt}`);
-  }
+  /* URL già presente. Incrementiamo la stella fino a un massimo di 5. */
+  const newStar = Math.min(data.sp_star + 1, 5);
+  const {error: updateError} = await supabase
+    .from("site_pages")
+    .update({sp_modified: detectedAt, sp_star: newStar})
+    .eq("id_site_page", data.id_site_page);
+  if (updateError) {throw updateError;}
+    crawlerStatus.pagesUpdated++;
+    console.log(`[UPDATE] ${pageUrl}` + ` | star=${newStar} | detected=${detectedAt}`);
 }
 
 /* SERVER HTTP */
