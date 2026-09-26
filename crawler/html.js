@@ -232,9 +232,9 @@ function extractDates(text) {
     /* Se manca l'anno non inventiamo una data. Conserviamo comunque il segnale. */
     if (year) {
       const date = normalizeDate(m[1], month, year);
-      if (date) {result.push({date, raw: m[0], index: m.index });}
-    } else {result.push({date: null, raw: m[0], index: m.index, partial: true});}
-  }
+        if (date) {result.push({date, raw: m[0], index: m.index});}
+      }
+    }
   /* Deduplica */
   const seen = new Set();
   return result.filter(item => {
