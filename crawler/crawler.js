@@ -288,34 +288,37 @@ function buildDom(html) {
 
 function foundRicorsivity(root, html) {
   const result = [];
-  const today = getToday();
+  function getStructure(node) {
+    return node.tag + ">" + node.children.map(getStructure).join(",");
+  }
   function walk(node) {
     const groups = new Map();
-    for (const child of node.children) {const structure = child.tag + ">" + child.children.map(item => item.tag).join(",");
-      if (!groups.has(structure)) {groups.set(structure, []);}
+    for (const child of node.children) {
+      const structure = getStructure(child);
+      if (!groups.has(structure)) {
+        groups.set(structure, []);
+      }
       groups.get(structure).push(child);
     }
     for (const [structure, elements] of groups) {
       if (elements.length < 2) continue;
-      let hasHref = false;
-      let hasFutureDate = false;
-      function inspect(element) {
-        if (hasHref && hasFutureDate) return;
-        if (element.tag === "a") {const match = html.slice(element.openEnd, element.end).match(/\bhref\s*=\s*["']([^"']+)["']/i);
-          if (match) hasHref = true;}
-        const content = html.slice(element.start, element.end);
-        if (findFutureDate(content)) {hasFutureDate = true;}
-        for (const child of element.children) {inspect(child);
-          if (hasHref && hasFutureDate) return;}}
-      for (const element of elements) {inspect(element);
-        if (hasHref && hasFutureDate) break;}
-      if (hasHref || hasFutureDate) {result.push({structure, elements});}
-      // Un gruppo ricorsivo trovato non viene esplorato ulteriormente.
-      continue;}
-    for (const child of node.children) {walk(child);}}
+      result.push({structure, elements});
+      /* La ricorsività trovata è il massimo blocco.
+         Non analizziamo le ricorsività contenute al suo interno. */
+    }
+    for (const child of node.children) {
+      const structure = getStructure(child);
+      const elements = groups.get(structure);
+      if (elements && elements.length >= 2) {
+        continue;
+      }
+      walk(child);
+    }
+  }
   for (const child of root.children) {
     if (child.tag === "header" || child.tag === "footer") continue;
-    walk(child);}
+    walk(child);
+  }
   return result;
 }
 
