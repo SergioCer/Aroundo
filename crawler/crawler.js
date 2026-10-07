@@ -51,6 +51,10 @@ async function loadComuniDictionary() {
   return COMUNI_DICTIONARY; 
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /* CITTA' */ 
 function matchComune(text) { 
   if (!text || !COMUNI_DICTIONARY?.length) {return null;} 
