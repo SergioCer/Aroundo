@@ -9,6 +9,25 @@ const MAX_PAGES_PER_SITE = 50;
 const REQUEST_TIMEOUT = 20000;
 const USER_AGENT = "Mozilla/5.0 Crawler/1.0";
 
+/* DIZIONARI — CARICAMENTO DB */ 
+import { supabase } from "./supabase_node.js"; e 
+/* Comuni */
+let COMUNI_DICTIONARY = null;
+
+async function loadComuniDictionary() { 
+  if (COMUNI_DICTIONARY) {return COMUNI_DICTIONARY;} 
+  const { data, error } = await supabase .from("comuni") .select(id_comune, co_descrizione, co_cap, id_provincia,) .order("co_descrizione"); 
+  if (error) {console.error("[COMUNI] Errore caricamento comuni:", error); COMUNI_DICTIONARY = []; 
+    return COMUNI_DICTIONARY; } COMUNI_DICTIONARY = (data || []).map(comune => ({ id: comune.id_comune, descrizione: clean(comune.co_descrizione), 
+      cap: comune.co_cap, provinciaId: comune.id_provincia, terms: buildTerms(comune.co_descrizione) })); console.log("[COMUNI] Dizionario caricato:", COMUNI_DICTIONARY.length); 
+  return COMUNI_DICTIONARY; }
+
+/* CITTA' */ 
+function matchComune(text) { if (!text || !COMUNI_DICTIONARY?.length) {return null;} 
+  for (const comune of COMUNI_DICTIONARY) { for (const term of comune.terms) { if (!term) continue; 
+      const re = new RegExp(\\b${escapeRegExp(term)}\\b, "i"); if (re.test(text)) {return comune;} } } 
+  return null; }
+
 /* STATO CRAWLER */
 let crawlerRunning = false;
 const crawlerStatus = {startedAt: null, finishedAt: null, sitesTotal: 0, sitesCompleted: 0, pagesVisited: 0, pagesInserted: 0, pagesUpdated: 0, errors: 0};
@@ -367,14 +386,36 @@ async function crawlSite(site) {
     /* ANALISI STRUTTURALE */
     const root = buildDom(result.content);
     const ricorsivity = foundRicorsivity(root, result.content);
-    /* PRE-FILTRO TEMPORALE: La pagina viene memorizzata solamente se contiene almeno una data futura rispetto al giorno della scansione. */
-    const futureDate = findFutureDate(result.content);
-    if (futureDate) {console.log(`[CANDIDATA] ${currentUrl}` + ` → data futura:` + ` ${futureDate.toISOString().slice(0, 10)}`);
-      /* sp_modified NON è la data dell'evento. È il momento in cui questa scansione ha individuato una pagina candidata. */
-      const detectedAt = new Date().toISOString();
-      try {await saveSitePage(site.id_site, result.url || currentUrl, detectedAt);
-      } catch (error) {crawlerStatus.errors++; console.log(`[DB ERROR]` + ` ${currentUrl}` + ` → ${error.message}`);}
-    } else {console.log(`[IGNORATA] ${currentUrl}` + ` → nessuna data futura`);}
+    
+/* ANALISI DEI SINGOLI BLOCCHI */
+const detectedAt = new Date().toISOString();
+for (const group of ricorsivity) {
+  for (const element of group.elements) {
+    const block = result.content.slice(element.start, element.end);
+    const futureDate = findFutureDate(block);
+    if (!futureDate) {continue;}
+    const comune = matchComune(block);
+    const idComune = comune ? comune.id : null;
+    console.log(`[BLOCCO] ${currentUrl}` +
+      ` → data=${futureDate.toISOString().slice(0, 10)}` +
+      ` | comune=${idComune}` +
+      ` | lunghezza=${block.length}`);
+    try {
+      await saveSitePage(
+        site.id_site,
+        result.url || currentUrl,
+        detectedAt,
+        futureDate.toISOString().slice(0, 10),
+        idComune,
+        block
+      );
+    } catch (error) {
+      crawlerStatus.errors++;
+      console.log(`[DB ERROR]` + ` ${currentUrl}` + ` → ${error.message}`);
+    }
+  }
+}
+
     /* CERCA NUOVI LINK DAI GRUPPI RICORSIVI */
     for (const group of ricorsivity) {
       for (const element of group.elements) {
@@ -408,33 +449,46 @@ async function crawlSite(site) {
 }
 
 /* SALVATAGGIO SITE_PAGE */
-async function saveSitePage(siteId, pageUrl, detectedAt) {
-  /* Prima cerchiamo se la URL esiste già per questo sito. */
+async function saveSitePage(siteId, pageUrl, detectedAt, futureDate, idComune, block) {
   const {data, error} = await supabase
     .from("site_pages")
     .select("id_site_page, sp_star")
     .eq("id_site", siteId)
     .eq("sp_url", pageUrl)
+    .eq("sp_block", block)
     .maybeSingle();
   if (error) {throw error;}
-  /* URL nuova. */
-  if (!data) {const {error: insertError} = await supabase
+  if (!data) {
+    const {error: insertError} = await supabase
       .from("site_pages")
-      .insert({id_site: siteId, sp_url: pageUrl, sp_modified: detectedAt, sp_star: 1});
+      .insert({
+        id_site: siteId,
+        sp_url: pageUrl,
+        sp_modified: detectedAt,
+        sp_star: 1,
+        sp_date: futureDate,
+        id_comune: idComune,
+        sp_block: block
+      });
     if (insertError) {throw insertError;}
-      crawlerStatus.pagesInserted++;
-      console.log(`[INSERT] ${pageUrl}` + ` | star=1 | detected=${detectedAt}`);
-      return;
+    crawlerStatus.pagesInserted++;
+    console.log(`[INSERT] ${pageUrl}` + ` | star=1 | date=${futureDate} | comune=${idComune}`);
+    return;
   }
-  /* URL già presente. Incrementiamo la stella fino a un massimo di 5. */
   const newStar = Math.min(data.sp_star + 1, 5);
   const {error: updateError} = await supabase
     .from("site_pages")
-    .update({sp_modified: detectedAt, sp_star: newStar})
+    .update({
+      sp_modified: detectedAt,
+      sp_date: futureDate,
+      id_comune: idComune,
+      sp_block: block,
+      sp_star: newStar
+    })
     .eq("id_site_page", data.id_site_page);
   if (updateError) {throw updateError;}
-    crawlerStatus.pagesUpdated++;
-    console.log(`[UPDATE] ${pageUrl}` + ` | star=${newStar} | detected=${detectedAt}`);
+  crawlerStatus.pagesUpdated++;
+  console.log(`[UPDATE] ${pageUrl}` + ` | star=${newStar} | date=${futureDate} | comune=${idComune}`);
 }
 
 /* SERVER HTTP */
