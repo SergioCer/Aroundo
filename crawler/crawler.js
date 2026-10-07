@@ -9,24 +9,43 @@ const MAX_PAGES_PER_SITE = 50;
 const REQUEST_TIMEOUT = 20000;
 const USER_AGENT = "Mozilla/5.0 Crawler/1.0";
 
-/* DIZIONARI — CARICAMENTO DB */ 
-import { supabase } from "./supabase_node.js"; e 
 /* Comuni */
 let COMUNI_DICTIONARY = null;
 
 async function loadComuniDictionary() { 
   if (COMUNI_DICTIONARY) {return COMUNI_DICTIONARY;} 
-  const { data, error } = await supabase .from("comuni") .select(`id_comune, co_descrizione, co_cap, id_provincia`) .order("co_descrizione"); 
-  if (error) {console.error("[COMUNI] Errore caricamento comuni:", error); COMUNI_DICTIONARY = []; 
-    return COMUNI_DICTIONARY; } COMUNI_DICTIONARY = (data || []).map(comune => ({ id: comune.id_comune, descrizione: clean(comune.co_descrizione), 
-      cap: comune.co_cap, provinciaId: comune.id_provincia, terms: buildTerms(comune.co_descrizione) })); console.log("[COMUNI] Dizionario caricato:", COMUNI_DICTIONARY.length); 
-  return COMUNI_DICTIONARY; }
+  const { data, error } = await supabase
+    .from("comuni")
+    .select(`id_comune, co_descrizione, co_cap, id_provincia`)
+    .order("co_descrizione"); 
+  if (error) {
+    console.error("[COMUNI] Errore caricamento comuni:", error); 
+    COMUNI_DICTIONARY = []; 
+    return COMUNI_DICTIONARY; 
+  } 
+  COMUNI_DICTIONARY = (data || []).map(comune => ({ 
+    id: comune.id_comune, 
+    descrizione: clean(comune.co_descrizione), 
+    cap: comune.co_cap, 
+    provinciaId: comune.id_provincia, 
+    terms: buildTerms(comune.co_descrizione) 
+  })); 
+  console.log("[COMUNI] Dizionario caricato:", COMUNI_DICTIONARY.length); 
+  return COMUNI_DICTIONARY; 
+}
 
 /* CITTA' */ 
-function matchComune(text) { if (!text || !COMUNI_DICTIONARY?.length) {return null;} 
-  for (const comune of COMUNI_DICTIONARY) { for (const term of comune.terms) { if (!term) continue; 
-      const re = new RegExp(`\\b${escapeRegExp(term)}\\b`, "i"); if (re.test(text)) {return comune;} } } 
-  return null; }
+function matchComune(text) { 
+  if (!text || !COMUNI_DICTIONARY?.length) {return null;} 
+  for (const comune of COMUNI_DICTIONARY) { 
+    for (const term of comune.terms) { 
+      if (!term) continue; 
+      const re = new RegExp(`\\b${escapeRegExp(term)}\\b`, "i"); 
+      if (re.test(text)) {return comune;} 
+    } 
+  } 
+  return null; 
+}
 
 /* STATO CRAWLER */
 let crawlerRunning = false;
