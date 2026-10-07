@@ -407,6 +407,7 @@ async function crawlSite(site) {
     const ricorsivity = foundRicorsivity(root, result.content);
     
 /* ANALISI DEI SINGOLI BLOCCHI */
+await loadComuniDictionary();
 const detectedAt = new Date().toISOString();
 for (const group of ricorsivity) {
   for (const element of group.elements) {
