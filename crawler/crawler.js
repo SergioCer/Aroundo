@@ -9,6 +9,23 @@ const MAX_PAGES_PER_SITE = 250;
 const REQUEST_TIMEOUT = 20000;
 const USER_AGENT = "Mozilla/5.0 Crawler/1.0";
 
+function normalizeCategoryTerm(value) {
+  if (!value) return "";
+  return String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildTerms(descrizione, slug) {
+  const values = [];
+  if (descrizione) {values.push(descrizione);}
+  if (slug) {values.push(...String(slug) .split(";") .map(value => value.trim()) .filter(Boolean));}
+  return [...new Set(values .map(normalizeCategoryTerm) .filter(Boolean))];
+}
+
 /* Comuni */
 let COMUNI_DICTIONARY = null;
 
