@@ -25,7 +25,7 @@ async function loadComuniDictionary() {
   } 
   COMUNI_DICTIONARY = (data || []).map(comune => ({ 
     id: comune.id_comune, 
-    descrizione: clean(comune.co_descrizione), 
+    descrizione: comune.co_descrizione, 
     cap: comune.co_cap, 
     provinciaId: comune.id_provincia, 
     terms: buildTerms(comune.co_descrizione) 
