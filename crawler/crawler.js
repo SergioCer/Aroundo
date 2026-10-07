@@ -5,7 +5,7 @@ const { supabase } = require("./supabase_node.js");
 
 /* CONFIGURAZIONE */
 const PORT = 3001;
-const MAX_PAGES_PER_SITE = 50;
+const MAX_PAGES_PER_SITE = 250;
 const REQUEST_TIMEOUT = 20000;
 const USER_AGENT = "Mozilla/5.0 Crawler/1.0";
 
