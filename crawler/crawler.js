@@ -316,7 +316,7 @@ function foundRicorsivity(root) {
       } else {
         result.push({
           structure,
-          elements: [node]
+          elements: [elements[0].parent]
         });
       }
     }
