@@ -290,6 +290,130 @@ function buildDom(html) {
 
 function foundRicorsivity(root) {
   const result = [];
+  const map = new Map();
+  const recursivities = [];
+  /* PRIMA FASE:
+   * costruiamo una mappa del DOM.
+   * Ogni nodo viene visitato una sola volta. */
+  function mapNode(node) {
+    const children = node.children.filter(child =>
+      child.tag !== "script" && child.tag !== "style"
+    );
+    const entry = {
+      node,
+      parent: node.parent,
+      children,
+      structure: null,
+      recursivities: []
+    };
+    map.set(node, entry);
+    for (const child of children) {
+      mapNode(child);
+    }
+    /* La struttura viene costruita dopo i figli:
+     * in questo modo ogni sottoalbero è già disponibile. */
+    entry.structure = node.tag + ">" +
+      children.map(child => map.get(child).structure).join(",");
+    return entry;
+  }
+  for (const child of root.children) {
+    if (child.tag === "header" || child.tag === "footer") continue;
+    mapNode(child);
+  }
+  /* SECONDA FASE:
+   * cerchiamo le ricorsività direttamente sulla mappa. */
+  function findRecurrences(entry) {
+    const children = entry.children;
+    if (children.length < 2) {
+      for (const child of children) {
+        findRecurrences(map.get(child));
+      }
+      return;
+    }
+    const structures = children.map(child =>
+      map.get(child).structure
+    );
+    for (let length = 1; length <= Math.floor(children.length / 2); length++) {
+      for (let start = 0; start + length * 2 <= children.length; start++) {
+        let repeated = true;
+        for (let offset = 0; offset < length; offset++) {
+          if (
+            structures[start + offset] !==
+            structures[start + length + offset]
+          ) {
+            repeated = false;
+            break;
+          }
+        }
+        if (!repeated) continue;
+        let repetitions = 2;
+        while (
+          start + (repetitions + 1) * length <= children.length
+        ) {
+          let same = true;
+          for (let offset = 0; offset < length; offset++) {
+            if (
+              structures[start + offset] !==
+              structures[start + repetitions * length + offset]
+            ) {
+              same = false;
+              break;
+            }
+          }
+          if (!same) break;
+          repetitions++;
+        }
+        if (
+          length === 1 &&
+          repetitions === 2 &&
+          children.length !== 2
+        ) {
+          continue;
+        }
+        const elements = children.slice(
+          start,
+          start + length * repetitions
+        );
+        const recurrence = {
+          node: entry.node,
+          structure: structures
+            .slice(start, start + length)
+            .join(","),
+          elements,
+          terminal: elements.every(element =>
+            map.get(element).children.length === 0
+          )
+        };
+        entry.recursivities.push(recurrence);
+        recursivities.push(recurrence);
+      }
+    }
+    /* Continuiamo comunque a scendere:
+     * una ricorsività può contenerne altre. */
+    for (const child of children) {
+      findRecurrences(map.get(child));
+    }
+  }
+  for (const child of root.children) {
+    if (child.tag === "header" || child.tag === "footer") continue;
+    findRecurrences(map.get(child));
+  }
+  /* Per ora restituiamo tutte le ricorsività individuate
+   * nel formato utilizzato dal resto del crawler.
+   * La scelta dei blocchi viene fatta separatamente. */
+  for (const recurrence of recursivities) {
+    result.push({
+      structure: recurrence.structure,
+      elements: recurrence.elements
+    });
+  }
+  return result;
+}
+
+
+/* VECCHIA ***** 
+function foundRicorsivity(root) {
+  const result = [];
   const recursivities = [];
   function getChildren(node) {
     return node.children.filter(child =>
@@ -334,11 +458,9 @@ function foundRicorsivity(root) {
         ) {
           repetitions++;
         }
-        /*
-         * Una semplice coppia dello stesso elemento,
-         * inserita in una struttura più ampia, non è sufficiente
-         * per considerarla una ricorsività.
-         */
+        // Una semplice coppia dello stesso elemento,
+        // inserita in una struttura più ampia, non è sufficiente
+        // per considerarla una ricorsività. 
         if (
           length === 1 &&
           repetitions === 2 &&
@@ -368,10 +490,8 @@ function foundRicorsivity(root) {
     const recurrence = findRecurrence(node);
     if (recurrence) {
       recursivities.push(recurrence);
-      /*
-       * La ricorsività trovata è già una struttura completa.
-       * Non cerchiamo ricorsività sovrapposte al suo interno.
-       */
+      // La ricorsività trovata è già una struttura completa.
+      // Non cerchiamo ricorsività sovrapposte al suo interno. 
       return;
     }
     for (const child of getChildren(node)) {
@@ -447,6 +567,7 @@ function findSingleBlock(recurrence) {
   }
   return result;
 }
+*/
 
 async function pageCrawled(href) {
   const { data, error } = await supabase
