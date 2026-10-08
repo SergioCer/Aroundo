@@ -291,7 +291,6 @@ function buildDom(html) {
 function foundRicorsivity(root) {
   const result = [];
   const recursivities = [];
-
   function getChildren(node) {
     return node.children.filter(child =>
       child.tag !== "script" && child.tag !== "style"
@@ -412,17 +411,17 @@ function foundRicorsivity(root) {
     }
     return count;
   }
-  function findSingleBlock(recurrence) {
-    let current = recurrence.elements[0].parent;
-    while (current && current.tag !== "#root") {
-      const count = countRecursivities(current);
-      if (count === 1) {
-        return current;
-      }
-      current = current.parent;
+function findSingleBlock(recurrence) {
+  let current = recurrence.elements[0].parent;
+  while (current && current.tag !== "#root") {
+    const count = countRecursivities(current);
+    if (count === 1) {
+      return current;
     }
-    return recurrence.elements[0].parent;
+    current = current.parent;
   }
+  return recurrence.elements[0].parent;
+}
   function addRecurrence(recurrence) {
     if (recurrence.terminal) {
       const block = findSingleBlock(recurrence);
