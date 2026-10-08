@@ -286,7 +286,7 @@ function buildDom(html) {
   return root;
 }
 
-function foundRicorsivity(root, html) {
+function foundRicorsivity(root) {
   const result = [];
   function getStructure(node) {
     return node.tag + ">" + node.children.map(getStructure).join(",");
@@ -294,6 +294,7 @@ function foundRicorsivity(root, html) {
   function walk(node) {
     const groups = new Map();
     for (const child of node.children) {
+      if (child.tag === "script" || child.tag === "style") continue;
       const structure = getStructure(child);
       if (!groups.has(structure)) {
         groups.set(structure, []);
@@ -302,11 +303,25 @@ function foundRicorsivity(root, html) {
     }
     for (const [structure, elements] of groups) {
       if (elements.length < 2) continue;
-      result.push({structure, elements});
-      /* La ricorsività trovata è il massimo blocco.
-         Non analizziamo le ricorsività contenute al suo interno. */
+      const hasDescendants = elements.some(element =>
+        element.children.some(child =>
+          child.tag !== "script" && child.tag !== "style"
+        )
+      );
+      if (hasDescendants) {
+        result.push({
+          structure,
+          elements
+        });
+      } else {
+        result.push({
+          structure,
+          elements: [node]
+        });
+      }
     }
     for (const child of node.children) {
+      if (child.tag === "script" || child.tag === "style") continue;
       const structure = getStructure(child);
       const elements = groups.get(structure);
       if (elements && elements.length >= 2) {
@@ -316,7 +331,14 @@ function foundRicorsivity(root, html) {
     }
   }
   for (const child of root.children) {
-    if (child.tag === "header" || child.tag === "footer") continue;
+    if (
+      child.tag === "header" ||
+      child.tag === "footer" ||
+      child.tag === "script" ||
+      child.tag === "style"
+    ) {
+      continue;
+    }
     walk(child);
   }
   return result;
