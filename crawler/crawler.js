@@ -290,197 +290,55 @@ function buildDom(html) {
 
 function foundRicorsivity(root) {
   const result = [];
+  const recursivities = [];
   const map = new Map();
-  const recursivities = [];
-  /* PRIMA FASE:
-   * costruiamo una mappa del DOM.
-   * Ogni nodo viene visitato una sola volta. */
-  function mapNode(node) {
-    const children = node.children.filter(child =>
-      child.tag !== "script" && child.tag !== "style"
-    );
-    const entry = {
-      node,
-      parent: node.parent,
-      children,
-      structure: null,
-      recursivities: []
-    };
-    map.set(node, entry);
-    for (const child of children) {
-      mapNode(child);
-    }
-    /* La struttura viene costruita dopo i figli:
-     * in questo modo ogni sottoalbero è già disponibile. */
-    entry.structure = node.tag + ">" +
-      children.map(child => map.get(child).structure).join(",");
-    return entry;
-  }
-  for (const child of root.children) {
-    if (child.tag === "header" || child.tag === "footer") continue;
-    mapNode(child);
-  }
-  /* SECONDA FASE:
-   * cerchiamo le ricorsività direttamente sulla mappa. */
-  function findRecurrences(entry) {
-    const children = entry.children;
-    if (children.length < 2) {
-      for (const child of children) {
-        findRecurrences(map.get(child));
-      }
-      return;
-    }
-    const structures = children.map(child =>
-      map.get(child).structure
-    );
-    for (let length = 1; length <= Math.floor(children.length / 2); length++) {
-      for (let start = 0; start + length * 2 <= children.length; start++) {
-        let repeated = true;
-        for (let offset = 0; offset < length; offset++) {
-          if (
-            structures[start + offset] !==
-            structures[start + length + offset]
-          ) {
-            repeated = false;
-            break;
-          }
-        }
-        if (!repeated) continue;
-        let repetitions = 2;
-        while (
-          start + (repetitions + 1) * length <= children.length
-        ) {
-          let same = true;
-          for (let offset = 0; offset < length; offset++) {
-            if (
-              structures[start + offset] !==
-              structures[start + repetitions * length + offset]
-            ) {
-              same = false;
-              break;
-            }
-          }
-          if (!same) break;
-          repetitions++;
-        }
-        if (
-          length === 1 &&
-          repetitions === 2 &&
-          children.length !== 2
-        ) {
-          continue;
-        }
-        const elements = children.slice(
-          start,
-          start + length * repetitions
-        );
-        const recurrence = {
-          node: entry.node,
-          structure: structures
-            .slice(start, start + length)
-            .join(","),
-          elements,
-          terminal: elements.every(element =>
-            map.get(element).children.length === 0
-          )
-        };
-        entry.recursivities.push(recurrence);
-        recursivities.push(recurrence);
-      }
-    }
-    /* Continuiamo comunque a scendere:
-     * una ricorsività può contenerne altre. */
-    for (const child of children) {
-      findRecurrences(map.get(child));
-    }
-  }
-  for (const child of root.children) {
-    if (child.tag === "header" || child.tag === "footer") continue;
-    findRecurrences(map.get(child));
-  }
-  /* Per ora restituiamo tutte le ricorsività individuate
-   * nel formato utilizzato dal resto del crawler.
-   * La scelta dei blocchi viene fatta separatamente. */
-  for (const recurrence of recursivities) {
-    result.push({
-      structure: recurrence.structure,
-      elements: recurrence.elements
-    });
-  }
-  return result;
-}
-
-
-/* VECCHIA ***** 
-function foundRicorsivity(root) {
-  const result = [];
-  const recursivities = [];
   function getChildren(node) {
     return node.children.filter(child =>
       child.tag !== "script" && child.tag !== "style"
     );
   }
+  /* MAPPA DOM: struttura calcolata una sola volta per nodo */
+  function mapNode(node) {
+    const children = getChildren(node);
+    const entry = {node, children, structure: null, recursivities: []};
+    map.set(node, entry);
+    for (const child of children) {mapNode(child);}
+    entry.structure = node.tag + ">" +
+      children.map(child => map.get(child).structure).join(",");
+    return entry;
+  }
+  for (const child of getChildren(root)) {
+    if (child.tag === "header" || child.tag === "footer") {continue;}
+    mapNode(child);
+  }
   function getStructure(node) {
-    return node.tag + ">" + getChildren(node)
-      .map(getStructure)
-      .join(",");
+    return map.get(node)?.structure || node.tag + ">";
   }
   function sameStructureSequence(structures, start, length) {
     for (let offset = 0; offset < length; offset++) {
-      if (
-        structures[start + offset] !==
-        structures[start + length + offset]
-      ) {
-        return false;
-      }
+      if (structures[start + offset] !== structures[start + length + offset]) {return false;}
     }
     return true;
   }
   function findRecurrence(node) {
     const children = getChildren(node);
-    if (children.length < 2) {
-      return null;
-    }
+    if (children.length < 2) {return null;}
     const structures = children.map(getStructure);
     for (let length = 1; length <= Math.floor(children.length / 2); length++) {
       for (let start = 0; start + length * 2 <= children.length; start++) {
-        if (!sameStructureSequence(structures, start, length)) {
-          continue;
-        }
+        if (!sameStructureSequence(structures, start, length)) {continue;}
         let repetitions = 2;
         while (
           start + (repetitions + 1) * length <= children.length &&
-          sameStructureSequence(
-            structures,
-            start,
-            repetitions * length
-          )
-        ) {
-          repetitions++;
-        }
-        // Una semplice coppia dello stesso elemento,
-        // inserita in una struttura più ampia, non è sufficiente
-        // per considerarla una ricorsività. 
-        if (
-          length === 1 &&
-          repetitions === 2 &&
-          children.length !== 2
-        ) {
-          continue;
-        }
-        const elements = children.slice(
-          start,
-          start + length * repetitions
-        );
+          sameStructureSequence(structures, start, repetitions * length)
+        ) {repetitions++;}
+        if (length === 1 && repetitions === 2 && children.length !== 2) {continue;}
+        const elements = children.slice(start, start + length * repetitions);
         return {
           node,
-          structure: structures
-            .slice(start, start + length)
-            .join(","),
+          structure: structures.slice(start, start + length).join(","),
           elements,
-          terminal: elements.every(element =>
-            getChildren(element).length === 0
-          )
+          terminal: elements.every(element => getChildren(element).length === 0)
         };
       }
     }
@@ -490,84 +348,52 @@ function foundRicorsivity(root) {
     const recurrence = findRecurrence(node);
     if (recurrence) {
       recursivities.push(recurrence);
-      // La ricorsività trovata è già una struttura completa.
-      // Non cerchiamo ricorsività sovrapposte al suo interno. 
+      map.get(node).recursivities.push(recurrence);
       return;
     }
-    for (const child of getChildren(node)) {
-      collectRecursivities(child);
-    }
+    for (const child of getChildren(node)) {collectRecursivities(child);}
   }
-  function containsRecurrence(node, target) {
-    for (const recurrence of recursivities) {
-      if (recurrence === target) {
-        continue;
-      }
-      for (const element of recurrence.elements) {
-        let current = element;
-        while (current) {
-          if (current === node) {
-            return true;
-          }
-          current = current.parent;
-        }
-      }
-    }
-    return false;
+  for (const child of getChildren(root)) {
+    if (child.tag === "header" || child.tag === "footer") {continue;}
+    collectRecursivities(child);
   }
+  /* MAPPA DELLE RICORSIVITÀ: ogni nodo conosce quante ricorsività ricadono nel proprio sottoalbero. */
   function countRecursivities(node) {
-    let count = 0;
-    for (const recurrence of recursivities) {
-      for (const element of recurrence.elements) {
-        let current = element;
-        while (current) {
-          if (current === node) {
-            count++;
-            break;
-          }
-          current = current.parent;
-        }
-      }
+    const entry = map.get(node);
+    if (!entry) {return 0;}
+    let count = entry.recursivities.length;
+    for (const child of entry.children) {
+      count += countRecursivities(child);
     }
+    entry.recursivityCount = count;
     return count;
   }
-function findSingleBlock(recurrence) {
-  let current = recurrence.elements[0].parent;
-  while (current && current.tag !== "#root") {
-    const count = countRecursivities(current);
-    if (count === 1) {
-      return current;
-    }
-    current = current.parent;
+  for (const child of getChildren(root)) {
+    if (child.tag === "header" || child.tag === "footer") {continue;}
+    countRecursivities(child);
   }
-  return recurrence.elements[0].parent;
-}
+  function findSingleBlock(recurrence) {
+    let block = recurrence.elements[0].parent;
+    let current = block;
+    while (current && current.tag !== "#root") {
+      const entry = map.get(current);
+      if (!entry || entry.recursivityCount !== 1) {break;}
+      block = current;
+      current = current.parent;
+    }
+    return block;
+  }
   function addRecurrence(recurrence) {
     if (recurrence.terminal) {
       const block = findSingleBlock(recurrence);
-      result.push({
-        structure: recurrence.structure,
-        elements: [block]
-      });
+      result.push({structure: recurrence.structure, elements: [block]});
       return;
     }
-    result.push({
-      structure: recurrence.structure,
-      elements: recurrence.elements
-    });
+    result.push({structure: recurrence.structure, elements: recurrence.elements});
   }
-  for (const child of getChildren(root)) {
-    if (child.tag === "header" || child.tag === "footer") {
-      continue;
-    }
-    collectRecursivities(child);
-  }
-  for (const recurrence of recursivities) {
-    addRecurrence(recurrence);
-  }
+  for (const recurrence of recursivities) {addRecurrence(recurrence);}
   return result;
 }
-*/
 
 async function pageCrawled(href) {
   const { data, error } = await supabase
@@ -687,11 +513,24 @@ for (const group of ricorsivity) {
     if (!futureDate) {continue;}
     const comune = matchComune(block);
     const idComune = comune ? comune.id : null;
+    
     console.log(`[BLOCCO] ${currentUrl}` +
       ` → data=${futureDate.toISOString().slice(0, 10)}` +
       ` | comune=${idComune}` +
       ` | lunghezza=${block.length}`);
+
     try {
+      const duplicate = await sitePageExists(
+        site.id_site,
+        futureDate.toISOString().slice(0, 10),
+        idComune,
+        block
+      );
+      if (duplicate) {
+        console.log(`[DUPLICATO] ${currentUrl} → blocco già presente`);
+        continue;
+      } 
+
       await saveSitePage(
         site.id_site,
         result.url || currentUrl,
@@ -706,6 +545,23 @@ for (const group of ricorsivity) {
     }
   }
 }
+
+    async function sitePageExists(siteId, futureDate, idComune, block) {
+      let query = supabase
+        .from("site_pages")
+        .select("id_site_page")
+        .eq("id_site", siteId)
+        .eq("sp_date", futureDate)
+        .eq("sp_block", block);
+      if (idComune === null) {
+        query = query.is("id_comune", null);
+      } else {
+        query = query.eq("id_comune", idComune);
+      }
+      const {data, error} = await query.limit(1);
+      if (error) {throw error;}
+      return data.length > 0;
+    }
 
     /* CERCA NUOVI LINK DAI GRUPPI RICORSIVI */
     for (const group of ricorsivity) {
