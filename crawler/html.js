@@ -184,16 +184,18 @@ function extractTimes(text) {
 /* PREZZO */
 function extractPrice(text) {
   if (!text) return null;
-  const free =/\b(?:ingresso|entrata|biglietto|partecipazione)?\s*(?:gratuito|gratuita|gratis|free)\b/i;
+  const free = /\b(?:free|gratis|gratuito|gratuita|gratuit|gratuitement|kostenlos|kostenfrei|kostenloser Eintritt|ingresso libero)\b/i;
   if (free.test(text)) {return "gratuito";}
   const patterns = [
-    /\b(?:€|euro)\s*(\d+(?:[,.]\d{1,2})?)\b/i,
-    /\b(\d+(?:[,.]\d{1,2})?)\s*(?:€|euro)\b/i,
-    /\b(?:bigliett[oi]|ingresso|costo|prezzo)[^.;\n]{0,80}?(\d+(?:[,.]\d{1,2})?)\s*(?:€|euro)\b/i
+    /(?:€|EUR|USD|GBP|CHF|JPY|CNY|CAD|AUD)\s*\d[\d.,]*/i,
+    /\d[\d.,]*\s*(?:€|EUR|USD|GBP|CHF|JPY|CNY|CAD|AUD)\b/i
   ];
   for (const re of patterns) {
     const match = text.match(re);
-    if (match) {return clean(match[0]);}
+    if (match) {
+      const amount = match[0].match(/[\d][\d.,]*/)[0];
+      return amount;
+    }
   }
   return null;
 }
@@ -399,6 +401,13 @@ function extractLocation(text) {
     if (!m) continue;
     let value = clean(m[1] || m[0]);
     if (!value) continue;
+    /* RIMUOVE URL E FRAMMENTI EDITORIALI */
+    value = value
+      .replace(/https?:\/\/\S+/gi, "")
+      .replace(/\s+(?:🗓️|📍|🏛️|🏷️|🏢|ℹ️|⚠️).*$/s, "")
+      .replace(/\s+\d{1,2}\s+\w+\s+\d{4}.*$/i, "")
+      .trim();
+    if (!value) continue;
     /* CHIUSURA SEMANTICA DEL LUOGO */
     value = value
       .split(
@@ -443,12 +452,16 @@ function extractTitle(block) {
   for (const value of extractTagText(block, "h2")) {candidates.push(value);}
   for (const value of extractTagText(block, "h3")) {candidates.push(value);}
   for (const value of extractTagText(block, "title")) {candidates.push(value);}
-  for (const candidate of candidates) {const value = clean(decodeHtml(candidate));
+  const genericTitles = /^(programma|eventi?|agenda|calendario|news|notizie|home|homepage|dettagli|scopri di più|leggi tutto|informazioni)$/i;
+  for (const candidate of candidates) {
+    const value = clean(decodeHtml(candidate));
     if (!value) continue;
     const normalized = value
-      .replace(/\s*[|–—-]\s*TP24.*$/i, "")
+      .replace(/\s*[|–—-]\s*[^|–—-]+$/, "")
       .trim();
-    if (normalized.length >= 3 && normalized.length <= 300) {return normalized;}
+    if (normalized.length >= 3 && normalized.length <= 300 && !genericTitles.test(normalized)) {
+      return normalized;
+    }
   }
   return null;
 }
@@ -457,7 +470,7 @@ function extractTitle(block) {
 function extractImage(block, pageUrl) {
   const candidates = [];
   const ogImage = metaContent(block, "og:image");
-  if (ogImage) {candidates.push({url: absoluteUrl(ogImage, pageUrl), score: 100});}
+  if (ogImage) {candidates.push({url: normalizeImageUrl(ogImage, pageUrl), score: 100});}
   const imgRe = /<img\b[^>]*>/gi;
   for (const m of block.matchAll(imgRe)) {const tag = m[0];
     const src =(tag.match(/\b(?:src|data-src|data-lazy-src)\s*=\s*["']([^"']+)/i) || [])[1];
@@ -465,7 +478,7 @@ function extractImage(block, pageUrl) {
     const alt =(tag.match(/\balt\s*=\s*["']([^"']*)/i) || [])[1] || "";
     const candidate = src || srcset;
     if (!candidate) continue;
-    const url = absoluteUrl(candidate.split(",")[0].trim().split(/\s+/)[0], pageUrl);
+    const url = normalizeImageUrl(candidate.split(",")[0].trim().split(/\s+/)[0], pageUrl);
     if (!url) continue;
     const lower = url.toLowerCase();
     /* Scartiamo immagini chiaramente generiche. */
@@ -478,6 +491,25 @@ function extractImage(block, pageUrl) {
   }
   candidates.sort((a, b) => b.score - a.score);
   return candidates.length ? candidates[0].url : null;
+}
+
+/* URL IMMAGINE */
+function normalizeImageUrl(value, pageUrl) {
+  if (!value) return null;
+  let url = absoluteUrl(value.trim(), pageUrl);
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/_next/image") {
+      const original = parsed.searchParams.get("url");
+      if (original) {
+        url = new URL(original, parsed.origin).href;
+      }
+    }
+  } catch (error) {
+    return url;
+  }
+  return url;
 }
 
 /* DESCRIPTION */
@@ -537,9 +569,9 @@ function analyzeSignals(page, categoryDictionary) {
 function toSchemaEvent(page, s) {
   const startDate = s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
   const location = s.location || s.city ? {
-      "@type": "Place", name: s.location || s.city?.co_descrizione, ...(s.city ? {
-      address: {"@type": "PostalAddress", addressLocality: s.city.co_descrizione, ...(s.city.co_cap ? {
-      postalCode: String(s.city.co_cap)} : {})}} : {})} : null;  
+    "@type": "Place", name: s.location || s.city?.co_descrizione, ...(s.city && !s.location ? {
+    address: {"@type": "PostalAddress", addressLocality: s.city.co_descrizione, ...(s.city.co_cap ? {
+    postalCode: String(s.city.co_cap)} : {})}} : {})} : null;
   const organizer = s.organizer
     ? {"@type": "Organization", name: s.organizer} : null;
   const creators = s.creators.length
