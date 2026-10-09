@@ -1,6 +1,3 @@
-/* DIZIONARI — CARICAMENTO DB */
-import { supabase } from "./supabase_node.js";
-
 /* categorie */
 let CATEGORY_DICTIONARY = null;
 async function loadCategoryDictionary() {
