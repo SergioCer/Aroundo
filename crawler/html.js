@@ -49,15 +49,10 @@ async function loadCategoryDictionary() {
 /* ======================================================
 AROUNDO - HTML EVENT EXTRACTOR - LOGICA
 EVENTO COMPLETO: TITOLO + DATA + LUOGO
-INCOMPLETO: almeno 2 fondamentali tra: TITOLO / DATA / LUOGO + almeno 2 rafforzativi forti tra:
-        ORA; PREZZO / GRATUITO; ORGANIZZATORE; CREATOR / PERFORMER; CATEGORIA
+INCOMPLETO: almeno 2 fondamentali tra: TITOLO / DATA / LUOGO + almeno 2 rafforzativi forti tra: ORA; PREZZO / GRATUITO; ORGANIZZATORE; CREATOR / PERFORMER; CATEGORIA
 IMG e URL NON sono rafforzativi forti.
 La pagina viene analizzata come struttura HTML.
 I segnali possono trovarsi in nodi diversi ma devono appartenere allo stesso contenitore semantico.
-Quando un contenitore viene riconosciuto:
-    1. viene estratto
-    2. viene consumato
-    3. non viene più analizzato
 Schema.org è OUTPUT, non criterio di riconoscimento. */
 
 /* UTILITA' */
@@ -514,7 +509,7 @@ function analyzeSignals(page, categoryDictionary) {
   const location = extractLocation(text);
   const image = extractImage(block, page.sp_url);
   const date = page.sp_date || null;
-  const city = page.id_comune || null;
+  const city = page.comuni || null;
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
@@ -536,44 +531,30 @@ function analyzeSignals(page, categoryDictionary) {
   /* EVENTO COMPLETO: 3 fondamentali + almeno 2 rafforzativi */
   if (fundamentalCount === 3 && reinforcementCount >= 2) {classification = "evento";}
   /* EVENTO INCOMPLETO: 3 fondamentali senza almeno 2 rafforzativi */
-  else if (fundamentalCount === 3) {classification = "incompleto";}
+  else if (fundamentalCount >= 2 && reinforcementCount >= 2) {classification = "incompleto";}
   return {text, title, date, times, price, organizer, creators, category,
     location, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
 }
 
 /* CONVERSIONE SCHEMA.ORG */
 function toSchemaEvent(page, s) {
-  const startDate = s.date
-    ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`
-    : null;
-  const location = s.location
-    ? {"@type": "Place", name: s.location}
-    : s.city
-      ? {"@type": "Place", name: String(s.city)}
-      : null;
+  const startDate = s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
+  const location = s.location || s.city ? {
+      "@type": "Place", name: s.location || s.city?.co_descrizione, ...(s.city ? {
+      address: {"@type": "PostalAddress", addressLocality: s.city.co_descrizione, ...(s.city.co_cap ? {
+      postalCode: String(s.city.co_cap)} : {})}} : {})} : null;  
   const organizer = s.organizer
-    ? {"@type": "Organization", name: s.organizer}
-    : null;
+    ? {"@type": "Organization", name: s.organizer} : null;
   const creators = s.creators.length
-    ? s.creators.map(name => ({"@type": "Person", name}))
-    : null;
+    ? s.creators.map(name => ({"@type": "Person", name})) : null;
   const offers = s.price
-    ? {"@type": "Offer", price: s.price === "gratuito" ? "0" : s.price}
-    : null;
-  return {
-    "@context": "https://schema.org",
-    "@type": "Event",
-    name: s.title,
+    ? {"@type": "Offer", price: s.price === "gratuito" ? "0" : s.price} : null;
+  return {"@context": "https://schema.org", "@type": "Event", name: s.title,
     description: extractDescription(s.text, s.title),
-    image: s.image,
-    url: page.sp_url,
-    startDate,
-    location,
-    organizer,
-    performer: creators,
-    creator: creators,
-    offers,
-    inLanguage: "it",
+    image: s.image, url: page.sp_url,
+    startDate, location, organizer,
+    performer: creators, creator: creators,
+    offers, inLanguage: "it",
     data: {
       sourceUrl: page.sp_url,
       id_site_page: page.id_site_page,
@@ -598,35 +579,6 @@ function toSchemaEvent(page, s) {
       times: s.times.map(x => x.value)
     }
   };
-}
-
-/* DEDUPLICAZIONE */
-function eventKey(event) {
-  const d = event.data || {};
-  return [
-    event.name || "",
-    event.startDate || "",
-    event.location?.name || "",
-    d.city?.id || ""
-  ]
-    .join("|")
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-}
-
-function uniqueEvents(events) {
-  const map = new Map();
-  for (const event of events) {
-    const key = eventKey(event);
-    if (!key.replace(/\|/g, "")) {continue;}
-    const previous = map.get(key);
-    if (!previous) {map.set(key, event); continue;}
-    /* Se abbiamo due rappresentazioni dello stesso evento, conserviamo quella con più segnali. */
-    const currentSignals = event.data?.signals?.length || 0;
-    const previousSignals = previous.data?.signals?.length || 0;
-    if (currentSignals > previousSignals) {map.set(key, event);}
-  }
-  return [...map.values()];
 }
 
 async function processSitePage(page, categoryDictionary) {
@@ -676,14 +628,24 @@ async function processSitePage(page, categoryDictionary) {
 
 async function main() {
   const categoryDictionary = await loadCategoryDictionary();
-  const { data: pages, error } = await supabase
+const pages = [];
+const batchSize = 500;
+let from = 0;
+while (true) {
+  const { data, error } = await supabase
     .from("site_pages")
-    .select("id_site_page, sp_url, sp_date, id_comune, sp_block")
-    .not("sp_block", "is", null);
+    .select(`id_site_page, sp_url, sp_date, id_comune, sp_block, comuni (co_descrizione, co_cap)`)
+    .not("sp_block", "is", null)
+    .order("id_site_page", { ascending: true })
+    .range(from, from + batchSize - 1);
   if (error) {
     console.error("[HTML] Errore caricamento pagine:", error);
     return;
   }
+  pages.push(...(data || []));
+  if (!data || data.length < batchSize) break;
+  from += batchSize;
+}
   for (const page of pages || []) {
     try {
       await processSitePage(page, categoryDictionary);
