@@ -1,6 +1,6 @@
 /* categorie */
 let CATEGORY_DICTIONARY = null;
-async function loadCategoryDictionary() {
+async function loadCategoryDictionary(supabase) {
   if (CATEGORY_DICTIONARY) {return CATEGORY_DICTIONARY;}
    const { data, error } = await supabase
     .from("categorie")
@@ -578,7 +578,7 @@ function toSchemaEvent(page, s) {
   };
 }
 
-async function processSitePage(page, categoryDictionary) {
+async function processSitePage(page, categoryDictionary, supabase) {
   const signals = analyzeSignals(page, categoryDictionary);
   if (!signals) {
     console.log(`[HTML] Blocco vuoto: ${page.id_site_page}`);
@@ -623,8 +623,8 @@ async function processSitePage(page, categoryDictionary) {
   console.log(`[HTML] Evento salvato: ${page.id_site_page} (${signals.classification})`);
 }
 
-async function main() {
-  const categoryDictionary = await loadCategoryDictionary();
+export async function runAnalysis(supabase) {
+const categoryDictionary = await loadCategoryDictionary(supabase);
 const pages = [];
 const batchSize = 500;
 let from = 0;
@@ -645,7 +645,7 @@ while (true) {
 }
   for (const page of pages || []) {
     try {
-      await processSitePage(page, categoryDictionary);
+      await processSitePage(page, categoryDictionary, supabase);
     } catch (error) {
       console.error(`[HTML] Errore pagina ${page.id_site_page}:`, error);
     }
