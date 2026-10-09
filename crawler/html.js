@@ -655,4 +655,3 @@ while (true) {
   }
   console.log("[HTML] Analisi completata.");
 }
-main().catch(error => console.error("[HTML] Errore:", error));
