@@ -205,54 +205,37 @@ body{
   font-weight:normal
 }
 </style>
-
 </head>
-
 <body>
-
 <div class="top">
-
   <h1>Aroundo — Eventi acquisiti</h1>
-
   <div class="status" id="status">
     Caricamento dati...
   </div>
-
 </div>
-
-
 <div class="wrap">
-
   <div class="section">
-
     <h2>Eventi</h2>
-
+      <button id="analyzeBtn" class="schema-button">AVVIA ANALISI HTML</button>
+      <span id="analysisStatus" style="margin-left:12px"></span>
+   
     <div id="results">
       <div class="empty">
         Caricamento degli eventi da Supabase...
       </div>
     </div>
-
   </div>
-
 </div>
 
-
 <script type="module">
-
 import { supabase } from "../supabase.js";
+import { runAnalysis } from "../html.js";
 
-
-/* ---------------------------------------------------------
-   UTILITÀ
---------------------------------------------------------- */
-
+/* UTILITÀ */
 function escapeHtml(value){
-
   if(value === null || value === undefined){
     return "";
   }
-
   return String(value)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
@@ -261,42 +244,30 @@ function escapeHtml(value){
     .replace(/'/g,"&#039;");
 }
 
-
 function value(v){
-
   if(v === null || v === undefined){
     return "";
   }
-
   if(typeof v === "string"){
     return v.trim();
   }
-
   if(typeof v === "object"){
-
     if(v.name){
       return value(v.name);
     }
-
     if(v["@value"]){
       return value(v["@value"]);
     }
-
     return JSON.stringify(v);
   }
-
   return String(v);
 }
 
-
 function formatDate(value){
-
   if(!value){
     return "";
   }
-
   try{
-
     return new Date(value).toLocaleString(
       "it-IT",
       {
@@ -304,72 +275,48 @@ function formatDate(value){
         timeStyle:"short"
       }
     );
-
   }catch(e){
-
     return value;
   }
 }
 
-
 function eventLocation(event){
-
   const location = event.location;
-
   if(!location){
     return "";
   }
-
   if(typeof location === "string"){
     return location;
   }
-
   const parts = [];
-
   if(location.name){
     parts.push(value(location.name));
   }
-
   const address = location.address;
-
   if(address){
-
     if(typeof address === "string"){
-
       parts.push(address);
-
     }else{
-
       if(address.streetAddress){
         parts.push(value(address.streetAddress));
       }
-
       if(address.addressLocality){
         parts.push(
           value(address.addressLocality)
         );
       }
-
       if(address.addressRegion){
         parts.push(
           value(address.addressRegion)
         );
       }
-
     }
-
   }
-
   return parts.join(", ");
 }
 
-
-/* ---------------------------------------------------------
-   SCHEMA.ORG
---------------------------------------------------------- */
-
+/* SCHEMA.ORG */
 const schemaFields = [
-
   "@context",
   "@type",
   "name",
@@ -389,12 +336,10 @@ const schemaFields = [
   "duration",
   "eventSchedule",
   "sameAs"
-
 ];
 
 
 function formatSchemaValue(value){
-
   if(
     value === null ||
     value === undefined ||
@@ -402,7 +347,6 @@ function formatSchemaValue(value){
   ){
     return "";
   }
-
   if(typeof value === "object"){
     return JSON.stringify(
       value,
@@ -410,88 +354,62 @@ function formatSchemaValue(value){
       2
     );
   }
-
   return String(value);
 }
-
 function displaySchemaValue(v){
-
   if(v === null || v === undefined){
     return "";
   }
-
   if(Array.isArray(v)){
     return v
       .map(item => displaySchemaValue(item))
       .filter(Boolean)
       .join(", ");
   }
-
   if(typeof v === "object"){
-
     if(v.name){
       return displaySchemaValue(v.name);
     }
-
     if(v["@value"]){
       return displaySchemaValue(v["@value"]);
     }
-
     if(v.price !== undefined){
-
       const currency =
         v.priceCurrency
           ? ` ${v.priceCurrency}`
           : "";
-
       return `${v.price}${currency}`;
     }
-
     return JSON.stringify(v);
   }
-
   return String(v);
 }
 
 function schemaDetails(event,id){
-
   const fields = [...schemaFields];
-
   Object.keys(event).forEach(key => {
-
     if(!fields.includes(key)){
       fields.push(key);
     }
-
   });
-
-
   return `
-
     <div
       id="${id}"
       class="schema-details"
     >
-
       ${fields.map(field => {
-
         const exists =
           event[field] !== undefined &&
           event[field] !== null &&
           event[field] !== "";
-
         return `
-
           <div class="schema-field">
-
             <div class="schema-name">
               ${escapeHtml(field)}
             </div>
-
             <div class="schema-value ${
               exists ? "" : "schema-missing"
             }">
-
               ${
                 exists
                   ? escapeHtml(
@@ -501,198 +419,136 @@ function schemaDetails(event,id){
                     )
                   : "non presente"
               }
-
             </div>
-
           </div>
-
         `;
-
       }).join("")}
-
     </div>
-
   `;
-
 }
 
-
-/* ---------------------------------------------------------
-   SCHEDA EVENTO
---------------------------------------------------------- */
-
+/* SCHEDA EVENTO */
 function eventCard(row,index){
-
   const event =
     row.se_schema || {};
-
   const title =
     value(event.name) ||
     value(event.title) ||
     "Evento senza titolo";
-
   const description =
     value(event.description);
-
   const startDate =
     value(event.startDate);
-
   const endDate =
     value(event.endDate);
-
   const location =
     eventLocation(event);
-
   const organizer =
     value(event.organizer);
-
   const offers =
     displaySchemaValue(event.offers);
-
   const performer =
     displaySchemaValue(event.performer);
-
   const category =
     displaySchemaValue(event.category);
-
   const creator =
     displaySchemaValue(event.creator);
-
   const image =
     value(event.image);
-
   const sourceUrl =
     row.site_pages &&
     row.site_pages.sp_url
       ? row.site_pages.sp_url
       : value(event.url);
-
   const schemaId =
     `schema-${row.id_site_event || index}`;
-
-
   return `
-
     <article class="event">
-
       ${
         image
           ? `
             <div class="event-image">
-
               <img
                 src="${escapeHtml(image)}"
                 alt="${escapeHtml(title)}"
                 loading="lazy"
               >
-
             </div>
           `
           : ""
       }
-
-
       <div class="event-body">
-
         <h3>
-
           ${escapeHtml(title)}
-
           <span class="record-id">
             #${escapeHtml(row.id_site_event)}
           </span>
-
         </h3>
-
-
         ${
           startDate
             ? `
               <div class="field">
-
                 <span class="label">
                   Data:
                 </span>
-
                 ${escapeHtml(
                   formatDate(startDate)
                 )}
-
               </div>
             `
             : ""
         }
-
-
         ${
           endDate
             ? `
               <div class="field">
-
                 <span class="label">
                   Fine:
                 </span>
-
                 ${escapeHtml(
                   formatDate(endDate)
                 )}
-
               </div>
             `
             : ""
         }
-
-
         ${
           location
             ? `
               <div class="field">
-
                 <span class="label">
                   Luogo:
                 </span>
-
                 ${escapeHtml(location)}
-
               </div>
             `
             : ""
         }
-
-
         ${
           organizer
             ? `
               <div class="field">
-
                 <span class="label">
                   Organizzatore:
                 </span>
-
                 ${escapeHtml(organizer)}
-
               </div>
             `
             : ""
         }
-
         ${
           performer
             ? `
               <div class="field">
-
                 <span class="label">
                   Performer:
                 </span>
-
                 ${escapeHtml(performer)}
 
               </div>
             `
             : ""
         }   
-
-
         ${
         offers
           ? `
@@ -703,7 +559,6 @@ function eventCard(row,index){
           `
           : ""
       }
-
         ${
           category
             ? `
@@ -714,7 +569,6 @@ function eventCard(row,index){
             `
             : ""
         }
-
         ${  
           creator
             ? `
@@ -725,30 +579,22 @@ function eventCard(row,index){
             `
             : ""
         }
-
-
         ${
           description
             ? `
               <div class="event-description">
-
                 ${escapeHtml(description)}
-
               </div>
             `
             : ""
         }
-
-
         ${
           sourceUrl
             ? `
               <div class="source">
-
                 <span class="label">
                   Fonte:
                 </span>
-
                 <a
                   href="${escapeHtml(sourceUrl)}"
                   target="_blank"
@@ -756,88 +602,51 @@ function eventCard(row,index){
                 >
                   ${escapeHtml(sourceUrl)}
                 </a>
-
               </div>
             `
             : ""
         }
-
-
         <div class="timestamp">
-
           Acquisito:
           ${escapeHtml(
             formatDate(row.se_extracted)
           )}
-
         </div>
-
-
         <button
           class="schema-button"
           onclick="toggleSchema('${schemaId}')"
         >
           SCHEMA.ORG
         </button>
-
-
         ${schemaDetails(event,schemaId)}
-
       </div>
-
     </article>
-
   `;
-
 }
 
-
-/* ---------------------------------------------------------
-   APERTURA / CHIUSURA SCHEMA
---------------------------------------------------------- */
-
+/* APERTURA / CHIUSURA SCHEMA */
 window.toggleSchema = function(id){
-
   const element =
     document.getElementById(id);
-
   if(!element){
     return;
   }
-
   element.classList.toggle("open");
-
 };
 
-
-/* ---------------------------------------------------------
-   LETTURA SUPABASE
---------------------------------------------------------- */
-
+/* LETTURA SUPABASE */
 async function loadEvents(){
-
   const status =
     document.getElementById("status");
-
   const results =
     document.getElementById("results");
-
-
   try{
-
-    /*
-     * site_events
-     *
+    /* site_events
      * site_pages viene utilizzata solamente
-     * per recuperare l'URL della pagina origine.
-     */
-
+     * per recuperare l'URL della pagina origine. */
     const { data, error } =
-
       await supabase
-
         .from("site_events")
-
         .select(`
           id_site_event,
           id_site_page,
@@ -848,99 +657,74 @@ async function loadEvents(){
             sp_url
           )
         `)
-
         .order(
           "id_site_event",
           {
             ascending:false
           }
         );
-
-
     if(error){
       throw error;
     }
-
-
     if(!data || data.length === 0){
-
       status.textContent =
         "Nessun evento presente in site_events.";
-
       results.innerHTML = `
-
         <div class="empty">
-
           La tabella site_events
           non contiene ancora eventi.
-
         </div>
-
       `;
-
       return;
     }
-
-
     status.textContent =
       `${data.length} eventi acquisiti`;
-
-
     results.innerHTML = `
-
       <div class="events-grid">
-
         ${data.map(
           (row,index) =>
             eventCard(row,index)
         ).join("")}
-
       </div>
-
     `;
-
-
   }catch(error){
-
     console.error(
       "Errore lettura site_events:",
       error
     );
-
-
     status.textContent =
       "Errore durante il caricamento.";
-
-
     results.innerHTML = `
-
       <div class="error">
-
         <strong>
           Errore lettura Supabase
         </strong>
-
         <br><br>
-
         ${escapeHtml(error.message)}
-
       </div>
-
     `;
-
   }
-
 }
 
-
-/* ---------------------------------------------------------
-   AVVIO
---------------------------------------------------------- */
+/* AVVIO */
+document.getElementById("analyzeBtn").addEventListener("click", async () => {
+  const button = document.getElementById("analyzeBtn");
+  const status = document.getElementById("analysisStatus");
+  button.disabled = true;
+  status.textContent = "Analisi in corso...";
+  try {
+    await runAnalysis(supabase);
+    status.textContent = "Analisi completata.";
+    await loadEvents();
+  } catch (error) {
+    console.error("[HTML] Errore analisi:", error);
+    status.textContent = `Errore: ${error.message}`;
+  } finally {
+    button.disabled = false;
+  }
+});
 
 loadEvents();
-
 </script>
-
 </body>
-
 </html>
