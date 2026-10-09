@@ -501,7 +501,7 @@ function extractDescription(text, title) {
 }
 
 /* SEGNALI */
-function analyzeSignals(block, categoryDictionary) {
+function analyzeSignals(page, categoryDictionary) {
   const block = page.sp_block;
   const text = stripHtml(block);
   if (!text) return null;
@@ -542,42 +542,60 @@ function analyzeSignals(block, categoryDictionary) {
 }
 
 /* CONVERSIONE SCHEMA.ORG */
-function toSchemaEvent(candidate, url) {
-  const s = candidate.signals;
-  const startDate =s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
-  let endDate = null;
-  if (s.dates.length > 1 && s.dates[s.dates.length - 1].date) {
-    const last = s.dates[s.dates.length - 1].date;
-    endDate = `${last}${s.times[0] ? "T" + s.times[0].value : ""}`;}
-  const location = s.location || s.city ? {"@type": "Place", name: s.location || s.city?.descrizione, ...(s.city ? {
-         address: {"@type": "PostalAddress", addressLocality: s.city.descrizione, ...(s.city.cap ? {postalCode: String(s.city.cap)}: {})}}: {})}
+function toSchemaEvent(page, s) {
+  const startDate = s.date
+    ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`
     : null;
-  const organizer = s.organizer ? {"@type": "Organization", name: s.organizer}
+  const location = s.location
+    ? {"@type": "Place", name: s.location}
+    : s.city
+      ? {"@type": "Place", name: String(s.city)}
       : null;
-  const creators = s.creators.length ? s.creators.map(name => ({"@type": "Person", name}))
-      : null;
-  const offers = s.price ? {"@type": "Offer", price: s.price === "gratuito" ? "0" : s.price}
-      : null;
-  return {"@type": "Event", name: s.title, description: extractDescription(s.text, s.title),
-    image: s.image, url, startDate, endDate, eventStatus: null, eventAttendanceMode: null, location, organizer,
-    performer: creators, offers, audience: null, inLanguage: "it", duration: null, eventSchedule: null, sameAs: null,
-    creator: creators, "@context": "https://schema.org", type: "HTML",
-    data: {sourceUrl: url, 
-      container: candidate.node.tag,
+  const organizer = s.organizer
+    ? {"@type": "Organization", name: s.organizer}
+    : null;
+  const creators = s.creators.length
+    ? s.creators.map(name => ({"@type": "Person", name}))
+    : null;
+  const offers = s.price
+    ? {"@type": "Offer", price: s.price === "gratuito" ? "0" : s.price}
+    : null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: s.title,
+    description: extractDescription(s.text, s.title),
+    image: s.image,
+    url: page.sp_url,
+    startDate,
+    location,
+    organizer,
+    performer: creators,
+    creator: creators,
+    offers,
+    inLanguage: "it",
+    data: {
+      sourceUrl: page.sp_url,
+      id_site_page: page.id_site_page,
       classification: s.classification,
       fundamentals: s.fundamentals,
       reinforcements: s.reinforcements,
-      signals: [ ...Object.entries(s.fundamentals) .filter(([, value]) => value) .map(([key]) => key),
-        ...Object.entries(s.reinforcements) .filter(([, value]) => value) .map(([key]) => key)],
+      signals: [
+        ...Object.entries(s.fundamentals)
+          .filter(([, value]) => value)
+          .map(([key]) => key),
+        ...Object.entries(s.reinforcements)
+          .filter(([, value]) => value)
+          .map(([key]) => key)
+      ],
       text: s.text,
       price: s.price,
       category: s.category,
       creators: s.creators,
       organizer: s.organizer,
-      city: s.city,
-      times: s.times.map(x => x.value),
-      dates: s.dates,
-      consumedRange: {start: candidate.node.start, end: candidate.node.end}
+      id_comune: page.id_comune,
+      date: s.date,
+      times: s.times.map(x => x.value)
     }
   };
 }
@@ -612,11 +630,67 @@ function uniqueEvents(events) {
 }
 
 async function processSitePage(page, categoryDictionary) {
-const signals = analyzeSignals(page, categoryDictionary);
+  const signals = analyzeSignals(page, categoryDictionary);
   if (!signals) {
     console.log(`[HTML] Blocco vuoto: ${page.id_site_page}`);
     return;
   }
-  // Il resto verrà completato adattando analyzeSignals()
-  // e toSchemaEvent() ai dati già presenti in site_pages.
+  if (signals.classification === "non-evento") {
+    console.log(`[HTML] Non è un evento: ${page.id_site_page}`);
+    return;
+  }
+  const schema = toSchemaEvent(page, signals);
+  const { data: existing, error: findError } = await supabase
+    .from("site_events")
+    .select("id_site_event")
+    .eq("id_site_page", page.id_site_page)
+    .limit(1)
+    .maybeSingle();
+  if (findError) {
+    console.error(`[HTML] Errore ricerca evento ${page.id_site_page}:`, findError);
+    return;
+  }
+  let result;
+  if (existing) {
+    result = await supabase
+      .from("site_events")
+      .update({
+        se_schema: schema,
+        se_extracted: new Date().toISOString()
+      })
+      .eq("id_site_event", existing.id_site_event);
+  } else {
+    result = await supabase
+      .from("site_events")
+      .insert({
+        id_site_page: page.id_site_page,
+        se_schema: schema
+      });
+  }
+  if (result.error) {
+    console.error(`[HTML] Errore salvataggio evento ${page.id_site_page}:`, result.error);
+    return;
+  }
+  console.log(`[HTML] Evento salvato: ${page.id_site_page} (${signals.classification})`);
 }
+
+async function main() {
+  const categoryDictionary = await loadCategoryDictionary();
+  const { data: pages, error } = await supabase
+    .from("site_pages")
+    .select("id_site_page, sp_url, sp_date, id_comune, sp_block")
+    .not("sp_block", "is", null);
+  if (error) {
+    console.error("[HTML] Errore caricamento pagine:", error);
+    return;
+  }
+  for (const page of pages || []) {
+    try {
+      await processSitePage(page, categoryDictionary);
+    } catch (error) {
+      console.error(`[HTML] Errore pagina ${page.id_site_page}:`, error);
+    }
+  }
+  console.log("[HTML] Analisi completata.");
+}
+main().catch(error => console.error("[HTML] Errore:", error));
