@@ -371,7 +371,7 @@ function eventCard(row,index){
   const description = value(event.description);
   const startDate = value(event.startDate);
   const endDate = value(event.endDate);
-  const comune = value(event.location?.address?.addressLocality);
+  const comune = value(event.site_pages?.comuni?.co_descrizione);
   const location = eventLocation(event);
   const organizer = value(event.organizer);
   const offers = displaySchemaValue(event.offers);
@@ -383,7 +383,7 @@ function eventCard(row,index){
   const schemaId = `schema-${row.id_site_event || index}`;
   return `<article class="event">
       ${image ? `<div class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>`: ""}
-      <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
+        <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
       ${startDate ? `<div class="field"><span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">
         Ora:</span> ${escapeHtml(formatDate(startDate).time)}`: ""}</div>`: ""}
       ${endDate? `<div class="field"><span class="label">Fine:</span>${escapeHtml(formatDate(endDate))}</div>`: ""}
@@ -394,49 +394,11 @@ function eventCard(row,index){
       ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
       ${category ? `<div class="field"><span class="label">Categoria:</span>${escapeHtml(category)}</div>`: ""}
       ${creator ? `<div class="field"><span class="label">Creator:</span>${escapeHtml(creator)}</div>`: ""}
-      ${
-          description
-            ? `
-              <div class="event-description">
-                ${escapeHtml(description)}
-              </div>
-            `
-            : ""
-        }
-        ${
-          sourceUrl
-            ? `
-              <div class="source">
-                <span class="label">
-                  Fonte:
-                </span>
-                <a
-                  href="${escapeHtml(sourceUrl)}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  ${escapeHtml(sourceUrl)}
-                </a>
-              </div>
-            `
-            : ""
-        }
-        <div class="timestamp">
-          Acquisito:
-          ${escapeHtml(
-            formatDate(row.se_extracted)
-          )}
-        </div>
-        <button
-          class="schema-button"
-          onclick="toggleSchema('${schemaId}')"
-        >
-          SCHEMA.ORG
-        </button>
-        ${schemaDetails(event,schemaId)}
-      </div>
-    </article>
-  `;
+      ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
+      ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
+      ${escapeHtml(sourceUrl)}</a></div>`: ""}<div class="timestamp">Acquisito:
+      ${escapeHtml(formatDate(row.se_extracted))}</div><button class="schema-button" onclick="toggleSchema('${schemaId}')">SCHEMA.ORG</button>
+      ${schemaDetails(event,schemaId)}</div></article>`;
 }
 
 /* APERTURA / CHIUSURA SCHEMA */
@@ -526,7 +488,7 @@ async function loadEvents(){
     const { data, error } =
       await supabase
         .from("site_events")
-        .select(`id_site_event, id_site_page, id_evento, se_schema, se_extracted, site_pages (sp_url)`)
+        .select(`id_site_event, id_site_page, id_evento, se_schema, se_extracted, site_pages (sp_url, id_comune, comuni (co_descrizione))`)
         .order("id_site_event",{ascending:false});
     if(error){throw error;}
     if(!data || data.length === 0){
