@@ -583,6 +583,7 @@ function toSchemaEvent(page, s) {
         ? {"@type": "Offer", description: "Definire"}
         : {"@type": "Offer", price: s.price}
     : null;
+  const categoryData = s.category || {};
   return {"@context": "https://schema.org", "@type": "Event", name: s.title,
     description: extractDescription(s.text, s.title),
     image: s.image, url: page.sp_url,
@@ -605,15 +606,15 @@ function toSchemaEvent(page, s) {
       ],
       text: s.text,
       price: s.price,
-      category: s.category,
-      categorySlug: s.categorySlug ?? null,
-      macroMatches: s.macroMatches ?? [],
-      subMatches: s.subMatches ?? [],
-      excludedMatches: s.excludedMatches ?? [],
-      macroCount: s.macroCount ?? 0,
-      subCount: s.subCount ?? 0,
-      strength: s.strength ?? null,
-      excluded: s.excluded ?? false,
+      category: categoryData.category ?? null,
+      categorySlug: categoryData.categorySlug ?? null,
+      macroMatches: categoryData.macroMatches ?? [],
+      subMatches: categoryData.subMatches ?? [],
+      excludedMatches: categoryData.excludedMatches ?? [],
+      macroCount: categoryData.macroCount ?? 0,
+      subCount: categoryData.subCount ?? 0,
+      strength: categoryData.strength ?? null,
+      excluded: categoryData.excluded ?? false,
       creators: s.creators,
       organizer: s.organizer,
       id_comune: page.id_comune,
