@@ -560,7 +560,7 @@ function analyzeSignals(page, categoryDictionary) {
   /* EVENTO COMPLETO: 3 fondamentali + almeno 2 rafforzativi */
   if (fundamentalCount === 3 && reinforcementCount >= 2) {classification = "evento";}
   /* EVENTO INCOMPLETO: 3 fondamentali senza almeno 2 rafforzativi */
-  else if (fundamentalCount >= 2 && reinforcementCount >= 2) {classification = "incompleto";}
+  else if (fundamentalCount >= 2 && reinforcementCount >= 1) {classification = "incompleto";}
   return {text, title, date, times, price, organizer, creators, category,
     location, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
 }
@@ -606,6 +606,14 @@ function toSchemaEvent(page, s) {
       text: s.text,
       price: s.price,
       category: s.category,
+      categorySlug: s.categorySlug ?? null,
+      macroMatches: s.macroMatches ?? [],
+      subMatches: s.subMatches ?? [],
+      excludedMatches: s.excludedMatches ?? [],
+      macroCount: s.macroCount ?? 0,
+      subCount: s.subCount ?? 0,
+      strength: s.strength ?? null,
+      excluded: s.excluded ?? false,
       creators: s.creators,
       organizer: s.organizer,
       id_comune: page.id_comune,
