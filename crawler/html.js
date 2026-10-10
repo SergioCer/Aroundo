@@ -568,8 +568,8 @@ function analyzeSignals(page, categoryDictionary) {
 /* CONVERSIONE SCHEMA.ORG */
 function toSchemaEvent(page, s) {
   const startDate = s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
-  const location = s.location ? {"@type": "Place", 
-    name: s.location, ...(s.city ? {
+  const location = s.location || s.city ? {
+    "@type": "Place", ...(s.location ? {name: s.location} : {}), ...(s.city ? {
     address: {"@type": "PostalAddress", addressLocality: s.city.co_descrizione, ...(s.city.co_cap ? {
     postalCode: String(s.city.co_cap)} : {})}} : {})} : null;
   const organizer = s.organizer
