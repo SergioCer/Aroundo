@@ -513,12 +513,10 @@ for (const group of ricorsivity) {
     if (!futureDate) {continue;}
     const comune = matchComune(block);
     const idComune = comune ? comune.id : null;
-    
     console.log(`[BLOCCO] ${currentUrl}` +
       ` → data=${futureDate.toISOString().slice(0, 10)}` +
       ` | comune=${idComune}` +
       ` | lunghezza=${block.length}`);
-
     try {
       const duplicate = await sitePageExists(
         site.id_site,
