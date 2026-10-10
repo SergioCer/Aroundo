@@ -515,19 +515,58 @@ let loadedEvents = [];
 let sortBy = "id";
 let sortAscending = false;
 
+
+/* ORDINAMENTO EVENTI */
 function sortEvents() {
-  const getDate = (row) => {const schema = row.se_schema || {};
-    return schema.startDate || schema.data?.date || "";};
-  const getPlace = (row) => {const schema = row.se_schema || {};
-    return schema.location?.address?.addressLocality || "";};
-  loadedEvents.sort((a, b) => {let result = 0;
-    if (sortBy === "date-place") {result = String(getDate(a)).localeCompare(String(getDate(b)), "it", { numeric: true });
-      if (result === 0) {result = String(getPlace(a)).localeCompare(String(getPlace(b)), "it", { numeric: true, sensitivity: "base" });}
-    } else if (sortBy === "place-date") {result = String(getPlace(a)).localeCompare(String(getPlace(b)), "it", { numeric: true, sensitivity: "base" });
-      if (result === 0) {result = String(getDate(a)).localeCompare(String(getDate(b)), "it", { numeric: true });}
-    } else {result = Number(a.id_site_event) - Number(b.id_site_event);}
-    return sortAscending ? result : -result;});
-  document.getElementById("results").innerHTML = ` <div class="events-grid">${loadedEvents.map((row, index) => eventCard(row, index)).join("")}</div>`;
+  const getDate = (row) => {
+    const schema = row.se_schema || {};
+    return schema.startDate || schema.data?.date || "";
+  };
+  const getPlace = (row) => {
+    const schema = row.se_schema || {};
+    return schema.location?.address?.addressLocality || "";
+  };
+  loadedEvents.sort((a, b) => {
+    const dateA = getDate(a);
+    const dateB = getDate(b);
+    const placeA = getPlace(a);
+    const placeB = getPlace(b);
+    let result = 0;
+    const compareDate = () => {
+      if (!dateA && !dateB) return 0;
+      if (!dateA) return 1;
+      if (!dateB) return -1;
+      return String(dateA).localeCompare(String(dateB));
+    };
+    const comparePlace = () => {
+      if (!placeA && !placeB) return 0;
+      if (!placeA) return 1;
+      if (!placeB) return -1;
+      return String(placeA).localeCompare(
+        String(placeB), "it",
+        { numeric: true, sensitivity: "base" }
+      );
+    };
+    if (sortBy === "date") {
+      result = compareDate();
+    } else if (sortBy === "place") {
+      result = comparePlace();
+    } else if (sortBy === "date-place") {
+      result = compareDate();
+      if (result === 0) result = comparePlace();
+    } else if (sortBy === "place-date") {
+      result = comparePlace();
+      if (result === 0) result = compareDate();
+    } else {
+      result = Number(a.id_site_event) - Number(b.id_site_event);
+    }
+    return sortAscending ? result : -result;
+  });
+  document.getElementById("results").innerHTML = `
+    <div class="events-grid">
+      ${loadedEvents.map((row, index) => eventCard(row, index)).join("")}
+    </div>
+  `;
 }
   
 document.getElementById("sortBy").addEventListener("change", (event) => {
