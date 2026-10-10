@@ -386,17 +386,18 @@ function eventCard(row,index){
       ${startDate ? `<div class="field"><span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">
         Ora:</span> ${escapeHtml(formatDate(startDate).time)}`: ""}</div>`: ""}
       ${endDate? `<div class="field"><span class="label">Fine:</span>${escapeHtml(formatDate(endDate))}</div>`: ""}
-      ${comune ? `<div class="field"><span class="label">Comune:</span>${escapeHtml(comune)}</div>`: ""}
-      ${location ? `<div class="field"><span class="label">Luogo:</span>${escapeHtml(location)}</div>`: ""}
-      ${organizer ? `<div class="field"><span class="label">Organizzatore:</span>${escapeHtml(organizer)}</div>`: ""}
-      ${performer ? `<div class="field"><span class="label">Performer:</span>${escapeHtml(performer)}</div>`: ""}   
+      ${comune ? `<div class="field"><span class="label">Comune: </span>${escapeHtml(comune)}</div>`: ""}
+      ${location ? `<div class="field"><span class="label">Luogo: </span>${escapeHtml(location)}</div>`: ""}
+      ${organizer ? `<div class="field"><span class="label">Organizzatore: </span>${escapeHtml(organizer)}</div>`: ""}
+      ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>`: ""}   
       ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
-      ${category ? `<div class="field"><span class="label">Categoria:</span>${escapeHtml(category)}</div>`: ""}
-      ${creator ? `<div class="field"><span class="label">Creator:</span>${escapeHtml(creator)}</div>`: ""}
+      ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
+      ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>`: ""}
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
-      ${escapeHtml(sourceUrl)}</a></div>`: ""}<div class="timestamp">Acquisito:
-      ${escapeHtml(formatDate(row.se_extracted))}</div><button class="schema-button" onclick="toggleSchema('${schemaId}')">SCHEMA.ORG</button>
+      ${escapeHtml(sourceUrl)}</a></div>`: ""}
+      <div class="timestamp">Acquisito: ${escapeHtml(formatDate(row.se_extracted))}</div>
+      <button class="schema-button" onclick="toggleSchema('${schemaId}')">SCHEMA.ORG</button>
       ${schemaDetails(event,schemaId)}</div></article>`;
 }
 
