@@ -222,6 +222,8 @@ body{
 <div class="event-controls">
   <label for="sortBy">Ordina per:</label>
   <select id="sortBy">
+    <option value="date-place">Data → Luogo</option>
+    <option value="place-date">Luogo → Data</option>
     <option value="id">ID</option>
     <option value="date">Data</option>
     <option value="place">Luogo</option>
@@ -650,17 +652,19 @@ let loadedEvents = [];
 let sortBy = "id";
 let sortAscending = false;
 
+
 function sortEvents() {
-  const getValue = (row) => {
-    const schema = row.se_schema || {};
-    if (sortBy === "id") {
-      return row.id_site_event;
-    }
-    if (sortBy === "date") {
-      return schema.startDate || schema.data?.date || "";
-    }
-    return schema.location?.name || "";
-  };
+  const getDate = (row) => {const schema = row.se_schema || {}; return schema.startDate || schema.data?.date || "";};
+  const getPlace = (row) => {const schema = row.se_schema || {}; return schema.location?.name || "";};
+  loadedEvents.sort((a, b) => {let result = 0;
+    if (sortBy === "date-place") {result = String(getDate(a)).localeCompare(String(getDate(b)), "it", { numeric: true });
+      if (result === 0) {result = String(getPlace(a)).localeCompare(String(getPlace(b)), "it", { numeric: true, sensitivity: "base" });}
+    } else if (sortBy === "place-date") {result = String(getPlace(a)).localeCompare(String(getPlace(b)), "it", { numeric: true, sensitivity: "base" });
+      if (result === 0) {result = String(getDate(a)).localeCompare(String(getDate(b)), "it", { numeric: true });}
+    } else {result = Number(a.id_site_event) - Number(b.id_site_event);}
+    return sortAscending ? result : -result;});
+  document.getElementById("results").innerHTML = `<div class="events-grid">${loadedEvents.map((row, index) => eventCard(row, index)).join("")}</div>`;
+}
 
   loadedEvents.sort((a, b) => {
     const valueA = getValue(a);
