@@ -289,11 +289,10 @@ function eventLocation(event){
   if(location.name){parts.push(value(location.name));}
   const address = location.address;
   if(address){
-    if(typeof address === "string"){parts.push(address);
+    if(typeof address === "string"){
+      if(!location.name){parts.push(address);}
     }else{
       if(address.streetAddress){parts.push(value(address.streetAddress));}
-      if(address.addressLocality){parts.push(value(address.addressLocality));}
-      if(address.addressRegion){parts.push(value(address.addressRegion));}
     }
   }
   return parts.join(", ");
