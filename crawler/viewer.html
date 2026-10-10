@@ -646,16 +646,16 @@ window.toggleSchema = function(id){
   element.classList.toggle("open");
 };
 
-
 /* ORDINAMENTO EVENTI */
 let loadedEvents = [];
 let sortBy = "id";
 let sortAscending = false;
 
-
 function sortEvents() {
-  const getDate = (row) => {const schema = row.se_schema || {}; return schema.startDate || schema.data?.date || "";};
-  const getPlace = (row) => {const schema = row.se_schema || {}; return schema.location?.name || "";};
+  const getDate = (row) => {const schema = row.se_schema || {};
+    return schema.startDate || schema.data?.date || "";};
+  const getPlace = (row) => {const schema = row.se_schema || {};
+    return schema.location?.address?.addressLocality || "";};
   loadedEvents.sort((a, b) => {let result = 0;
     if (sortBy === "date-place") {result = String(getDate(a)).localeCompare(String(getDate(b)), "it", { numeric: true });
       if (result === 0) {result = String(getPlace(a)).localeCompare(String(getPlace(b)), "it", { numeric: true, sensitivity: "base" });}
@@ -663,36 +663,20 @@ function sortEvents() {
       if (result === 0) {result = String(getDate(a)).localeCompare(String(getDate(b)), "it", { numeric: true });}
     } else {result = Number(a.id_site_event) - Number(b.id_site_event);}
     return sortAscending ? result : -result;});
-  document.getElementById("results").innerHTML = `<div class="events-grid">${loadedEvents.map((row, index) => eventCard(row, index)).join("")}</div>`;
+  document.getElementById("results").innerHTML = ` <div class="events-grid">${loadedEvents.map((row, index) => eventCard(row, index)).join("")}</div>`;
 }
-
-  loadedEvents.sort((a, b) => {
-    const valueA = getValue(a);
-    const valueB = getValue(b);
-    const result = String(valueA).localeCompare(
-      String(valueB),
-      "it",
-      { numeric: true, sensitivity: "base" }
-    );
-    return sortAscending ? result : -result;
-  });
-  document.getElementById("results").innerHTML = `
-    <div class="events-grid">
-      ${loadedEvents.map((row, index) => eventCard(row, index)).join("")}
-    </div>
-  `;
-}
+  
 document.getElementById("sortBy").addEventListener("change", (event) => {
   sortBy = event.target.value;
   sortEvents();
 });
+  
 document.getElementById("sortDirection").addEventListener("click", () => {
   sortAscending = !sortAscending;
   document.getElementById("sortDirection").textContent =
     sortAscending ? "↑ Crescente" : "↓ Decrescente";
   sortEvents();
 });
-
   
 /* LETTURA SUPABASE */
 async function loadEvents(){
