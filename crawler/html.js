@@ -184,6 +184,8 @@ function extractTimes(text) {
 /* PREZZO */
 function extractPrice(text) {
   if (!text) return null;
+  const priceToDefine = /\b(?:prezzo da definire|prezzo da confermare|prezzo da stabilire|prezzo non ancora disponibile|price to be determined|price to be confirmed|price tbd)\b/i;
+  if (priceToDefine.test(text)) {return "da definire";}
   const free = /\b(?:free|gratis|gratuito|gratuita|gratuit|gratuitement|kostenlos|kostenfrei|kostenloser Eintritt|ingresso libero)\b/i;
   if (free.test(text)) {return "gratuito";}
   const patterns = [
@@ -192,10 +194,8 @@ function extractPrice(text) {
   ];
   for (const re of patterns) {
     const match = text.match(re);
-    if (match) {
-      const amount = match[0].match(/[\d][\d.,]*/)[0];
-      return amount;
-    }
+    if (match) {const amount = match[0].match(/[\d][\d.,]*/)[0];
+      return amount;}
   }
   return null;
 }
@@ -577,7 +577,12 @@ function toSchemaEvent(page, s) {
   const creators = s.creators.length
     ? s.creators.map(name => ({"@type": "Person", name})) : null;
   const offers = s.price
-    ? {"@type": "Offer", price: s.price === "gratuito" ? "0" : s.price} : null;
+    ? s.price === "gratuito"
+      ? {"@type": "Offer", price: "0", description: "Gratuito"}
+      : s.price === "da definire"
+        ? {"@type": "Offer", description: "Definire"}
+        : {"@type": "Offer", price: s.price}
+    : null;
   return {"@context": "https://schema.org", "@type": "Event", name: s.title,
     description: extractDescription(s.text, s.title),
     image: s.image, url: page.sp_url,
