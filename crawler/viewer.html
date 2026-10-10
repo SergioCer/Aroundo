@@ -270,9 +270,15 @@ function value(v){
 }
 
 function formatDate(value){
-  if(!value){return "";}
-  try{return new Date(value).toLocaleString("it-IT", {dateStyle:"medium", timeStyle:"short"});
-  }catch(e){return value;}
+  if(!value){return {date:"", time:""};}
+  try{
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())){return {date:value, time:""};}
+    const datePart = date.toLocaleDateString("it-IT", {day:"2-digit", month:"2-digit", year:"numeric"});
+    const hasTime = /T\d{2}:\d{2}/.test(value);
+    const timePart = hasTime ? date.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"}) : "";
+    return {date:datePart, time:timePart};
+  }catch(e){return {date:value, time:""};}
 }
 
 function eventLocation(event){
@@ -332,6 +338,7 @@ function displaySchemaValue(v){
     .join(", ");
   }
   if(typeof v === "object"){
+    if(v.description){return displaySchemaValue(v.description);}
     if(v.name){return displaySchemaValue(v.name);}
     if(v["@value"]){return displaySchemaValue(v["@value"]);}
     if(v.price !== undefined){const currency = v.priceCurrency ? ` ${v.priceCurrency}`: ""; return `${v.price}${currency}`;}
@@ -377,88 +384,17 @@ function eventCard(row,index){
   return `<article class="event">
       ${image ? `<div class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>`: ""}
       <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
-      ${startDate ? `<div class="field"><span class="label">Data:</span>${escapeHtml(formatDate(startDate))}</div>`: ""}
+      ${startDate ? `<div class="field"><span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">
+        Ora:</span> ${escapeHtml(formatDate(startDate).time)}`: ""}</div>`: ""}
       ${endDate? `<div class="field"><span class="label">Fine:</span>${escapeHtml(formatDate(endDate))}</div>`: ""}
+      ${comune ? `<div class="field"><span class="label">Comune:</span>${escapeHtml(comune)}</div>`: ""}
+      ${location ? `<div class="field"><span class="label">Luogo:</span>${escapeHtml(location)}</div>`: ""}
+      ${organizer ? `<div class="field"><span class="label">Organizzatore:</span>${escapeHtml(organizer)}</div>`: ""}
+      ${performer ? `<div class="field"><span class="label">Performer:</span>${escapeHtml(performer)}</div>`: ""}   
+      ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
+      ${category ? `<div class="field"><span class="label">Categoria:</span>${escapeHtml(category)}</div>`: ""}
+      ${creator ? `<div class="field"><span class="label">Creator:</span>${escapeHtml(creator)}</div>`: ""}
       ${
-          comune
-            ? `
-              <div class="field">
-                <span class="label">
-                  Comune:
-                </span>
-                ${escapeHtml(comune)}
-              </div>
-            `
-            : ""
-        }
-        ${
-          location
-            ? `
-              <div class="field">
-                <span class="label">
-                  Luogo:
-                </span>
-                ${escapeHtml(location)}
-              </div>
-            `
-            : ""
-        }
-        ${
-          organizer
-            ? `
-              <div class="field">
-                <span class="label">
-                  Organizzatore:
-                </span>
-                ${escapeHtml(organizer)}
-              </div>
-            `
-            : ""
-        }
-        ${
-          performer
-            ? `
-              <div class="field">
-                <span class="label">
-                  Performer:
-                </span>
-                ${escapeHtml(performer)}
-
-              </div>
-            `
-            : ""
-        }   
-        ${
-        offers
-          ? `
-            <div class="field">
-              <span class="label">Prezzo:</span>
-              ${escapeHtml(offers)}
-            </div>
-          `
-          : ""
-      }
-        ${
-          category
-            ? `
-              <div class="field">
-                <span class="label">Categoria:</span>
-                ${escapeHtml(category)}
-              </div>
-            `
-            : ""
-        }
-        ${  
-          creator
-            ? `
-              <div class="field">
-                <span class="label">Creator:</span>
-                ${escapeHtml(creator)}
-              </div>
-            `
-            : ""
-        }
-        ${
           description
             ? `
               <div class="event-description">
