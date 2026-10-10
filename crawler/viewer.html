@@ -388,11 +388,11 @@ function eventCard(row,index){
       ${endDate? `<div class="field"><span class="label">Fine:</span>${escapeHtml(formatDate(endDate))}</div>`: ""}
       ${comune ? `<div class="field"><span class="label">Comune: </span>${escapeHtml(comune)}</div>`: ""}
       ${location ? `<div class="field"><span class="label">Luogo: </span>${escapeHtml(location)}</div>`: ""}
+      ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
       ${organizer ? `<div class="field"><span class="label">Organizzatore: </span>${escapeHtml(organizer)}</div>`: ""}
       ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>`: ""}   
-      ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
-      ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
       ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>`: ""}
+      ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
