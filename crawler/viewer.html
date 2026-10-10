@@ -345,19 +345,32 @@ function displaySchemaValue(v){
   return String(v);
 }
 
-function schemaDetails(event,id){
+function schemaDetails(event, id) {
   const fields = [...schemaFields];
-  Object.keys(event).forEach(key => {if(!fields.includes(key)){fields.push(key);}});
-  if (event.data && typeof event.data === "object") {fields.push("data");}
-  return `<div id="${id}"class="schema-details">
-      ${fields.map(field => {const exists =
-          event[field] !== undefined &&
-          event[field] !== null &&
-          event[field] !== "";
-        return `<div class="schema-field"><div class="schema-name">${escapeHtml(field)}
-            </div><div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml( formatSchemaValue(event[field])):"non presente"}
-            </div></div>`;
-      }).join("")}</div>`;
+  Object.keys(event).forEach(key => {
+    if (key !== "data" && !fields.includes(key)) {
+      fields.push(key);
+    }
+  });
+  const dataFields = event.data && typeof event.data === "object"
+    ? Object.keys(event.data)
+    : [];
+  dataFields.forEach(key => {
+    if (!fields.includes(key)) {
+      fields.push(key);
+    }
+  });
+  return `<div id="${id}" class="schema-details">
+    ${fields.map(field => {
+      const inData = dataFields.includes(field);
+      const v = inData ? event.data[field] : event[field];
+      const exists = v !== undefined && v !== null && v !== "";
+      return `<div class="schema-field">
+        <div class="schema-name">${escapeHtml(field)}</div>
+        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(formatSchemaValue(v)) : "non presente"}</div>
+      </div>`;
+    }).join("")}
+  </div>`;
 }
 
 /* SCHEDA EVENTO */
