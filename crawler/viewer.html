@@ -300,27 +300,37 @@ function eventLocation(event){
 
 /* SCHEMA.ORG */
 const schemaFields = [
-  "@context",
-  "@type",
+  "eventStatus",
   "name",
   "description",
-  "image",
-  "url",
   "startDate",
   "endDate",
-  "eventStatus",
-  "eventAttendanceMode",
   "location",
   "organizer",
   "performer",
   "offers",
+  "eventAttendanceMode",
+  "@context",
+  "@type",
+  "image",
+  "url",
+  /* CLASSIFICAZIONE */
+  "category",
+  "categorySlug",
+  "macroMatches",
+  "subMatches",
+  "excludedMatches",
+  "macroCount",
+  "subCount",
+  "strength",
+  "excluded",
+  /* ALTRE PROPRIETÀ SCHEMA.ORG */
   "audience",
   "inLanguage",
   "duration",
   "eventSchedule",
   "sameAs"
 ];
-
 
 function formatSchemaValue(value){
   if(value === null || value === undefined || value === ""
