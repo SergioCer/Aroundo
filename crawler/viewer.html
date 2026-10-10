@@ -222,6 +222,7 @@ body{
 <div class="event-controls">
   <label for="sortBy">Ordina per:</label>
   <select id="sortBy">
+    <option value="id">ID</option>
     <option value="date">Data</option>
     <option value="place">Luogo</option>
   </select>
@@ -646,12 +647,15 @@ window.toggleSchema = function(id){
 
 /* ORDINAMENTO EVENTI */
 let loadedEvents = [];
-let sortBy = "date";
+let sortBy = "id";
 let sortAscending = false;
 
 function sortEvents() {
   const getValue = (row) => {
     const schema = row.se_schema || {};
+    if (sortBy === "id") {
+      return row.id_site_event;
+    }
     if (sortBy === "date") {
       return schema.startDate || schema.data?.date || "";
     }
