@@ -347,11 +347,8 @@ function displaySchemaValue(v){
 
 function schemaDetails(event,id){
   const fields = [...schemaFields];
-  Object.keys(event).forEach(key => {
-    if(!fields.includes(key)){
-      fields.push(key);
-    }
-  });
+  Object.keys(event).forEach(key => {if(!fields.includes(key)){fields.push(key);}});
+  if (event.data && typeof event.data === "object") {fields.push("data");}
   return `<div id="${id}"class="schema-details">
       ${fields.map(field => {const exists =
           event[field] !== undefined &&
