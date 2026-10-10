@@ -529,6 +529,8 @@ function analyzeSignals(page, categoryDictionary) {
   const block = page.sp_block;
   const text = stripHtml(block);
   if (!text) return null;
+  const date = page.sp_date || null;
+  const city = page.comuni || null;
   const title = extractTitle(block);
   const times = extractTimes(text);
   const price = extractPrice(text);
@@ -537,8 +539,6 @@ function analyzeSignals(page, categoryDictionary) {
   const category = extractCategory(text, categoryDictionary);
   const location = extractLocation(text);
   const image = extractImage(block, page.sp_url);
-  const date = page.sp_date || null;
-  const city = page.comuni || null;
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
@@ -568,8 +568,8 @@ function analyzeSignals(page, categoryDictionary) {
 /* CONVERSIONE SCHEMA.ORG */
 function toSchemaEvent(page, s) {
   const startDate = s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
-  const location = s.location || s.city ? {
-    "@type": "Place", name: s.location || s.city?.co_descrizione, ...(s.city ? {
+  const location = s.location ? {"@type": "Place", 
+    name: s.location, ...(s.city ? {
     address: {"@type": "PostalAddress", addressLocality: s.city.co_descrizione, ...(s.city.co_cap ? {
     postalCode: String(s.city.co_cap)} : {})}} : {})} : null;
   const organizer = s.organizer
