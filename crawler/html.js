@@ -8,12 +8,11 @@ async function loadCategoryDictionary(supabase) {
       subcategorie (id_subcategoria, sc_descrizione, sc_slug, sc_attiva)`)
     .eq("mc_attiva", true);
   if (error) {console.error("[CATEGORY] Errore caricamento categorie:", error);
-    CATEGORY_DICTIONARY = {macro: [], sub: [], excluded: []};
+    CATEGORY_DICTIONARY = {macro: [], sub: []};
     return CATEGORY_DICTIONARY;
   }
   const macro = [];
   const sub = [];
-  const excluded = [];
   for (const categoria of data || []) {
     const mcSlug = clean(categoria.mc_slug || "");
     const macroItem = {
@@ -23,9 +22,6 @@ async function loadCategoryDictionary(supabase) {
       terms: buildTerms(categoria.mc_descrizione, categoria.mc_slug)
     };
     macro.push(macroItem);
-    /* citizen e infrastructure non sono eventi. Li manteniamo però nel dizionario perché sono segnali semantici utili per l'esclusione. */
-    // CANCELLARE
-    // if ([16, 19].includes(Number(categoria.id_categoria))) {excluded.push(macroItem);}
     for (const sottocategoria of categoria.subcategorie || []) {
       if (sottocategoria.sc_attiva === false) {continue;}
       const subItem = {
@@ -37,9 +33,9 @@ async function loadCategoryDictionary(supabase) {
       };
       sub.push(subItem);}
   }
-  CATEGORY_DICTIONARY = {macro, sub, excluded};
+  CATEGORY_DICTIONARY = {macro, sub};
   console.log("[CATEGORY] Dizionario caricato:",
-    {macro: macro.length, sub: sub.length, excluded: excluded.length});
+    {macro: macro.length, sub: sub.length});
   return CATEGORY_DICTIONARY;
 }
 
@@ -314,7 +310,6 @@ function extractCategory(text, dictionary) {
   if (!text || !dictionary) {return null;}
   const macroMatches = [];
   const subMatches = [];
-  const excludedMatches = [];
   /* MACRO CATEGORIE */
   for (const macro of dictionary.macro) {
     for (const term of macro.terms) {
@@ -344,25 +339,10 @@ function extractCategory(text, dictionary) {
       }
     }
   }
-  /* ESCLUSIONI */
-  for (const item of dictionary.excluded) {
-    for (const term of item.terms) {
-      if (containsCategoryTerm(text, term)) {
-        excludedMatches.push({
-          id: item.id,
-          descrizione: item.descrizione,
-          slug: item.slug,
-          matchedTerm: term
-        });
-        break;
-      }
-    }
-  }
   /* NESSUN RISULTATO */
   if (
     macroMatches.length === 0 &&
     subMatches.length === 0 &&
-    excludedMatches.length === 0
   ) {
     return null;
   }
@@ -373,7 +353,6 @@ function extractCategory(text, dictionary) {
     categorySlug: macroMatches.length === 1 ? macroMatches[0].slug: null,
     macroMatches,
     subMatches,
-    excludedMatches,
     /* Rafforzamento semantico:
       1 macro + 1 sub
       1 macro + 2+ sub
@@ -385,7 +364,6 @@ function extractCategory(text, dictionary) {
               macroMatches.length === 1 && subMatches.length >= 1 ? "confermato" : (
                   macroMatches.length === 1 ? "base" : (
                       subMatches.length >= 1 ? "sottocategoria" : null)))),
-    excluded: excludedMatches.length > 0
   };
 }
 
@@ -548,7 +526,7 @@ function analyzeSignals(page, categoryDictionary) {
     prezzo: !!price,
     organizzatore: !!organizer,
     creator: creators.length > 0,
-    categoria: !!category && !category.excluded
+    categoria: !!category
   };
   const reinforcementNames =
     Object.entries(reinforcements)
@@ -607,11 +585,9 @@ function toSchemaEvent(page, s) {
       categorySlug: categoryData.categorySlug ?? null,
       macroMatches: categoryData.macroMatches ?? [],
       subMatches: categoryData.subMatches ?? [],
-      excludedMatches: categoryData.excludedMatches ?? [],
       macroCount: categoryData.macroCount ?? 0,
       subCount: categoryData.subCount ?? 0,
       strength: categoryData.strength ?? null,
-      excluded: categoryData.excluded ?? false,
       id_comune: page.id_comune,
     }
   };
