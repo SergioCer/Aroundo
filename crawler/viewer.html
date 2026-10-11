@@ -236,6 +236,20 @@ body{
   border-radius:4px;
   font-weight:bold
 }  
+
+.delete-button{
+  background:#e74c3c;
+  color:white;
+  border:0;
+  border-radius:4px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-weight:bold
+}
+  
+.delete-button:hover{
+  background:#c0392b
+}  
   
 </style>
 </head>
@@ -457,7 +471,8 @@ function eventCard(row,index){
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
       <div class="timestamp">Acquisito: ${escapeHtml(formatDate(row.se_extracted).date)} - 
       <span class="classification-${escapeHtml(value(event.data?.classification))}">${escapeHtml(value(event.data?.classification))}</span></div>
-      <button class="schema-button" onclick="toggleSchema('${schemaId}')">SCHEMA.ORG</button>
+      <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
+      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')">Delete</button>
       ${schemaDetails(event,schemaId)}</div></article>`;
 }
 
@@ -526,6 +541,13 @@ function sortEvents() {
     </div>
   `;
 }
+
+/* Cancella l'evento selezionato */ 
+async function deleteEvent(id){
+  const {error}=await supabase.from('site_events').delete().eq('id_site_event',id);
+  if(error){console.error(error);alert("Errore durante l'eliminazione");return}
+  document.querySelector(`button[onclick="deleteEvent('${id}')"]`)?.closest('article.event')?.remove();
+}  
   
 document.getElementById("sortBy").addEventListener("change", (event) => {
   sortBy = event.target.value;
