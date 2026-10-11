@@ -591,7 +591,6 @@ function toSchemaEvent(page, s) {
     performer: creators, creator: creators,
     offers, inLanguage: "it",
     data: {
-      sourceUrl: page.sp_url,
       id_site_page: page.id_site_page,
       classification: s.classification,
       fundamentals: s.fundamentals,
@@ -604,8 +603,8 @@ function toSchemaEvent(page, s) {
           .filter(([, value]) => value)
           .map(([key]) => key)
       ],
-      text: s.text,
-      price: s.price,
+      // text: s.text,
+      // price: s.price,
       category: categoryData.category ?? null,
       categorySlug: categoryData.categorySlug ?? null,
       macroMatches: categoryData.macroMatches ?? [],
@@ -615,11 +614,10 @@ function toSchemaEvent(page, s) {
       subCount: categoryData.subCount ?? 0,
       strength: categoryData.strength ?? null,
       excluded: categoryData.excluded ?? false,
-      creators: s.creators,
-      organizer: s.organizer,
+      // creators: s.creators,
       id_comune: page.id_comune,
-      date: s.date,
-      times: s.times.map(x => x.value)
+      // date: s.date,
+      // times: s.times.map(x => x.value)
     }
   };
 }
