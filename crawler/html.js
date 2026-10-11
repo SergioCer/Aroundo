@@ -603,8 +603,6 @@ function toSchemaEvent(page, s) {
           .filter(([, value]) => value)
           .map(([key]) => key)
       ],
-      // text: s.text,
-      // price: s.price,
       category: categoryData.category ?? null,
       categorySlug: categoryData.categorySlug ?? null,
       macroMatches: categoryData.macroMatches ?? [],
@@ -614,10 +612,7 @@ function toSchemaEvent(page, s) {
       subCount: categoryData.subCount ?? 0,
       strength: categoryData.strength ?? null,
       excluded: categoryData.excluded ?? false,
-      // creators: s.creators,
       id_comune: page.id_comune,
-      // date: s.date,
-      // times: s.times.map(x => x.value)
     }
   };
 }
