@@ -474,6 +474,8 @@ function eventCard(row,index){
       ${schemaDetails(event,schemaId)}</div></article>`;
 }
 
+window.deleteEvent=deleteEvent;
+  
 /* APERTURA / CHIUSURA SCHEMA */
 window.toggleSchema = function(id){
   const element = document.getElementById(id);
