@@ -298,7 +298,7 @@ function eventLocation(event){
   return parts.join(", ");
 }
 
-/* SCHEMA.ORG */
+/* CAMPI ORDINABILI di SCHEMA.ORG */
 const schemaFields = [
   "eventStatus",
   "name",
@@ -310,10 +310,6 @@ const schemaFields = [
   "performer",
   "offers",
   "eventAttendanceMode",
-  "@context",
-  "@type",
-  "image",
-  "url",
   /* CLASSIFICAZIONE */
   "category",
   "categorySlug",
@@ -324,11 +320,23 @@ const schemaFields = [
   "subCount",
   "strength",
   "excluded",
+  /* ANALISI DELL'ESTRAZIONE */
+  "classification",
+  "fundamentals",
+  "reinforcements",
+  "signals",
+  /* RIFERIMENTI INTERNI */
+  "id_site_page",
+  "id_comune",
   /* ALTRE PROPRIETÀ SCHEMA.ORG */
   "audience",
   "inLanguage",
   "duration",
   "eventSchedule",
+  "@context",
+  "@type",
+  "image",
+  "url",
   "sameAs"
 ];
 
@@ -377,7 +385,7 @@ function schemaDetails(event, id) {
       const exists = v !== undefined && v !== null && v !== "";
       return `<div class="schema-field">
         <div class="schema-name">${escapeHtml(field)}</div>
-        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(formatSchemaValue(v)) : "non presente"}</div>
+        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(formatSchemaValue(v)) : "null"}</div>
       </div>`;
     }).join("")}
   </div>`;
