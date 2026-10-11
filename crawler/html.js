@@ -342,7 +342,7 @@ function extractCategory(text, dictionary) {
   /* NESSUN RISULTATO */
   if (
     macroMatches.length === 0 &&
-    subMatches.length === 0 &&
+    subMatches.length === 0
   ) {
     return null;
   }
