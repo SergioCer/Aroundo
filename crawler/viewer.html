@@ -423,7 +423,9 @@ function eventCard(row,index){
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
-      <div class="timestamp">Acquisito: ${escapeHtml(formatDate(row.se_extracted))}</div>
+      <div class="timestamp">
+      Acquisito: ${escapeHtml(formatDate(row.se_extracted).date)} - ${escapeHtml(row.classification === "evento" ? "completo" : "incompleto")}
+      </div>
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">SCHEMA.ORG</button>
       ${schemaDetails(event,schemaId)}</div></article>`;
 }
