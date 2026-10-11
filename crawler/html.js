@@ -23,9 +23,8 @@ async function loadCategoryDictionary(supabase) {
       terms: buildTerms(categoria.mc_descrizione, categoria.mc_slug)
     };
     macro.push(macroItem);
-    /* citizen e infrastructure non sono eventi.
-      Li manteniamo però nel dizionario perché sono segnali semantici utili per l'esclusione. */
-    if (mcSlug === "citizen" || mcSlug === "infrastructure") {excluded.push(macroItem);}
+    /* citizen e infrastructure non sono eventi. Li manteniamo però nel dizionario perché sono segnali semantici utili per l'esclusione. */
+    if ([16, 19].includes(Number(categoria.id_categoria))) {excluded.push(macroItem);}
     for (const sottocategoria of categoria.subcategorie || []) {
       if (sottocategoria.sc_attiva === false) {continue;}
       const subItem = {
