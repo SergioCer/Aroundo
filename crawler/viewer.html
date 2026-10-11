@@ -220,6 +220,22 @@ body{
   color:#999;
   font-weight:normal
 }
+
+.classification-evento{
+  background:#27ae60;
+  color:white;
+  padding:3px 7px;
+  border-radius:4px;
+  font-weight:bold
+}
+
+.classification-incompleto{
+  background:#e74c3c;
+  color:white;
+  padding:3px 7px;
+  border-radius:4px;
+  font-weight:bold
+}  
   
 </style>
 </head>
@@ -439,9 +455,8 @@ function eventCard(row,index){
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
-      <div class="timestamp">
-      Acquisito: ${escapeHtml(formatDate(row.se_extracted).date)} - ${escapeHtml(value(event.data?.classification))}
-      </div>
+      <div class="timestamp">Acquisito: ${escapeHtml(formatDate(row.se_extracted).date)} - 
+      <span class="classification-${escapeHtml(value(event.data?.classification))}">${escapeHtml(value(event.data?.classification))}</span></div>
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">SCHEMA.ORG</button>
       ${schemaDetails(event,schemaId)}</div></article>`;
 }
