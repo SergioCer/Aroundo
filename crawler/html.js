@@ -519,9 +519,11 @@ function cleanBlock(value) {
   block = block.replace(/<([a-z][\w:-]*)\b(?=[^>]*\b(?:data-ad(?:vertisement)?|aria-label\s*=\s*["'][^"']*\b(?:advertisement|advertising|pubblicità|annuncio)\b))[^>]*>[\s\S]*?<\/\1\s*>/gi, " ");
   // Crediti fotografici: elimina paragrafi che iniziano con Foto o Photo
   block = block.replace(/<p\b[^>]*>\s*(?:Foto|Photo)\s*:[\s\S]*?<\/p\s*>/gi, " ");
-  // Disclaimer: elimina paragrafi con formule esplicite di esclusione di responsabilità
+  // Disclaimer: rimuove paragrafi con formule esplicite di esclusione di responsabilità
   block = block.replace(/<p\b[^>]*>[\s\S]*?<\/p\s*>/gi, html =>
-    /(?:disclaimer|esclusione di responsabilità|non siamo responsabili|non è responsabile)/i.test(stripHtml(html)) ? " " : html);
+    /(?:disclaimer|esclusione di responsabilità|non siamo responsabili|non è responsabile|not responsible|not liable|limitation of liability)/i.test(stripHtml(html)) ? " " : html);
+  // Note sulle fonti: rimuove paragrafi dedicati esclusivamente alla fonte editoriale
+  block = block.replace(/<p\b[^>]*>[\s\S]*?<\/p\s*>/gi, html => /^\s*(?:Source|Fonte)\s*:/i.test(stripHtml(html)) ? " " : html);
   // Pulsanti di condivisione: rimuove controlli con ruolo esplicito
   block = block.replace(/<([a-z][\w:-]*)\b(?=[^>]*\b(?:aria-label|title)\s*=\s*["'][^"']*(?:share|condividi|social sharing)[^"']*["'])[^>]*>[\s\S]*?<\/\1\s*>/gi, " ");  
   return block;
