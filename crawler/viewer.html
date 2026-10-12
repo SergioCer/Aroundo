@@ -343,36 +343,41 @@ const schemaFields = [
   "description",
   "startDate",
   "endDate",
+  "duration",
+  "doorTime",
   "location",
   "offers",
+  "isAccessibleForFree",
   "organizer",
   "creator",
   "performer",
+  "actor",
+  "composer",
   /* CLASSIFICAZIONE */
-  "strength",
+  "strength",       // Forza della classificazione
   "category",
-  "categorySlug",
-  "macroCount",
-  "macroMatches",
-  "subCount",
-  "subMatches",
+  "categorySlug",   // Slug categoria valorizzato
+  "macroCount",     // conteggio macroCategorie
+  "macroMatches",   // corrispondenze macroCategorie
+  "subCount",       // conteggio subCategorie
+  "subMatches",     // corrispondenze subCategorie
   /* ANALISI DELL'ESTRAZIONE */
-  "fundamentals",
-  "reinforcements",
-  "signals",
+  "fundamentals",   // Campi Fondamentali
+  "reinforcements", // Campi Rafforzativi
+  "signals",        // Segnali intercettati
   /* RIFERIMENTI INTERNI */
-  "id_site_page",
-  "id_comune",
+  "id_site_page",   // riferimento pagina sorgente
+  "id_comune",      // ID del comune
+  "classification", // Attributo: Evento / Incompleto
   /* ALTRE PROPRIETÀ SCHEMA.ORG */
-  "classification",
+  "subEvent",
+  "superEvent",
   "eventAttendanceMode",
   "eventStatus",
+  "eventSchedule",
+  "previousStartDate",
   "audience",
   "inLanguage",
-  "duration",
-  "eventSchedule",
-  "@context",
-  "@type",
   "image",
   "url",
   "sameAs"
