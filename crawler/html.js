@@ -508,13 +508,13 @@ function cleanBlock(value) {
   block = block
     .replace(/<script\b[\s\S]*?<\/script\s*>/gi, " ")       // Script: codice eseguibile
     .replace(/<style\b[\s\S]*?<\/style\s*>/gi, " ")        // Style: regole CSS
-    .replace(/<noscript\b[\s\S]*?<\/noscript\s*>/gi, " ")  // Noscript: contenuto alternativo
-    .replace(/<svg\b[\s\S]*?<\/svg\s*>/gi, " ")            // SVG: grafica vettoriale
-    .replace(/<template\b[\s\S]*?<\/template\s*>/gi, " ") // Template: contenuto non renderizzato
+  //  .replace(/<noscript\b[\s\S]*?<\/noscript\s*>/gi, " ")  // Noscript: contenuto alternativo
+  //  .replace(/<svg\b[\s\S]*?<\/svg\s*>/gi, " ")            // SVG: grafica vettoriale
+  //  .replace(/<template\b[\s\S]*?<\/template\s*>/gi, " ") // Template: contenuto non renderizzato
     .replace(/<img\b[^>]*>/gi, " ")                        // Img: immagini, già estratte separatamente
-    .replace(/<(iframe|object|embed|canvas)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ") // Contenuti incorporati
-    .replace(/<iframe\b[^>]*\/?>/gi, " ")                  // Iframe: incorporamenti senza chiusura standard
-    .replace(/<[^>]+\bhidden(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?[^>]*>[\s\S]*?<\/[^>]+>/gi, " "); // Hidden: contenuti nascosti
+  //  .replace(/<(iframe|object|embed|canvas)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ") // Contenuti incorporati
+  //  .replace(/<iframe\b[^>]*\/?>/gi, " ")                  // Iframe: incorporamenti senza chiusura standard
+  //  .replace(/<[^>]+\bhidden(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?[^>]*>[\s\S]*?<\/[^>]+>/gi, " "); // Hidden: contenuti nascosti
   // Pubblicità: rimuove elementi con marcatori espliciti
   // block = block.replace(/<([a-z][\w:-]*)\b(?=[^>]*\b(?:data-ad(?:vertisement)?|aria-label\s*=\s*["'][^"']*\b(?:advertisement|advertising|pubblicità|annuncio)\b))[^>]*>[\s\S]*?<\/\1\s*>/gi, " ");
   // Crediti fotografici: elimina paragrafi che iniziano con Foto o Photo
