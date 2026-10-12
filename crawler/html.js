@@ -501,9 +501,24 @@ function extractDescription(text, title) {
   return value;
 }
 
+/* PULIZIA BLOCCO */
+function cleanBlock(value) {
+  if (!value) return "";
+  let block = String(value);
+  block = block
+    .replace(/<script\b[\s\S]*?<\/script\s*>/gi, " ")
+    .replace(/<style\b[\s\S]*?<\/style\s*>/gi, " ")
+    .replace(/<noscript\b[\s\S]*?<\/noscript\s*>/gi, " ")
+    .replace(/<svg\b[\s\S]*?<\/svg\s*>/gi, " ")
+    .replace(/<template\b[\s\S]*?<\/template\s*>/gi, " ")
+    .replace(/<img\b[^>]*>/gi, " ");
+  return block;
+}
+
 /* SEGNALI */
 function analyzeSignals(page, categoryDictionary) {
-  const block = page.sp_block;
+  const image = extractImage(page.sp_block, page.sp_url);
+  const block = cleaned.block;
   const text = stripHtml(block);
   if (!text) return null;
   const date = page.sp_date || null;
@@ -515,7 +530,6 @@ function analyzeSignals(page, categoryDictionary) {
   const creators = extractCreators(text);
   const category = extractCategory(text, categoryDictionary);
   const location = extractLocation(text);
-  const image = extractImage(block, page.sp_url);
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
