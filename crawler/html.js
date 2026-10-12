@@ -518,7 +518,7 @@ function cleanBlock(value) {
 /* SEGNALI */
 function analyzeSignals(page, categoryDictionary) {
   const image = extractImage(page.sp_block, page.sp_url);
-  const block = cleaned.block;
+  const block = cleanBlock(page.sp_block);
   const text = stripHtml(block);
   if (!text) return null;
   const date = page.sp_date || null;
