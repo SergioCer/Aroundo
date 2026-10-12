@@ -40,7 +40,6 @@ body{
 
 .wrap{
   padding:12px;
-  max-width:1400px;
   margin:auto;
   flex:1;
   min-height:0;
@@ -67,14 +66,13 @@ body{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
   gap:10px;
-  margin-top:10px
 }
 
 .event{
   background:#fff;
   border:1px solid #ddd;
-  border-left:5px solid #27ae60;
-  border-radius:10px;
+  border-left:6px solid #27ae60;
+  border-radius:20px;
   overflow:hidden;
   box-shadow:0 2px 6px #0001
 }
@@ -96,16 +94,17 @@ body{
 }
 
 .event-body{
-  padding:10px
+  padding:8px
 }
 
 .event h3{
-  margin:0 0 12px;
+  margin:0 0 10px;
+  text-align: center;
   font-size:20px
 }
 
 .event .field{
-  margin:7px 0;
+  margin:4px 0;
   line-height:1.45
 }
 
@@ -115,14 +114,13 @@ body{
 }
 
 .event-description{
-  margin:12px 0;
+  margin:8px 0;
   color:#555;
   line-height:1.5
 }
 
 .schema-button{
   margin-top:6px;
-  margin-bottom: 6px;
   padding:6px 10px;
   border:0;
   border-radius:20px;
@@ -139,17 +137,16 @@ body{
 
 .schema-details{
   display:none;
-  margin-top:14px;
-  border-top:1px solid #ddd;
-  padding-top:14px
-}
+  margin-top:8px;
+  border-top:2px solid #ddd;
+  }
 
 .schema-details.open{
   display:block
 }
 
 .schema-field{
-  padding:5px 0;
+  padding:0px 0;
   border-bottom:1px solid #eee;
   line-height:1.4
 }
@@ -192,10 +189,10 @@ body{
 }
 
 .source{
-  margin-top:12px;
+  margin-top:8px;
   padding-top:10px;
   border-top:1px solid #eee;
-  font-size:13px;
+  font-size:10px;
   color:#666;
   word-break:break-all
 }
@@ -211,7 +208,7 @@ body{
 
 .timestamp{
   margin-top:6px;
-  font-size:12px;
+  font-size:10px;
   color:#999
 }
 
@@ -572,7 +569,7 @@ async function loadEvents(){
         .order("id_site_event",{ascending:false});
     if(error){throw error;}
     if(!data || data.length === 0){
-      status.textContent = "Nessun evento presente in site_events.";
+      status.textContent = "Nessun evento presente in site_events!";
       results.innerHTML = `<div class="empty">La tabella site_events non contiene ancora eventi.</div>`;
       return;}
     loadedEvents = data;
@@ -592,7 +589,7 @@ document.getElementById("analyzeBtn").addEventListener("click", async () => {
   status.textContent = "Analisi in corso...";
   try {
     await runAnalysis(supabase);
-    status.textContent = "Analisi completata.";
+    status.textContent = "Analisi completata!";
     await loadEvents();
   } catch (error) {
     console.error("[HTML] Errore analisi:", error);
