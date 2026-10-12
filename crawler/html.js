@@ -506,12 +506,24 @@ function cleanBlock(value) {
   if (!value) return "";
   let block = String(value);
   block = block
-    .replace(/<script\b[\s\S]*?<\/script\s*>/gi, " ")
-    .replace(/<style\b[\s\S]*?<\/style\s*>/gi, " ")
-    .replace(/<noscript\b[\s\S]*?<\/noscript\s*>/gi, " ")
-    .replace(/<svg\b[\s\S]*?<\/svg\s*>/gi, " ")
-    .replace(/<template\b[\s\S]*?<\/template\s*>/gi, " ")
-    .replace(/<img\b[^>]*>/gi, " ");
+    .replace(/<script\b[\s\S]*?<\/script\s*>/gi, " ")       // Script: codice eseguibile
+    .replace(/<style\b[\s\S]*?<\/style\s*>/gi, " ")        // Style: regole CSS
+    .replace(/<noscript\b[\s\S]*?<\/noscript\s*>/gi, " ")  // Noscript: contenuto alternativo
+    .replace(/<svg\b[\s\S]*?<\/svg\s*>/gi, " ")            // SVG: grafica vettoriale
+    .replace(/<template\b[\s\S]*?<\/template\s*>/gi, " ") // Template: contenuto non renderizzato
+    .replace(/<img\b[^>]*>/gi, " ")                        // Img: immagini, già estratte separatamente
+    .replace(/<(iframe|object|embed|canvas)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ") // Contenuti incorporati
+    .replace(/<iframe\b[^>]*\/?>/gi, " ")                  // Iframe: incorporamenti senza chiusura standard
+    .replace(/<[^>]+\bhidden(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?[^>]*>[\s\S]*?<\/[^>]+>/gi, " "); // Hidden: contenuti nascosti
+  // Pubblicità: rimuove elementi con marcatori espliciti
+  block = block.replace(/<([a-z][\w:-]*)\b(?=[^>]*\b(?:data-ad(?:vertisement)?|aria-label\s*=\s*["'][^"']*\b(?:advertisement|advertising|pubblicità|annuncio)\b))[^>]*>[\s\S]*?<\/\1\s*>/gi, " ");
+  // Crediti fotografici: elimina paragrafi che iniziano con Foto o Photo
+  block = block.replace(/<p\b[^>]*>\s*(?:Foto|Photo)\s*:[\s\S]*?<\/p\s*>/gi, " ");
+  // Disclaimer: elimina paragrafi con formule esplicite di esclusione di responsabilità
+  block = block.replace(/<p\b[^>]*>[\s\S]*?<\/p\s*>/gi, html =>
+    /(?:disclaimer|esclusione di responsabilità|non siamo responsabili|non è responsabile)/i.test(stripHtml(html)) ? " " : html);
+  // Pulsanti di condivisione: rimuove controlli con ruolo esplicito
+  block = block.replace(/<([a-z][\w:-]*)\b(?=[^>]*\b(?:aria-label|title)\s*=\s*["'][^"']*(?:share|condividi|social sharing)[^"']*["'])[^>]*>[\s\S]*?<\/\1\s*>/gi, " ");  
   return block;
 }
 
