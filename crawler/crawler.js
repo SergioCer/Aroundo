@@ -194,15 +194,15 @@ function extractSchemaEvents(html) {
 
 /* DATA FUTURA DEL SINGOLO EVENTO SCHEMA.ORG */
 function getSchemaFutureDate(event) {
-  if (!event?.startDate) {return null;}
-  const value = String(event.startDate).trim();
+  const value = String(event?.startDate || "").trim();
   const dateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (!dateMatch) {return null;}
   const year = Number(dateMatch[1]);
   const month = Number(dateMatch[2]) - 1;
   const day = Number(dateMatch[3]);
   const date = createValidDate(year, month, day);
-  if (!date || date <= getToday()) {return null;}
+  const today = getToday();
+  if (!date || date <= today) {return null;}
   return date;
 }
 
