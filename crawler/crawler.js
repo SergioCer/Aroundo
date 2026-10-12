@@ -156,6 +156,105 @@ function findFutureDate(html) {if (!html) {return null;}
   return null;
 }
 
+
+/* ESTRAZIONE EVENTI SCHEMA.ORG */
+function extractSchemaEvents(html) {
+  const events = [];
+  const jsonLdRegex = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let match;
+  function isEvent(item) {
+    const types = Array.isArray(item["@type"]) ? item["@type"] : [item["@type"]];
+    return types.some(type =>
+      typeof type === "string" &&
+      (type.toLowerCase() === "event" || type.toLowerCase().endsWith("event"))
+    );
+  }
+  function collect(item) {
+    if (!item || typeof item !== "object") {return;}
+    if (!Array.isArray(item) && isEvent(item)) {
+      events.push(item);
+    }
+    if (Array.isArray(item)) {
+      for (const child of item) {collect(child);}
+    } else {
+      for (const value of Object.values(item)) {
+        if (value && typeof value === "object") {collect(value);}
+      }
+    }
+  }
+  while ((match = jsonLdRegex.exec(html)) !== null) {
+    try {
+      collect(JSON.parse(match[1]));
+    } catch (error) {
+      console.log("[SCHEMA] JSON-LD non valido, blocco ignorato.");
+    }
+  }
+  return events;
+}
+
+/* DATA FUTURA DEL SINGOLO EVENTO SCHEMA.ORG */
+function getSchemaFutureDate(event) {
+  if (!event?.startDate) {return null;}
+  const value = String(event.startDate).trim();
+  const dateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!dateMatch) {return null;}
+  const year = Number(dateMatch[1]);
+  const month = Number(dateMatch[2]) - 1;
+  const day = Number(dateMatch[3]);
+  const date = createValidDate(year, month, day);
+  if (!date || date <= getToday()) {return null;}
+  return date;
+}
+
+/* COMUNE DELL'EVENTO SCHEMA.ORG */
+function getSchemaComune(event) {
+  const location = event?.location;
+  if (!location) {return null;}
+  const locations = Array.isArray(location) ? location : [location];
+  for (const item of locations) {
+    if (!item || typeof item !== "object") {continue;}
+    const address = item.address;
+    const addresses = Array.isArray(address) ? address : [address];
+    for (const entry of addresses) {
+      if (!entry) {continue;}
+      const text = typeof entry === "string"
+        ? entry
+        : [
+            entry.addressLocality,
+            entry.addressRegion,
+            entry.postalCode,
+            entry.streetAddress
+          ].filter(Boolean).join(" ");
+      const comune = matchComune(text);
+      if (comune) {return comune;}
+    }
+    const comune = matchComune(item.name || "");
+    if (comune) {return comune;}
+  }
+  return null;
+}
+
+/* CONTROLLO DUPLICATI SCHEMA.ORG */
+async function schemaEventExists(siteId, pageUrl, futureDate, idComune, block) {
+  let query = supabase
+    .from("site_pages")
+    .select("id_site_page")
+    .eq("id_site", siteId)
+    .eq("sp_url", pageUrl)
+    .eq("sp_date", futureDate)
+    .eq("sp_block", block);
+  if (idComune === null) {
+    query = query.is("id_comune", null);
+  } else {
+    query = query.eq("id_comune", idComune);
+  }
+  const {data, error} = await query.limit(1);
+  if (error) {throw error;}
+  return data.length > 0;
+}
+
+
+
 /* NORMALIZZAZIONE URL */
 function normalizeUrl(href, baseUrl) {
   try {
@@ -502,10 +601,50 @@ async function crawlSite(site) {
     /* ANALISI STRUTTURALE */
     const root = buildDom(result.content);
     const ricorsivity = foundRicorsivity(root, result.content);
-    
 /* ANALISI DEI SINGOLI BLOCCHI */
 await loadComuniDictionary();
 const detectedAt = new Date().toISOString();
+/* ANALISI EVENTI SCHEMA.ORG */
+const schemaEvents = extractSchemaEvents(result.content);
+for (const event of schemaEvents) {
+  const futureDate = getSchemaFutureDate(event);
+  if (!futureDate) {continue;}
+  const futureDateISO = futureDate.toISOString().slice(0, 10);
+  const comune = getSchemaComune(event);
+  const idComune = comune ? comune.id : null;
+  const block = JSON.stringify(event, null, 2);
+  const pageUrl = result.url || currentUrl;
+  console.log(
+    `[SCHEMA] ${pageUrl}` +
+    ` → data=${futureDateISO}` +
+    ` | comune=${idComune}` +
+    ` | lunghezza=${block.length}`
+  );
+  try {
+    const duplicate = await schemaEventExists(
+      site.id_site,
+      pageUrl,
+      futureDateISO,
+      idComune,
+      block
+    );
+    if (duplicate) {
+      console.log(`[SCHEMA DUPLICATO] ${pageUrl} → evento già presente`);
+      continue;
+    }
+    await saveSitePage(
+      site.id_site,
+      pageUrl,
+      detectedAt,
+      futureDateISO,
+      idComune,
+      block
+    );
+  } catch (error) {
+    crawlerStatus.errors++;
+    console.log(`[SCHEMA DB ERROR] ${pageUrl} → ${error.message}`);
+  }
+}
 for (const group of ricorsivity) {
   for (const element of group.elements) {
     const block = result.content.slice(element.start, element.end);
