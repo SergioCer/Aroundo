@@ -180,18 +180,17 @@ function extractTimes(text) {
 /* PREZZO */
 function extractPrice(text) {
   if (!text) return null;
-  const priceToDefine = /\b(?:prezzo da definire|prezzo da confermare|prezzo da stabilire|prezzo non ancora disponibile|price to be determined|price to be confirmed|price tbd)\b/i;
-  if (priceToDefine.test(text)) {return "da definire";}
-  const free = /\b(?:free|gratis|gratuito|gratuita|gratuit|gratuitement|kostenlos|kostenfrei|kostenloser Eintritt|ingresso libero)\b/i;
-  if (free.test(text)) {return "gratuito";}
+  const priceToDefine = /\b(?:prezzo da definire|prezzo da confermare|prezzo da stabilire|prezzo non ancora disponibile|prezzo da annunciare|price to be determined|price to be confirmed|price to be announced|price tbd|tbd|to be announced|to be determined|to be confirmed|not yet announced|not yet available)\b/i;
+  if (priceToDefine.test(text)) return "da definire";
+  const free = /\b(?:gratis|gratuito|gratuita|gratuiti|gratuite|gratuitement|kostenlos|kostenfrei|free admission|free entry|free entrance|ingresso libero|entrata libera)\b/i;
+  if (free.test(text)) return "gratuito";
   const patterns = [
     /(?:€|EUR|USD|GBP|CHF|JPY|CNY|CAD|AUD)\s*\d[\d.,]*/i,
     /\d[\d.,]*\s*(?:€|EUR|USD|GBP|CHF|JPY|CNY|CAD|AUD)\b/i
   ];
   for (const re of patterns) {
     const match = text.match(re);
-    if (match) {const amount = match[0].match(/[\d][\d.,]*/)[0];
-      return amount;}
+    if (match) return match[0].match(/\d[\d.,]*/)[0];
   }
   return null;
 }
