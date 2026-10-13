@@ -156,7 +156,6 @@ function findFutureDate(html) {if (!html) {return null;}
   return null;
 }
 
-
 /* ESTRAZIONE EVENTI SCHEMA.ORG */
 function extractSchemaEvents(html) {
   const events = [];
@@ -597,7 +596,8 @@ async function crawlSite(site) {
       } continue;
     }
     /* Pagina non disponibile o risorsa non HTML. */
-    if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
+    
+    // if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
     /* ANALISI STRUTTURALE */
     const root = buildDom(result.content);
     const ricorsivity = foundRicorsivity(root, result.content);
@@ -716,7 +716,7 @@ for (const group of ricorsivity) {
               catch {linkUrl = null;}
               if (linkUrl && linkUrl.hostname === siteHost) {
                 if (!isIgnoredUrl(link) && !visited.has(link) && !queue.includes(link) && !(await pageCrawled(link))) {
-                  console.log(`[QUEUE] ${currentUrl} → ${link}`);
+                  // console.log(`[QUEUE] ${currentUrl} → ${link}`);
                   queue.push(link);
                 }
               }
