@@ -297,15 +297,24 @@ function escapeHtml(value){
     .replace(/'/g,"&#039;");
 }
 
-function value(v){
-  if(v === null || v === undefined){return "";}
-  if(typeof v === "string"){return v.trim();}
-  if(typeof v === "object"){
-    if(v.name){return value(v.name);}
-    if(v["@value"]){return value(v["@value"]);}
+function value(v) {
+  if (v === null || v === undefined) return "";
+  if (Array.isArray(v)) {return v.map(value).filter(Boolean).join(", ");}
+  if (typeof v === "object") {
+    if (v.name) return value(v.name);
+    if (v["@value"] !== undefined) return value(v["@value"]);
+    const address = v.address;
+    if (address) {const parts = [
+        v.name,
+        typeof address === "string" ? address : address.streetAddress,
+        typeof address === "object" ? address.addressLocality : null,
+        typeof address === "object" ? address.addressRegion : null
+      ].map(value).filter(Boolean);
+      if (parts.length) return [...new Set(parts)].join(", ");
+    }
     return JSON.stringify(v);
   }
-  return String(v);
+  return String(v).trim();
 }
 
 function formatDate(value){
@@ -320,21 +329,24 @@ function formatDate(value){
   }catch(e){return {date:value, time:""};}
 }
 
-function eventLocation(event){
+function eventLocation(event) {
   const location = event.location;
-  if(!location){return "";}
-  if(typeof location === "string"){return location;}
+  if (!location) return "";
+  if (typeof location === "string") {return location;}
   const parts = [];
-  if(location.name){parts.push(value(location.name));}
+  if (location.name) {parts.push(value(location.name));}
   const address = location.address;
-  if(address){
-    if(typeof address === "string"){
-      if(!location.name){parts.push(address);}
-    }else{
-      if(address.streetAddress){parts.push(value(address.streetAddress));}
-    }
+  if (typeof address === "string") {parts.push(address);
+  } else if (address && typeof address === "object") {[
+      address.streetAddress,
+      address.addressLocality,
+      address.addressRegion,
+      address.postalCode
+    ].forEach(part => {
+      const text = value(part);
+      if (text && !parts.includes(text)) parts.push(text);});
   }
-  return parts.join(", ");
+  return [...new Set(parts)].join(", ");
 }
 
 /* CAMPI ORDINABILI di SCHEMA.ORG */
@@ -409,29 +421,15 @@ function displaySchemaValue(v){
 function schemaDetails(event, id) {
   const fields = [...schemaFields];
   Object.keys(event).forEach(key => {
-    if (key !== "data" && !fields.includes(key)) {
-      fields.push(key);
-    }
-  });
-  const dataFields = event.data && typeof event.data === "object"
-    ? Object.keys(event.data)
-    : [];
-  dataFields.forEach(key => {
-    if (!fields.includes(key)) {
-      fields.push(key);
-    }
-  });
+    if (!fields.includes(key)) {fields.push(key);}});
   return `<div id="${id}" class="schema-details">
     ${fields.map(field => {
-      const inData = dataFields.includes(field);
-      const v = inData ? event.data[field] : event[field];
+      const v = event[field];
       const exists = v !== undefined && v !== null && v !== "";
       return `<div class="schema-field">
         <div class="schema-name">${escapeHtml(field)}</div>
         <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(formatSchemaValue(v)) : "null"}</div>
-      </div>`;
-    }).join("")}
-  </div>`;
+      </div>`; }).join("")}</div>`;
 }
 
 /* SCHEDA EVENTO */
@@ -441,8 +439,8 @@ function eventCard(row,index){
   const description = value(event.description);
   const startDate = value(event.startDate);
   const endDate = value(event.endDate);
-  const comune = value(event.location?.address?.addressLocality);
   const location = eventLocation(event);
+  const comune = value(typeof event.location === "object" ? event.location.address?.addressLocality: "");
   const organizer = value(event.organizer);
   const offers = displaySchemaValue(event.offers);
   const performer = displaySchemaValue(event.performer);
@@ -456,7 +454,7 @@ function eventCard(row,index){
         <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
       ${startDate ? `<div class="field"><span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">
         Ora:</span> ${escapeHtml(formatDate(startDate).time)}`: ""}</div>`: ""}
-      ${endDate? `<div class="field"><span class="label">Fine:</span>${escapeHtml(formatDate(endDate))}</div>`: ""}
+      ${endDate ? `<div class="field"><span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` — ${escapeHtml(formatDate(endDate).time)}` : ""}</div>` : ""}      
       ${comune ? `<div class="field"><span class="label">Comune: </span>${escapeHtml(comune)}</div>`: ""}
       ${location ? `<div class="field"><span class="label">Luogo: </span>${escapeHtml(location)}</div>`: ""}
       ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
@@ -468,7 +466,7 @@ function eventCard(row,index){
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
       <div class="timestamp">Acquisito: ${escapeHtml(formatDate(row.se_extracted).date)} - 
-      <span class="classification-${escapeHtml(value(event.data?.classification))}">${escapeHtml(value(event.data?.classification))}</span></div>
+      <span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')">Delete</button>
       ${schemaDetails(event,schemaId)}</div></article>`;
@@ -495,10 +493,12 @@ function sortEvents() {
     const schema = row.se_schema || {};
     return schema.startDate || schema.data?.date || "";
   };
-  const getPlace = (row) => {
-    const schema = row.se_schema || {};
-    return schema.location?.address?.addressLocality || "";
-  };
+const getPlace = (row) => {const location = row.se_schema?.location;
+  if (!location || typeof location !== "object") return "";
+  return location.address?.addressLocality
+    || location.name
+    || "";
+};
   loadedEvents.sort((a, b) => {
     const dateA = getDate(a);
     const dateB = getDate(b);
