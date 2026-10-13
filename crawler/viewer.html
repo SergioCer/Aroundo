@@ -329,15 +329,16 @@ function formatDate(value){
   }catch(e){return {date:value, time:""};}
 }
 
-function eventLocation(event) {
-  const location = event.location;
+function eventLocation(event) {const location = event.location;
   if (!location) return "";
-  if (typeof location === "string") {return location;}
+  if (typeof location === "string") return location;
+  if (typeof location !== "object") return "";
   const parts = [];
   if (location.name) {parts.push(value(location.name));}
   const address = location.address;
   if (typeof address === "string") {parts.push(address);
-  } else if (address && typeof address === "object") {[
+  } else if (address && typeof address === "object") {
+    [
       address.streetAddress,
       address.addressLocality,
       address.addressRegion,
@@ -440,7 +441,7 @@ function eventCard(row,index){
   const startDate = value(event.startDate);
   const endDate = value(event.endDate);
   const location = eventLocation(event);
-  const comune = value(typeof event.location === "object" ? event.location.address?.addressLocality: "");
+  const comune = value(event.location && typeof event.location === "object" ? event.location.address?.addressLocality: "");
   const organizer = value(event.organizer);
   const offers = displaySchemaValue(event.offers);
   const performer = displaySchemaValue(event.performer);
