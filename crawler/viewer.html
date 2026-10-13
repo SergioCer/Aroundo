@@ -544,11 +544,19 @@ const getPlace = (row) => {const location = row.se_schema?.location;
 }
 
 /* Cancella l'evento selezionato */ 
-async function deleteEvent(id){
-  const {error}=await supabase.from('site_events').delete().eq('id_site_event',id);
-  if(error){console.error(error);alert("Errore durante l'eliminazione");return}
-  document.querySelector(`button[onclick="deleteEvent('${id}')"]`)?.closest('article.event')?.remove();
-}  
+
+async function deleteEvent(id) {
+  const { error } = await supabase
+    .from("site_events")
+    .delete()
+    .eq("id_site_event", id);
+  if (error) {console.error(error); alert("Errore durante l'eliminazione"); return;}
+  // Rimuove il record anche dall'array usato per l'ordinamento.
+  loadedEvents = loadedEvents.filter(row => String(row.id_site_event) !== String(id));
+  // Aggiorna le schede, il conteggio e l'ordinamento.
+  document.getElementById("status").textContent = String(loadedEvents.length);
+  sortEvents();
+}
   
 document.getElementById("sortBy").addEventListener("change", (event) => {
   sortBy = event.target.value;
