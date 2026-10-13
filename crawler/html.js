@@ -621,7 +621,7 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   const internal = {
     id_site_page: page.id_site_page,
     id_comune: page.id_comune,
-    classification: "evento",
+    classification: "json",
     fundamentals: {},
     reinforcements: {},
     signals: [],
