@@ -39,15 +39,6 @@ async function loadCategoryDictionary(supabase) {
   return CATEGORY_DICTIONARY;
 }
 
-/* ======================================================
-AROUNDO - HTML EVENT EXTRACTOR - LOGICA
-EVENTO COMPLETO: TITOLO + DATA + LUOGO
-INCOMPLETO: almeno 2 fondamentali tra: TITOLO / DATA / LUOGO + almeno 2 rafforzativi forti tra: ORA; PREZZO / GRATUITO; ORGANIZZATORE; CREATOR / PERFORMER; CATEGORIA
-IMG e URL NON sono rafforzativi forti.
-La pagina viene analizzata come struttura HTML.
-I segnali possono trovarsi in nodi diversi ma devono appartenere allo stesso contenitore semantico.
-Schema.org è OUTPUT, non criterio di riconoscimento. */
-
 /* UTILITA' */
 function clean(value) {
   if (value === null || value === undefined) return null;
@@ -475,17 +466,12 @@ function normalizeImageUrl(value, pageUrl) {
   if (!value) return null;
   let url = absoluteUrl(value.trim(), pageUrl);
   if (!url) return null;
-  try {
-    const parsed = new URL(url);
+  try {const parsed = new URL(url);
     if (parsed.pathname === "/_next/image") {
       const original = parsed.searchParams.get("url");
-      if (original) {
-        url = new URL(original, parsed.origin).href;
-      }
+      if (original) {url = new URL(original, parsed.origin).href;}
     }
-  } catch (error) {
-    return url;
-  }
+  } catch (error) {return url;}
   return url;
 }
 
@@ -588,81 +574,165 @@ function toSchemaEvent(page, s) {
         : {"@type": "Offer", price: s.price}
     : null;
   const categoryData = s.category || {};
-  return {"@context": "https://schema.org", "@type": "Event", name: s.title,
-    description: extractDescription(s.text, s.title),
-    image: s.image, url: page.sp_url,
-    startDate, location, organizer,
-    performer: creators, creator: creators,
-    offers, inLanguage: "it",
-    data: {
-      id_site_page: page.id_site_page,
-      classification: s.classification,
-      fundamentals: s.fundamentals,
-      reinforcements: s.reinforcements,
-      signals: [
-        ...Object.entries(s.fundamentals)
-          .filter(([, value]) => value)
-          .map(([key]) => key),
-        ...Object.entries(s.reinforcements)
-          .filter(([, value]) => value)
-          .map(([key]) => key)
-      ],
-      category: categoryData.category ?? null,
-      categorySlug: categoryData.categorySlug ?? null,
-      macroMatches: categoryData.macroMatches ?? [],
-      subMatches: categoryData.subMatches ?? [],
-      macroCount: categoryData.macroCount ?? 0,
-      subCount: categoryData.subCount ?? 0,
-      strength: categoryData.strength ?? null,
-      id_comune: page.id_comune,
-    }
+const internal = {
+  id_site_page: page.id_site_page,
+  id_comune: page.id_comune,
+  classification: s.classification,
+  fundamentals: s.fundamentals,
+  reinforcements: s.reinforcements,
+  signals: [
+    ...Object.entries(s.fundamentals)
+      .filter(([, value]) => value)
+      .map(([key]) => key),
+    ...Object.entries(s.reinforcements)
+      .filter(([, value]) => value)
+      .map(([key]) => key)
+  ],
+  category: categoryData.category ?? null,
+  categorySlug: categoryData.categorySlug ?? null,
+  macroMatches: categoryData.macroMatches ?? [],
+  subMatches: categoryData.subMatches ?? [],
+  macroCount: categoryData.macroCount ?? 0,
+  subCount: categoryData.subCount ?? 0,
+  strength: categoryData.strength ?? null
+};
+const source = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  name: s.title,
+  description: extractDescription(s.text, s.title),
+  startDate,
+  location,
+  organizer,
+  performer: creators,
+  creator: creators,
+  offers,
+  image: s.image,
+  url: page.sp_url,
+  inLanguage: "it"
+};
+return normalizeSchemaEvent(source, internal);
+}
+
+/* CONVERSIONE JSON-LD */
+function toSchemaJsonEvent(page, parsed, categoryDictionary) {
+  const source = { ...parsed };
+  const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
+  const internal = {
+    id_site_page: page.id_site_page,
+    id_comune: page.id_comune,
+    classification: "evento",
+    fundamentals: {},
+    reinforcements: {},
+    signals: [],
+    category: categoryData.category ?? null,
+    categorySlug: categoryData.categorySlug ?? null,
+    macroMatches: categoryData.macroMatches ?? [],
+    subMatches: categoryData.subMatches ?? [],
+    macroCount: categoryData.macroCount ?? 0,
+    subCount: categoryData.subCount ?? 0,
+    strength: categoryData.strength ?? null
   };
+  return normalizeSchemaEvent(source, internal);
+}
+
+
+/* CAMPI CANONICI — stesso ordine del Viewer */
+const SCHEMA_FIELDS = [
+  "name", "description", "startDate", "endDate", "duration",
+  "doorTime", "location", "offers", "isAccessibleForFree",
+  "organizer", "creator", "performer", "actor", "composer",
+  "strength", "category", "categorySlug", "macroCount",
+  "macroMatches", "subCount", "subMatches",
+  "fundamentals", "reinforcements", "signals",
+  "id_site_page", "id_comune", "classification",
+  "subEvent", "superEvent", "eventAttendanceMode",
+  "eventStatus", "eventSchedule", "previousStartDate",
+  "audience", "inLanguage", "image", "url", "sameAs"
+];
+
+/* Costruisce uno schema normalizzato:
+ * 1. campi canonici nell'ordine stabilito;
+ * 2. proprietà aggiuntive non duplicate in coda.
+ * I campi assenti vengono rappresentati come null. */
+function normalizeSchemaEvent(source, internal = {}) {
+  const input = source && typeof source === "object" ? source : {};
+  const result = {};
+  for (const field of SCHEMA_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(internal, field)) {
+      result[field] = internal[field];
+    } else if (Object.prototype.hasOwnProperty.call(input, field)) {
+      result[field] = input[field];
+    } else {result[field] = null;}
+  }
+  // Conserva tutte le proprietà aggiuntive non canoniche.
+  for (const [key, value] of Object.entries(input)) {
+    if (!Object.prototype.hasOwnProperty.call(result, key)) {result[key] = value;}
+  }
+  return result;
+}
+
+/* Riconosce il formato originale di sp_block.
+ * Non modifica il contenuto salvato in site_pages. */
+function detectBlockFormat(value) {
+  if (typeof value !== "string") return "unknown";
+  const block = value.replace(/^\uFEFF/, "").trim();
+  if (!block) return "empty";
+  if (block.startsWith("<")) return "html";
+  if (block.startsWith("{")) return "json";
+  return "unknown";
+}
+
+function parseJsonBlock(value) {
+  const block = String(value).replace(/^\uFEFF/, "").trim();
+  try {const parsed = JSON.parse(block);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {return { error: "Il JSON non contiene un oggetto" };}
+    return { data: parsed };
+  } catch (error) {return { error: error.message };}
 }
 
 async function processSitePage(page, categoryDictionary, supabase) {
-  const signals = analyzeSignals(page, categoryDictionary);
-  if (!signals) {
-    console.log(`[HTML] Blocco vuoto: ${page.id_site_page}`);
-    return;
-  }
-  if (signals.classification === "non-evento") {
-    console.log(`[HTML] Non è un evento: ${page.id_site_page}`);
-    return;
-  }
-  const schema = toSchemaEvent(page, signals);
+  const format = detectBlockFormat(page.sp_block);
+  let schema;
+  let classification;
+  if (format === "html") {const signals = analyzeSignals(page, categoryDictionary);
+    if (!signals) {console.log(`[HTML] Blocco vuoto: ${page.id_site_page}`); return;}
+    if (signals.classification === "non-evento") {console.log(`[HTML] Non è un evento: ${page.id_site_page}`); return;}
+    schema = toSchemaEvent(page, signals);
+    classification = signals.classification;
+  } else if (format === "json") {
+    const parsedResult = parseJsonBlock(page.sp_block);
+    if (parsedResult.error) {console.error(`[JSON] JSON non valido ${page.id_site_page}:`, parsedResult.error); return;}
+    const parsed = parsedResult.data;
+    const types = Array.isArray(parsed["@type"])
+      ? parsed["@type"]
+      : [parsed["@type"]];
+    const isEvent = types.some(type => typeof type === "string" && type.split("/").pop().split(":").pop() === "Event");
+    if (!isEvent) {console.log(`[JSON] Non è un evento Schema.org: ${page.id_site_page}`); return;}
+    schema = toSchemaJsonEvent(page, parsed, categoryDictionary);
+    classification = "evento";
+  } else {console.log(`[FORMATO] Blocco ${format}: ${page.id_site_page}`); return;}
   const { data: existing, error: findError } = await supabase
     .from("site_events")
     .select("id_site_event")
     .eq("id_site_page", page.id_site_page)
     .limit(1)
     .maybeSingle();
-  if (findError) {
-    console.error(`[HTML] Errore ricerca evento ${page.id_site_page}:`, findError);
-    return;
-  }
+  if (findError) {console.error(`[ESTRAI] Errore ricerca evento ${page.id_site_page}:`, findError); return;}
   let result;
-  if (existing) {
-    result = await supabase
+  if (existing) {result = await supabase
       .from("site_events")
-      .update({
-        se_schema: schema,
-        se_extracted: new Date().toISOString()
-      })
+      .update({se_schema: schema, se_extracted: new Date().toISOString()})
       .eq("id_site_event", existing.id_site_event);
-  } else {
-    result = await supabase
+  } else {result = await supabase
       .from("site_events")
-      .insert({
-        id_site_page: page.id_site_page,
-        se_schema: schema
-      });
+      .insert({id_site_page: page.id_site_page, se_schema: schema});
   }
   if (result.error) {
-    console.error(`[HTML] Errore salvataggio evento ${page.id_site_page}:`, result.error);
-    return;
-  }
-  console.log(`[HTML] Evento salvato: ${page.id_site_page} (${signals.classification})`);
+    console.error(`[ESTRAI] Errore salvataggio evento ${page.id_site_page}:`, result.error); return;}
+  console.log(`[ESTRAI] Evento salvato: ${page.id_site_page} (${classification})`);
 }
+
 
 export async function runAnalysis(supabase) {
 const categoryDictionary = await loadCategoryDictionary(supabase);
