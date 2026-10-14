@@ -636,7 +636,6 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   return normalizeSchemaEvent(source, internal);
 }
 
-
 /* CAMPI CANONICI — stesso ordine del Viewer */
 const SCHEMA_FIELDS = [
   "name", "description", "startDate", "endDate", "duration",
@@ -672,6 +671,43 @@ function normalizeSchemaEvent(source, internal = {}) {
   return result;
 }
 
+/* ECCEZIONI ESTRAZIONE */
+const EXTRACTION_EXCEPTIONS = [
+  // Moesco inserisce la propria redazione come organizzatore.
+  {domain: "moesco.it", field: "organizer", name: "Redazione moesco", action: "remove"}
+];
+
+function applyExtractionExceptions(schema, page) {
+  let hostname = "";
+  try {hostname = new URL(page.sp_url).hostname.toLowerCase();
+  } catch {return schema;}
+  for (const rule of EXTRACTION_EXCEPTIONS) {
+    if (rule.field !== "organizer" || rule.action !== "remove") continue;
+    if (hostname !== rule.domain && !hostname.endsWith("." + rule.domain)) continue;
+    const organizer = schema.organizer;
+    if (organizer && typeof organizer === "object" && organizer.name === rule.name) {schema.organizer = null;}
+  }
+  return schema;
+}
+
+/* CONFRONTO JSON NORMALIZZATO */
+function eventDuplicateKey(schema) {
+  const normalized = {...schema};
+  delete normalized.url;
+  delete normalized.id_site_page;
+  function sortKeys(value) {
+    if (Array.isArray(value)) return value.map(sortKeys);
+    if (value && typeof value === "object") {return Object.keys(value).sort().reduce((result, key) => {result[key] = sortKeys(value[key]); return result;}, {});}
+    return value;
+  }
+  return JSON.stringify(sortKeys(normalized));
+}
+
+function isDuplicateEvent(schema, existingSchemas) {
+  const key = eventDuplicateKey(schema);
+  return existingSchemas.has(key);
+}
+
 /* Riconosce il formato originale di sp_block.
  * Non modifica il contenuto salvato in site_pages. */
 function detectBlockFormat(value) {
@@ -691,7 +727,8 @@ function parseJsonBlock(value) {
   } catch (error) {return { error: error.message };}
 }
 
-async function processSitePage(page, categoryDictionary, supabase) {
+
+async function processSitePage(page, categoryDictionary, supabase, eventState) {
   const format = detectBlockFormat(page.sp_block);
   let schema;
   let classification;
@@ -712,54 +749,83 @@ async function processSitePage(page, categoryDictionary, supabase) {
     schema = toSchemaJsonEvent(page, parsed, categoryDictionary);
     classification = "evento";
   } else {console.log(`[FORMATO] Blocco ${format}: ${page.id_site_page}`); return;}
-  const { data: existing, error: findError } = await supabase
-    .from("site_events")
-    .select("id_site_event")
-    .eq("id_site_page", page.id_site_page)
-    .limit(1)
-    .maybeSingle();
-  if (findError) {console.error(`[ESTRAI] Errore ricerca evento ${page.id_site_page}:`, findError); return;}
-  let result;
-  if (existing) {result = await supabase
+  schema = applyExtractionExceptions(schema, page);
+  const pageId = String(page.id_site_page);
+  const existing = eventState.byPage.get(pageId);
+  const key = eventDuplicateKey(schema);
+  if (existing) {
+    const oldKey = eventDuplicateKey(existing.se_schema);
+    const result = await supabase
       .from("site_events")
       .update({se_schema: schema, se_extracted: new Date().toISOString()})
       .eq("id_site_event", existing.id_site_event);
-  } else {result = await supabase
-      .from("site_events")
-      .insert({id_site_page: page.id_site_page, se_schema: schema});
+    if (result.error) {console.error(`[ESTRAI] Errore aggiornamento evento ${page.id_site_page}:`, result.error); return;}
+    eventState.removeKey(oldKey);
+    eventState.addKey(key);
+    existing.se_schema = schema;
+    console.log(`[ESTRAI] Evento aggiornato: ${page.id_site_page} (${classification})`); return;
   }
-  if (result.error) {
-    console.error(`[ESTRAI] Errore salvataggio evento ${page.id_site_page}:`, result.error); return;}
+  if (isDuplicateEvent(schema, eventState.keys)) {console.log(`[ESTRAI] Duplicato ignorato: ${page.id_site_page}`); return;}
+  const result = await supabase
+    .from("site_events")
+    .insert({id_site_page: page.id_site_page, se_schema: schema})
+    .select("id_site_event")
+    .single();
+  if (result.error) {console.error(`[ESTRAI] Errore inserimento evento ${page.id_site_page}:`, result.error); return;}
+  eventState.byPage.set(pageId, {
+    id_site_event: result.data.id_site_event,
+    id_site_page: page.id_site_page,
+    se_schema: schema
+  });
+  eventState.addKey(key);
   console.log(`[ESTRAI] Evento salvato: ${page.id_site_page} (${classification})`);
 }
 
 
 export async function runAnalysis(supabase) {
 const categoryDictionary = await loadCategoryDictionary(supabase);
+const {data: existingEvents, error: eventsError} = await supabase
+  .from("site_events")
+  .select("id_site_event, id_site_page, se_schema");
+if (eventsError) {console.error("[ESTRAI] Errore caricamento eventi esistenti:", eventsError); return;}
+const eventState = {
+  byPage: new Map(),
+  keys: new Set(),
+  keyCounts: new Map(),
+  addKey(key) {const count = this.keyCounts.get(key) || 0;
+    this.keyCounts.set(key, count + 1);
+    this.keys.add(key);
+  },
+  removeKey(key) {const count = this.keyCounts.get(key) || 0;
+    if (count <= 1) {
+      this.keyCounts.delete(key);
+      this.keys.delete(key);
+    } else {
+      this.keyCounts.set(key, count - 1);
+    }
+  }
+};
+for (const event of existingEvents || []) {
+  eventState.byPage.set(String(event.id_site_page), event);
+  if (event.se_schema && typeof event.se_schema === "object") {eventState.addKey(eventDuplicateKey(event.se_schema));}
+}
 const pages = [];
 const batchSize = 500;
 let from = 0;
-while (true) {
-  const { data, error } = await supabase
+while (true) {const { data, error } = await supabase
     .from("site_pages")
     .select(`id_site_page, sp_url, sp_date, id_comune, sp_block, comuni (co_descrizione, co_cap)`)
     .not("sp_block", "is", null)
     .order("id_site_page", { ascending: true })
     .range(from, from + batchSize - 1);
-  if (error) {
-    console.error("[HTML] Errore caricamento pagine:", error);
-    return;
-  }
+  if (error) {console.error("[HTML] Errore caricamento pagine:", error); return;}
   pages.push(...(data || []));
   if (!data || data.length < batchSize) break;
   from += batchSize;
 }
-  for (const page of pages || []) {
-    try {
-      await processSitePage(page, categoryDictionary, supabase);
-    } catch (error) {
-      console.error(`[HTML] Errore pagina ${page.id_site_page}:`, error);
-    }
-  }
-  console.log("[HTML] Analisi completata.");
+for (const page of pages || []) {
+  try {await processSitePage(page, categoryDictionary, supabase, eventState);
+  } catch (error) {console.error(`[HTML] Errore pagina ${page.id_site_page}:`, error);}
+}
+console.log("[HTML] Analisi completata.");
 }
