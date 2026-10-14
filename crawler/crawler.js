@@ -282,6 +282,7 @@ function isIgnoredUrl(url) {
 }
 
 /* ESTRAZIONE DEGLI HREF */
+// ATTENZIONE sembra che non sia agganciata da nessuna parte ***** CANCELLARE ?????
 function extractLinks(html, pageUrl) {
   const results = [];
   const regex = /<a\b[^>]*\bhref\s*=\s*(['"])(.*?)\1/gi;
@@ -676,32 +677,27 @@ for (const group of ricorsivity) {
       if (error) {throw error;}
       return data.length > 0;
     }
-    /* CERCA NUOVI LINK DAI GRUPPI RICORSIVI */
-    for (const group of ricorsivity) {
-      for (const element of group.elements) {
-        const stack = [element];
-        while (stack.length > 0) {
-          const node = stack.pop();
-          const openingTag = result.content.slice(node.start, node.openEnd);
-          const hrefMatch = openingTag.match(/\bhref\s*=\s*["']([^"']+)["']/i);
-          if (hrefMatch) {
-            const link = normalizeUrl(hrefMatch[1], result.url || currentUrl);
-            if (link) {
-              let linkUrl;
-              try {linkUrl = new URL(link);}
-              catch {linkUrl = null;}
-              if (linkUrl && linkUrl.hostname === siteHost) {
-                if (!isIgnoredUrl(link) && !visited.has(link) && !queue.includes(link) && !(await pageCrawled(link))) {
-                  // console.log(`[QUEUE] ${currentUrl} → ${link}`);
-                  queue.push(link);
-                }
-              }
-            }
-          }
-          for (const child of node.children) {stack.push(child);}
-        }
-      }
-    }
+/* CERCA NUOVI LINK NELL'INTERA PAGINA */
+const linkRegex = /<a\b[^>]*\bhref\s*=\s*(["'])(.*?)\1/gi;
+for (const match of result.content.matchAll(linkRegex)) {
+  const link = normalizeUrl(match[2], result.url || currentUrl);
+  if (!link) continue;
+  let linkUrl;
+  try {
+    linkUrl = new URL(link);
+  } catch {
+    continue;
+  }
+  const hostname = linkUrl.hostname.replace(/^www\./i, "");
+  const allowedHost = siteHost.replace(/^www\./i, "");
+  if (hostname !== allowedHost) continue;
+  if (isIgnoredUrl(link)) continue;
+  if (visited.has(link)) continue;
+  if (queue.includes(link)) continue;
+  if (await pageCrawled(link)) continue;
+  console.log(`[QUEUE] ${currentUrl} → ${link}`);
+  queue.push(link);
+}
   }
   console.log("");
   console.log(`Scansione site ${site.id_site} terminata.`);
