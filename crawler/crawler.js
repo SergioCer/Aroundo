@@ -181,12 +181,8 @@ function extractSchemaEvents(html) {
     }
   }
   while ((match = jsonLdRegex.exec(html)) !== null) {
-    try {
-      collect(JSON.parse(match[1]));
-    } catch (error) {
-      console.log("[SCHEMA] JSON-LD non valido, blocco ignorato.");
-    }
-  }
+    try {collect(JSON.parse(match[1]));
+    } catch (error) {console.log(`[SCHEMA] JSON-LD non valido: ${error.message}`);}
   return events;
 }
 
@@ -579,6 +575,27 @@ async function crawlSite(site) {
     // if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
     /* ANALISI STRUTTURALE */
     if (typeof result.content !== "string") {continue;}
+    /* REDIRECT HTML META REFRESH */
+    const metaRefresh = result.content.match(
+      /<meta\b[^>]*http-equiv\s*=\s*["']?refresh["']?[^>]*content\s*=\s*["'][^"']*url\s*=\s*([^"']+)["']/i
+    );
+    if (metaRefresh) {
+      const redirected = normalizeUrl(metaRefresh[1].trim(), result.url || currentUrl);
+      if (redirected) {
+        const redirectedUrl = new URL(redirected);
+        const hostname = redirectedUrl.hostname.replace(/^www\./i, "");
+        const allowedHost = siteHost.replace(/^www\./i, "");
+        if (
+          hostname === allowedHost &&
+          !visited.has(redirected) &&
+          !queue.includes(redirected)
+        ) {
+          console.log(`[META REDIRECT] ${currentUrl} → ${redirected}`);
+          queue.unshift(redirected);
+        }
+      }
+      continue;
+    }
     const root = buildDom(result.content);
     const ricorsivity = foundRicorsivity(root, result.content);
 /* ANALISI DEI SINGOLI BLOCCHI */
