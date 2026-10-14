@@ -28,7 +28,6 @@ function buildTerms(descrizione, slug) {
 
 /* Comuni */
 let COMUNI_DICTIONARY = null;
-
 async function loadComuniDictionary() { 
   if (COMUNI_DICTIONARY) {return COMUNI_DICTIONARY;} 
   const { data, error } = await supabase
@@ -252,8 +251,6 @@ async function schemaEventExists(siteId, pageUrl, futureDate, idComune, block) {
   return data.length > 0;
 }
 
-
-
 /* NORMALIZZAZIONE URL */
 function normalizeUrl(href, baseUrl) {
   try {
@@ -368,8 +365,7 @@ function buildDom(html) {
       continue;
     }
     /* tag void */
-    const voidTag =
-      /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i.test(lower);
+    const voidTag = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i.test(lower);
     const node = {
       tag: lower,
       start: match.index,
@@ -379,9 +375,7 @@ function buildDom(html) {
       parent: stack[stack.length - 1]
     };
     stack[stack.length - 1].children.push(node);
-    if (!voidTag && !full.endsWith("/>")) {
-      stack.push(node);
-    }
+    if (!voidTag && !full.endsWith("/>")) {stack.push(node);}
   }
   return root;
 }
@@ -391,9 +385,7 @@ function foundRicorsivity(root) {
   const recursivities = [];
   const map = new Map();
   function getChildren(node) {
-    return node.children.filter(child =>
-      child.tag !== "script" && child.tag !== "style"
-    );
+    return node.children.filter(child => child.tag !== "script" && child.tag !== "style");
   }
   /* MAPPA DOM: struttura calcolata una sola volta per nodo */
   function mapNode(node) {
@@ -401,8 +393,7 @@ function foundRicorsivity(root) {
     const entry = {node, children, structure: null, recursivities: []};
     map.set(node, entry);
     for (const child of children) {mapNode(child);}
-    entry.structure = node.tag + ">" +
-      children.map(child => map.get(child).structure).join(",");
+    entry.structure = node.tag + ">" + children.map(child => map.get(child).structure).join(",");
     return entry;
   }
   for (const child of getChildren(root)) {
@@ -426,29 +417,19 @@ function foundRicorsivity(root) {
       for (let start = 0; start + length * 2 <= children.length; start++) {
         if (!sameStructureSequence(structures, start, length)) {continue;}
         let repetitions = 2;
-        while (
-          start + (repetitions + 1) * length <= children.length &&
+        while (start + (repetitions + 1) * length <= children.length &&
           sameStructureSequence(structures, start, repetitions * length)
         ) {repetitions++;}
         if (length === 1 && repetitions === 2 && children.length !== 2) {continue;}
         const elements = children.slice(start, start + length * repetitions);
-        return {
-          node,
-          structure: structures.slice(start, start + length).join(","),
-          elements,
-          terminal: elements.every(element => getChildren(element).length === 0)
-        };
+        return {node, structure: structures.slice(start, start + length).join(","), elements, terminal: elements.every(element => getChildren(element).length === 0)};
       }
     }
     return null;
   }
   function collectRecursivities(node) {
     const recurrence = findRecurrence(node);
-    if (recurrence) {
-      recursivities.push(recurrence);
-      map.get(node).recursivities.push(recurrence);
-      return;
-    }
+    if (recurrence) {recursivities.push(recurrence); map.get(node).recursivities.push(recurrence); return;}
     for (const child of getChildren(node)) {collectRecursivities(child);}
   }
   for (const child of getChildren(root)) {
@@ -467,9 +448,7 @@ function foundRicorsivity(root) {
     return count;
   }
   for (const child of getChildren(root)) {
-    if (child.tag === "header" || child.tag === "footer") {continue;}
-    countRecursivities(child);
-  }
+    if (child.tag === "header" || child.tag === "footer") {continue;} countRecursivities(child);}
   function findSingleBlock(recurrence) {
     let block = recurrence.elements[0].parent;
     let current = block;
@@ -596,7 +575,6 @@ async function crawlSite(site) {
       } continue;
     }
     /* Pagina non disponibile o risorsa non HTML. */
-    
     // if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
     /* ANALISI STRUTTURALE */
     const root = buildDom(result.content);
@@ -667,7 +645,6 @@ for (const group of ricorsivity) {
         console.log(`[DUPLICATO] ${currentUrl} → blocco già presente`);
         continue;
       } 
-
       await saveSitePage(
         site.id_site,
         result.url || currentUrl,
@@ -682,7 +659,6 @@ for (const group of ricorsivity) {
     }
   }
 }
-
     async function sitePageExists(siteId, futureDate, idComune, block) {
       let query = supabase
         .from("site_pages")
@@ -699,7 +675,6 @@ for (const group of ricorsivity) {
       if (error) {throw error;}
       return data.length > 0;
     }
-
     /* CERCA NUOVI LINK DAI GRUPPI RICORSIVI */
     for (const group of ricorsivity) {
       for (const element of group.elements) {
@@ -784,7 +759,6 @@ http.createServer(
     /* HOME */
     if (requestUrl.pathname === "/") 
       {return res.end(JSON.stringify({crawler: "AroundoCrawler", port: PORT, running: crawlerRunning, maxPagesPerSite: MAX_PAGES_PER_SITE, status: crawlerStatus}, null, 2));}
-
 /* TEST SINGOLO SITO */
 if (requestUrl.pathname === "/test") {
   if (crawlerRunning) {return res.end(JSON.stringify({ok: false, message: "Crawler già in esecuzione.", status: crawlerStatus}, null, 2));}
@@ -818,7 +792,6 @@ if (requestUrl.pathname === "/test") {
     });
   return res.end(JSON.stringify({ok: true, message: `Test avviato per site=${siteId}.`, status: crawlerStatus}, null, 2));
 }                       
-                       
     /* START */
     if (requestUrl.pathname === "/start") {
       if (crawlerRunning) {return res.end(JSON.stringify({ok: false, message: "Crawler già in esecuzione.", status: crawlerStatus}, null, 2));}
