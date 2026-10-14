@@ -23,7 +23,7 @@ body{
 }
   
 .top{
-  background:#17202a;
+  background:#2980b9;
   color:white;
   padding:20px
 }
@@ -124,7 +124,7 @@ body{
   padding:6px 10px;
   border:0;
   border-radius:20px;
-  background:#34495e;
+  background:#27ae60;
   color:white;
   cursor:pointer;
   font-size:14px;
@@ -591,8 +591,8 @@ async function loadEvents(){
         .order("id_site_event",{ascending:false});
     if(error){throw error;}
     if(!data || data.length === 0){
-      status.textContent = "Nessun evento presente in site_events!";
-      results.innerHTML = `<div class="empty">La tabella site_events non contiene ancora eventi.</div>`;
+      status.textContent = "Nessun evento presente!";
+      results.innerHTML = `<div class="empty">La tabella site_events non contiene eventi. Eseguire ESTRAI</div>`;
       return;}
     loadedEvents = data;
     status.textContent = `${data.length}`;
