@@ -5,7 +5,7 @@ const { supabase } = require("./supabase_node.js");
 
 /* CONFIGURAZIONE */
 const PORT = 3001;
-const MAX_PAGES_PER_SITE = 1000;
+const MAX_PAGES_PER_SITE = 1500;
 const REQUEST_TIMEOUT = 20000;
 const USER_AGENT = "Mozilla/5.0 Crawler/1.0";
 
@@ -577,6 +577,7 @@ async function crawlSite(site) {
     /* Pagina non disponibile o risorsa non HTML. */
     // if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
     /* ANALISI STRUTTURALE */
+    if (typeof result.content !== "string") {continue;}
     const root = buildDom(result.content);
     const ricorsivity = foundRicorsivity(root, result.content);
 /* ANALISI DEI SINGOLI BLOCCHI */
@@ -783,7 +784,7 @@ if (requestUrl.pathname === "/test") {
   crawlSite(site)
     .catch(error => {
       crawlerStatus.errors++;
-      console.log(`[SITE ERROR]` + ` site=${site.id_site}` + ` → ${error.message}`);
+      console.error(`[SITE ERROR] site=${site.id_site} →`, error.stack || error);
     })
     .finally(() => {
       crawlerStatus.sitesCompleted = 1;
