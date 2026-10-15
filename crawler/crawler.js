@@ -169,9 +169,7 @@ function extractSchemaEvents(html) {
   }
   function collect(item) {
     if (!item || typeof item !== "object") {return;}
-    if (!Array.isArray(item) && isEvent(item)) {
-      events.push(item);
-    }
+    if (!Array.isArray(item) && isEvent(item)) {events.push(item);}
     if (Array.isArray(item)) {
       for (const child of item) {collect(child);}
     } else {
@@ -182,7 +180,9 @@ function extractSchemaEvents(html) {
   }
   while ((match = jsonLdRegex.exec(html)) !== null) {
     try {collect(JSON.parse(match[1]));
-    } catch (error) {console.log(`[SCHEMA] JSON-LD non valido: ${error.message}`);}
+    } catch (error) {console.log(`[SCHEMA] JSON-LD non valido: ${error.message}`);
+}
+  }
   return events;
 }
 
