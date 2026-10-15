@@ -644,11 +644,13 @@ const getPlace = (row) => {const location = row.se_schema?.location;
   const childRows = loadedEvents.filter(row => reconciliationChildIds.has(String(row.id_site_event)));
   const selectedIds = new Set([ ...(reconciliationParentId !== null ? [reconciliationParentId] : []), ...reconciliationChildIds]);
   const normalRows = loadedEvents.filter(row => !selectedIds.has(String(row.id_site_event)));
-  document.getElementById("results").innerHTML = 
-    `${parentRow ? `<section class="reconciliation-section"><h2>Riconciliazione</h2>
-      <div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>PADRE</h3> ${eventCard(parentRow, 0, "parent")}</div>
-    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>FIGLIO</h3> ${eventCard(row, index, "child")}</div> `).join("")}
-      </div></section>` : ""}<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
+// Riconciliazione: fuori dall'area che scorre
+document.getElementById("reconciliation").innerHTML = parentRow
+    ? `<section class="reconciliation-section"><h2>Riconciliazione</h2><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>PADRE</h3>
+    ${eventCard(parentRow, 0, "parent")}</div>
+    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>FIGLIO</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
+// Eventi non selezionati: unica area scorrevole
+document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
 }
 
 /* Cancella l'evento selezionato */ 
