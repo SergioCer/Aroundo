@@ -661,7 +661,7 @@ function normalizeSchemaEvent(source, internal = {}) {
     if (Object.prototype.hasOwnProperty.call(internal, field)) {
       result[field] = internal[field];
     } else if (Object.prototype.hasOwnProperty.call(input, field)) {
-      result[field] = input[field];
+      result[field] = ["startDate", "endDate", "previousStartDate"].includes(field) ? normalizeSchemaDate(input[field]) : input[field];
     } else {result[field] = null;}
   }
   // Conserva tutte le proprietà aggiuntive non canoniche.
@@ -670,6 +670,13 @@ function normalizeSchemaEvent(source, internal = {}) {
   }
   return result;
 }
+
+function normalizeSchemaDate(value) {
+  if (typeof value !== "string") return value;
+  // Converte lo spazio tra data e ora in T.
+  return value.replace(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)/, "$1T$2");
+}
+
 
 /* ECCEZIONI ESTRAZIONE */
 const EXTRACTION_EXCEPTIONS = [
