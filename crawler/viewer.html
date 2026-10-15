@@ -257,6 +257,47 @@ body{
 .delete-button:hover{
   background:#c0392b
 }  
+
+
+.reconciliation-section {
+  margin-bottom: 24px;
+  padding: 18px;
+  border: 2px solid #8b9bb4;
+  border-radius: 12px;
+  background: #eef2f7;
+}
+
+.reconciliation-section h2 {
+  margin: 0 0 16px;
+}
+
+.reconciliation-grid {
+  align-items: start;
+}
+
+.reconciliation-card {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ccd4df;
+}
+
+.reconciliation-card h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.reconciliation-card .event {
+  margin: 0;
+}
+
+.reconciliation-card button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
   
 </style>
 </head>
@@ -443,7 +484,7 @@ function schemaDetails(event, id) {
 }
 
 /* SCHEDA EVENTO */
-function eventCard(row,index){
+function eventCard(row, index, reconciliationRole = null){
   const event = row.se_schema || {};
   const title = value(event.name) || value(event.title) || "Evento senza titolo";
   const description = value(event.description);
@@ -477,12 +518,16 @@ function eventCard(row,index){
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
       <div class="timestamp">Acquisito: ${escapeHtml(formatDate(row.se_extracted).date)} - 
       <span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
+      ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')">Delete</button>
       ${schemaDetails(event,schemaId)}</div></article>`;
 }
 
 window.deleteEvent=deleteEvent;
+window.selectParent = selectParent;
+window.addReconciliationChild = addReconciliationChild;
+window.removeFromReconciliation = removeFromReconciliation;
   
 /* APERTURA / CHIUSURA SCHEMA */
 window.toggleSchema = function(id){
@@ -491,11 +536,50 @@ window.toggleSchema = function(id){
   element.classList.toggle("open");
 };
 
-/* ORDINAMENTO EVENTI */
 let loadedEvents = [];
 let sortBy = "id";
 let sortAscending = true;
+let reconciliationParentId = null;
+const reconciliationChildIds = new Set();
 
+
+function selectParent(id) {
+  if (reconciliationParentId !== null) return;
+  reconciliationParentId = String(id);
+  sortEvents();
+}
+
+function addReconciliationChild(id) {
+  const childId = String(id);
+  if (reconciliationParentId === null) return;
+  if (childId === reconciliationParentId) return;
+  reconciliationChildIds.add(childId);
+  sortEvents();
+}
+
+function removeFromReconciliation(id, role) {
+  const eventId = String(id);
+  if (role === "parent") {
+    // Il padre può essere rimosso soltanto se non ci sono figli.
+    if (reconciliationChildIds.size > 0) return;
+    reconciliationParentId = null;
+    reconciliationChildIds.clear();
+  } else if (role === "child") {reconciliationChildIds.delete(eventId);}
+  sortEvents();
+}
+
+function reconciliationButton(row, role = null) {
+  const id = String(row.id_site_event);
+  if (role === "parent") {
+    if (reconciliationChildIds.size > 0) {
+      // Per ora è soltanto un pulsante visibile.
+      return `<button class="schema-button" type="button" disabled title="La riconciliazione sarà implementata in una fase successiva">RICONCILIA</button>`;}
+    return `<button class="delete-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')">Deseleziona</button>`;}
+  if (role === "child") {
+    return `<button class="delete-button" type="button" onclick="removeFromReconciliation('${id}', 'child')">Deseleziona</button>`;}
+  if (reconciliationParentId === null) {
+    return `<button class="schema-button" type="button" onclick="selectParent('${id}')">PADRE</button>`;}
+    return `<button class="schema-button" type="button" onclick="addReconciliationChild('${id}')">FIGLIO</button>`;}
 
 /* ORDINAMENTO EVENTI */
 function sortEvents() {
@@ -545,15 +629,18 @@ const getPlace = (row) => {const location = row.se_schema?.location;
     }
     return sortAscending ? result : -result;
   });
-  document.getElementById("results").innerHTML = `
-    <div class="events-grid">
-      ${loadedEvents.map((row, index) => eventCard(row, index)).join("")}
-    </div>
-  `;
+  const parentRow = loadedEvents.find(row => String(row.id_site_event) === reconciliationParentId);
+  const childRows = loadedEvents.filter(row => reconciliationChildIds.has(String(row.id_site_event)));
+  const selectedIds = new Set([ ...(reconciliationParentId !== null ? [reconciliationParentId] : []), ...reconciliationChildIds]);
+  const normalRows = loadedEvents.filter(row => !selectedIds.has(String(row.id_site_event)));
+  document.getElementById("results").innerHTML = 
+    `${parentRow ? `<section class="reconciliation-section"><h2>Riconciliazione</h2>
+      <div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>PADRE</h3> ${eventCard(parentRow, 0, "parent")}</div>
+    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>FIGLIO</h3> ${eventCard(row, index, "child")}</div> `).join("")}
+      </div></section>` : ""}<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
 }
 
 /* Cancella l'evento selezionato */ 
-
 async function deleteEvent(id) {
   const { error } = await supabase
     .from("site_events")
