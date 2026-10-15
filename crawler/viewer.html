@@ -258,14 +258,20 @@ body{
   background:#c0392b
 }  
 
+#reconciliation {
+  flex: 0 0 auto;
+  min-height: 0;
+  position: relative;
+  z-index: 10;
+}
 
+#reconciliation:empty {
+  display: none;
+}
+  
 .reconciliation-section {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  align-self: start;
-  margin-bottom: 24px;
-  padding: 18px;
+  margin: 12px;
+  padding: 12px;
   border: 2px solid #8b9bb4;
   border-radius: 12px;
   background: #eef2f7;
@@ -324,7 +330,8 @@ body{
 </div>
       <button id="analyzeBtn" class="schema-button">ESTRAI</button>
       <span id="analysisStatus" style="margin-left:12px"></span>
-  
+
+<div id="reconciliation"></div>    
 <div class="wrap">
     <div id="results">
       <div class="empty">
