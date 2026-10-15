@@ -312,6 +312,22 @@ body{
   cursor: not-allowed;
 }
 
+.reconciliation-select-button {
+  margin-top: 6px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 20px;
+  background: #8e44ad;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.reconciliation-select-button:hover {
+  background: #6c3483;
+}  
+
   .reconciliation-remove-button {
   background: #e67e22;
   color: white;
@@ -606,8 +622,8 @@ function reconciliationButton(row, role = null) {
   if (role === "child") {
     return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')">Deseleziona</button>`;}
   if (reconciliationParentId === null) {
-    return `<button class="schema-button" type="button" onclick="selectParent('${id}')">PADRE</button>`;}
-    return `<button class="schema-button" type="button" onclick="addReconciliationChild('${id}')">FIGLIO</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')">PADRE</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')">FIGLIO</button>`;}
 
 /* ORDINAMENTO EVENTI */
 function sortEvents() {
