@@ -822,7 +822,7 @@ for (const match of result.content.matchAll(linkRegex)) {
   if (visited.has(link)) continue;
   if (queue.includes(link)) continue;
   if (await pageCrawled(link)) continue;
-  console.log(`[QUEUE] ${currentUrl} → ${link}`);
+  // console.log(`[QUEUE] ${currentUrl} → ${link}`);
   queue.push(link);
 }
   }
