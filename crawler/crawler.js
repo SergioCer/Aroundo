@@ -332,8 +332,18 @@ function fetchPage(url) {
     });
 }
 
-/* Pulisce il DOM */
+/* COSTRUZIONE DEL DOM SEMPLIFICATO, Scopo:
+   - leggere i tag HTML;
+   - ricostruire la gerarchia padre/figlio;
+   - registrare la posizione iniziale e finale di ogni nodo nel codice HTML originale.
+   Nota: questa funzione non interpreta il contenuto dei tag, non applica le regole di un browser e non corregge automaticamente un HTML malformato. */
 function buildDom(html) {
+    /* 1. NODO RADICE: Rappresenta l'intero documento.
+     Non corrisponde a un tag HTML reale.
+     start/end delimitano l'intera stringa HTML.
+     openEnd vale 0 perché la radice non ha un tag di apertura.
+     children conterrà i nodi principali.
+     parent è null perché la radice non ha un genitore. */
   const root = {
     tag: "#root",
     start: 0,
@@ -342,27 +352,51 @@ function buildDom(html) {
     children: [],
     parent: null
   };
+    /* 2. PILA DEI TAG APERTI, La pila rappresenta il percorso corrente nella gerarchia HTML. Inizialmente contiene soltanto la radice.
+     Quando si incontra un tag di apertura, il nuovo nodo viene aggiunto come figlio del nodo in cima alla pila e, se non è un tag vuoto, viene inserito nella pila. */
   const stack = [root];
+    /* 3. RICERCA DEI TAG, La regex individua:
+     - commenti HTML;
+     - tag di apertura;
+     - tag di chiusura.
+     Il primo gruppo catturato contiene il nome del tag.
+     I commenti non hanno un nome di tag e vengono ignorati.
+     Attenzione: questa è una scansione testuale, non un parser HTML completo. Per esempio, un carattere ">" dentro un attributo quotato può interferire con il riconoscimento. */
   const tagRe = /<!--[\s\S]*?-->|<\/?([a-zA-Z][\w:-]*)(?:\s[^>]*)?>/g;
   for (const match of html.matchAll(tagRe)) {
     const full = match[0];
     const tag = match[1];
+    /* Ignora i commenti HTML. */
     if (!tag) continue;
+    /* Uniforma il nome del tag in minuscolo. */
     const lower = tag.toLowerCase();
+    /* 4. TAG DI CHIUSURA, Cerca nella pila, dall'alto verso il basso, il nodo aperto con lo stesso nome.
+       Se lo trova:
+       - aggiorna end alla fine del tag di chiusura;
+       - rimuove dalla pila quel nodo e gli eventuali nodi più interni rimasti aperti.
+       Se non trova una corrispondenza, ignora la chiusura. */
     if (full.startsWith("</")) {
-      /* chiusura: cerchiamo il tag corrispondente  */
       for (let i = stack.length - 1; i > 0; i--) {
         if (stack[i].tag === lower) {
           const node = stack[i];
           node.end = match.index + full.length;
+          /* La pila torna al genitore del nodo chiuso. */
           stack.length = i;
           break;
         }
       }
       continue;
     }
-    /* tag void */
+    /* 5. TAG VOID, Questi tag non richiedono una chiusura esplicita nella struttura HTML, per esempio img, br e input.
+       Il loro intervallo termina subito dopo il tag.
+       Gli altri nodi partono invece con end provvisorio uguale alla fine dell'intero documento. */
     const voidTag = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i.test(lower);
+    /* 6. CREAZIONE DEL NODO
+       start  = posizione del tag di apertura;
+       end    = posizione finale del nodo, definitiva solo quando viene trovata la chiusura;
+       openEnd = posizione subito dopo il tag di apertura;
+       children = nodi figli;
+       parent = nodo che si trova in cima alla pila. */
     const node = {
       tag: lower,
       start: match.index,
@@ -371,9 +405,13 @@ function buildDom(html) {
       children: [],
       parent: stack[stack.length - 1]
     };
+    /* 7. COLLEGAMENTO AL PADRE, Il nodo viene aggiunto ai figli del genitore corrente. */
     stack[stack.length - 1].children.push(node);
+    /* 8. AGGIORNAMENTO DELLA PILA, I tag non void entrano nella pila perché i successivi tag dovranno essere associati ai loro figli.
+       I tag void e quelli con chiusura /> non vengono inseriti. */
     if (!voidTag && !full.endsWith("/>")) {stack.push(node);}
   }
+  /* 9. RISULTATO, Restituisce la radice e tutti i nodi raggiungibili attraverso children, con i relativi intervalli HTML. */
   return root;
 }
 
@@ -386,42 +424,84 @@ function foundRicorsivity(root) {
   }
   /* MAPPA DOM: struttura calcolata una sola volta per nodo */
   function mapNode(node) {
+    // Recupera i figli diretti del nodo.
     const children = getChildren(node);
+    // Crea la voce associata al nodo, inizializzando la struttura e le ricorsività.
     const entry = {node, children, structure: null, recursivities: []};
+    // Registra subito il nodo nella mappa, rendendolo accessibile tramite il nodo DOM.
     map.set(node, entry);
+    // Elabora ricorsivamente tutti i figli, calcolando prima le loro strutture.
     for (const child of children) {mapNode(child);}
+    // Costruisce la struttura del nodo combinando il suo tag con le strutture dei figli.
     entry.structure = node.tag + ">" + children.map(child => map.get(child).structure).join(",");
+    // Restituisce la voce completa del nodo.
     return entry;
   }
+  // Elabora i figli diretti della radice, escludendo header e footer.
   for (const child of getChildren(root)) {
+    // Salta header e footer, perché non devono partecipare all'analisi delle ricorsività.
     if (child.tag === "header" || child.tag === "footer") {continue;}
+    // Costruisce la mappa DOM del figlio e dei suoi discendenti.
     mapNode(child);
   }
+  /* RECUPERO DELLA STRUTTURA DI UN NODO, Se il nodo è presente in map e possiede una struttura già calcolata, restituisce quella.
+  Se la struttura non è disponibile oppure è una stringa vuota, usa come ripiego il solo nome del tag seguito da ">".
+  Esempi del ripiego:
+  - nodo tr  → "tr>"
+  - nodo td  → "td>"
+  - nodo img → "img>" */
   function getStructure(node) {
     return map.get(node)?.structure || node.tag + ">";
   }
+  /* Verifica se due sequenze consecutive di elementi hanno la stessa struttura. */
   function sameStructureSequence(structures, start, length) {
     for (let offset = 0; offset < length; offset++) {
       if (structures[start + offset] !== structures[start + length + offset]) {return false;}
     }
     return true;
   }
+  /* INDIVIDUAZIONE DI UNA SEQUENZA RICORRENTE DI NODI, Scopo:
+  cercare tra i figli diretti di un nodo una sequenza di elementi che ripetano la stessa struttura HTML.
+  Importante: qui non vengono confrontati il testo, gli attributi HTML, le classi CSS o il contenuto delle card.
+  Il confronto dipende da getStructure() e dalle funzioni che confrontano le strutture. */
   function findRecurrence(node) {
+    /* 1. FIGLI DIRETTI, Recupera i figli del nodo corrente.
+    Se ci sono meno di due figli, non può esserci una sequenza ripetuta almeno due volte. */
     const children = getChildren(node);
     if (children.length < 2) {return null;}
+    /* 2. STRUTTURA DI OGNI FIGLIO, Per ogni figlio calcola la sua rappresentazione strutturale mediante getStructure().
+    Ad esempio, due nodi con strutture identiche possono essere rappresentati dalla stessa stringa anche se contengono testi, attributi o URL differenti. */
     const structures = children.map(getStructure);
+    /* 3. LUNGHEZZA DELLA SEQUENZA DA CERCARE, length indica quanti elementi compongono un singolo gruppo da ripetere.
+    Il limite children.length / 2 garantisce che ci siano abbastanza figli per almeno due gruppi. */
     for (let length = 1; length <= Math.floor(children.length / 2); length++) {
+      /* 4. POSIZIONE INIZIALE, start è l'indice del primo elemento candidato della sequenza.
+      Il limite del ciclo assicura che entrino almeno due gruppi consecutivi della lunghezza scelta. */
       for (let start = 0; start + length * 2 <= children.length; start++) {
+        /* 5. PRIMO CONFRONTO, Verifica se due sequenze consecutive, ciascuna lunga length, hanno la stessa struttura.
+        Se non coincidono, prova un'altra posizione oppure una diversa lunghezza. */
         if (!sameStructureSequence(structures, start, length)) {continue;}
+        /* 6. CONTEGGIO DELLE RIPETIZIONI, Se i primi due gruppi coincidono, la sequenza ha inizialmente due ripetizioni.
+        Il ciclo prova ad aggiungerne altre, confrontando gruppi progressivamente più lunghi. */
         let repetitions = 2;
         while (start + (repetitions + 1) * length <= children.length &&
           sameStructureSequence(structures, start, repetitions * length)
         ) {repetitions++;}
+        /* 7. ESCLUSIONE DI UNA CASISTICA PARTICOLARE, Se:
+        - il gruppo contiene un solo elemento;
+        - sono state trovate esattamente due ripetizioni;
+        - il nodo ha più di due figli;
+        la sequenza viene ignorata.
+        La regola sembra voler evitare di considerare come ricorrenza ogni semplice coppia di elementi uguali in un contenitore più grande. */
         if (length === 1 && repetitions === 2 && children.length !== 2) {continue;}
+        /* 8. ESTRAZIONE DEGLI ELEMENTI, Recupera tutti i nodi compresi nella sequenza riconosciuta, in ordine, includendo ogni ripetizione. */
         const elements = children.slice(start, start + length * repetitions);
+        /* 9. VERIFICA DELLA TERMINALITÀ, terminal è true soltanto se tutti gli elementi individuati non hanno figli.
+        Un gruppo di righe <tr> contenenti altre righe gerarchiche o celle con tag interni, per esempio, normalmente non sarà terminale. */
         return {node, structure: structures.slice(start, start + length).join(","), elements, terminal: elements.every(element => getChildren(element).length === 0)};
       }
     }
+    /* 10. NESSUNA RICORRENZA, Se nessuna sequenza supera i controlli, restituisce null. */
     return null;
   }
   function collectRecursivities(node) {
@@ -433,15 +513,21 @@ function foundRicorsivity(root) {
     if (child.tag === "header" || child.tag === "footer") {continue;}
     collectRecursivities(child);
   }
-  /* MAPPA DELLE RICORSIVITÀ: ogni nodo conosce quante ricorsività ricadono nel proprio sottoalbero. */
+  /* MAPPA DELLE RICORSIVITÀ: conta le ricorsività associate a ogni nodo e ai suoi discendenti. */
   function countRecursivities(node) {
+    // Recupera dalla mappa i dati associati al nodo corrente.
     const entry = map.get(node);
+    // Se il nodo non è presente nella mappa, non ha ricorsività conteggiabili.
     if (!entry) {return 0;}
+    // Inizializza il conteggio con le ricorsività associate direttamente al nodo.
     let count = entry.recursivities.length;
+    // Aggiunge al totale le ricorsività presenti nei sottoalberi dei figli.
     for (const child of entry.children) {
       count += countRecursivities(child);
     }
+    // Memorizza nella mappa il totale delle ricorsività del sottoalbero corrente.
     entry.recursivityCount = count;
+    // Restituisce il totale al nodo chiamante.
     return count;
   }
   for (const child of getChildren(root)) {
