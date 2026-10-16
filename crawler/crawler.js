@@ -504,13 +504,23 @@ function foundRicorsivity(root) {
     /* 10. NESSUNA RICORRENZA, Se nessuna sequenza supera i controlli, restituisce null. */
     return null;
   }
+  /* RACCOLTA DELLE RICORSIVITÀ: individua le sequenze di nodi con struttura HTML ripetuta.
+  Se trova una ricorsività nel nodo corrente, la registra e interrompe la discesa nei suoi figli. */
   function collectRecursivities(node) {
+    // Cerca una sequenza ricorrente tra i figli diretti del nodo corrente.
     const recurrence = findRecurrence(node);
-    if (recurrence) {recursivities.push(recurrence); map.get(node).recursivities.push(recurrence); return;}
+    // Se trova una ricorsività, la registra nell'elenco globale e nella mappa del nodo.
+      if (recurrence) {recursivities.push(recurrence); map.get(node).recursivities.push(recurrence); 
+      // Interrompe la discesa: i figli non vengono analizzati separatamente.
+      return;}
+    // Se non trova ricorsività, prosegue ricorsivamente sui figli del nodo corrente.
     for (const child of getChildren(node)) {collectRecursivities(child);}
   }
+  // Avvia la ricerca delle ricorsività sui figli diretti della radice DOM.
   for (const child of getChildren(root)) {
+    // Esclude header e footer dall'analisi delle sequenze ricorrenti.
     if (child.tag === "header" || child.tag === "footer") {continue;}
+    // Cerca e registra le ricorsività nel sottoalbero del figlio corrente.
     collectRecursivities(child);
   }
   /* MAPPA DELLE RICORSIVITÀ: conta le ricorsività associate a ogni nodo e ai suoi discendenti. */
@@ -530,28 +540,42 @@ function foundRicorsivity(root) {
     // Restituisce il totale al nodo chiamante.
     return count;
   }
+  // Calcola il numero totale di ricorsività per ogni sottoalbero analizzato.
   for (const child of getChildren(root)) {
+    // Esclude header e footer, già esclusi dalle altre fasi dell'analisi.
     if (child.tag === "header" || child.tag === "footer") {continue;} countRecursivities(child);}
+  /* INDIVIDUAZIONE DEL BLOCCO: risale dal primo elemento della ricorsività
+  verso i suoi antenati, cercando il contenitore più ampio che appartiene a un sottoalbero con una sola ricorsività. */
   function findSingleBlock(recurrence) {
+    // Parte dal genitore del primo elemento della ricorsività.
     let block = recurrence.elements[0].parent;
     let current = block;
+    // Risale nell'albero DOM fino alla radice o finché non trova una condizione di arresto.
     while (current && current.tag !== "#root") {
       const entry = map.get(current);
+      // Interrompe la risalita se il nodo non è mappato oppure il suo sottoalbero contiene un numero di ricorsività diverso da uno.
       if (!entry || entry.recursivityCount !== 1) {break;}
+      // Il nodo corrente diventa il candidato blocco.
       block = current;
       current = current.parent;
     }
+    // Restituisce il blocco individuato.
     return block;
   }
+  /* AGGIUNTA DELLA RICORSIVITÀ AL RISULTATO: decide quali elementi inserire in result in base alla terminalità della ricorsività. */
   function addRecurrence(recurrence) {
+    // Se gli elementi della ricorsività sono terminali, cerca di risalire al contenitore che rappresenta il singolo blocco.
     if (recurrence.terminal) {
       const block = findSingleBlock(recurrence);
       result.push({structure: recurrence.structure, elements: [block]});
       return;
     }
+    // Se la ricorsività non è terminale, conserva direttamente gli elementi individuati.
     result.push({structure: recurrence.structure, elements: recurrence.elements});
   }
+  // Converte tutte le ricorsività individuate negli elementi da restituire.
   for (const recurrence of recursivities) {addRecurrence(recurrence);}
+  // Restituisce i blocchi individuati nell'albero DOM.
   return result;
 }
 
