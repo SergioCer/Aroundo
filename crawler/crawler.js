@@ -26,7 +26,7 @@ function buildTerms(descrizione, slug) {
   return [...new Set(values .map(normalizeCategoryTerm) .filter(Boolean))];
 }
 
-/* Comuni */
+/* Carica la tabella Comuni */
 let COMUNI_DICTIONARY = null;
 async function loadComuniDictionary() { 
   if (COMUNI_DICTIONARY) {return COMUNI_DICTIONARY;} 
@@ -54,7 +54,7 @@ function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/* CITTA' */ 
+/* Cerca la corrispondenda del comune nel blocco di testo selezionato */ 
 function matchComune(text) { 
   if (!text || !COMUNI_DICTIONARY?.length) {return null;} 
   for (const comune of COMUNI_DICTIONARY) { 
@@ -95,6 +95,7 @@ function getToday() {const today = new Date();
   return today;
 }
 
+/* Ricerca di una data futura */
 function findFutureDate(html) {if (!html) {return null;}
   /* 0. SCHEMA.ORG / JSON-LD
      Cerchiamo "startDate" all'interno dei dati JSON-LD della pagina.
@@ -120,8 +121,7 @@ function findFutureDate(html) {if (!html) {return null;}
     /* JSON-LD non valido: proseguiamo con i controlli successivi. */
     }
   }
-    /* PULIZIA DEL CONTENUTO
-  Eliminiamo script e style perché le date presenti nel codice della pagina non devono essere considerate.
+    /* PULIZIA DEL CONTENUTO: Eliminiamo script e style perché le date presenti nel codice della pagina non devono essere considerate.
   Poi eliminiamo i tag HTML e normalizziamo gli spazi. */
   const text = html .replace(/<script[\s\S]*?<\/script>/gi, " ")
       .replace(/<style[\s\S]*?<\/style>/gi, " ")
@@ -263,6 +263,7 @@ function normalizeUrl(href, baseUrl) {
   } catch {return null;}
 }
 
+/* Ignora url contenenti valori non utilizzabili */
 function isIgnoredUrl(url) {
   const lower = url.toLowerCase();
   if (lower.startsWith("mailto:") ||
