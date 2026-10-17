@@ -789,16 +789,22 @@ for (const group of ricorsivity) {
   }
 }
     async function sitePageExists(siteId, futureDate, idComune, block) {
+    // Prepara una query per verificare se il blocco è già presente nella tabella site_pages per il sito, la data e il contenuto indicati.
       let query = supabase
         .from("site_pages")
         .select("id_site_page")
         .eq("id_site", siteId)
         .eq("sp_date", futureDate)
         .eq("sp_block", block);
+      // Se il comune non è stato individuato, cerca i record in cui id_comune è NULL.
       if (idComune === null) {query = query.is("id_comune", null);
+      // Se il comune è stato individuato, cerca i record associati esattamente a quell'ID.
       } else {query = query.eq("id_comune", idComune);}
+      // Esegue la query e limita il risultato a una sola riga: per sapere se esiste un duplicato non serve recuperarli tutti.
       const {data, error} = await query.limit(1);
+      // Se Supabase restituisce un errore, lo propaga al chiamante.
       if (error) {throw error;}
+      // Restituisce true se esiste almeno un record corrispondente, false se non ne esiste nessuno.
       return data.length > 0;
     }
 /* RICERCA DEI LINK: esamina tutti gli attributi href degli elementi <a> presenti nell'HTML originale, non soltanto quelli contenuti nei blocchi evento. */
