@@ -635,14 +635,14 @@ async function crawlAllSites() {
   console.log("===============================================");
 }
 
-/* SCANSIONE DI UN SITO*/
+/* SCANSIONE DI UN SITO:, visita le pagine interne, individua gli eventi e salva i blocchi contenenti una data futura nella tabella site_pages. */
 async function crawlSite(site) {
   console.log("");
   console.log("=================================================");
   console.log(`SITE ${site.id_site}`);
   console.log(site.st_url);
   console.log("=================================================");
-  /* st_crawled viene aggiornato all'inizio della scansione. */
+  /* REGISTRAZIONE DELL'INIZIO DELLA SCANSIONE: aggiorna il timestamp del sito nel database. */
   const crawlStartedAt = new Date().toISOString();
   const {error: crawlUpdateError
   } = await supabase
@@ -650,29 +650,34 @@ async function crawlSite(site) {
     .update({st_crawled: crawlStartedAt})
     .eq("id_site", site.id_site);
   if (crawlUpdateError) {throw crawlUpdateError;}
-  /* Coda BFS. */
+  /* CODA BFS: contiene gli URL da visitare. La visita avviene in ampiezza, elaborando gli URL nell'ordine in cui vengono inseriti. */
   const queue = [];
   const visited = new Set();
   const startUrl = normalizeUrl(site.st_url, site.st_url);
   if (!startUrl) {throw new Error("st_url non valido");}
-  /* Hostname consentito. */
+  /* DOMINIO CONSENTITO: limita la scansione alle pagine dello stesso hostname iniziale. */
   const siteHost = new URL(startUrl).hostname;
   queue.push(startUrl);
+  /* CICLO PRINCIPALE: continua finché ci sono URL in coda e non è stato raggiunto il limite massimo di pagine visitate. */
   while (queue.length > 0 && visited.size < MAX_PAGES_PER_SITE) {
     const currentUrl = queue.shift();
+    // Evita di visitare nuovamente un URL già elaborato.
     if (visited.has(currentUrl)) {continue;}
-      /* Controllo dominio. */
+      /* VALIDAZIONE DELL'URL: ignora URL non validi o appartenenti a un hostname diverso. */
       let current;
       try {current = new URL(currentUrl);
       } catch {continue;}
     if (current.hostname !== siteHost) {continue;}
+    // Registra la pagina come visitata prima di scaricarla.
     visited.add(currentUrl);
     console.log(`[${visited.size}/${MAX_PAGES_PER_SITE}]` + ` ${currentUrl}`);
     crawlerStatus.pagesVisited++;
+    /* DOWNLOAD DELLA PAGINA: in caso di errore registra il problema e passa all'URL successivo. */
     let result;
     try {result = await fetchPage(currentUrl);
     } catch (error) {crawlerStatus.errors++; console.log(`[ERROR] ${currentUrl}` + ` → ${error.message}`); continue;}
-    /* Redirect. */
+    /* REDIRECT HTTP: inserisce l'URL di destinazione in testa alla coda se appartiene allo stesso hostname. 
+    In questo caso non analizza il contenuto della risposta corrente. */
     if (result.redirect) {const redirected = result.url;
       if (redirected && !visited.has(redirected)) {
         let redirectedUrl;
@@ -683,9 +688,12 @@ async function crawlSite(site) {
     }
     /* Pagina non disponibile o risorsa non HTML. */
     // if (!result.available) {console.log(`[SKIP ${result.status || ""}]` + ` ${currentUrl}`); continue;}
-    /* ANALISI STRUTTURALE */
+    /* CONTROLLO DEL CONTENUTO: prosegue soltanto se il contenuto scaricato è una stringa.
+       Il controllo sullo stato HTTP è attualmente commentato. */
     if (typeof result.content !== "string") {continue;}
-    /* REDIRECT HTML META REFRESH */
+    /* REDIRECT HTML META REFRESH: cerca un URL di destinazione dichiarato nell'HTML.
+       Se è valido e appartiene al dominio consentito, lo mette in testa alla coda. 
+       La pagina corrente non viene analizzata ulteriormente. */
     const metaRefresh = result.content.match(
       /<meta\b[^>]*http-equiv\s*=\s*["']?refresh["']?[^>]*content\s*=\s*["'][^"']*url\s*=\s*([^"']+)["']/i
     );
@@ -706,19 +714,23 @@ async function crawlSite(site) {
       }
       continue;
     }
+    /* ANALISI STRUTTURALE: costruisce il DOM della pagina e individua i gruppi di nodi che presentano sequenze di strutture HTML ripetute. */
     const root = buildDom(result.content);
     const ricorsivity = foundRicorsivity(root, result.content);
-/* ANALISI DEI SINGOLI BLOCCHI */
+/* PREPARAZIONE DELL'ANALISI DEI BLOCCHI: carica il dizionario dei comuni e crea un timestamp comune alle operazioni di salvataggio effettuate durante questa pagina. */
 await loadComuniDictionary();
 const detectedAt = new Date().toISOString();
-/* ANALISI EVENTI SCHEMA.ORG */
+/* ANALISI DEGLI EVENTI SCHEMA.ORG: estrae gli eventi dichiarati nei dati strutturati della pagina, indipendentemente dall'analisi delle ricorsività DOM. */
 const schemaEvents = extractSchemaEvents(result.content);
 for (const event of schemaEvents) {
+  // Considera soltanto gli eventi per cui viene individuata una data futura.
   const futureDate = getSchemaFutureDate(event);
   if (!futureDate) {continue;}
   const futureDateISO = futureDate.toISOString().slice(0, 10);
+  // Cerca di associare l'evento a un comune conosciuto.
   const comune = getSchemaComune(event);
   const idComune = comune ? comune.id : null;
+  // Serializza l'evento per conservarne la rappresentazione nei dati grezzi.
   const block = JSON.stringify(event, null, 2);
   const pageUrl = result.url || currentUrl;
   console.log(
@@ -727,6 +739,8 @@ for (const event of schemaEvents) {
     ` | comune=${idComune}` +
     ` | lunghezza=${block.length}`
   );
+  /* CONTROLLO DUPLICATI E SALVATAGGIO: verifica se l'evento è già presente prima di inserirlo.
+         Gli errori vengono registrati senza interrompere la scansione. */
   try {
     const duplicate = await schemaEventExists(
       site.id_site,
@@ -752,40 +766,25 @@ for (const event of schemaEvents) {
     console.log(`[SCHEMA DB ERROR] ${pageUrl} → ${error.message}`);
   }
 }
+/* ANALISI DEI BLOCCHI DOM: esamina gli elementi restituiti da foundRicorsivity().
+       Ogni elemento fornisce gli indici start/end con cui estrarre la porzione corrispondente dell'HTML originale. */    
 for (const group of ricorsivity) {
   for (const element of group.elements) {
     const block = result.content.slice(element.start, element.end);
+    // Scarta i blocchi per cui non viene individuata una data futura.
     const futureDate = findFutureDate(block);
     if (!futureDate) {continue;}
+    // Associa il blocco a un comune, se riconosciuto.
     const comune = matchComune(block);
     const idComune = comune ? comune.id : null;
-    console.log(`[BLOCCO] ${currentUrl}` +
-      ` → data=${futureDate.toISOString().slice(0, 10)}` +
-      ` | comune=${idComune}` +
-      ` | lunghezza=${block.length}`);
-    try {
-      const duplicate = await sitePageExists(
-        site.id_site,
-        futureDate.toISOString().slice(0, 10),
-        idComune,
-        block
-      );
-      if (duplicate) {
-        console.log(`[DUPLICATO] ${currentUrl} → blocco già presente`);
-        continue;
-      } 
-      await saveSitePage(
-        site.id_site,
-        result.url || currentUrl,
-        detectedAt,
-        futureDate.toISOString().slice(0, 10),
-        idComune,
-        block
-      );
-    } catch (error) {
-      crawlerStatus.errors++;
-      console.log(`[DB ERROR]` + ` ${currentUrl}` + ` → ${error.message}`);
-    }
+    console.log(`[BLOCCO] ${currentUrl}` + ` → data=${futureDate.toISOString().slice(0, 10)}` + ` | comune=${idComune}` + ` | lunghezza=${block.length}`);
+    /* CONTROLLO DUPLICATI: verifica la presenza di un blocco con lo stesso sito, data, comune e contenuto HTML. */
+    try {const duplicate = await sitePageExists(site.id_site, futureDate.toISOString().slice(0, 10), idComune, block);
+      if (duplicate) {console.log(`[DUPLICATO] ${currentUrl} → blocco già presente`); continue;}
+      // Salva il blocco HTML originale in site_pages.
+      await saveSitePage(site.id_site, result.url || currentUrl, detectedAt, futureDate.toISOString().slice(0, 10), idComune, block);
+    } catch (error) {crawlerStatus.errors++;
+      console.log(`[DB ERROR]` + ` ${currentUrl}` + ` → ${error.message}`);}
   }
 }
     async function sitePageExists(siteId, futureDate, idComune, block) {
@@ -795,37 +794,40 @@ for (const group of ricorsivity) {
         .eq("id_site", siteId)
         .eq("sp_date", futureDate)
         .eq("sp_block", block);
-      if (idComune === null) {
-        query = query.is("id_comune", null);
-      } else {
-        query = query.eq("id_comune", idComune);
-      }
+      if (idComune === null) {query = query.is("id_comune", null);
+      } else {query = query.eq("id_comune", idComune);}
       const {data, error} = await query.limit(1);
       if (error) {throw error;}
       return data.length > 0;
     }
-/* CERCA NUOVI LINK NELL'INTERA PAGINA */
+/* RICERCA DEI LINK: esamina tutti gli attributi href degli elementi <a> presenti nell'HTML originale, non soltanto quelli contenuti nei blocchi evento. */
 const linkRegex = /<a\b[^>]*\bhref\s*=\s*(["'])(.*?)\1/gi;
 for (const match of result.content.matchAll(linkRegex)) {
+  // Normalizza il collegamento rispetto all'URL della pagina corrente.
   const link = normalizeUrl(match[2], result.url || currentUrl);
   if (!link) continue;
+  // Ignora URL non validi.
   let linkUrl;
-  try {
-    linkUrl = new URL(link);
+  try {linkUrl = new URL(link);
   } catch {
     continue;
   }
+  // Limita la scansione ai collegamenti interni allo stesso hostname.
   const hostname = linkUrl.hostname.replace(/^www\./i, "");
   const allowedHost = siteHost.replace(/^www\./i, "");
   if (hostname !== allowedHost) continue;
+  // Esclude gli URL non pertinenti e quelli già visitati o in coda.
   if (isIgnoredUrl(link)) continue;
   if (visited.has(link)) continue;
   if (queue.includes(link)) continue;
+  // Evita di accodare pagine già registrate come scansionate oggi.
   if (await pageCrawled(link)) continue;
   // console.log(`[QUEUE] ${currentUrl} → ${link}`);
+  // Inserisce il nuovo URL in fondo alla coda.
   queue.push(link);
 }
   }
+  /* FINE SCANSIONE: comunica il termine del processo e il numero di URL visitati. */
   console.log("");
   console.log(`Scansione site ${site.id_site} terminata.`);
   console.log(`Pagine visitate: ${visited.size}`);
@@ -833,6 +835,8 @@ for (const match of result.content.matchAll(linkRegex)) {
 
 /* SALVATAGGIO SITE_PAGE */
 async function saveSitePage(siteId, pageUrl, detectedAt, futureDate, idComune, block) {
+  // Cerca se esiste già una riga per lo stesso sito, URL e blocco HTML.
+  // La data e il comune non fanno parte dei criteri di ricerca.
   const {data, error} = await supabase
     .from("site_pages")
     .select("id_site_page, sp_star")
@@ -840,7 +844,9 @@ async function saveSitePage(siteId, pageUrl, detectedAt, futureDate, idComune, b
     .eq("sp_url", pageUrl)
     .eq("sp_block", block)
     .maybeSingle();
+  // Se la query restituisce un errore, interrompe la funzione e lascia al chiamante la gestione dell'errore.
   if (error) {throw error;}
+  // Se non esiste una riga corrispondente, inserisce un nuovo record.
   if (!data) {
     const {error: insertError} = await supabase
       .from("site_pages")
@@ -853,12 +859,18 @@ async function saveSitePage(siteId, pageUrl, detectedAt, futureDate, idComune, b
         id_comune: idComune,
         sp_block: block
       });
+    // Se l'inserimento fallisce, propaga l'errore al chiamante.
     if (insertError) {throw insertError;}
+    // Aggiorna il contatore dei record inseriti durante la scansione.
     crawlerStatus.pagesInserted++;
     console.log(`[INSERT] ${pageUrl}` + ` | star=1 | date=${futureDate} | comune=${idComune}`);
+    // Termina la funzione: il nuovo record è già stato inserito.
     return;
   }
+  // Se il record esiste già, incrementa il contatore dei rilevamenti.
+  // Il valore massimo consentito è 5.
   const newStar = Math.min(data.sp_star + 1, 5);
+  // Aggiorna il record esistente con i dati dell'ultimo rilevamento.
   const {error: updateError} = await supabase
     .from("site_pages")
     .update({
@@ -869,7 +881,9 @@ async function saveSitePage(siteId, pageUrl, detectedAt, futureDate, idComune, b
       sp_star: newStar
     })
     .eq("id_site_page", data.id_site_page);
+  // Se l'aggiornamento fallisce, propaga l'errore al chiamante.
   if (updateError) {throw updateError;}
+  // Aggiorna il contatore dei record modificati durante la scansione.
   crawlerStatus.pagesUpdated++;
   console.log(`[UPDATE] ${pageUrl}` + ` | star=${newStar} | date=${futureDate} | comune=${idComune}`);
 }
