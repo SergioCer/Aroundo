@@ -259,10 +259,7 @@ input, textarea {
   color:#6b7280;
 }  
 
-/* =========================================================
-   MODALE IL TUO SITO
-========================================================= */
-
+/* MODALE IL TUO SITO */
 .my-site-dialog{
   width:min(920px, calc(100vw - 30px));
   max-width:920px;
@@ -931,6 +928,7 @@ input, textarea {
 </dialog>
   
 <!-- SI - NO - ANNULLA -->
+<!-- CANCELLARE vedi saveDialog.js *****  
 <div id="saveDialog" style="
   display:none;
   position:fixed;
@@ -988,10 +986,12 @@ input, textarea {
     </div>
   </div>
 </div>
+  -->
   
 </div>
   
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>  
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+<script src="saveDialog.js"></script>
 <script type="module">
   
 import { requireAuth } from './auth-check.js';
@@ -1043,6 +1043,7 @@ slugAliasInput.addEventListener('input', () => {
   markDirty();
 });
   
+/* CANCELLARE vedi saveDialog.js *****
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
   return new Promise(resolve => {
@@ -1054,6 +1055,7 @@ function dialogAction(type) {
   document.getElementById("saveDialog").style.display = "none";
   dialogResolve(type);
 }
+CANCELLARE vedi saveDialog.js ***** */ 
 
 /* LOAD */
 async function load() {
