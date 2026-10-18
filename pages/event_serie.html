@@ -109,10 +109,10 @@ input, textarea {
   overflow-y:auto;
 }
 
-.mini-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+// .mini-table {
+//   width: 100%;
+//   border-collapse: collapse;
+// }
 
 .table td {
   padding: 6px;
@@ -134,9 +134,8 @@ input, textarea {
   
 </style>
 </head>
-
 <body>
-
+  
 <div class="topbar">
   <button id="backBtn" class="back-btn" onclick="requestBack()">←</button>
   Event Serie
@@ -145,13 +144,10 @@ input, textarea {
 <div class="card">
   <div class="section-title">Titolo</div>
   <input id="es_title" oninput="markDirty()">
-
   <div class="section-title">Descrizione</div>
   <textarea id="es_description" oninput="markDirty()"></textarea>
-
   <div class="section-title">Note</div>
   <textarea id="es_notes" oninput="markDirty()"></textarea>
-
   <div class="section-title">Organizzatore</div>
 <div id="es_organizzatore" style="
   padding:6px;
@@ -161,92 +157,22 @@ input, textarea {
   font-size:15px;
   color:#374151;
 "></div>
-
   <div class="section-title">Copertina</div>
   <input id="es_cover" oninput="markDirty(); preview()">
-
   <div class="preview">
     <img id="img">
   </div>
-
 <!-- EVENTI COLLEGATI -->
 <div class="section-box">
 <div class="section-header" onclick="toggleEvents()">
     <span id="eventiArrow">▶</span>
     <span id="eventiTitle">Eventi collegati (0)</span>
 </div>
-
   <div class="section-panel" id="panel">
-    <table class="table">
-      <tbody id="eventsBody"></tbody>
-    </table>
+    <table class="table"><tbody id="eventsBody"></tbody></table>
   </div>
-  
 </div>
-  
   <div class="footer" id="es_created"></div>
-  
-<!-- SI - NO - ANNULLA -->
-<!-- CANCELLARE vedi saveDialog.js *****  
-<div id="saveDialog" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.4);
-  z-index:99999;
-  align-items:center;
-  justify-content:center;
-">
-  <div style="
-    background:white;
-    padding:22px;
-    border-radius:12px;
-    width:300px;
-    text-align:center;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  ">
-    <div style="margin-bottom:18px; font-weight:600;">
-      Vuoi salvare le modifiche?
-    </div>
-    <div style="display:flex; gap:10px; justify-content:center;">
-      <button onclick="dialogAction('yes')" style="
-        flex:1;
-        background:#22c55e;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">Sì</button>
-      <button onclick="dialogAction('no')" style="
-        flex:1;
-        background:#ef4444;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">No</button>
-      <button onclick="dialogAction('cancel')" style="
-        flex:1;
-        background:#9ca3af;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">Annulla</button>
-    </div>
-  </div>
-</div>
-CANCELLARE vedi saveDialog.js ***** -->  
-  
 </div>
 
 <script type="module">
@@ -265,25 +191,8 @@ let dirty = false;
 let eventsOpen = false;
 let dialogResolve;  
 
-/* CANCELLARE vedi saveDialog.js *****   
-function askSaveDialog() {
-  const dialog = document.getElementById("saveDialog");
-  dialog.style.display = "flex";
-  return new Promise(resolve => {
-    dialogResolve = resolve;
-  });
-}
-
-function dialogAction(type) {
-  document.getElementById("saveDialog").style.display = "none";
-  dialogResolve(type);
-}
-window.dialogAction = dialogAction;  
-CANCELLARE vedi saveDialog.js ***** */
-
 async function load() {
-  if (isNew) {
-    original = JSON.stringify({
+  if (isNew) {original = JSON.stringify({
       es_title: '',
       es_description: '',
       es_notes: '',
@@ -292,31 +201,20 @@ async function load() {
     dirty = false;
     document.getElementById("backBtn").classList.remove("dirty");
     es_created.textContent = "";
-    if (idOrganizzatore) {
-  const { data } = await supabase
+    if (idOrganizzatore) {const { data } = await supabase
     .from("organizzatori")
     .select("or_nome")
     .eq("id_organizzatore", idOrganizzatore)
     .single();
-  es_organizzatore.textContent = data?.or_nome || "—";
-}
+  es_organizzatore.textContent = data?.or_nome || "—";}
     return;
   }
 const { data, error } = await supabase
   .from("event_series")
-  .select(`
-    *,
-    organizzatori (
-      id_organizzatore,
-      or_nome
-    )
-  `)
+  .select(` *, organizzatori (id_organizzatore, or_nome)`)
   .eq("id_event_series", id)
   .single();
-  if (error) {
-    console.error(error);
-    return;
-  }
+  if (error) {console.error(error); return;}
   original = JSON.stringify({
     es_title: data.es_title || '',
     es_description: data.es_description || '',
@@ -327,11 +225,8 @@ const { data, error } = await supabase
   es_description.value = data.es_description || "";
   es_notes.value = data.es_notes || "";
   es_cover.value = data.es_cover || "";
-  es_created.textContent = data.es_created
-  ? new Date(data.es_created).toLocaleString()
-  : "";
-  es_organizzatore.textContent =
-  data.organizzatori?.or_nome || "—";
+  es_created.textContent = data.es_created ? new Date(data.es_created).toLocaleString(): "";
+  es_organizzatore.textContent = data.organizzatori?.or_nome || "—";
   dirty = false;
   document.getElementById("backBtn").classList.remove("dirty");
   preview();
@@ -350,24 +245,15 @@ async function loadEvents() {
 if(eventi.length){
   const header = document.createElement("tr");
   header.className = "header-row";
-  header.innerHTML = `
-    <td>Data</td>
-    <td>Evento</td>
-  `;
+  header.innerHTML = `<td>Data</td><td>Evento</td>`;
   body.appendChild(header);
 }
 eventi.forEach(e=>{
   const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${new Date(e.ev_inizio).toLocaleDateString()}</td>
-    <td class="link">${e.ev_titolo}</td>
-  `;
-  tr.cells[1].onclick = () =>
-    location.href = `evento.html?id=${e.id_evento}`;
+  tr.innerHTML = `<td>${new Date(e.ev_inizio).toLocaleDateString()}</td><td class="link">${e.ev_titolo}</td>`;
+  tr.cells[1].onclick = () => location.href = `evento.html?id=${e.id_evento}`;
   body.appendChild(tr);
 });
-
-  
 const title = document.getElementById("eventiTitle");
 const arrow = document.getElementById("eventiArrow");
 const header = document.querySelector(".section-header");
@@ -381,8 +267,7 @@ if (!data || data.length === 0) {
 }
 }
 
-function getSnapshot() {
-  return {
+function getSnapshot() {return {
     es_title: document.getElementById('es_title').value,
     es_description: document.getElementById('es_description').value,
     es_notes: document.getElementById('es_notes').value,
@@ -390,25 +275,20 @@ function getSnapshot() {
   };
 }
 
-async function save() {
-  const payload = {
+async function save() {const payload = {
     es_title: es_title.value,
     es_description: es_description.value,
     es_notes: es_notes.value,
     es_cover: es_cover.value
   };
-  if (isNew && idOrganizzatore) {
-    payload.id_organizzatore = Number(idOrganizzatore);
-  }
+  if (isNew && idOrganizzatore) {payload.id_organizzatore = Number(idOrganizzatore);}
   let result;
-  if (isNew) {
-    result = await supabase
+  if (isNew) {result = await supabase
       .from('event_series')
       .insert(payload)
       .select()
       .single();
-  } else {
-    result = await supabase
+  } else {result = await supabase
       .from('event_series')
       .update(payload)
       .eq('id_event_series', id)
@@ -416,11 +296,7 @@ async function save() {
       .single();
   }
   const { error, data } = result;
-  if (error) {
-    console.error(error);
-    alert("Errore salvataggio");
-    return false;
-  }
+  if (error) {console.error(error); alert("Errore salvataggio"); return false;}
   dirty = false;
   original = JSON.stringify(payload);
   if (isNew && data?.id_event_series) {
@@ -456,16 +332,13 @@ window.requestBack = async () => {
   const choice = await askSaveDialog();
   if (choice === "cancel")
     return;
-  if (choice === "yes") {
-    const success = await save();
+  if (choice === "yes") {const success = await save();
     if (!success)
       return;
     history.back();
     return;
   }
-  if (choice === "no") {
-    history.back();
-  }
+  if (choice === "no") {history.back();}
 };
   
 load();
