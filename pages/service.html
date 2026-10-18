@@ -230,27 +230,6 @@ Icon
 </div>
 </div>
 
-<!-- CANCELLARE vedi saveDialog.js *****  
-<div id="saveDialog" class="dialog-overlay">
-<div class="dialog">
-<div class="dialog-title">
-Save changes?
-</div>
-<div class="dialog-buttons">
-<button class="btn-green" onclick="dialogAction('yes')">
-Yes
-</button>
-<button class="btn-red" onclick="dialogAction('no')">
-No
-</button>
-<button onclick="dialogAction('cancel')">
-Cancel
-</button>
-</div>
-</div>
-</div>
- CANCELLARE vedi saveDialog.js *****   -->  
-
 <script type="module">
 import { requireAuth } from './auth-check.js';
 await requireAuth();
@@ -268,11 +247,8 @@ let dialogResolve;
 
 /* LOAD */
 async function load(){
-  if(isNew){
-    original = JSON.stringify({});
-    if(newGenre){
-      id_genere.value = newGenre;
-    }
+  if(isNew){original = JSON.stringify({});
+    if(newGenre){id_genere.value = newGenre;}
     setTimeout(updateGuide,100);
     sv_servizio.focus();
     return;
@@ -282,10 +258,7 @@ async function load(){
     .select('*')
     .eq('id_servizio',id)
     .single();
-  if(error){
-    console.error(error);
-    return;
-  }
+  if(error){console.error(error); return;}
   original=JSON.stringify(data);
   sv_servizio.value=data.sv_servizio||'';
   sv_descrizione.value=data.sv_descrizione||'';
@@ -305,18 +278,12 @@ const guideSteps=[
 ];
 
 function updateGuide(){
-  guideSteps.forEach(s=>{
-    const el=document.getElementById(s.id);
+  guideSteps.forEach(s=>{const el=document.getElementById(s.id);
     el.classList.remove("guide-active","guide-complete");
-    if(s.valid()){
-      el.classList.add("guide-complete");
-    }
+    if(s.valid()){el.classList.add("guide-complete");}
   });
-  
   const next=guideSteps.find(s=>!s.valid());
-  if(next){
-    document.getElementById(next.id).classList.add("guide-active");
-  }
+  if(next){document.getElementById(next.id).classList.add("guide-active");}
 }
 
 /* CHANGE ACTIVE STATUS */
@@ -333,12 +300,7 @@ function setActiveStatus(value){
 }
   
 /* ICON */
-function updateIcon(){
-  iconPreview.innerHTML=
-    sv_icona.value
-    ? `<span class="material-symbols-outlined">${sv_icona.value}</span>`
-    : "";
-}
+function updateIcon(){iconPreview.innerHTML= sv_icona.value ? `<span class="material-symbols-outlined">${sv_icona.value}</span>` : "";}
 
 sv_icona.addEventListener("input",()=>{
   updateIcon();
@@ -346,8 +308,7 @@ sv_icona.addEventListener("input",()=>{
 });
 
 /* DIRTY */
-window.markDirty=function(){
-  const current=JSON.stringify({
+window.markDirty=function(){const current=JSON.stringify({
     sv_servizio:sv_servizio.value,
     sv_descrizione:sv_descrizione.value,
     sv_icona:sv_icona.value,
@@ -361,8 +322,7 @@ window.markDirty=function(){
 };
 
 /* SAVE */
-async function save(){
-  const payload={
+async function save(){const payload={
     sv_servizio:sv_servizio.value,
     sv_descrizione:sv_descrizione.value,
     sv_icona:sv_icona.value,
@@ -371,31 +331,21 @@ async function save(){
     id_genere:id_genere.value
   };
   let result;
-  if(isNew){
-    result=await supabase
+  if(isNew){result=await supabase
       .from("servizi")
       .insert(payload)
       .select()
       .single();
-  }else{
-    result=await supabase
+  }else{result=await supabase
       .from("servizi")
       .update(payload)
       .eq("id_servizio",id)
       .select()
       .single();
   }
-  if(result.error){
-    console.error(result.error);
-    alert("Save error");
-    return false;
-  }
+  if(result.error){console.error(result.error); alert("Save error"); return false;}
   dirty=false;
-  if(isNew){
-    location.href=`service.html?id=${result.data.id_servizio}`;
-  }
-  return true;
-}
+  if(isNew){location.href=`service.html?id=${result.data.id_servizio}`;} return true;}
 
 /* BACK */
 window.requestBack=async function(){
@@ -411,22 +361,6 @@ window.requestBack=async function(){
   }
   history.back();
 };
-
-/* CANCELLARE vedi saveDialog.js *****
-function askSaveDialog(){
-  document.getElementById("saveDialog")
-    .style.display="flex";
-  return new Promise(resolve=>{
-    dialogResolve=resolve;
-  });
-}
-
-window.dialogAction=function(type){
-  document.getElementById("saveDialog")
-    .style.display="none";
-  dialogResolve(type);
-}; 
-CANCELLARE vedi saveDialog.js ***** */
 
 async function loadGenres(){
   const {data,error}=await supabase
