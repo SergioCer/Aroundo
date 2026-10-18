@@ -7,6 +7,7 @@
 
 <link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="saveDialog.js"></script>  
 
 <style>
 body {
@@ -475,7 +476,9 @@ input, select, textarea {
   <!-- FOOTER -->
   <div class="footer" id="ev_creato"></div>
 
+
 <!-- SI - NO - ANNULLA -->
+<!-- CANCELLARE vedi saveDialog.js *****
 <div id="saveDialog" style="
   display:none;
   position:fixed;
@@ -533,6 +536,7 @@ input, select, textarea {
     </div>
   </div>
 </div>
+-->  
 
 <div id="warningDialog" style="
   display:none;
@@ -1240,7 +1244,7 @@ window.requestBack = async () => {
     location.href = 'eventi.html';
     return;
   }
-  const choice = await askSaveDialog();
+  const choice = await ask();
   if (choice === "cancel") return;
   if (choice === "yes") {
     const success = await save();
@@ -1378,6 +1382,7 @@ function openNewLuogoFromMap(lat, lng) {
   window.location.href = url;
 }
 
+/* CANCELLARE vedi saveDialog.js *****
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
   return new Promise(resolve => {
@@ -1385,11 +1390,11 @@ function askSaveDialog() {
   });
 }
 
-/* Richiama SI-NO-ANNULLA */  
 function dialogAction(type) {
   document.getElementById("saveDialog").style.display = "none";
   dialogResolve(type);
 }
+CANCELLARE vedi saveDialog.js  ***** */ 
 
 window.dialogAction = dialogAction;
 
