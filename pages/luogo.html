@@ -7,8 +7,8 @@
 
 <link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+<script src="saveDialog.js"></script>
   
 <style>
 body {
@@ -331,7 +331,8 @@ textarea:disabled {
     Updated: <span id="lu_updated"></span>
   </div>
 
-  <!-- SI - NO - ANNULLA -->
+<!-- SI - NO - ANNULLA -->
+<!-- CANCELLARE vedi saveDialog.js *****
 <div id="saveDialog" style="
   display:none;
   position:fixed;
@@ -376,7 +377,7 @@ textarea:disabled {
         cursor:pointer;
         font-weight:600;
       ">No</button>
-      <button onclick="dialogAction('cancel')" style="
+      <button onclick="('cancel')" style="
         flex:1;
         background:#9ca3af;
         color:white;
@@ -776,6 +777,7 @@ async function save() {
   return true;
 }  
   
+/* CANCELLARE vedi saveDialog.js *****
 function askSaveDialog() {
   document.getElementById("saveDialog").style.display = "flex";
   return new Promise(resolve => {
@@ -787,6 +789,7 @@ function dialogAction(type) {
   document.getElementById("saveDialog").style.display = "none";
   dialogResolve(type);
 }
+CANCELLARE vedi saveDialog.js ***** */
 
 function updatePageState() {
   const comuneOk = !isNew || id_comune_hidden.value !== "";
@@ -820,10 +823,7 @@ function initMapLuogo() {
 // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(map); // Mappa Base di Aroundo
 // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map); // Mappa Neutra
 // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
-baseLayer = L.tileLayer(
-  mapStyles[currentMapStyle].url,
-  mapStyles[currentMapStyle].options
-).addTo(map);
+baseLayer = L.tileLayer(mapStyles[currentMapStyle].url, mapStyles[currentMapStyle].options).addTo(map);
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
