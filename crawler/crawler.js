@@ -655,6 +655,7 @@ async function crawlSite(site) {
   const queue = [];
   const visited = new Set();
   const startUrl = normalizeUrl(site.st_url, site.st_url);
+  const startPath = startUrl.pathname.replace(/\/+$/, "") || "/";
   if (!startUrl) {throw new Error("st_url non valido");}
   /* DOMINIO CONSENTITO: limita la scansione alle pagine dello stesso hostname iniziale. */
   const siteHost = new URL(startUrl).hostname;
@@ -823,6 +824,9 @@ for (const match of result.content.matchAll(linkRegex)) {
   const hostname = linkUrl.hostname.replace(/^www\./i, "");
   const allowedHost = siteHost.replace(/^www\./i, "");
   if (hostname !== allowedHost) continue;
+  // Limita la scansione al percorso dichiarato in st_url e alle sue sottopagine, evitando di risalire a directory superiori o di entrare in altre sezioni del sito.
+  const linkPath = linkUrl.pathname.replace(/\/+$/, "") || "/";
+  if (startPath !== "/" && linkPath !== startPath && !linkPath.startsWith(startPath + "/")) continue;
   // Esclude gli URL non pertinenti e quelli già visitati o in coda.
   if (isIgnoredUrl(link)) continue;
   if (visited.has(link)) continue;
