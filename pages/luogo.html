@@ -331,66 +331,6 @@ textarea:disabled {
     Updated: <span id="lu_updated"></span>
   </div>
 
-<!-- SI - NO - ANNULLA -->
-<!-- CANCELLARE vedi saveDialog.js *****
-<div id="saveDialog" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.4);
-  z-index:99999;
-  align-items:center;
-  justify-content:center;
-">
-  <div style="
-    background:white;
-    padding:22px;
-    border-radius:12px;
-    width:300px;
-    text-align:center;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  ">
-    <div style="margin-bottom:18px; font-weight:600;">
-      Vuoi salvare le modifiche?
-    </div>
-    <div style="display:flex; gap:10px; justify-content:center;">
-      <button onclick="dialogAction('yes')" style="
-        flex:1;
-        background:#22c55e;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">Sì</button>
-      <button onclick="dialogAction('no')" style="
-        flex:1;
-        background:#ef4444;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">No</button>
-      <button onclick="('cancel')" style="
-        flex:1;
-        background:#9ca3af;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">Annulla</button>
-    </div>
-  </div>
-</div>
-
 <!-- COORDINATE -->  
 <div id="coordDialog" style="
   display:none;
@@ -776,20 +716,6 @@ async function save() {
   }
   return true;
 }  
-  
-/* CANCELLARE vedi saveDialog.js *****
-function askSaveDialog() {
-  document.getElementById("saveDialog").style.display = "flex";
-  return new Promise(resolve => {
-    dialogResolve = resolve;
-  });
-}
-
-function dialogAction(type) {
-  document.getElementById("saveDialog").style.display = "none";
-  dialogResolve(type);
-}
-CANCELLARE vedi saveDialog.js ***** */
 
 function updatePageState() {
   const comuneOk = !isNew || id_comune_hidden.value !== "";
@@ -817,9 +743,7 @@ function updatePageState() {
 
 function initMapLuogo() {
   if (map) return;
-  map = L.map('map', {
-    zoomControl: false
-  });
+  map = L.map('map', {zoomControl: false});
 // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OSM'}).addTo(map); // Mappa Base di Aroundo
 // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map); // Mappa Neutra
 // L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png',{ attribution: '&copy; OSM & CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
@@ -827,9 +751,7 @@ baseLayer = L.tileLayer(mapStyles[currentMapStyle].url, mapStyles[currentMapStyl
 map.on("click", async (e) => {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
-  if (!comune?.lat || !comune?.lng) {
-    return;
-  }
+  if (!comune?.lat || !comune?.lng) {return;}
   if (!isPointInComune(e.latlng)) {
   await askCoordDialog(
     "",
@@ -856,28 +778,14 @@ map.on("click", async (e) => {
   const oldLng = lu_lng.value;
     if (!oldLat || !oldLng) {
       // PRIMO INSERIMENTO
-      if (minDist < 2) {
-        mode = "block";
-        msg = "Posizione già occupata";
-      } else if (minDist <= 10) {
-        mode = "warn";
-        msg = "Esistono posizioni molto vicine, confermi ?";
-      } else {
-        mode = "first";
-        msg = "Aggiungere il luogo ?";
-      }
+      if (minDist < 2) {mode = "block"; msg = "Posizione già occupata";
+      } else if (minDist <= 10) {mode = "warn"; msg = "Esistono posizioni molto vicine, confermi ?";
+      } else {mode = "first"; msg = "Aggiungere il luogo ?";}
     } else {
       // MODIFICA SUCCESSIVA
-      if (minDist < 2) {
-        mode = "block";
-        msg = "Posizione già occupata";
-      } else if (minDist <= 10) {
-        mode = "warn";
-        msg = "Esistono posizioni molto vicine, confermi ?";
-      } else {
-        mode = "move";
-        msg = "Spostare il luogo ?";
-      }
+      if (minDist < 2) {mode = "block"; msg = "Posizione già occupata";
+      } else if (minDist <= 10) {mode = "warn"; msg = "Esistono posizioni molto vicine, confermi ?";
+      } else {mode = "move"; msg = "Spostare il luogo ?";}
     }
   const choice = await askCoordDialog(oldLat, oldLng, latF, lngF, msg);
   // BLOCCO
@@ -885,15 +793,10 @@ map.on("click", async (e) => {
   // ANNULLA
   if (choice !== "yes") return;
   // OK → APPLICO MOVIMENTO / CREAZIONE
-  if (marker) {
-    marker.setLatLng([lat, lng]);
+  if (marker) {marker.setLatLng([lat, lng]);
   } else {
   // NUOVO LUOGO → crea marker rosso
-    marker = L.marker([lat, lng], {
-      icon: selectedIcon,
-      riseOnHover: true
-    }).addTo(map);
-  }
+    marker = L.marker([lat, lng], {icon: selectedIcon, riseOnHover: true}).addTo(map);}
   lu_lat.value = latF;
   lu_lng.value = lngF;
   markDirty();
@@ -905,39 +808,21 @@ window.changeMapStyle = function () {
   if (currentMapStyle >= mapStyles.length)
     currentMapStyle = 0;
   // rimuove la mappa corrente
-  if (baseLayer) {
-    map.removeLayer(baseLayer);
-  }
+  if (baseLayer) {map.removeLayer(baseLayer);}
   // rimuove eventuali etichette precedenti
-  if (labelsLayer) {
-    map.removeLayer(labelsLayer);
-    labelsLayer = null;
-  }
+  if (labelsLayer) {map.removeLayer(labelsLayer); labelsLayer = null;}
   // carica nuova mappa
-  baseLayer = L.tileLayer(
-    mapStyles[currentMapStyle].url,
-    mapStyles[currentMapStyle].options
-  ).addTo(map);
+  baseLayer = L.tileLayer(mapStyles[currentMapStyle].url, mapStyles[currentMapStyle].options).addTo(map);
   // se richiesto aggiunge le etichette
-  if (mapStyles[currentMapStyle].labels) {
-    labelsLayer = L.tileLayer(
+  if (mapStyles[currentMapStyle].labels) {labelsLayer = L.tileLayer(
       "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-      {
-        attribution: "&copy; Esri",
-        maxZoom: 19
-      }
-    ).addTo(map);
-  }
-  document.getElementById("mapStyleBtn").textContent =
-    mapStyles[currentMapStyle].name;
+      {attribution: "&copy; Esri", maxZoom: 19}).addTo(map);}
+  document.getElementById("mapStyleBtn").textContent = mapStyles[currentMapStyle].name;
 };
 
 function isPointInComune(latlng) {
   if (!comuneGeoJson) return true;
-  return turf.booleanPointInPolygon(
-    turf.point([latlng.lng, latlng.lat]),
-    comuneGeoJson
-  );
+  return turf.booleanPointInPolygon(turf.point([latlng.lng, latlng.lat]), comuneGeoJson);
 }
   
 async function drawComuneConfine(nomeComune) {
@@ -947,13 +832,9 @@ async function drawComuneConfine(nomeComune) {
   const data = await res.json();
   if (!data.features || !data.features.length) return;
   // prende solo il confine amministrativo del comune
-  const feature = data.features.find(f =>
-    f.properties.category === "boundary"
-  );
+  const feature = data.features.find(f => f.properties.category === "boundary");
   if (!feature) return;
-  if (comuneLayer) {
-    map.removeLayer(comuneLayer);
-  }
+  if (comuneLayer) {map.removeLayer(comuneLayer);}
   comuneLayer = L.geoJSON(feature, {
     style: {
       color: "blue",
@@ -973,11 +854,8 @@ function renderMarkers(list) {
   if (!valid.length) {
   const idComune = id_comune_hidden.value;
   const comune = comuniCoords[idComune];
-  if (comune?.lat && comune?.lng) {
-    map.setView([comune.lat, comune.lng], 12);
-  } else {
-    map.setView([38.1, 13.3], 8);
-  }
+  if (comune?.lat && comune?.lng) {map.setView([comune.lat, comune.lng], 12);
+  } else {map.setView([38.1, 13.3], 8);}
   return;
 }
   valid.forEach(l => {
@@ -986,20 +864,10 @@ function renderMarkers(list) {
       [l.lu_lat, l.lu_lng],
       { icon: isCurrent ? selectedIcon : defaultIcon }
     ).addTo(map);
-    m.bindTooltip(
-      `
-      <b>${l.lu_location || ""}</b><br>
-      ${l.lu_descrizione || ""}
-      `,
-      {
-        direction: "top",
-        sticky: true
-      }
-    );
+    m.bindTooltip(`<b>${l.lu_location || ""}</b><br> ${l.lu_descrizione || ""}`, {direction: "top", sticky: true});
     markers.push(m);
-    if (isCurrent) {
-      marker = m; // marker globale del luogo attivo
-    }
+    // marker globale del luogo attivo
+    if (isCurrent) {marker = m;}
   });
 }
 
@@ -1033,36 +901,11 @@ const selectedIcon = L.icon({
 
 function askCoordDialog(oldLat, oldLng, newLat, newLng, message) {
     const box = document.getElementById("coordContent");
-    let html = `
-    <div style="margin-bottom:10px;font-weight:600">
-    ${message}
-    </div>
-    `;
-    if (oldLat && oldLng) {
-    html += `
-    <div style="font-family:monospace;font-weight:bold;color:#111827">
-    Lat : ${oldLat}<br>
-    Lng : ${oldLng}
-    </div>
-    <div style="height:10px"></div>
-    `;
-    }
-    if (newLat && newLng) {
-      html += `
-        <div style="
-          text-align:center;
-          font-size:20px;
-          margin:8px 0;
-        ">
-          ↓
-        </div>
-        <div style="font-family:monospace;color:#374151">
-          Lat : ${newLat}<br>
-          Lng : ${newLng}
-        </div>
-        <div style="height:16px"></div>
-      `;
-    }
+    let html = `<div style="margin-bottom:10px;font-weight:600"> ${message}</div>`;
+    if (oldLat && oldLng) {html += `<div style="font-family:monospace;font-weight:bold;color:#111827">
+      Lat : ${oldLat}<br>Lng : ${oldLng}</div><div style="height:10px"></div>`;}
+    if (newLat && newLng) {html += `<div style="text-align:center; font-size:20px; margin:8px 0;">↓</div><div style="font-family:monospace;color:#374151">
+      Lat : ${newLat}<br>Lng : ${newLng}</div><div style="height:16px"></div>`;}
     box.innerHTML = html;
     const yesBtn = document.querySelector("#coordDialog button:nth-child(1)");
     yesBtn.style.display = (newLat && newLng) ? "" : "none";
@@ -1263,29 +1106,12 @@ function renderEventi() {
   // righe dati
   eventiList.forEach(e => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${formatInizio(e.ev_inizio)}</td>
-      <td class="link-cell">
-        ${e.ev_titolo || ""}
-      </td>
-      <td class="link-cell">
-        ${e.organizzatori?.or_nome || ""}
-      </td>
-      <td>
-        ${e.ev_descrizione || ""}
-      </td>
-    `;
+    tr.innerHTML = `<td>${formatInizio(e.ev_inizio)}</td><td class="link-cell"> ${e.ev_titolo || ""}</td><td class="link-cell">
+        ${e.organizzatori?.or_nome || ""}</td><td> ${e.ev_descrizione || ""}</td>`;
     // Evento
-    tr.cells[1].onclick = () => {
-      location.href = `evento.html?id=${e.id_evento}`;
-    };
+    tr.cells[1].onclick = () => {location.href = `evento.html?id=${e.id_evento}`;};
     // Organizzatore
-    if (e.organizzatori) {
-      tr.cells[2].onclick = () => {
-        location.href =
-          `organizzatore.html?id=${e.organizzatori.id_organizzatore}`;
-      };
-    }
+    if (e.organizzatori) {tr.cells[2].onclick = () => {location.href = `organizzatore.html?id=${e.organizzatori.id_organizzatore}`;};}
     body.appendChild(tr);
   });
 }
@@ -1301,8 +1127,7 @@ function sortEventi(list) {
 function renderOrganizzatori() {
   const body = document.getElementById("organizzatoriBody");
   body.innerHTML = "";
-  document.getElementById("organizzatoriTitle").textContent =
-    `Organizzatori (${organizzatoriList.length})`;
+  document.getElementById("organizzatoriTitle").textContent = `Organizzatori (${organizzatoriList.length})`;
   const arrow = document.getElementById("organizzatoriArrow");
   const sectionHeader = document.querySelector("#organizzatoriPanel").previousElementSibling;
   if (organizzatoriList.length === 0) {
@@ -1314,26 +1139,14 @@ function renderOrganizzatori() {
   // intestazione colonne
   const headerRow = document.createElement("tr");
   headerRow.className = "header-row";
-  headerRow.innerHTML = `
-    <td>Nome</td>
-    <td style="text-align:right;">N° eventi</td>
-  `;
+  headerRow.innerHTML = `<td>Nome</td><td style="text-align:right;">N° eventi</td>`;
   body.appendChild(headerRow);
   // righe
   organizzatoriList.forEach(o => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="link-cell">
-        ${o.or_nome || ""}
-      </td>
-      <td style="text-align:right;">
-        ${o.num_eventi || 0}
-      </td>
-    `;
+    tr.innerHTML = `<td class="link-cell"> ${o.or_nome || ""}</td><td style="text-align:right;"> ${o.num_eventi || 0}</td>`;
     // click su nome → organizzatore
-    tr.cells[0].onclick = () => {
-      location.href = `organizzatore.html?id=${o.id_organizzatore}`;
-    };
+    tr.cells[0].onclick = () => {location.href = `organizzatore.html?id=${o.id_organizzatore}`;};
     body.appendChild(tr);
   });
 }
