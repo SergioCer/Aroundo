@@ -191,18 +191,6 @@ Category
 </div>
 </div>
 </div>
-<!-- CANCELLARE vedi saveDislog.js *****
-<div id="saveDialog" class="dialog-overlay">
-<div class="dialog">
-<div class="dialog-title">Save changes?</div>
-<div class="dialog-buttons">
-<button class="btn-green" onclick="dialogAction('yes')">Yes</button>
-<button class="btn-red" onclick="dialogAction('no')">No</button>
-<button onclick="dialogAction('cancel')">Cancel</button>
-</div>
-</div>
-</div>
-CANCELLARE vedi saveDislog.js ***** -->   
 <script type="module">
 
 import { requireAuth } from './auth-check.js';
@@ -308,34 +296,36 @@ window.markDirty=function(){
 };
 
 /* SAVE */
-async function save(){
-    if(!sc_descrizione.value.trim()){
+async function save() {
+  if (!sc_descrizione.value.trim()) {
+    updateGuide();
     sc_descrizione.focus();
-    return;
+    return false;
   }
-  const payload={
-    sc_descrizione:sc_descrizione.value.trim(),
-    sc_note:sc_note.value.trim(),
-    sc_icona:sc_icona.value.trim(),
-    sc_colore:sc_colore.value,
-    sc_attiva:activeBtn.classList.contains("btn-green"),
-    id_categoria:parseInt(id_categoria.value)
+  const payload = {
+    sc_descrizione: sc_descrizione.value.trim(),
+    sc_note: sc_note.value.trim(),
+    sc_icona: sc_icona.value.trim(),
+    sc_colore: sc_colore.value,
+    sc_attiva: activeBtn.classList.contains("btn-green"),
+    id_categoria: parseInt(id_categoria.value)
   };
-
-  if(isNew){
-    const {data}=await supabase
+  if (isNew) {const { data, error } = await supabase
       .from("subcategorie")
       .insert(payload)
       .select()
       .single();
-    location.href=`category.html?id=${data.id_subcategoria}`;
-  }else{
-    await supabase
+    if (error || !data) {console.error("Errore nel salvataggio:", error); return false;}
+    // La nuova categoria è stata salvata.
+    // Non navigare qui: ci penserà requestBack().
+  } else {const { error } = await supabase
       .from("subcategorie")
       .update(payload)
-      .eq("id_subcategoria",id);
+      .eq("id_subcategoria", id);
+    if (error) {console.error("Errore nell'aggiornamento:", error); return false;}
   }
-  dirty=false;
+  dirty = false;
+  return true;
 }
 
 /* BACK */
