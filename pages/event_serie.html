@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script src="saveDialog.js"></script>
 <title>Event Serie</title>
-
+  
 <style>
 body {
   margin: 0;
@@ -186,6 +187,7 @@ input, textarea {
   <div class="footer" id="es_created"></div>
   
 <!-- SI - NO - ANNULLA -->
+<!-- CANCELLARE vedi saveDialog.js *****  
 <div id="saveDialog" style="
   display:none;
   position:fixed;
@@ -243,6 +245,7 @@ input, textarea {
     </div>
   </div>
 </div>
+CANCELLARE vedi saveDialog.js ***** -->  
   
 </div>
 
@@ -262,6 +265,7 @@ let dirty = false;
 let eventsOpen = false;
 let dialogResolve;  
 
+/* CANCELLARE vedi saveDialog.js *****   
 function askSaveDialog() {
   const dialog = document.getElementById("saveDialog");
   dialog.style.display = "flex";
@@ -275,6 +279,7 @@ function dialogAction(type) {
   dialogResolve(type);
 }
 window.dialogAction = dialogAction;  
+CANCELLARE vedi saveDialog.js ***** */
 
 async function load() {
   if (isNew) {
