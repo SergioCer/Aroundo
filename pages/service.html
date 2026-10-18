@@ -4,7 +4,8 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<script src="saveDialog.js"></script>
+  
 <title>Service</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 <style>
@@ -15,7 +16,6 @@ body{
   background:#f2f4f7;
 }
 
-/* TOPBAR */
 .topbar{
   display:flex;
   justify-content:center;
@@ -53,7 +53,6 @@ body{
   background:#d1d5db;
 }
 
-/* CARD */
 .card{
   background:white;
   margin:15px;
@@ -61,14 +60,12 @@ body{
   border-radius:20px;
 }
 
-/* LABEL */
 .section-title{
   font-size:11px;
   color:#777;
   margin:10px 0 4px;
 }
 
-/* INPUT */
 input,
 textarea,
 select{
@@ -86,7 +83,6 @@ textarea{
   resize:vertical;
 }
 
-/* INLINE */
 .inline-row{
   display:flex;
   align-items:center;
@@ -102,13 +98,11 @@ textarea{
   gap:6px;
 }
 
-/* SMALL LABEL */
 .small-label{
   font-size:11px;
   color:#777;
 }
 
-/* STATUS */
 .status{
   display:flex;
   align-items:center;
@@ -134,12 +128,10 @@ textarea{
   color:white;
 }
 
-/* LEVEL */
 .level-select{
   width:60px;
 }
 
-/* ICON */
 .icon-preview{
   height:40px;
   display:flex;
@@ -152,7 +144,6 @@ textarea{
   line-height:1;
 }
 
-/* BUTTON */
 .btn-icon{
   width:34px;
   height:34px;
@@ -182,47 +173,6 @@ textarea{
   background:#9ca3af;
 }
 
-/* DIALOG */
-.dialog-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.40);
-  z-index:9999;
-  justify-content:center;
-  align-items:center;
-}
-
-.dialog{
-  width:340px;
-  background:white;
-  border-radius:12px;
-  padding:22px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
-
-.dialog-title{
-  text-align:center;
-  font-weight:bold;
-  margin-bottom:18px;
-}
-
-.dialog-buttons{
-  display:flex;
-  gap:10px;
-  margin-top:20px;
-}
-
-.dialog-buttons button{
-  flex:1;
-  border:none;
-  border-radius:8px;
-  padding:10px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* GUIDE */
 .guide-active{
   outline:2px solid #22c55e;
 }
@@ -279,7 +229,8 @@ Icon
 </div>
 </div>
 </div>
-  
+
+<!-- CANCELLARE vedi saveDialog.js *****  
 <div id="saveDialog" class="dialog-overlay">
 <div class="dialog">
 <div class="dialog-title">
@@ -298,6 +249,7 @@ Cancel
 </div>
 </div>
 </div>
+ CANCELLARE vedi saveDialog.js *****   -->  
 
 <script type="module">
 import { requireAuth } from './auth-check.js';
@@ -460,7 +412,7 @@ window.requestBack=async function(){
   history.back();
 };
 
-/* SAVE DIALOG */
+/* CANCELLARE vedi saveDialog.js *****
 function askSaveDialog(){
   document.getElementById("saveDialog")
     .style.display="flex";
@@ -473,7 +425,8 @@ window.dialogAction=function(type){
   document.getElementById("saveDialog")
     .style.display="none";
   dialogResolve(type);
-};  
+}; 
+CANCELLARE vedi saveDialog.js ***** */
 
 async function loadGenres(){
   const {data,error}=await supabase
