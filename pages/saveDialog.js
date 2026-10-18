@@ -53,17 +53,11 @@
       font-weight: 600;
     }
 
-    #saveDialog .save-dialog-yes {
-      background: #22c55e;
-    }
+    #saveDialog .save-dialog-yes {background: #22c55e;}
 
-    #saveDialog .save-dialog-no {
-      background: #ef4444;
-    }
+    #saveDialog .save-dialog-no {background: #ef4444;}
 
-    #saveDialog .save-dialog-cancel {
-      background: #9ca3af;
-    }
+    #saveDialog .save-dialog-cancel {background: #9ca3af;}
   `;
 
   // 2. HTML
@@ -72,11 +66,7 @@
          role="dialog"
          aria-modal="true"
          aria-labelledby="saveDialogMessage">
-      <div class="save-dialog-box">
-        <div id="saveDialogMessage"
-             class="save-dialog-message">
-          Vuoi salvare le modifiche?
-        </div>
+      <div class="save-dialog-box"><div id="saveDialogMessage" class="save-dialog-message">Vuoi salvare le modifiche?</div>
         <div class="save-dialog-buttons">
           <button type="button" class="save-dialog-yes" data-action="yes">Yes</button>
           <button type="button" class="save-dialog-no" data-action="no">No</button>
