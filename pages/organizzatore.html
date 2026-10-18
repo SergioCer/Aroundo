@@ -926,68 +926,6 @@ input, textarea {
     </button>
   </div>
 </dialog>
-  
-<!-- SI - NO - ANNULLA -->
-<!-- CANCELLARE vedi saveDialog.js *****  
-<div id="saveDialog" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.4);
-  z-index:99999;
-  align-items:center;
-  justify-content:center;
-">
-  <div style="
-    background:white;
-    padding:22px;
-    border-radius:12px;
-    width:300px;
-    text-align:center;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  ">
-    <div style="margin-bottom:18px; font-weight:600;">
-      Vuoi salvare le modifiche?
-    </div>
-    <div style="display:flex; gap:10px; justify-content:center;">
-      <button onclick="dialogAction('yes')" style="
-        flex:1;
-        background:#22c55e;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">Sì</button>
-      <button onclick="dialogAction('no')" style="
-        flex:1;
-        background:#ef4444;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">No</button>
-      <button onclick="dialogAction('cancel')" style="
-        flex:1;
-        background:#9ca3af;
-        color:white;
-        border:none;
-        padding:10px;
-        border-radius:8px;
-        cursor:pointer;
-        font-weight:600;
-      ">Annulla</button>
-    </div>
-  </div>
-</div>
-  -->
-  
 </div>
   
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
@@ -1042,20 +980,6 @@ slugAliasInput.addEventListener('input', () => {
   );
   markDirty();
 });
-  
-/* CANCELLARE vedi saveDialog.js *****
-function askSaveDialog() {
-  document.getElementById("saveDialog").style.display = "flex";
-  return new Promise(resolve => {
-    dialogResolve = resolve;
-  });
-}
-
-function dialogAction(type) {
-  document.getElementById("saveDialog").style.display = "none";
-  dialogResolve(type);
-}
-CANCELLARE vedi saveDialog.js ***** */ 
 
 /* LOAD */
 async function load() {
@@ -1140,10 +1064,7 @@ window.searchComuniOrganizzatore = async (text) => {
     .select('id_comune, co_descrizione, co_cap')
     .ilike('co_descrizione', text + '%')
     .limit(10);
-  if (error) {
-    console.error("Errore ricerca comuni:", error);
-    return;
-  }
+  if (error) {console.error("Errore ricerca comuni:", error); return;}
   box.innerHTML = '';
   (data || []).forEach(c => {
     const div = document.createElement('div');
@@ -1151,10 +1072,8 @@ window.searchComuniOrganizzatore = async (text) => {
     div.innerText = c.co_descrizione;
     div.onclick = () => {
       document.getElementById('id_comune_organizzatore').value = c.co_descrizione;
-      document.getElementById('id_comune_organizzatore_hidden').value =
-        c.id_comune;
-      document.getElementById('or_cap').value =
-        c.co_cap || '';
+      document.getElementById('id_comune_organizzatore_hidden').value = c.id_comune;
+      document.getElementById('or_cap').value = c.co_cap || '';
       box.innerHTML = '';
       markDirty();
     };
@@ -1167,10 +1086,7 @@ async function loadSocialCatalog(){
     .from('social')
     .select('id_social, so_img, so_description, so_prefix')
     .order('so_description', { ascending:true });
-  if(error){
-    console.error("ERRORE CATALOGO SOCIAL:", error);
-    return;
-  }
+  if(error){console.error("ERRORE CATALOGO SOCIAL:", error); return;}
   socialCatalog = data || [];
 }
 
@@ -1193,10 +1109,7 @@ async function loadSocialOrganizzatore(idOrg){
     `)
     .eq('id_organizzatore', idOrg)
     .order('so_order', { ascending:true });
-  if(error){
-    console.error("ERRORE SOCIAL:", error);
-    return;
-  }
+  if(error){console.error("ERRORE SOCIAL:", error); return;}
   socialList = data || [];
   renderSocial();
 }
@@ -1208,29 +1121,24 @@ function renderSocial(){
     `Social (${socialList.length})`;
   document.getElementById("socialArrow").textContent =
     socialOpen ? "▼" : "▶";
-  const section =
-    document.querySelector("#socialPanel").previousElementSibling;
+  const section = document.querySelector("#socialPanel").previousElementSibling;
   /* Se non ci sono social, la sezione resta comunque visibile
      perché dobbiamo poter utilizzare il pulsante +. */
   section.classList.remove("disabled");
-  socialList.forEach(s => {
-    const tr = document.createElement("tr");
+  socialList.forEach(s => {const tr = document.createElement("tr");
     tr.dataset.id = s.id_social_organizer;
-    tr.innerHTML = `
-      <td style="
+    tr.innerHTML = `<td style="
         width:30px;
         color:#6b7280;
         cursor:grab;
         font-size:18px;
       ">
         ☰
-      </td>
-      <td style="
+      </td><td style="
         width:38px;
         text-align:center;
       ">
-        <img
-          src="${s.social?.so_img || ""}"
+        <img src="${s.social?.so_img || ""}"
           style="
             width:26px;
             height:26px;
@@ -1241,18 +1149,14 @@ function renderSocial(){
           "
           title="Apri collegamento"
         >
-      </td>
-      <td
-        class="link-cell social-edit-cell"
+      </td><td class="link-cell social-edit-cell" 
         style="
           font-weight:600;
           cursor:pointer;
         "
       >
         ${s.social?.so_description || ""}
-      </td>
-      <td
-        class="social-edit-cell"
+      </td><td class="social-edit-cell"
         style="
           color:#6b7280;
           max-width:150px;
@@ -1261,15 +1165,11 @@ function renderSocial(){
           text-overflow:ellipsis;
           cursor:pointer;
         "
-      >
-        ${s.so_description || ""}
-      </td>
-      <td style="
-        width:34px;
-        text-align:center;
-      ">
-        <button
-          onclick="deleteSocial(event, ${s.id_social_organizer})"
+      > ${s.so_description || ""}</td><td 
+        style="
+          width:34px;
+          text-align:center;
+        "><button onclick="deleteSocial(event, ${s.id_social_organizer})"
           style="
             width:26px;
             height:26px;
@@ -1280,8 +1180,7 @@ function renderSocial(){
             font-weight:bold;
             cursor:pointer;
           "
-        >−</button>
-      </td>
+        >−</button></td>
     `;
     /* ICONA = APRE LINK */
     tr.cells[1].querySelector("img").onclick = (e) => {
@@ -1335,18 +1234,12 @@ function initSocialSortable(){
 }
 
 function populateSocialSelect(selectedId = ""){
-  const select =
-    document.getElementById("socialSelect");
-  select.innerHTML =
-    `<option value="">Seleziona social...</option>`;
-  socialCatalog.forEach(s => {
-    const option =
-      document.createElement("option");
+  const select = document.getElementById("socialSelect");
+  select.innerHTML = `<option value="">Seleziona social...</option>`;
+  socialCatalog.forEach(s => {const option = document.createElement("option");
     option.value = s.id_social;
-    option.textContent =
-      s.so_description;
-    option.dataset.prefix =
-      s.so_prefix || "";
+    option.textContent = s.so_description;
+    option.dataset.prefix = s.so_prefix || "";
     select.appendChild(option);
   });
   select.value = selectedId || "";
@@ -1359,21 +1252,16 @@ window.createSocial = async (e) => {
   populateSocialSelect();
   document.getElementById("socialUrl").value = "";
   document.getElementById("socialDescription").value = "";
-  document.getElementById("socialDialogTitle").textContent =
-    "Nuovo social";
-  document.getElementById("socialDialog").style.display =
-    "flex";
+  document.getElementById("socialDialogTitle").textContent = "Nuovo social";
+  document.getElementById("socialDialog").style.display = "flex";
 };
 
 /* Quando seleziono un social, precompilo il prefisso ma lascio l'URL completamente modificabile. */
 document.getElementById("socialSelect")
   .addEventListener("change", function(){
-    const selected =
-      this.options[this.selectedIndex];
-    const prefix =
-      selected?.dataset?.prefix || "";
-    const urlInput =
-      document.getElementById("socialUrl");
+    const selected = this.options[this.selectedIndex];
+    const prefix = selected?.dataset?.prefix || "";
+    const urlInput = document.getElementById("socialUrl");
     if(prefix){
       urlInput.value = prefix;
       urlInput.focus();
@@ -1387,27 +1275,18 @@ document.getElementById("socialSelect")
 
 /* MODIFICA SOCIAL */
 window.openEditSocial = (socialOrganizerId) => {
-  const s =
-    socialList.find(
-      x => x.id_social_organizer == socialOrganizerId
-    );
+  const s = socialList.find(x => x.id_social_organizer == socialOrganizerId);
   if(!s) return;
-  editingSocialId =
-    socialOrganizerId;
+  editingSocialId = socialOrganizerId;
   populateSocialSelect(
     s.id_social
   );
-  document.getElementById("socialUrl").value =
-    s.so_url || "";
-  document.getElementById("socialDescription").value =
-    s.so_description || "";
-  document.getElementById("socialDialogTitle").textContent =
-    "Modifica social";
-  document.getElementById("socialDialog").style.display =
-    "flex";
+  document.getElementById("socialUrl").value = s.so_url || "";
+  document.getElementById("socialDescription").value = s.so_description || "";
+  document.getElementById("socialDialogTitle").textContent = "Modifica social";
+  document.getElementById("socialDialog").style.display = "flex";
   /* Cursore alla fine dell'URL. */
-  const urlInput =
-    document.getElementById("socialUrl");
+  const urlInput = document.getElementById("socialUrl");
   urlInput.focus();
   urlInput.setSelectionRange(
     urlInput.value.length,
@@ -1417,34 +1296,20 @@ window.openEditSocial = (socialOrganizerId) => {
 
 /* SALVA NUOVO / MODIFICA */
 window.saveSocial = async () => {
-  const idSocial =
-    document.getElementById("socialSelect").value;
-  const url =
-    document.getElementById("socialUrl")
+  const idSocial = document.getElementById("socialSelect").value;
+  const url = document.getElementById("socialUrl")
       .value
       .trim();
-  const description =
-    document.getElementById("socialDescription")
+  const description = document.getElementById("socialDescription")
       .value
       .trim();
-  if(!idSocial){
-    alert("Seleziona un social.");
-    return;
-  }
-  if(!url){
-    alert("Inserisci il collegamento.");
-    return;
-  }
-  if(description.length > 60){
-    alert("La descrizione non può superare 60 caratteri.");
-    return;
-  }
+  if(!idSocial){alert("Seleziona un social."); return;}
+  if(!url){alert("Inserisci il collegamento."); return;}
+  if(description.length > 60){alert("La descrizione non può superare 60 caratteri."); return;}
 
   /* MODIFICA */
   if(editingSocialId){
-
-    const { error } =
-      await supabase
+    const { error } = await supabase
         .from("social_organizzatori")
         .update({
           id_social:Number(idSocial),
@@ -1456,18 +1321,13 @@ window.saveSocial = async () => {
           "id_social_organizer",
           editingSocialId
         );
-    if(error){
-      console.error(
-        "ERRORE MODIFICA SOCIAL:",
-        error
-      );
+    if(error){console.error("ERRORE MODIFICA SOCIAL:", error);
       alert("Errore nella modifica del social.");
       return;
    }
   }
   /* NUOVO */
-  else {
-    const maxOrder =
+  else {const maxOrder =
       socialList.length
         ? Math.max(
             ...socialList.map(
@@ -1475,8 +1335,7 @@ window.saveSocial = async () => {
             )
           )
         : 0;
-    const { error } =
-      await supabase
+    const { error } = await supabase
         .from("social_organizzatori")
         .insert({
           id_organizzatore:id,
@@ -1487,13 +1346,8 @@ window.saveSocial = async () => {
           so_order:maxOrder + 1
         });
     if(error){
-      console.error(
-        "ERRORE SALVATAGGIO SOCIAL:",
-        error
-      );
-      alert(
-        "Errore nel salvataggio del social."
-      );
+      console.error("ERRORE SALVATAGGIO SOCIAL:", error);
+      alert("Errore nel salvataggio del social.");
       return;
     }
   }
@@ -1503,18 +1357,11 @@ window.saveSocial = async () => {
 };
 
 /* ELIMINA RIFERIMENTO */
-window.deleteSocial = async (
-  e,
-  socialOrganizerId
-) => {
+window.deleteSocial = async (e, socialOrganizerId) => {
   e.stopPropagation();
-  const ok =
-    confirm(
-      "Vuoi rimuovere questo riferimento social dall'organizzatore?"
-    );
+  const ok = confirm("Vuoi rimuovere questo riferimento social dall'organizzatore?");
   if(!ok) return;
-  const { error } =
-    await supabase
+  const { error } = await supabase
       .from("social_organizzatori")
       .delete()
       .eq(
@@ -1522,13 +1369,8 @@ window.deleteSocial = async (
         socialOrganizerId
       );
   if(error){
-    console.error(
-      "ERRORE ELIMINAZIONE SOCIAL:",
-      error
-    );
-    alert(
-      "Errore nella rimozione del social."
-    );
+    console.error("ERRORE ELIMINAZIONE SOCIAL:", error);
+    alert("Errore nella rimozione del social.");
     return;
   }
   await loadSocialOrganizzatore(id);
@@ -1592,10 +1434,7 @@ lu_location:e.luoghi.lu_location,
 comune:comune,
 num_eventi:1
 });
-}else{
-const l = luoghiMap.get(id);
-l.num_eventi++;
-}
+}else{const l = luoghiMap.get(id); l.num_eventi++;}
 });
 }
 
@@ -1647,17 +1486,8 @@ body.innerHTML="";
 .sort((a,b)=>a.lu_location.localeCompare(b.lu_location))
 .forEach(l=>{
 const tr=document.createElement("tr");
-tr.innerHTML=`
-<td style="color:#6b7280;font-weight:500;">
-  ${l.comune || ""}
-</td>
-<td class="link-cell">
-  ${l.lu_location}
-</td>
-<td style="text-align:right;font-weight:600;">
-  ${l.num_eventi}
-</td>
-`;
+tr.innerHTML=`<td style="color:#6b7280;font-weight:500;"> ${l.comune || ""}
+</td><td class="link-cell"> ${l.lu_location}</td><td style="text-align:right;font-weight:600;"> ${l.num_eventi}</td>`;
 tr.cells[1].onclick=()=>location.href=`luogo.html?id=${l.id_luogo}`;
 body.appendChild(tr);
 });
@@ -1759,14 +1589,10 @@ if (!validateFondazione()) {alert("Controlla l'anno di fondazione."); return fal
   return true;
 }
 
-/* =========================================================
-   IL TUO SITO
-========================================================= */
+/* IL TUO SITO */
 let mySiteOriginalSlug = "";
 let mySiteOriginalAlias = "";
-/* ---------------------------------------------------------
-   NORMALIZZAZIONE
---------------------------------------------------------- */
+/* NORMALIZZAZIONE */
 function normalizeSlug(value){
     return String(value || "")
         .trim()
@@ -1786,185 +1612,119 @@ function normalizeSlug(value){
    globale. La rendiamo quindi disponibile a window.
 */
 window.normalizeSlug = normalizeSlug;
-/* ---------------------------------------------------------
-   APERTURA
---------------------------------------------------------- */
+/* APERTURA */
 window.openMySiteDialog = function(){
-    const slugInput =
-        document.getElementById("slug");
-    const aliasInput =
-        document.getElementById("slug_alias");
-    const slug =
-        slugInput?.value?.trim() || "";
-    const alias =
-        aliasInput?.value?.trim() || "";
+    const slugInput = document.getElementById("slug");
+    const aliasInput = document.getElementById("slug_alias");
+    const slug = slugInput?.value?.trim() || "";
+    const alias = aliasInput?.value?.trim() || "";
     mySiteOriginalSlug = slug;
     mySiteOriginalAlias = alias;
-    document.getElementById("mySiteSlug").value =
-        slug;
+    document.getElementById("mySiteSlug").value = slug;
     updateMySiteAliasDisplay(alias);
     updateMySitePreview(slug);
-    const dialog =
-        document.getElementById("mySiteDialog");
+    const dialog = document.getElementById("mySiteDialog");
     dialog.showModal();
 };
-/* ---------------------------------------------------------
-   CHIUSURA
---------------------------------------------------------- */
+/* CHIUSURA */
 window.closeMySiteDialog = function(){
     document
         .getElementById("mySiteDialog")
         .close();
 };
-/* ---------------------------------------------------------
-   VISUALIZZA VECCHIO INDIRIZZO
---------------------------------------------------------- */
+/* VISUALIZZA VECCHIO INDIRIZZO */
 function updateMySiteAliasDisplay(alias){
-    const box =
-        document.getElementById("mySiteAliasBox");
-    const display =
-        document.getElementById("mySiteAliasDisplay");
+    const box = document.getElementById("mySiteAliasBox");
+    const display = document.getElementById("mySiteAliasDisplay");
     if(alias){
-        display.textContent =
-            "https://aroundo.it/" + alias;
+        display.textContent = "https://aroundo.it/" + alias;
         box.style.display = "block";
     }else{
         box.style.display = "none";
     }
 }
-/* ---------------------------------------------------------
-   INPUT SLUG
---------------------------------------------------------- */
+/* INPUT SLUG */
 window.handleMySiteSlugInput = function(){
-    const input =
-        document.getElementById("mySiteSlug");
-    const message =
-        document.getElementById("mySiteSlugMessage");
-    const original =
-        input.value;
-    const normalized =
-        normalizeSlug(original);
+    const input = document.getElementById("mySiteSlug");
+    const message = document.getElementById("mySiteSlugMessage");
+    const original = input.value;
+    const normalized = normalizeSlug(original);
     if(original !== normalized){
-        input.value =
-            normalized;
+        input.value = normalized;
     }
-    message.className =
-        "my-site-message";
+    message.className = "my-site-message";
     message.textContent = "";
     if(!normalized){
-        message.textContent =
-            "Scegli un indirizzo per la tua pagina.";
+        message.textContent = "Scegli un indirizzo per la tua pagina.";
         message.classList.add("error");
         updateMySitePreview("");
         return;
     }
     if(!/^[a-z0-9]+(?:_[a-z0-9]+)*$/.test(normalized)){
-        message.textContent =
-            "Usa solo lettere, numeri e underscore.";
+        message.textContent = "Usa solo lettere, numeri e underscore.";
         message.classList.add("error");
         return;
     }
     if(normalized === mySiteOriginalSlug){
-        message.textContent =
-            "Questo è il tuo indirizzo attuale.";
+        message.textContent = "Questo è il tuo indirizzo attuale.";
         message.classList.add("ok");
     }else{
-        message.textContent =
-            "Nuovo indirizzo: https://aroundo.it/" + normalized;
+        message.textContent = "Nuovo indirizzo: https://aroundo.it/" + normalized;
         message.classList.add("ok");
     }
     updateMySitePreview(normalized);
 };
-/* ---------------------------------------------------------
-   ANTEPRIMA
---------------------------------------------------------- */
+/* ANTEPRIMA */
 function updateMySitePreview(slug){
-    const iframe =
-        document.getElementById("mySitePreview");
+    const iframe = document.getElementById("mySitePreview");
     if(!slug){
-        iframe.src =
-            "about:blank";
+        iframe.src = "about:blank";
         return;
     }
-    iframe.src =
-        "/MyAroundo/Organizer/index.html?slug=" +
-        encodeURIComponent(slug);
+    iframe.src = "/MyAroundo/Organizer/index.html?slug=" + encodeURIComponent(slug);
 }
-/* ---------------------------------------------------------
-   APRI IL SITO
---------------------------------------------------------- */
+/* APRI IL SITO */
 window.openCurrentMySite = function(){
-    const slug =
-        document
+    const slug = document
             .getElementById("mySiteSlug")
             .value
             .trim();
     if(!slug)
         return;
-    window.open(
-        "/MyAroundo/Organizer/index.html?slug=" +
-        encodeURIComponent(slug),
-        "_blank",
-        "noopener,noreferrer"
-    );
+    window.open("/MyAroundo/Organizer/index.html?slug=" + encodeURIComponent(slug), "_blank", "noopener,noreferrer");
 };
-/* ---------------------------------------------------------
-   VERIFICA DISPONIBILITÀ
---------------------------------------------------------- */
+/* VERIFICA DISPONIBILITÀ */
 async function checkMySiteSlug(slug, idOrganizzatore){
-    const { data, error } =
-        await supabase
+    const { data, error } = await supabase
             .from("organizzatori")
             .select("id_organizzatore")
             .eq("slug", slug)
             .neq("id_organizzatore", idOrganizzatore)
             .limit(1);
-    if(error){
-        console.error(
-            "Errore verifica indirizzo:",
-            error
-        );
-        return {
-            ok:false,
-            message:
-                "Non è stato possibile verificare l'indirizzo."
-        };
+    if(error){console.error("Errore verifica indirizzo:", error);
+        return {ok:false, message: "Non è stato possibile verificare l'indirizzo."};
     }
     if(data && data.length){
-        return {
-            ok:false,
-            message:
-                "Questo indirizzo è già utilizzato. Scegline un altro."
-        };
+        return {ok:false, message: "Questo indirizzo è già utilizzato. Scegline un altro."};
     }
-    return {
-        ok:true
-    };
+    return {ok:true};
 }
-/* ---------------------------------------------------------
-   SALVATAGGIO IN DASHBOARD
---------------------------------------------------------- */
+/* SALVATAGGIO IN DASHBOARD */
 window.saveMySiteAddress = async function(){
-    const newSlug =
-        normalizeSlug(
+    const newSlug = normalizeSlug(
             document
                 .getElementById("mySiteSlug")
                 .value
         );
-    const slugMessage =
-        document.getElementById("mySiteSlugMessage");
+    const slugMessage = document.getElementById("mySiteSlugMessage");
     if(!newSlug){
-        slugMessage.textContent =
-            "Inserisci un indirizzo.";
-        slugMessage.className =
-            "my-site-message error";
+        slugMessage.textContent = "Inserisci un indirizzo.";
+        slugMessage.className = "my-site-message error";
         return;
     }
     if(!/^[a-z0-9]+(?:_[a-z0-9]+)*$/.test(newSlug)){
-        slugMessage.textContent =
-            "L'indirizzo contiene caratteri non validi.";
-        slugMessage.className =
-            "my-site-message error";
+        slugMessage.textContent = "L'indirizzo contiene caratteri non validi.";
+        slugMessage.className = "my-site-message error";
         return;
     }
     /* NESSUNA MODIFICA */
@@ -1972,96 +1732,56 @@ window.saveMySiteAddress = async function(){
         closeMySiteDialog();
         return;
     }
-    /*
-       Recuperiamo l'ID dal campo già presente
-       nella dashboard.
-    */
-    const idOrganizzatore =
-        window.currentOrganizerId ||
+    /* Recuperiamo l'ID dal campo già presente nella dashboard. */
+    const idOrganizzatore = window.currentOrganizerId ||
         document
             .getElementById("id_organizzatore")
             ?.value;
     if(!idOrganizzatore){
-        console.error(
-            "ID organizzatore non disponibile."
-        );
-        slugMessage.textContent =
-            "Impossibile identificare l'organizzatore.";
-        slugMessage.className =
-            "my-site-message error";
+        console.error("ID organizzatore non disponibile.");
+        slugMessage.textContent = "Impossibile identificare l'organizzatore.";
+        slugMessage.className = "my-site-message error";
         return;
     }
     /* VERIFICA DISPONIBILITÀ */
-    const check =
-        await checkMySiteSlug(
+    const check = await checkMySiteSlug(
             newSlug,
             idOrganizzatore
         );
     if(!check.ok){
-        slugMessage.textContent =
-            check.message;
-        slugMessage.className =
-            "my-site-message error";
+        slugMessage.textContent = check.message;
+        slugMessage.className = "my-site-message error";
         return;
     }
-    /*
-       A questo punto dobbiamo decidere
-       cosa fare del vecchio indirizzo.
-    */
-    let newAlias =
-        mySiteOriginalAlias;
+    /* A questo punto dobbiamo decidere cosa fare del vecchio indirizzo. */
+    let newAlias = mySiteOriginalAlias;
     if(mySiteOriginalSlug){
-        /*
-           Se non esiste un alias:
-           vecchio slug -> nuovo alias
-        */
+        /* Se non esiste un alias: vecchio slug -> nuovo alias */
         if(!mySiteOriginalAlias){
-            const result =
-                await askSiteAliasDialog(
-                    mySiteOriginalSlug
-                );
+            const result = await askSiteAliasDialog(mySiteOriginalSlug);
             if(result === "cancel")
                 return;
-            if(result === "yes"){
-                newAlias =
-                    mySiteOriginalSlug;
-            }
+            if(result === "yes"){newAlias = mySiteOriginalSlug;}
         }else{
-            /*
-               Esiste già un alias:
-               chiediamo se sostituirlo.
-            */
-            const result =
-                await askSiteAliasOverwriteDialog(
+            /* Esiste già un alias: chiediamo se sostituirlo. */
+            const result = await askSiteAliasOverwriteDialog(
                     mySiteOriginalAlias,
                     mySiteOriginalSlug
                 );
             if(result === "cancel")
                 return;
-            if(result === "yes"){
-                newAlias =
-                    mySiteOriginalSlug;
-            }
+            if(result === "yes"){newAlias = mySiteOriginalSlug;}
         }
     }
-    /*
-       Aggiorniamo i campi tecnici nascosti.
-       Il normale salvataggio della dashboard
-       potrà quindi usare gli stessi ID già esistenti.
-    */
-    document.getElementById("slug").value =
-        newSlug;
-    document.getElementById("slug_alias").value =
-        newAlias || "";
+    /* Aggiorniamo i campi tecnici nascosti.
+       Il normale salvataggio della dashboard potrà quindi usare gli stessi ID già esistenti. */
+    document.getElementById("slug").value = newSlug;
+    document.getElementById("slug_alias").value = newAlias || "";
     markDirty();
     closeMySiteDialog();
-    /*
-       QUI NON facciamo ancora un UPDATE autonomo.
-       Lasciamo che il sistema di salvataggio
-       esistente della dashboard faccia il proprio lavoro.
-    */
+    /* QUI NON facciamo ancora un UPDATE autonomo.
+       Lasciamo che il sistema di salvataggio esistente della dashboard faccia il proprio lavoro. */
 };
-  
 
 window.dialogAction = dialogAction;
  
