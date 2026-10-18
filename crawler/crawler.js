@@ -5,7 +5,7 @@ const { supabase } = require("./supabase_node.js");
 
 /* CONFIGURAZIONE */
 const PORT = 3001;
-const MAX_PAGES_PER_SITE = 1500;
+const MAX_PAGES_PER_SITE = 2500;
 const REQUEST_TIMEOUT = 20000;
 const USER_AGENT = "Mozilla/5.0 Crawler/1.0";
 
@@ -645,6 +645,8 @@ async function crawlSite(site) {
   console.log("=================================================");
   /* REGISTRAZIONE DELL'INIZIO DELLA SCANSIONE: aggiorna il timestamp del sito nel database. */
   const crawlStartedAt = new Date().toISOString();
+  /* PREPARAZIONE DELL'ANALISI DEI BLOCCHI: carica il dizionario dei comuni e crea un timestamp comune alle operazioni di salvataggio effettuate durante questa pagina. */
+  await loadComuniDictionary();
   const {error: crawlUpdateError
   } = await supabase
     .from("site")
@@ -655,7 +657,7 @@ async function crawlSite(site) {
   const queue = [];
   const visited = new Set();
   const startUrl = normalizeUrl(site.st_url, site.st_url);
-  const startPath = startUrl.pathname.replace(/\/+$/, "") || "/";
+  const startPath = new URL(startUrl).pathname.replace(/\/+$/, "") || "/";
   if (!startUrl) {throw new Error("st_url non valido");}
   /* DOMINIO CONSENTITO: limita la scansione alle pagine dello stesso hostname iniziale. */
   const siteHost = new URL(startUrl).hostname;
@@ -719,8 +721,6 @@ async function crawlSite(site) {
     /* ANALISI STRUTTURALE: costruisce il DOM della pagina e individua i gruppi di nodi che presentano sequenze di strutture HTML ripetute. */
     const root = buildDom(result.content);
     const ricorsivity = foundRicorsivity(root, result.content);
-/* PREPARAZIONE DELL'ANALISI DEI BLOCCHI: carica il dizionario dei comuni e crea un timestamp comune alle operazioni di salvataggio effettuate durante questa pagina. */
-await loadComuniDictionary();
 const detectedAt = new Date().toISOString();
 /* ANALISI DEGLI EVENTI SCHEMA.ORG: estrae gli eventi dichiarati nei dati strutturati della pagina, indipendentemente dall'analisi delle ricorsività DOM. */
 const schemaEvents = extractSchemaEvents(result.content);
