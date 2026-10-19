@@ -1,71 +1,26 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>MyAroundo</title>
 
 <script>
-
-const path =
-  window.location.pathname
-    .replace(/^\/+|\/+$/g, '');
-
-const parts =
-  path
-    .split('/')
-    .filter(Boolean);
-
-/*
-  Prendiamo sempre l'ultima parte del percorso.
-
-  /MyAroundo/pro_loco_trapani
-        ↓
-  pro_loco_trapani
-
-  /pro_loco_trapani
-        ↓
-  pro_loco_trapani
-*/
-
-const slug =
-  parts.length
-    ? parts[parts.length - 1]
-    : '';
-
-if (!slug) {
-
-  window.location.replace('/');
-
-} else {
-
-  window.location.replace(
-    '/MyAroundo/Organizer/index.html?slug=' +
-    encodeURIComponent(slug)
-  );
-
-}
-
+const path = window.location.pathname .replace(/^\/+|\/+$/g, '');
+const parts = path .split('/') .filter(Boolean);
+/* Prendiamo sempre l'ultima parte del percorso.
+  /MyAroundo/pro_loco_trapani ↓ pro_loco_trapani  /pro_loco_trapani ↓ pro_loco_trapani */
+const slug = parts.length ? parts[parts.length - 1]: '';
+if (!slug) {window.location.replace('/');
+} else {window.location.replace('/MyAroundo/Organizer/index.html?slug=' + encodeURIComponent(slug));}
 </script>
-
 </head>
-
 <body>
-
-<p
-  style="
-    font-family:Arial,Helvetica,sans-serif;
+<p style=" font-family:Arial,Helvetica,sans-serif;
     text-align:center;
     padding:40px;
-  "
->
-  Caricamento MyAroundo...
-</p>
+  ">Caricamento MyAroundo...</p>
 
 </body>
 </html>
