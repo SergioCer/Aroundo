@@ -548,9 +548,9 @@ function analyzeSignals(page, categoryDictionary) {
   /* NON EVENTO: impostazione base, mancano elementi fondamentali e rafforzativi */
   let classification = "non-evento";
   /* EVENTO: 3 fondamentali + almeno 2 rafforzativi */
-  if (fundamentalCount === 3 && reinforcementCount >= 2) {classification = "evento";}
+  if (fundamentalCount === 3 && reinforcementCount >= 2) {classification = "E";} // Evento
   /* INCOMPLETO: almeno 2 fondamentali + almeno 1 rafforzativo */
-  else if (fundamentalCount >= 2 && reinforcementCount >= 1) {classification = "incompleto";}
+  else if (fundamentalCount >= 2 && reinforcementCount >= 1) {classification = "I";} // Incompleto
   return {text, title, date, times, price, organizer, creators, category,
     location, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
 }
@@ -621,7 +621,7 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   const internal = {
     id_site_page: page.id_site_page,
     id_comune: page.id_comune,
-    classification: "json",
+    classification: "J", // Json
     fundamentals: {},
     reinforcements: {},
     signals: [],
@@ -744,7 +744,7 @@ async function processSitePage(page, categoryDictionary, supabase, eventState) {
     if (signals.classification === "non-evento") {console.log(`[HTML] Non è un evento: ${page.id_site_page}`); return;}
     schema = toSchemaEvent(page, signals);
     classification = signals.classification;
-  } else if (format === "json") {
+  } else if (format === "J") { // Json
     const parsedResult = parseJsonBlock(page.sp_block);
     if (parsedResult.error) {console.error(`[JSON] JSON non valido ${page.id_site_page}:`, parsedResult.error); return;}
     const parsed = parsedResult.data;
@@ -754,7 +754,7 @@ async function processSitePage(page, categoryDictionary, supabase, eventState) {
     const isEvent = types.some(type => typeof type === "string" && type.split("/").pop().split(":").pop() === "Event");
     if (!isEvent) {console.log(`[JSON] Non è un evento Schema.org: ${page.id_site_page}`); return;}
     schema = toSchemaJsonEvent(page, parsed, categoryDictionary);
-    classification = "evento";
+    classification = "E"; // Evento
   } else {console.log(`[FORMATO] Blocco ${format}: ${page.id_site_page}`); return;}
   schema = applyExtractionExceptions(schema, page);
   const pageId = String(page.id_site_page);
