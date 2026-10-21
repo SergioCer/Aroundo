@@ -34,12 +34,14 @@ body{
   text-align: center;
 }
 
-.wrap{
-  padding:12px;
-  margin:auto;
-  flex:1;
-  min-height:0;
-  overflow-y:auto
+.wrap {
+  padding: 12px;
+  margin: 0;
+  flex: 1 1 50%;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .section{
@@ -52,6 +54,7 @@ body{
   flex-direction:column;
   flex:1;
   min-height:0
+  overflow: hidden;
 }
 
 .events-grid{
@@ -295,14 +298,50 @@ body{
 }  
 
 #reconciliation {
-  flex: 0 0 auto;
+  flex: 1 1 50%;
   min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
   z-index: 10;
 }
 
 #reconciliation:empty {
   display: none;
+}
+
+#reconciliation:empty + #splitter {
+  display: none;
+}
+
+#splitter {
+  flex: 0 0 10px;
+  min-height: 10px;
+  cursor: row-resize;
+  touch-action: none;
+  user-select: none;
+  background: #e8e8e8;
+  border-top: 1px solid #d0d0d0;
+  border-bottom: 1px solid #d0d0d0;
+  position: relative;
+  z-index: 20;
+}
+
+#splitter::after {
+  content: "";
+  position: absolute;
+  width: 44px;
+  height: 3px;
+  border-radius: 3px;
+  background: #999;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#splitter:hover {
+  background: #dcdcdc;
 }
   
 .reconciliation-section {
@@ -397,7 +436,16 @@ body{
   <button id="sortDirection" type="button">↓ Decrescente</button>
 </div>
 
-<div id="reconciliation"></div>    
+<div id="reconciliation"></div>
+    <div
+      id="splitter"
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label="Ridimensiona le aree"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      tabindex="0"
+    ></div>
 <div class="wrap">
     <div id="results">
       <div class="empty">
@@ -546,6 +594,15 @@ function displaySchemaValue(v){
   return String(v);
 }
 
+function isSchemaDisplayable(value) {
+  if (value === undefined || value === null) return false;
+  if (typeof value === "string") {return value.trim() !== "";}
+  if (Array.isArray(value)) {return value.some(isSchemaDisplayable);}
+  if (typeof value === "object") {return Object.values(value).some(isSchemaDisplayable);}
+  // Mantiene visibili valori validi come 0 e false.
+  return true;
+}
+  
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
   Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
@@ -555,8 +612,8 @@ function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
     ${fields.map(field => {
       const v = event[field];
+      if (!isSchemaDisplayable(v)) return "";
       const exists = v !== undefined && v !== null && v !== "";
-      if (!exists) return "";
       const selection = reconciliationSelections.get(field);
       const isSelected = !!selection && (reconciliationRole === "parent" || (reconciliationRole === "child" && selection.childId === String(rowId)));
       const isChildField = reconciliationRole === "child" &&  exists && !nonReconciledFields.has(field);
@@ -603,7 +660,7 @@ function eventCard(row, index, reconciliationRole = null){
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
-      <div class="timestamp">Acquisito: ${escapeHtml(formatDate(row.se_extracted).date)} - 
+      <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)} - 
       <span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
@@ -964,6 +1021,60 @@ async function loadEvents(){
     results.innerHTML = `<div class="error"><strong>Errore lettura Supabase</strong><br><br>${escapeHtml(error.message)}</div>`;}
 }
 
+/* Divisore pannelli Riconciliazione & Wrap */
+const reconciliationPanel = document.getElementById("reconciliation");
+const eventsPanel = document.querySelector(".wrap");
+const splitter = document.getElementById("splitter");
+let splitDrag = null;
+
+function resizeReconciliation(height, totalHeight) {
+  const minHeight = Math.min(120, totalHeight / 2);
+  const maxHeight = Math.max(minHeight, totalHeight - minHeight);
+  const newHeight = Math.max(minHeight, Math.min(maxHeight, height));
+  reconciliationPanel.style.flex = `0 0 ${newHeight}px`;
+  eventsPanel.style.flex = "1 1 0";
+}
+  
+splitter.addEventListener("pointerdown", (event) => {
+  if (!reconciliationPanel.children.length) return;
+  splitDrag = {
+    startY: event.clientY,
+    startHeight: reconciliationPanel.clientHeight,
+    totalHeight:
+      reconciliationPanel.clientHeight + eventsPanel.clientHeight
+  };
+  splitter.setPointerCapture(event.pointerId);
+  event.preventDefault();
+});
+splitter.addEventListener("pointermove", (event) => {
+  if (!splitDrag) return;
+  const deltaY = event.clientY - splitDrag.startY;
+  resizeReconciliation(splitDrag.startHeight + deltaY, splitDrag.totalHeight);
+});
+  
+function stopSplitDrag() {splitDrag = null;}
+  
+splitter.addEventListener("pointerup", stopSplitDrag);
+splitter.addEventListener("pointercancel", stopSplitDrag);
+splitter.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+  if (!reconciliationPanel.children.length) return;
+  event.preventDefault();
+  const totalHeight = reconciliationPanel.clientHeight + eventsPanel.clientHeight;
+  const delta = event.key === "ArrowUp" ? -20 : 20;
+  resizeReconciliation(reconciliationPanel.clientHeight + delta, totalHeight);
+});
+
+let reconciliationWasEmpty = !reconciliationPanel.innerHTML.trim();
+const reconciliationObserver = new MutationObserver(() => {
+  const isEmpty = !reconciliationPanel.innerHTML.trim();
+  if (reconciliationWasEmpty && !isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";}
+  if (!reconciliationWasEmpty && isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";}
+  reconciliationWasEmpty = isEmpty;
+});
+reconciliationObserver.observe(reconciliationPanel, {childList: true, subtree: true, characterData: true});
+
+  
 /* AVVIO */
 document.getElementById("analyzeBtn").addEventListener("click", async () => {
   const button = document.getElementById("analyzeBtn");
