@@ -722,7 +722,7 @@ function detectBlockFormat(value) {
   const block = value.replace(/^\uFEFF/, "").trim();
   if (!block) return "empty";
   if (block.startsWith("<")) return "html";
-  if (block.startsWith("{")) return "json";
+  if (block.startsWith("{")) return "J";
   return "unknown";
 }
 
