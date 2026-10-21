@@ -37,24 +37,27 @@ body{
 .wrap {
   padding: 12px;
   margin: 0;
-  flex: 1 1 50%;
+  flex: 1 1 0;
   min-height: 0;
   min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
-.section{
-  background:white;
-  border-radius:10px;
-  margin-bottom:0;
-  padding:6px;
-  box-shadow:0 2px 8px #0001;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-  min-height:0
+.section {
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 0;
+  padding: 6px;
+  box-shadow: 0 2px 8px #0001;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .events-grid{
@@ -298,13 +301,14 @@ body{
 }  
 
 #reconciliation {
-  flex: 1 1 50%;
+  flex: 1 1 0;
   min-height: 0;
   min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   z-index: 10;
+  box-sizing: border-box;
 }
 
 #reconciliation:empty {
@@ -1029,7 +1033,7 @@ let splitDrag = null;
 
 function resizeReconciliation(height, totalHeight) {
   const minHeight = Math.min(120, totalHeight / 2);
-  const maxHeight = Math.max(minHeight, totalHeight - minHeight);
+  const maxHeight = totalHeight - minHeight;
   const newHeight = Math.max(minHeight, Math.min(maxHeight, height));
   reconciliationPanel.style.flex = `0 0 ${newHeight}px`;
   eventsPanel.style.flex = "1 1 0";
