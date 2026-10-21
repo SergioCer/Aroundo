@@ -556,6 +556,7 @@ function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
     ${fields.map(field => {
       const v = event[field];
       const exists = v !== undefined && v !== null && v !== "";
+      if (!exists) return "";
       const selection = reconciliationSelections.get(field);
       const isSelected = !!selection && (reconciliationRole === "parent" || (reconciliationRole === "child" && selection.childId === String(rowId)));
       const isChildField = reconciliationRole === "child" &&  exists && !nonReconciledFields.has(field);
