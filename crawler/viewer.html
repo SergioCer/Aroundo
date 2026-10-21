@@ -803,7 +803,7 @@ async function confirmReconciliation() {
   try {
     /* Prepara il JSON definitivo senza modificare preventivamente il record originale in memoria. */
     const finalSchema = getReconciledSchema(parentRow);
-    finalSchema.classification = "Riconciliato";
+    finalSchema.classification = "R";
     /* 1. Salva il padre. */
     const { error: updateError } = await supabase
       .from("site_events")
