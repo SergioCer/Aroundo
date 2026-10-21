@@ -159,6 +159,31 @@ body{
   border-bottom:0
 }
 
+/* Campi coinvolti nella riconciliazione */
+.schema-field.reconciliation-field-selectable {
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.schema-field.reconciliation-field-selectable:hover {
+  background: #fff8d6;
+}
+
+.schema-field.reconciliation-field-selected {
+  background: #fff0a6;
+  border-radius: 3px;
+}
+
+.schema-field.reconciliation-field-selected .schema-name,
+.schema-field.reconciliation-field-selected .schema-value {
+  color: #664d00;
+}
+
+.schema-field.reconciliation-field-unavailable {
+  cursor: not-allowed;
+  opacity: 0.65;
+}  
+
 .schema-name{
   display:inline;
   font-weight:normal;
@@ -176,6 +201,14 @@ body{
   word-break:break-word
 }
 
+.classification-Riconciliato {
+  background: #8e44ad;
+  color: white;
+  padding: 3px 7px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+  
 .empty{
   padding:18px;
   background:#fafafa;
@@ -513,23 +546,31 @@ function displaySchemaValue(v){
   return String(v);
 }
 
-function schemaDetails(event, id) {
+function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
-  Object.keys(event).forEach(key => {
-    if (!fields.includes(key)) {fields.push(key);}});
-  return `<div id="${id}" class="schema-details">
+  Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
+  const isReconciliationCard =
+    reconciliationRole === "parent" ||
+    reconciliationRole === "child";
+  return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
     ${fields.map(field => {
       const v = event[field];
       const exists = v !== undefined && v !== null && v !== "";
-      return `<div class="schema-field">
-        <div class="schema-name">${escapeHtml(field)}</div>
-        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(formatSchemaValue(v)) : "null"}</div>
-      </div>`; }).join("")}</div>`;
+      const selection = reconciliationSelections.get(field);
+      const isSelected = !!selection && (reconciliationRole === "parent" || (reconciliationRole === "child" && selection.childId === String(rowId)));
+      const isChildField = reconciliationRole === "child" &&  exists && !nonReconciledFields.has(field);
+      const unavailable = isChildField && !!selection &&  selection.childId !== String(rowId);
+      const classes = ["schema-field", isChildField ? "reconciliation-field-selectable" : "", isSelected ? "reconciliation-field-selected" : "",
+        unavailable ? "reconciliation-field-unavailable" : ""].filter(Boolean).join(" ");
+      const dataAttributes = isChildField ? `data-reconciliation-field="${escapeHtml(field)}" data-child-id="${escapeHtml(rowId)}"
+        title="${unavailable  ? "Deseleziona prima la fonte attuale di questo campo" : "Clicca per selezionare o deselezionare questo valore"}"`: "";
+      return `<div class="${classes}" ${dataAttributes}><div class="schema-name">${escapeHtml(field)}</div>
+        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(formatSchemaValue(v)) : "null"}</div></div>`;}).join("")}</div>`;
 }
 
 /* SCHEDA EVENTO */
 function eventCard(row, index, reconciliationRole = null){
-  const event = row.se_schema || {};
+  const event = reconciliationRole === "parent" ? getReconciledSchema(row) : (row.se_schema || {});
   const title = value(event.name) || value(event.title) || "Evento senza titolo";
   const description = value(event.description);
   const startDate = value(event.startDate);
@@ -566,13 +607,14 @@ function eventCard(row, index, reconciliationRole = null){
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')">Delete</button>
-      ${schemaDetails(event,schemaId)}</div></article>`;
+      ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}</div></article>`;
 }
 
 window.deleteEvent=deleteEvent;
 window.selectParent = selectParent;
 window.addReconciliationChild = addReconciliationChild;
 window.removeFromReconciliation = removeFromReconciliation;
+window.confirmReconciliation = confirmReconciliation;  
   
 /* APERTURA / CHIUSURA SCHEMA */
 window.toggleSchema = function(id){
@@ -581,51 +623,234 @@ window.toggleSchema = function(id){
   element.classList.toggle("open");
 };
 
+document.getElementById("reconciliation").addEventListener("click",
+  event => {const fieldElement = event.target.closest(".schema-field[data-reconciliation-field]");
+    if (!fieldElement) return;
+    toggleReconciliationField(fieldElement.dataset.reconciliationField, fieldElement.dataset.childId);
+  }
+);
+  
 let loadedEvents = [];
 let sortBy = "id";
 let sortAscending = true;
 let reconciliationParentId = null;
+let reconciliationSaving = false;  
 const reconciliationChildIds = new Set();
 
+/* field -> {
+ *   childId: ID del figlio fonte,
+ *   value: valore selezionato,
+ *   mode: "auto" oppure "manual"
+ * } */
+const reconciliationSelections = new Map();
+/* Campi per i quali non devono partire nuove proposte automatiche. La scelta manuale rimane comunque possibile. */
+const reconciliationLockedFields = new Set();
+/* Metadati che non devono essere ereditati automaticamente dai figli. */
+const nonReconciledFields = new Set(["classification", "id_site_page"]);
+
+function cloneJson(value) {
+  if (value === undefined) return undefined;
+  return JSON.parse(JSON.stringify(value));
+}
+
+function hasSchemaValue(value) {
+  return value !== undefined && value !== null && value !== "";
+}
+
+function sameSchemaValue(a, b) {
+  if (a === b) return true;
+  if (a === null || b === null || a === undefined || b === undefined) {return false;}
+  if (typeof a !== "object" || typeof b !== "object") {return false;}
+  if (Array.isArray(a) !== Array.isArray(b)) {return false;}
+  if (Array.isArray(a)) {
+    return a.length === b.length && a.every((item, index) => sameSchemaValue(item, b[index]));}
+  const keysA = Object.keys(a).sort();
+  const keysB = Object.keys(b).sort();
+  return keysA.length === keysB.length &&
+    keysA.every((key, index) => key === keysB[index] && sameSchemaValue(a[key], b[key]));
+}
+
+/* Crea il JSON temporaneo da mostrare nel padre. */
+function getReconciledSchema(parentRow) {
+  const result = cloneJson(parentRow.se_schema || {});
+  reconciliationSelections.forEach((selection, field) => {result[field] = cloneJson(selection.value);});
+  return result;
+}
 
 function selectParent(id) {
   if (reconciliationParentId !== null) return;
   reconciliationParentId = String(id);
+  reconciliationChildIds.clear();
+  reconciliationSelections.clear();
+  reconciliationLockedFields.clear();
   sortEvents();
+}
+
+/* L'automatismo viene eseguito soltanto all'ingresso effettivo del figlio nell'area di riconciliazione. */
+function proposeFieldsFromChild(childRow) {
+  const parentRow = loadedEvents.find(
+    row => String(row.id_site_event) === reconciliationParentId
+  );
+  if (!parentRow) return;
+  const parentSchema = parentRow.se_schema || {};
+  const childSchema = childRow.se_schema || {};
+  const childId = String(childRow.id_site_event);
+  Object.entries(childSchema).forEach(([field, childValue]) => {
+    if (nonReconciledFields.has(field)) return;
+    if (!hasSchemaValue(childValue)) return;
+    const currentSelection = reconciliationSelections.get(field);
+    /* Una selezione manuale è definitiva finché l'utente non la modifica o la deseleziona. */
+    if (currentSelection?.mode === "manual") return;
+    /* Se il padre ha già un valore originale, niente sovrascrittura automatica. */
+    if (hasSchemaValue(parentSchema[field]) && !currentSelection) {return;}
+    /* Un campo già chiuso all'automatismo non viene riproposto quando entrano altri figli. */
+    if (reconciliationLockedFields.has(field) && !currentSelection) {return;}
+    if (!currentSelection) {reconciliationSelections.set(field, {childId, value: cloneJson(childValue), mode: "auto"}); return;}
+    /* Un secondo figlio concorde non cambia la fonte. Un valore discordante ritira la proposta automatica e lascia il campo alla scelta manuale. */
+    if (!sameSchemaValue(currentSelection.value, childValue)) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
+  });
 }
 
 function addReconciliationChild(id) {
   const childId = String(id);
   if (reconciliationParentId === null) return;
   if (childId === reconciliationParentId) return;
+  if (reconciliationChildIds.has(childId)) return;
+  const childRow = loadedEvents.find(row => String(row.id_site_event) === childId);
+  if (!childRow) return;
   reconciliationChildIds.add(childId);
+  // L'unico punto in cui parte la proposta automatica.
+  proposeFieldsFromChild(childRow);
   sortEvents();
 }
 
 function removeFromReconciliation(id, role) {
   const eventId = String(id);
   if (role === "parent") {
-    // Il padre può essere rimosso soltanto se non ci sono figli.
+    // Il padre si può rimuovere solo senza figli.
     if (reconciliationChildIds.size > 0) return;
     reconciliationParentId = null;
     reconciliationChildIds.clear();
-  } else if (role === "child") {reconciliationChildIds.delete(eventId);}
+    reconciliationSelections.clear();
+    reconciliationLockedFields.clear();
+  } else if (role === "child") {
+    if (!reconciliationChildIds.has(eventId)) return;
+    reconciliationChildIds.delete(eventId);
+    /* Se il figlio era fonte di campi, rimuove le sue selezioni e impedisce nuove proposte automatiche per quei campi durante questa riconciliazione. */
+    reconciliationSelections.forEach((selection, field) => {
+      if (selection.childId === eventId) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
+    });
+  }
   sortEvents();
 }
+
+function toggleReconciliationField(field, childId) {
+  childId = String(childId);
+  if (!reconciliationChildIds.has(childId)) return;
+  const childRow = loadedEvents.find(row => String(row.id_site_event) === childId);
+  if (!childRow) return;
+  const childSchema = childRow.se_schema || {};
+  const childValue = childSchema[field];
+  if (nonReconciledFields.has(field)) return;
+  if (!hasSchemaValue(childValue)) return;
+  const currentSelection = reconciliationSelections.get(field);
+  /* Clic sul valore già selezionato: deseleziona. */
+  if (currentSelection?.childId === childId) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field); sortEvents(); return;}
+  /* Un altro figlio è già fonte di questo campo: occorre prima deselezionarlo. */
+  if (currentSelection) {alert("Questo campo è già assegnato a un altro figlio. " + "Deseleziona prima il valore attuale."); return;}
+  /* Se non esiste una selezione attiva, il clic crea una selezione manuale. */
+  reconciliationSelections.set(field, {childId, value: cloneJson(childValue), mode: "manual"});
+  reconciliationLockedFields.add(field);
+  sortEvents();
+}
+  
 
 function reconciliationButton(row, role = null) {
   const id = String(row.id_site_event);
   if (role === "parent") {
-    if (reconciliationChildIds.size > 0) {
-      // Per ora è soltanto un pulsante visibile.
-      return `<button class="schema-button" type="button" disabled title="La riconciliazione sarà implementata in una fase successiva">RICONCILIA</button>`;}
-    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')">Deseleziona</button>`;}
+    if (reconciliationChildIds.size > 0) {      
+      return `<button class="schema-button" type="button" onclick="confirmReconciliation()">RICONCILIA</button>`;}
+      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')">Deseleziona</button>`;}
   if (role === "child") {
     return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')">Deseleziona</button>`;}
   if (reconciliationParentId === null) {
     return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')">PADRE</button>`;}
     return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')">FIGLIO</button>`;}
 
+async function confirmReconciliation() {
+  if (reconciliationSaving) return;
+  if (reconciliationParentId === null ||
+      reconciliationChildIds.size === 0) {
+    alert("Seleziona un padre e almeno un figlio.");
+    return;
+  }
+  const parentId = reconciliationParentId;
+  const childIds = [...reconciliationChildIds];
+  const parentRow = loadedEvents.find(
+    row => String(row.id_site_event) === parentId
+  );
+  if (!parentRow) {alert("Il padre selezionato non è più disponibile."); return;}
+  if (!confirm(
+    `Confermi la riconciliazione?\n\n` +
+    `Il padre #${parentId} verrà aggiornato e ` +
+    `${childIds.length} figli verranno cancellati ` +
+    `solo dopo il salvataggio riuscito.`
+  )) {
+    return;
+  }
+  reconciliationSaving = true;
+  try {
+    /* Prepara il JSON definitivo senza modificare preventivamente il record originale in memoria. */
+    const finalSchema = getReconciledSchema(parentRow);
+    finalSchema.classification = "Riconciliato";
+    /* 1. Salva il padre. */
+    const { error: updateError } = await supabase
+      .from("site_events")
+      .update({ se_schema: finalSchema })
+      .eq("id_site_event", parentId);
+    if (updateError) {
+      throw new Error(`Salvataggio del padre non riuscito: ${updateError.message}`);
+    }
+    /* Aggiorna subito il padre locale: anche se la cancellazione fallisse, il padre risulterà completo. */
+    parentRow.se_schema = finalSchema;
+    /* 2. Solo dopo il salvataggio riuscito, elimina i figli. */
+    const { error: deleteError } = await supabase
+      .from("site_events")
+      .delete()
+      .in("id_site_event", childIds);
+    if (deleteError) {
+      document.getElementById("status").textContent =
+        String(loadedEvents.length);
+      sortEvents();
+      alert("Il padre è stato salvato come Riconciliato, " +
+        "ma la cancellazione dei figli non è riuscita.\n\n" +
+        "I figli sono rimasti disponibili.\n" +
+        deleteError.message
+      );
+      return;
+    }
+    /* 3. Cancellazione riuscita: aggiorna lo stato locale. */
+    const deletedIds = new Set(childIds);
+    loadedEvents = loadedEvents.filter(
+      row => !deletedIds.has(String(row.id_site_event))
+    );
+    reconciliationParentId = null;
+    reconciliationChildIds.clear();
+    reconciliationSelections.clear();
+    reconciliationLockedFields.clear();
+    document.getElementById("status").textContent =
+      String(loadedEvents.length);
+    sortEvents();
+    alert("Riconciliazione completata con successo.");
+  } catch (error) {console.error("Errore durante la riconciliazione:", error);
+    alert("Errore durante la riconciliazione.\n\n" +
+      error.message
+    );
+  } finally {
+    reconciliationSaving = false;
+  }
+}
+  
 /* ORDINAMENTO EVENTI */
 function sortEvents() {
   const getDate = (row) => {
