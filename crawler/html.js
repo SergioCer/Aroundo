@@ -558,10 +558,14 @@ function analyzeSignals(page, categoryDictionary) {
 /* CONVERSIONE SCHEMA.ORG */
 function toSchemaEvent(page, s) {
   const startDate = s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
-  const location = s.location || s.city ? {
-    "@type": "Place", ...(s.location ? {name: s.location} : {}), ...(s.city ? {
-    address: {"@type": "PostalAddress", addressLocality: s.city.co_descrizione, ...(s.city.co_cap ? {
-    postalCode: String(s.city.co_cap)} : {})}} : {})} : null;
+const locationFields = {
+  location: s.location || null, 
+  address: null,
+  addressLocality: s.city?.co_descrizione ?? null,
+  postalCode: s.city?.co_cap ? String(s.city.co_cap): null,
+  addressRegion: null,
+  addressCountry: null
+};
   const organizer = s.organizer
     ? {"@type": "Organization", name: s.organizer} : null;
   const creators = s.creators.length
@@ -602,7 +606,7 @@ const source = {
   name: s.title,
   description: extractDescription(s.text, s.title),
   startDate,
-  location,
+  ...locationFields,
   organizer,
   performer: creators,
   creator: creators,
@@ -616,7 +620,7 @@ return normalizeSchemaEvent(source, internal);
 
 /* CONVERSIONE JSON-LD */
 function toSchemaJsonEvent(page, parsed, categoryDictionary) {
-  const source = { ...parsed };
+  const source = { ...parsed, ...splitSchemaLocation(parsed.location)};
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
   const internal = {
     id_site_page: page.id_site_page,
@@ -638,17 +642,40 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
 
 /* CAMPI CANONICI — stesso ordine del Viewer */
 const SCHEMA_FIELDS = [
-  "name", "description", "startDate", "endDate", "duration",
-  "doorTime", "location", "offers", "isAccessibleForFree",
-  "organizer", "creator", "performer", "actor", "composer",
-  "strength", "category", "categorySlug", "macroCount",
-  "macroMatches", "subCount", "subMatches",
+  "name", "description", "startDate", "endDate", "duration", "doorTime",
+  // Localizzazione scomposta
+  "location", "address", "addressLocality", "postalCode", "addressRegion", "addressCountry",
+  "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
+  "strength", "category", "categorySlug", "macroCount", "macroMatches", "subCount", "subMatches",
   "fundamentals", "reinforcements", "signals",
   "id_site_page", "id_comune", "classification",
-  "subEvent", "superEvent", "eventAttendanceMode",
-  "eventStatus", "eventSchedule", "previousStartDate",
+  "subEvent", "superEvent", "eventAttendanceMode", "eventStatus", "eventSchedule", "previousStartDate",
   "audience", "inLanguage", "image", "url", "sameAs"
 ];
+
+function splitSchemaLocation(location) {
+  const result = {location: null, address: null, addressLocality: null, postalCode: null, addressRegion: null, addressCountry: null};
+  if (!location) return result;
+  // Location dichiarata direttamente come testo.
+  if (typeof location === "string") {result.location = location; return result;}
+  // Alcune fonti dichiarano più luoghi.
+  if (Array.isArray(location)) {location = location[0] || null; if (!location) return result;}
+  if (typeof location !== "object") return result;
+  result.location = typeof location.name === "string" ? location.name: null;
+  const address = location.address;
+  // Indirizzo dichiarato come testo.
+  if (typeof address === "string") {result.address = address; return result;}
+  if (!address || typeof address !== "object") {return result;}
+  const scalar = value => {
+    if (typeof value === "string" || typeof value === "number") {return String(value);}
+    if (value && typeof value === "object") {return value.name ?? value.value ?? null;} return null;};
+  result.address = scalar(address.streetAddress);
+  result.addressLocality = scalar(address.addressLocality);
+  result.postalCode = scalar(address.postalCode);
+  result.addressRegion = scalar(address.addressRegion);
+  result.addressCountry = scalar(address.addressCountry);
+  return result;
+}
 
 /* Costruisce uno schema normalizzato:
  * 1. campi canonici nell'ordine stabilito;
