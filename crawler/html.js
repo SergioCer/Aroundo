@@ -566,17 +566,12 @@ const locationFields = {
   addressRegion: null,
   addressCountry: null
 };
-  const organizer = s.organizer
-    ? {"@type": "Organization", name: s.organizer} : null;
-  const creators = s.creators.length
-    ? s.creators.map(name => ({"@type": "Person", name})) : null;
-  const offers = s.price
-    ? s.price === "gratuito"
-      ? {"@type": "Offer", price: "0", description: "Gratuito"}
-      : s.price === "da definire"
-        ? {"@type": "Offer", description: "Definire"}
-        : {"@type": "Offer", price: s.price}
-    : null;
+const organizerName = typeof s.organizer === "string" ? s.organizer.trim() : typeof s.organizer?.name === "string" ? s.organizer.name.trim() : "";
+const organizer = organizerName ? { "@type": "Organization", name: organizerName } : null;
+  const creators = s.creators.length ? s.creators.map(name => ({"@type": "Person", name})) : null;
+  const offers = s.price ? s.price === "gratuito" ? {"@type": "Offer", price: "0", description: "Gratuito"}
+    : s.price === "da definire" ? {"@type": "Offer", description: "Definire"} 
+    : {"@type": "Offer", price: s.price}: null;
   const categoryData = s.category || {};
 const internal = {
   id_site_page: page.id_site_page,
@@ -621,6 +616,10 @@ return normalizeSchemaEvent(source, internal);
 /* CONVERSIONE JSON-LD */
 function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   const source = { ...parsed, ...splitSchemaLocation(parsed.location)};
+  // Normalizzazione dell'organizzatore
+  if (source.organizer != null) {const organizerName = typeof source.organizer === "string" ? source.organizer.trim() 
+    : typeof source.organizer === "object" && !Array.isArray(source.organizer) ? (typeof source.organizer.name === "string" ? source.organizer.name.trim(): ""): "";
+    source.organizer = organizerName ? { ...(typeof source.organizer === "object" && !Array.isArray(source.organizer) ? source.organizer: {}), "@type": "Organization", name: organizerName}: null;}
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
   const internal = {
     id_site_page: page.id_site_page,
