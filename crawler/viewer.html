@@ -645,8 +645,8 @@ function eventCard(row, index, reconciliationRole = null){
   const schemaId = `schema-${row.id_site_event || index}`;
   return `<article class="event">
       ${image ? `<div class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>`: ""}
-      ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
         <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
+      ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${startDate ? `<div class="field"><span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">
         Ora:</span> ${escapeHtml(formatDate(startDate).time)}`: ""}</div>`: ""}
       ${endDate ? `<div class="field"><span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">
