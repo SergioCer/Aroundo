@@ -325,7 +325,7 @@ body{
   cursor: row-resize;
   touch-action: none;
   user-select: none;
-  background: #e8e8e8;
+  background: #2f0afb;
   border-top: 1px solid #d0d0d0;
   border-bottom: 1px solid #d0d0d0;
   position: relative;
@@ -626,8 +626,15 @@ function eventCard(row, index, reconciliationRole = null){
   const description = value(event.description);
   const startDate = value(event.startDate);
   const endDate = value(event.endDate);
-  const location = eventLocation(event);
-  const comune = value(event.location && typeof event.location === "object" ? event.location.address?.addressLocality: "");
+  // Campi geografici autonomi
+  const location = value(event.location);
+  const address = value(event.address);
+  const comune = value(event.addressLocality);
+  const cap = value(event.postalCode);
+  const provincia = value(event.province);
+  const regione = value(event.addressRegion);
+  const stato = value(event.addressCountry);
+    // const comune = value(event.location && typeof event.location === "object" ? event.location.address?.addressLocality: "");
   const organizer = value(event.organizer);
   const offers = displaySchemaValue(event.offers);
   const performer = displaySchemaValue(event.performer);
@@ -643,8 +650,16 @@ function eventCard(row, index, reconciliationRole = null){
         Ora:</span> ${escapeHtml(formatDate(startDate).time)}`: ""}</div>`: ""}
       ${endDate ? `<div class="field"><span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">
       Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}</div>` : ""}
+      
       ${comune ? `<div class="field"><span class="label">Comune: </span>${escapeHtml(comune)}</div>`: ""}
-      ${location ? `<div class="field"><span class="label">Luogo: </span>${escapeHtml(location)}</div>`: ""}
+      
+      ${cap ? `<div class="field"><span class="label">CAP:</span> ${escapeHtml(cap)}</div>` : ""}
+      ${provincia ? `<div class="field"><span class="label">Provincia:</span> ${escapeHtml(provincia)}</div>` : ""}
+      ${regione ? `<div class="field"><span class="label">Regione:</span> ${escapeHtml(regione)}</div>` : ""}
+      ${stato ? `<div class="field"><span class="label">Stato:</span> ${escapeHtml(stato)}</div>` : ""}
+      ${address ? `<div class="field"><span class="label">Indirizzo:</span> ${escapeHtml(address)}</div>` : ""}
+      ${location ? `<div class="field"><span class="label">Luogo:</span> ${escapeHtml(location)}</div>` : ""}
+      
       ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
       ${organizer ? `<div class="field"><span class="label">Organizzatore: </span>${escapeHtml(organizer)}</div>`: ""}
       ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>`: ""}   
