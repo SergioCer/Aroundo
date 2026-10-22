@@ -920,11 +920,9 @@ function sortEvents() {
     const schema = row.se_schema || {};
     return schema.startDate || schema.data?.date || "";
   };
-const getPlace = (row) => {const location = row.se_schema?.location;
-  if (!location || typeof location !== "object") return "";
-  return location.address?.addressLocality
-    || location.name
-    || "";
+const getPlace = (row) => {
+  const schema = row.se_schema || {};
+  return value(schema.addressLocality) || "";
 };
   loadedEvents.sort((a, b) => {
     const dateA = getDate(a);
