@@ -1029,13 +1029,7 @@ const suggestionStopWords = new Set([
 ]);
 
 function suggestionWords(text) {
-  return [...new Set(
-    suggestionText(text)
-      .split(" ")
-      .filter(word =>
-        word.length > 2 && !suggestionStopWords.has(word)
-      )
-  )];
+  return [...new Set(suggestionText(text) .split(" ") .filter(word => word.length > 2 && !suggestionStopWords.has(word)))];
 }
 
 function suggestionSimilarity(textA, textB) {
@@ -1094,49 +1088,17 @@ function compareSuggestionPair(rowA, rowB) {
   const commonDescriptions = suggestionCommonWords(descA, descB);
   const commonCrossAB = suggestionCommonWords(titleA, descB);
   const commonCrossBA = suggestionCommonWords(titleB, descA);
-  const hasDistinctiveWord = words =>
-    words.some(word => word.length >= 6);
+  const hasDistinctiveWord = words => words.some(word => word.length >= 6);
   // Il titolo è un indizio forte se condivide almeno una parola distintiva.
-  const titleMatch =
-    titleScore >= 0.45 &&
-    hasDistinctiveWord(commonTitles);
+  const titleMatch = titleScore >= 0.45 && hasDistinctiveWord(commonTitles);
   // Le descrizioni devono condividere più di semplici formule generiche.
-  const descriptionMatch =
-    descScore >= 0.22 &&
-    (
-      commonDescriptions.length >= 3 ||
-      (
-        commonDescriptions.length >= 2 &&
-        hasDistinctiveWord(commonDescriptions)
-      )
-    );
+  const descriptionMatch = descScore >= 0.22 && (commonDescriptions.length >= 3 || (commonDescriptions.length >= 2 && hasDistinctiveWord(commonDescriptions)));
   // Recupera i casi in cui il titolo manca o compare soltanto nella descrizione.
-  const crossMatch =
-    (
-      crossAB >= 0.55 &&
-      hasDistinctiveWord(commonCrossAB)
-    ) ||
-    (
-      crossBA >= 0.55 &&
-      hasDistinctiveWord(commonCrossBA)
-    );
-  if (!titleMatch && !descriptionMatch && !crossMatch) {
-    return null;
-  }
-  // Data e comune sono filtri/indizi, non punti testuali.
-  // Le differenze nei singoli campi non annullano le somiglianze testuali.
-  const textScore = Math.max(
-    titleScore,
-    descScore,
-    crossAB,
-    crossBA
-  );
-  return {
-    score: textScore,
-    titleMatch,
-    descriptionMatch,
-    crossMatch
-  };
+  const crossMatch = (crossAB >= 0.55 && hasDistinctiveWord(commonCrossAB)) || (crossBA >= 0.55 && hasDistinctiveWord(commonCrossBA));
+  if (!titleMatch && !descriptionMatch && !crossMatch) {return null;}
+  // Data e comune sono filtri/indizi, non punti testuali. Le differenze nei singoli campi non annullano le somiglianze testuali.
+  const textScore = Math.max(titleScore, descScore, crossAB, crossBA);
+  return {score: textScore, titleMatch, descriptionMatch, crossMatch};
 }
 
 function suggestionCompleteness(row) {
@@ -1147,10 +1109,7 @@ function suggestionCompleteness(row) {
     "addressRegion", "addressCountry", "image", "organizer",
     "offers", "category", "url"
   ];
-  return usefulFields.reduce(
-    (count, field) => count + (hasSchemaValue(schema[field]) ? 1 : 0),
-    0
-  );
+  return usefulFields.reduce((count, field) => count + (hasSchemaValue(schema[field]) ? 1 : 0), 0);
 }
 
 function chooseSuggestionParent(rows) {
@@ -1168,11 +1127,9 @@ function chooseSuggestionParent(rows) {
 function buildSuggestionGroups() {
   const rows = loadedEvents.filter(row => row.se_schema);
   const groupsByKey = new Map();
-  // Raggruppa prima per data: le coppie senza una data confrontabile
-  // non vengono proposte.
+  // Raggruppa prima per data: le coppie senza una data confrontabile non vengono proposte.
   const byDate = new Map();
-  rows.forEach(row => {
-    const date = suggestionDate(row);
+  rows.forEach(row => {const date = suggestionDate(row);
     if (!date) return;
     if (!byDate.has(date)) byDate.set(date, []);
     byDate.get(date).push(row);
@@ -1186,72 +1143,30 @@ function buildSuggestionGroups() {
         const b = dateRows[j];
         const municipalityA = suggestionMunicipality(a);
         const municipalityB = suggestionMunicipality(b);
-        // Due identificativi comunali presenti e diversi sono un forte
-        // indizio di eventi distinti. Se manca il comune, si prosegue.
-        if (
-          municipalityA.startsWith("id:") &&
-          municipalityB.startsWith("id:") &&
-          municipalityA !== municipalityB
-        ) {
-          continue;
-        }
-        // Anche i comuni testuali possono essere confrontati quando
-        // entrambi sono presenti.
-        if (
-          municipalityA &&
-          municipalityB &&
-          !municipalityA.startsWith("id:") &&
-          !municipalityB.startsWith("id:") &&
-          municipalityA !== municipalityB
-        ) {
-          continue;
-        }
+        // Due identificativi comunali presenti e diversi sono un forte indizio di eventi distinti. Se manca il comune, si prosegue.
+        if (municipalityA.startsWith("id:") && municipalityB.startsWith("id:") && municipalityA !== municipalityB) {continue;}
+        // Anche i comuni testuali possono essere confrontati quando entrambi sono presenti.
+        if (municipalityA && municipalityB && !municipalityA.startsWith("id:") && !municipalityB.startsWith("id:") && municipalityA !== municipalityB) {continue;}
         const match = compareSuggestionPair(a, b);
         if (!match) continue;
-        matches.set(
-          `${a.id_site_event}|${b.id_site_event}`,
-          { a, b, score: match.score }
-        );
+        matches.set(`${a.id_site_event}|${b.id_site_event}`, { a, b, score: match.score });
       }
     }
-    // Ogni evento genera un gruppo candidato con i record che gli
-    // somigliano direttamente: evitiamo di unire gruppi solo per catena.
+    // Ogni evento genera un gruppo candidato con i record che gli somigliano direttamente: evitiamo di unire gruppi solo per catena.
     dateRows.forEach(seed => {
       const groupRows = [seed];
       const scores = [];
       matches.forEach(match => {
         let other = null;
-        if (String(match.a.id_site_event) === String(seed.id_site_event)) {
-          other = match.b;
-        } else if (
-          String(match.b.id_site_event) === String(seed.id_site_event)
-        ) {
-          other = match.a;
-        }
-        if (other) {
-          groupRows.push(other);
-          scores.push(match.score);
-        }
+        if (String(match.a.id_site_event) === String(seed.id_site_event)) {other = match.b;
+        } else if (String(match.b.id_site_event) === String(seed.id_site_event)) {other = match.a;}
+        if (other) {groupRows.push(other); scores.push(match.score);}
       });
       if (groupRows.length < 2) return;
-      const uniqueRows = [
-        ...new Map(
-          groupRows.map(row => [String(row.id_site_event), row])
-        ).values()
-      ];
-      const ids = uniqueRows
-        .map(row => String(row.id_site_event))
-        .sort((a, b) => Number(a) - Number(b));
+      const uniqueRows = [ ...new Map(groupRows.map(row => [String(row.id_site_event), row])).values()];
+      const ids = uniqueRows .map(row => String(row.id_site_event)) .sort((a, b) => Number(a) - Number(b));
       const key = ids.join(",");
-      if (!groupsByKey.has(key)) {
-        groupsByKey.set(key, {
-          key,
-          rows: uniqueRows,
-          averageScore: scores.length
-            ? scores.reduce((sum, score) => sum + score, 0) / scores.length
-            : 0
-        });
-      }
+      if (!groupsByKey.has(key)) {groupsByKey.set(key, {key, rows: uniqueRows, averageScore: scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0});}
     });
   });
   return [...groupsByKey.values()].sort((a, b) =>
@@ -1263,19 +1178,11 @@ function buildSuggestionGroups() {
 
 function suggestReconciliation() {
   const groups = buildSuggestionGroups();
-  const nextGroup = groups.find(
-    group => !suggestedGroupKeys.has(group.key)
-  );
+  const nextGroup = groups.find(group => !suggestedGroupKeys.has(group.key));
   const button = document.getElementById("suggestBtn");
   const status = document.getElementById("analysisStatus");
-  if (!nextGroup) {
-    button.textContent = "NON HO PROPOSTE";
-    button.disabled = true;
-    if (status) status.textContent = "";
-    return;
-  }
-  // Ricordiamo il gruppo proposto nella sessione corrente, per passare
-  // alla proposta successiva al prossimo clic.
+  if (!nextGroup) {button.textContent = "NON HO PROPOSTE"; button.disabled = true; if (status) status.textContent = ""; return;}
+  // Ricordiamo il gruppo proposto nella sessione corrente, per passare alla proposta successiva al prossimo clic.
   suggestedGroupKeys.add(nextGroup.key);
   // Inizializza una nuova proposta senza salvare nulla.
   reconciliationParentId = null;
@@ -1286,15 +1193,10 @@ function suggestReconciliation() {
   reconciliationParentId = String(parent.id_site_event);
   nextGroup.rows
     .filter(row => String(row.id_site_event) !== reconciliationParentId)
-    .forEach(row => {
-      addReconciliationChild(String(row.id_site_event));
-    });
+    .forEach(row => {addReconciliationChild(String(row.id_site_event));});
   button.textContent = "SUGGERISCI";
   button.disabled = false;
-  if (status) {
-    status.textContent =
-      `Proposta ${suggestedGroupKeys.size}: ${nextGroup.rows.length} eventi da verificare`;
-  }
+  if (status) {status.textContent = `Proposta ${suggestedGroupKeys.size}: ${nextGroup.rows.length} eventi da verificare`;}
   sortEvents();
 }
 
