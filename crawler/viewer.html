@@ -1066,7 +1066,9 @@ function suggestionMunicipality(row) {
 }
   
 function suggestionTitle(schema) {
-  return schema.name || schema.title || "";
+  const title = value(schema.name) || value(schema.title) || "";
+  if (suggestionText(title) === "evento senza titolo") {return "";}
+  return title;
 }
   
 function suggestionDescription(schema) {
