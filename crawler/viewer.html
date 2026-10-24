@@ -471,6 +471,31 @@ body{
 import { supabase } from "../supabase.js";
 import { runAnalysis } from "./html.js";
 
+const comuni = await loadComuni();
+const comuniMap = new Map(comuni.map(comune => [comune.id_comune, comune]));
+const filterComuni = document.getElementById("filterComuni");
+  
+async function loadComuni() {const { data, error } = await supabase
+    .from("comuni")
+    .select("id_comune, co_descrizione, co_attivato, co_previsto");
+  if (error) {console.error("Errore caricamento comuni:", error); return [];}
+  return data || [];
+}
+
+function filtraEventoPerComune(evento, comuniMap, filtro) {
+  if (filtro === "all") {return true;}
+  const schema = evento.se_schema || {};
+  const locality = value(schema.addressLocality).trim().toLowerCase();
+  const comune = [...comuniMap.values()].find(c => c.co_descrizione.trim().toLowerCase() === locality);
+  if (!comune) {return false;}
+  const dataEvento = value(schema.startDate).slice(0, 10);
+  if (!dataEvento) {return false;}
+  if (filtro === "attivi") {return comune.co_attivato != null && dataEvento >= comune.co_attivato;}
+  if (filtro === "previsti") {return comune.co_previsto != null && dataEvento >= comune.co_previsto;}
+  if (filtro === "attivi-previsti") {return ((comune.co_attivato != null && dataEvento >= comune.co_attivato) || (comune.co_previsto != null && dataEvento >= comune.co_previsto));}
+  return true;
+}
+  
 /* UTILITÀ */
 function escapeHtml(value){
   if(value === null || value === undefined){
@@ -498,8 +523,7 @@ function value(v) {
         typeof address === "object" ? address.addressRegion : null
       ].map(value).filter(Boolean);
       if (parts.length) return [...new Set(parts)].join(", ");
-    }
-    return JSON.stringify(v);
+    }    return JSON.stringify(v);
   }
   return String(v).trim();
 }
