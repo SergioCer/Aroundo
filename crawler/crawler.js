@@ -212,10 +212,12 @@ function getSchemaComune(event) {
     const addresses = Array.isArray(address) ? address : [address];
     for (const entry of addresses) {
       if (!entry) {continue;}
+        if (typeof entry === "object" && entry.addressLocality) {
+        const comuneLocality = matchComune(entry.addressLocality);
+          if (!comuneLocality) {entry.addressLocality = null;}}
       const text = typeof entry === "string"
         ? entry
-        : [
-            entry.addressLocality,
+        : [ entry.addressLocality,
             entry.postalCode,
             entry.streetAddress
           ].filter(Boolean).join(" ");
