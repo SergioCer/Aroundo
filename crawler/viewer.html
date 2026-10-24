@@ -1207,14 +1207,26 @@ async function loadEvents(){
     const { data, error } =
       await supabase
         .from("site_events")
-        .select(`id_site_event, id_site_page, id_evento, se_schema, se_extracted, site_pages (sp_url)`)
+        .select("id_site_event, id_site_page, id_evento, se_schema, se_extracted")
         .order("id_site_event",{ascending:false});
     if(error){throw error;}
     if(!data || data.length === 0){
       status.textContent = "Nessun evento presente!";
       results.innerHTML = `<div class="empty">La tabella site_events non contiene eventi. Eseguire ESTRAI</div>`;
       return;}
-    loadedEvents = data;
+    /* Recupero degli URL delle pagine origine */
+    const idsPagine = [...new Set(data .map(evento => evento.id_site_page) .filter(id => id !== null))];
+    let pagine = [];
+    if(idsPagine.length > 0){const { data: datiPagine, error: errorePagine } = await supabase
+        .from("site_pages")
+        .select("id_site_page, sp_url")
+        .in("id_site_page", idsPagine);
+      if(errorePagine) throw errorePagine;
+      pagine = datiPagine || [];
+    }
+    /* Ricostruzione della relazione usata dal viewer */
+    const mappaPagine = new Map(pagine.map(pagina => [pagina.id_site_page, pagina]));
+    loadedEvents = data.map(evento => ({ ...evento, site_pages: mappaPagine.get(evento.id_site_page) || null}));
     status.textContent = `${data.length}`;
     sortEvents();
   }catch(error){
