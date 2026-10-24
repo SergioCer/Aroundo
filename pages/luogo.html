@@ -242,15 +242,19 @@ textarea:disabled {
     <div id="comuniResults"></div> 
     <div class="card">
 
-      <!-- RIGA: LOCALITY + ADDRESS -->
+      <!-- RIGA: LOCALITY + CAP + ADDRESS -->
     <div style="display:flex; font-size:11px; gap:20px; margin-bottom:4px;">
       <div style="flex:1;">Locality:</div>
+      <div style="flex:0.6;">CAP:</div>
       <div style="flex:1;">Address:</div>
     </div>
     <div style="display:flex; gap:20px; margin-bottom:10px;">
       <input id="lu_location"
              style="flex:1; font-size:16px; text-align:left;"
              oninput="markDirty(); updateMapPopupTitle()">
+      <input id="lu_cap"
+             style="flex:0.6; min-width:0; font-size:16px; text-align:left;"
+             oninput="markDirty()">
       <input id="lu_address"
              style="flex:1; font-size:16px; text-align:left;"
              oninput="markDirty()">
@@ -581,6 +585,7 @@ if (isNew) {
   }
   original = JSON.stringify(data);
   lu_location.value = data.lu_location || '';
+  lu_cap.value = data.lu_cap || '';
   lu_address.value = data.lu_address || '';
   lu_phone.value = data.lu_phone || '';
   lu_email.value = data.lu_email || '';
@@ -674,6 +679,7 @@ async function loadOrganizzatoriLuogo(idLuogo) {
 async function save() {
   const payload = {
     lu_location: lu_location.value,
+    lu_cap: lu_cap.value.trim() || null,
     lu_address: lu_address.value,
     lu_phone: lu_phone.value,
     lu_email: lu_email.value,
@@ -723,6 +729,7 @@ function updatePageState() {
     .classList.toggle("locked", !comuneOk);
   const controls = [
     lu_location,
+    lu_cap,
     lu_address,
     lu_phone,
     lu_email,
@@ -1004,6 +1011,7 @@ window.markDirty = () => {
   }
   const current = JSON.stringify({
     lu_location: lu_location.value,
+    lu_cap: lu_cap.value,
     lu_address: lu_address.value,
     lu_phone: lu_phone.value,
     lu_email: lu_email.value,
