@@ -647,17 +647,16 @@ function eventCard(row, index, reconciliationRole = null){
         Ora:</span> ${escapeHtml(formatDate(startDate).time)}`: ""}</div>`: ""}
       ${endDate ? `<div class="field"><span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">
       Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}</div>` : ""}
-      ${comune ? `<div class="field"><span class="label">Comune: </span>${escapeHtml(comune)}</div>`: ""}
+      ${comune ? `<div class="field"><span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}</div>` : ""}
+      ${!comune && cap ? `<div class="field"><span class="label">CAP:</span> ${escapeHtml(cap)}</div>` : ""}
       ${location ? `<div class="field"><span class="label">Luogo:</span> ${escapeHtml(location)}</div>` : ""}
       ${address ? `<div class="field"><span class="label">Indirizzo:</span> ${escapeHtml(address)}</div>` : ""}
-      ${cap ? `<div class="field"><span class="label">CAP:</span> ${escapeHtml(cap)}</div>` : ""}
       ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
       ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
       ${organizer ? `<div class="field"><span class="label">Organizzatore: </span>${escapeHtml(organizer)}</div>`: ""}
       ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>`: ""}   
       ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>`: ""}
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
-      
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
       <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)} - 
