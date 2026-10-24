@@ -606,7 +606,49 @@ async function crawlAllSites() {
   crawlerStatus.pagesInserted = 0;
   crawlerStatus.pagesUpdated = 0;
   crawlerStatus.errors = 0;
-  try {const {data: sites, error} = await supabase
+  try {
+    /* BONIFICA PREVENTIVA SITE_PAGES / SITE_EVENTS */
+    const dataLimite = new Date();
+    const oggiItalia = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Rome",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(dataLimite);
+    const domani = new Date(`${oggiItalia}T00:00:00Z`);
+    domani.setUTCDate(domani.getUTCDate() + 1);
+    const dataDomani = domani.toISOString().slice(0, 10);
+    console.log(`[BONIFICA] Elimino dati con data precedente a ${dataDomani}`);
+    // FASE 1: elimina le schede temporanee scadute
+    const { data: pagineScadute, error: errorePagine } = await supabase
+      .from("site_pages")
+      .select("id_site_page")
+      .lt("sp_date", dataDomani);
+    if (errorePagine) throw errorePagine;
+    const idsPagine = (pagineScadute || []).map(p => p.id_site_page);
+    let eventiEliminati = 0;
+    if (idsPagine.length > 0) {
+      const { data: eventiTemporanei, error: erroreEventi } = await supabase
+        .from("site_events")
+        .delete()
+        .in("id_site_page", idsPagine)
+        .is("id_evento", null)
+        .select("id_site_event");
+      if (erroreEventi) throw erroreEventi;
+      eventiEliminati = eventiTemporanei?.length || 0;
+    }
+    console.log(`[BONIFICA] Schede temporanee eliminate: ${eventiEliminati}`);
+    // FASE 2: elimina tutte le pagine scadute
+    const { data: pagineEliminate, error: erroreEliminazionePagine } =
+      await supabase
+        .from("site_pages")
+        .delete()
+        .lt("sp_date", dataDomani)
+        .select("id_site_page");
+    if (erroreEliminazionePagine) throw erroreEliminazionePagine;
+    console.log(`[BONIFICA] Pagine eliminate: ${pagineEliminate?.length || 0}`);
+    
+    const {data: sites, error} = await supabase
       .from("site")
       .select("id_site, st_url, st_crawled")
       .order("id_site", {ascending: true});
