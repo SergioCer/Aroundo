@@ -530,41 +530,6 @@ function eventLocation(event) {const location = event.location;
   return [...new Set(parts)].join(", ");
 }
 
-/* CAMPI ORDINABILI di SCHEMA.ORG */
-const schemaFields = [
-  "name", "description", "startDate", "endDate", "duration", "doorTime",
-  "location", "address", "addressLocality", "postalCode", "addressRegion", "addressCountry",
-  "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
-  /* CLASSIFICAZIONE */
-  "strength",       // Forza della classificazione
-  "category",
-  "categorySlug",   // Slug categoria valorizzato
-  "macroCount",     // conteggio macroCategorie
-  "macroMatches",   // corrispondenze macroCategorie
-  "subCount",       // conteggio subCategorie
-  "subMatches",     // corrispondenze subCategorie
-  /* ANALISI DELL'ESTRAZIONE */
-  "fundamentals",   // Campi Fondamentali
-  "reinforcements", // Campi Rafforzativi
-  "signals",        // Segnali intercettati
-  /* RIFERIMENTI INTERNI */
-  "id_site_page",   // riferimento pagina sorgente
-  "id_comune",      // ID del comune
-  "classification", // Attributo: Evento / Incompleto / Json / Riconciliato( E - I - J - R )
-  /* ALTRE PROPRIETÀ SCHEMA.ORG */
-  "subEvent",
-  "superEvent",
-  "eventAttendanceMode",
-  "eventStatus",
-  "eventSchedule",
-  "previousStartDate",
-  "audience",
-  "inLanguage",
-  "image",
-  "url",
-  "sameAs"
-];
-
 function formatSchemaValue(value){
   if(value === null || value === undefined || value === ""
   ){return "";}
@@ -596,6 +561,41 @@ function isSchemaDisplayable(value) {
   // Mantiene visibili valori validi come 0 e false.
   return true;
 }
+
+/* CAMPI ORDINABILI di SCHEMA.ORG */
+const schemaFields = [
+  "name", "description", "startDate", "endDate", "duration", "doorTime",
+  "location", "address", "addressLocality", "postalCode",
+  "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
+  /* CLASSIFICAZIONE */
+  "strength",       // Forza della classificazione
+  "category",
+  "categorySlug",   // Slug categoria valorizzato
+  "macroCount",     // conteggio macroCategorie
+  "macroMatches",   // corrispondenze macroCategorie
+  "subCount",       // conteggio subCategorie
+  "subMatches",     // corrispondenze subCategorie
+  /* ANALISI DELL'ESTRAZIONE */
+  "fundamentals",   // Campi Fondamentali
+  "reinforcements", // Campi Rafforzativi
+  "signals",        // Segnali intercettati
+  /* RIFERIMENTI INTERNI */
+  "id_site_page",   // riferimento pagina sorgente
+  "id_comune",      // ID del comune
+  "classification", // Attributo: Evento / Incompleto / Json / Riconciliato( E - I - J - R )
+  /* ALTRE PROPRIETÀ SCHEMA.ORG */
+  "subEvent",
+  "superEvent",
+  "eventAttendanceMode",
+  "eventStatus",
+  "eventSchedule",
+  "previousStartDate",
+  "audience",
+  "inLanguage",
+  "image",
+  "url",
+  "sameAs"
+];
   
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
@@ -632,10 +632,6 @@ function eventCard(row, index, reconciliationRole = null){
   const address = value(event.address);
   const comune = value(event.addressLocality);
   const cap = value(event.postalCode);
-  const provincia = value(event.province);
-  const regione = value(event.addressRegion);
-  const stato = value(event.addressCountry);
-    // const comune = value(event.location && typeof event.location === "object" ? event.location.address?.addressLocality: "");
   const organizer = value(event.organizer);
   const offers = displaySchemaValue(event.offers);
   const performer = displaySchemaValue(event.performer);
@@ -655,15 +651,13 @@ function eventCard(row, index, reconciliationRole = null){
       ${location ? `<div class="field"><span class="label">Luogo:</span> ${escapeHtml(location)}</div>` : ""}
       ${address ? `<div class="field"><span class="label">Indirizzo:</span> ${escapeHtml(address)}</div>` : ""}
       ${cap ? `<div class="field"><span class="label">CAP:</span> ${escapeHtml(cap)}</div>` : ""}
-      ${provincia ? `<div class="field"><span class="label">Provincia:</span> ${escapeHtml(provincia)}</div>` : ""}
-      ${regione ? `<div class="field"><span class="label">Regione:</span> ${escapeHtml(regione)}</div>` : ""}
-      ${stato ? `<div class="field"><span class="label">Stato:</span> ${escapeHtml(stato)}</div>` : ""}
       ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
       ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
       ${organizer ? `<div class="field"><span class="label">Organizzatore: </span>${escapeHtml(organizer)}</div>`: ""}
       ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>`: ""}   
       ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>`: ""}
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
+      
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
       <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)} - 
@@ -808,8 +802,7 @@ function removeFromReconciliation(id, role) {
   sortEvents();
 }
 
-function toggleReconciliationField(field, childId) {
-  childId = String(childId);
+function toggleReconciliationField(field, childId) {childId = String(childId);
   if (!reconciliationChildIds.has(childId)) return;
   const childRow = loadedEvents.find(row => String(row.id_site_event) === childId);
   if (!childRow) return;
@@ -817,17 +810,21 @@ function toggleReconciliationField(field, childId) {
   const childValue = childSchema[field];
   if (nonReconciledFields.has(field)) return;
   if (!hasSchemaValue(childValue)) return;
+  const fields = field === "addressLocality" ? ["addressLocality", "id_comune"] : [field];
+  // Per il comune, il figlio deve avere entrambi i valori.
+  if (field === "addressLocality" && !hasSchemaValue(childSchema.id_comune)
+  ) {alert("Impossibile selezionare il comune: manca id_comune nel figlio."); return;}
   const currentSelection = reconciliationSelections.get(field);
-  /* Clic sul valore già selezionato: deseleziona. */
-  if (currentSelection?.childId === childId) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field); sortEvents(); return;}
-  /* Un altro figlio è già fonte di questo campo: occorre prima deselezionarlo. */
-  if (currentSelection) {alert("Questo campo è già assegnato a un altro figlio. " + "Deseleziona prima il valore attuale."); return;}
-  /* Se non esiste una selezione attiva, il clic crea una selezione manuale. */
-  reconciliationSelections.set(field, {childId, value: cloneJson(childValue), mode: "manual"});
-  reconciliationLockedFields.add(field);
+  // Clic sulla selezione già attiva: deseleziona l'intera coppia.
+  if (currentSelection?.childId === childId) {fields.forEach(f => {const selection = reconciliationSelections.get(f);
+      if (selection?.childId === childId) {reconciliationSelections.delete(f);} reconciliationLockedFields.add(f);}); sortEvents(); return;}
+  // Se uno dei campi è assegnato a un altro figlio, non sovrascrivere.
+  const conflictingSelection = fields.some(f => {const selection = reconciliationSelections.get(f); return selection && selection.childId !== childId;});
+  if (conflictingSelection) {alert("Questo campo è già assegnato a un altro figlio. " + "Deseleziona prima il valore attuale."); return;}
+  // Selezione manuale: comune e ID vengono trasferiti insieme.
+  fields.forEach(f => {reconciliationSelections.set(f, {childId, value: cloneJson(childSchema[f]), mode: "manual"}); reconciliationLockedFields.add(f);});
   sortEvents();
 }
-  
 
 function reconciliationButton(row, role = null) {
   const id = String(row.id_site_event);
