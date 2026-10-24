@@ -216,7 +216,6 @@ function getSchemaComune(event) {
         ? entry
         : [
             entry.addressLocality,
-            entry.addressRegion,
             entry.postalCode,
             entry.streetAddress
           ].filter(Boolean).join(" ");
@@ -733,6 +732,8 @@ for (const event of schemaEvents) {
   // Cerca di associare l'evento a un comune conosciuto.
   const comune = getSchemaComune(event);
   const idComune = comune ? comune.id : null;
+  // Inserisce la descrizione del comune 
+  if (comune) {event.addressLocality = comune.descrizione;}
   // Serializza l'evento per conservarne la rappresentazione nei dati grezzi.
   const block = JSON.stringify(event, null, 2);
   const pageUrl = result.url || currentUrl;
