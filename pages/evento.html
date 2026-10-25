@@ -696,7 +696,7 @@ async function loadFromViewer() {
     id_comune_evento.value = comuniMap[schema.id_comune] || '';
     await filterLuoghi();
   }
-  await loadCoverFromViewer(schema.image);
+  // CANCELLARE ?????  await loadCoverFromViewer(schema.image);
   calcolaDurata();
   setTimeout(updateGuide, 100);
   updateLinkButton();
