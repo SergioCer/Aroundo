@@ -685,11 +685,17 @@ async function loadFromViewer() {
   console.log("Schema.org ricevuto:", schema);
   // Carica informazioni dal json dell'evento.
   original = JSON.stringify({});
-  ev_titolo.value = value(schema.name) || value(schema.title) || '';
-  ev_descrizione.value = value(schema.description) || '';
-  ev_link.value = value(schema.url) || '';
+  ev_titolo.value = schema.name || schema.title || '';
+  ev_descrizione.value = schema.description || '';
+  ev_link.value = schema.url || '';
   ev_inizio.value = schema.startDate ? schema.startDate.replace(' ', 'T').slice(0, 16): '';
   ev_fine.value = schema.endDate ? schema.endDate.replace(' ', 'T').slice(0, 16): '';
+  /* COMUNE */
+  if (schema.id_comune) {
+    id_comune_evento_hidden.value = schema.id_comune;
+    id_comune_evento.value = comuniMap[schema.id_comune] || '';
+    await filterLuoghi();
+  }
   calcolaDurata();
   setTimeout(updateGuide, 100);
   updateLinkButton();
