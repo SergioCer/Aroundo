@@ -592,8 +592,8 @@ const selectedIcon = L.icon({
   
 /* LOAD */
 async function load() {
-  if (isNew && !duplicateId) {
-    original = JSON.stringify({});
+  if (isNew && !duplicateId && source === 'viewer') {await loadFromViewer(); return;}
+  if (isNew && !duplicateId) {original = JSON.stringify({});
     setTimeout(updateGuide, 100);
     updateLinkButton();
     updateActiveButtonState();
@@ -659,6 +659,41 @@ async function load() {
   if (duplicateId) {dirty = true; document.getElementById('backBtn') .classList.add('dirty');}
 }
 
+/* LOAD DA VIEWER */
+async function loadFromViewer() {
+  const raw = sessionStorage.getItem("eventoDaViewer");
+  if (!raw) {
+    console.error("Nessun dato ricevuto dal viewer.");
+    alert("Non sono disponibili dati da importare dal viewer.");
+    return;
+  }
+  let datoViewer;
+  try {
+    datoViewer = JSON.parse(raw);
+  } catch (error) {
+    console.error("Dati del viewer non validi:", error);
+    alert("I dati ricevuti dal viewer non sono validi.");
+    return;
+  }
+  const schema = datoViewer.se_schema;
+  if (!schema || typeof schema !== "object") {
+    console.error("Schema.org non disponibile:", datoViewer);
+    alert("Lo Schema.org dell'evento non è disponibile.");
+    return;
+  }
+  console.log("ID evento sorgente:", datoViewer.id_site_event);
+  console.log("Schema.org ricevuto:", schema);
+  // Per ora inizializziamo la pagina come nuovo evento.
+  original = JSON.stringify({});
+  setTimeout(updateGuide, 100);
+  updateLinkButton();
+  updateActiveButtonState();
+  updateMapButton();
+  verifySeries();
+  ev_titolo.focus();
+}
+
+  
 /* SAVE */
 async function save() {
   const payload = {
