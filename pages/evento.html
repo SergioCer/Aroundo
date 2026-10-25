@@ -537,7 +537,8 @@ import { supabase } from '../supabase.js';
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const isNew = params.has('new') || !id;
-const duplicateId = params.get('duplicate');  
+const duplicateId = params.get('duplicate');
+const source = params.get('source');  
 
 let original = "{}";
 let dirty = false;
@@ -647,25 +648,15 @@ async function load() {
   ev_link.value = data.ev_link || '';
   currentCover = data.ev_copertina || null;
   ev_attivo.checked = !!data.ev_attivo;
-  ev_creato.textContent = data.ev_creato
-    ? new Date(data.ev_creato).toLocaleString()
-    : '';
-      if (data.id_event_series) {
-        document.getElementById("id_event_series").value =
-          data.id_event_series;
-        updateSeriesSelect();
-      }
+  ev_creato.textContent = data.ev_creato ? new Date(data.ev_creato).toLocaleString() : '';
+      if (data.id_event_series) {document.getElementById("id_event_series").value = data.id_event_series; updateSeriesSelect();}
   updateCover();
   updateBackupCover();
   updateMapButton()  
   updateLinkButton();
   updateActiveStatus();
   updateCategoriaSelect();
-  if (duplicateId) {
-    dirty = true;
-    document.getElementById('backBtn')
-      .classList.add('dirty');
-  }
+  if (duplicateId) {dirty = true; document.getElementById('backBtn') .classList.add('dirty');}
 }
 
 /* SAVE */
@@ -686,47 +677,30 @@ async function save() {
     ev_attivo: ev_attivo.checked
     };
   let result;
-  if (isNew) {
-    result = await supabase.from('eventi').insert(payload).select().single();
-  } else {
-    result = await supabase.from('eventi').update(payload).eq('id_evento', id).select().single();
-  }
+  if (isNew) {result = await supabase.from('eventi').insert(payload).select().single();
+  } else {result = await supabase.from('eventi').update(payload).eq('id_evento', id).select().single();}
  const { data, error } = result;
-if (error) {
-  console.error(error);
-  alert("Errore salvataggio");
-  return false;
-}
+if (error) {console.error(error); alert("Errore salvataggio"); return false;}
 if (selectedCoverFile) {
   const fileName = await uploadCover(data.id_evento);
   await supabase
     .from('eventi')
-    .update({
-      ev_copertina: fileName
-    })
+    .update({ev_copertina: fileName})
     .eq('id_evento', data.id_evento);
   currentCover = fileName;
   selectedCoverFile = null;
   coverDeleted = false;
 } else if (coverDeleted) {
-  if (currentCover) {
-    await backupCover(currentCover);
-    await deleteCover(data.id_evento);
-  }
+  if (currentCover) {await backupCover(currentCover); await deleteCover(data.id_evento);}
   await supabase
     .from('eventi')
-    .update({
-      ev_copertina: null
-    })
+    .update({ev_copertina: null})
     .eq('id_evento', data.id_evento);
   currentCover = null;
   coverDeleted = false;
 }
 dirty = false;
-if (isNew) {
-  location.href = `evento.html?id=${data.id_evento}`;
-}
-return true;
+if (isNew) {location.href = `evento.html?id=${data.id_evento}`;} return true;
 }
 
 /* Marca i campi DIRTY */
@@ -772,22 +746,14 @@ const guideSteps = [
 
 /* Visita Guidata su Aroundo */
 function updateGuide() {
-  // solo nuovi eventi
-  // if (!isNew || duplicateId) return;
   guideSteps.forEach(step => {
       const field = document.getElementById(step.id);
       field.classList.remove("guide-active");
       field.classList.remove("guide-complete");
-      if (step.valid()) {
-          field.classList.add("guide-complete");
-      }
+      if (step.valid()) {field.classList.add("guide-complete");}
   });
   const next = guideSteps.find(step => !step.valid());
-  if (next) {
-      document
-          .getElementById(next.id)
-          .classList.add("guide-active");
-  }
+  if (next) {document .getElementById(next.id) .classList.add("guide-active");}
 }
 
 /* Aggiorna lo stato Active/Deactive Button */  
@@ -811,17 +777,11 @@ window.changeActiveStatus = function(){
     if (!isComplete()) {
       ev_attivo.checked = false;
       updateGuide();
-      showWarning(
-       "The event is incomplete.\n\nComplete the highlighted required fields before activating."
-      );
+      showWarning("The event is incomplete.\n\nComplete the highlighted required fields before activating.");
       updateActiveStatus();
       return;
     }
-    if (!validateDateTime()) {
-      ev_attivo.checked = false;
-      updateActiveStatus();
-      return;
-    }
+    if (!validateDateTime()) {ev_attivo.checked = false; updateActiveStatus(); return;}
   }
   markDirty();
   updateActiveStatus();
@@ -833,10 +793,8 @@ window.updateActiveStatus = function () {
     const title = document.getElementById("activeTitle");
     btn.className = `btn-icon ${ev_attivo.checked ? "btn-green" : "btn-red"}`;    
     btn.textContent = ev_attivo.checked ? "✓" : "×";
-    title.textContent = ev_attivo.checked
-      ? "Active"
-      : "Unactive";
-  }
+    title.textContent = ev_attivo.checked ? "Active" : "Unactive";
+}
 
 /* LOAD Categorie */
 async function loadSelects() {
@@ -856,14 +814,8 @@ async function loadSelects() {
           .map(s => s.sc_descrizione)
           .join(" • ");
         let text = c.mc_descrizione;
-        if (subList) {
-          text += " • " + subList;
-        }
-        id_categoria.innerHTML += `
-          <option value="${c.id_categoria}">
-            ${text}
-          </option>
-        `;
+        if (subList) {text += " • " + subList;}
+        id_categoria.innerHTML += ` <option value="${c.id_categoria}"> ${text} </option> `;
       });
   id_luogo.innerHTML = `<option value="">Place...</option>`;
   updateCategoriaSelect();
@@ -882,16 +834,12 @@ function updateCategoriaSelect() {
     div.onclick = () => {
       id_categoria.value = opt.value;
       value.textContent = opt.textContent;
-      document
-        .getElementById("categoriaBox")
-        .classList.remove("open");
+      document .getElementById("categoriaBox") .classList.remove("open");
       markDirty();
     };
     box.appendChild(div);
   });
-  value.textContent =
-    id_categoria.options[id_categoria.selectedIndex]?.text ||
-    "Category...";
+  value.textContent = id_categoria.options[id_categoria.selectedIndex]?.text || "Category...";
 }
 
 document.getElementById("categoriaValue").addEventListener("click", () => {document.getElementById("categoriaBox").classList.toggle("open");
@@ -905,10 +853,7 @@ function updateLuogoSelect() {
   box.innerHTML = "";
   if (id_luogo.disabled) {
       value.classList.add("placeholder");
-      value.textContent =
-          id_comune_evento_hidden.value
-              ? "No places"
-              : "Select City first";
+      value.textContent = id_comune_evento_hidden.value ? "No places" : "Select City first";
         wrapper.classList.add("disabled");
         wrapper.classList.remove("open");
       return;
@@ -920,22 +865,16 @@ function updateLuogoSelect() {
     div.textContent = opt.textContent;
     div.onclick = () => {
       id_luogo.value = opt.value;
-      document
-        .getElementById("luogoBox")
-        .classList.remove("open");
+      document .getElementById("luogoBox") .classList.remove("open");
       updateLuogoSelect();
       markDirty();
     };
     box.appendChild(div);
   });
-  const selectedText =
-    id_luogo.options[id_luogo.selectedIndex]?.text || "Place...";
+  const selectedText = id_luogo.options[id_luogo.selectedIndex]?.text || "Place...";
     value.textContent = selectedText;
-    if (!id_luogo.value) {
-      value.classList.add("placeholder");
-    } else {
-      value.classList.remove("placeholder");
-  }
+    if (!id_luogo.value) {value.classList.add("placeholder");
+    } else {value.classList.remove("placeholder");}
   wrapper.classList.remove("disabled");
 }
 
@@ -957,10 +896,7 @@ function updateSeriesSelect() {
   box.innerHTML = "";
     if (select.disabled) {
       value.classList.add("placeholder");
-      value.textContent =
-          id_organizzatore_hidden.value
-              ? "No series"
-              : "Select organizer first";
+      value.textContent = id_organizzatore_hidden.value ? "No series" : "Select organizer first";
       wrapper.classList.remove("open");
       wrapper.classList.add("disabled");
       return;
@@ -981,11 +917,8 @@ function updateSeriesSelect() {
   const selectedText =
   select.options[select.selectedIndex]?.text || "Series...";
   value.textContent = selectedText;
-    if (!select.value) {
-    value.classList.add("placeholder");
-  } else {
-    value.classList.remove("placeholder");
-  }
+    if (!select.value) {value.classList.add("placeholder");
+  } else {value.classList.remove("placeholder");}
   wrapper.classList.remove("disabled");
 }
   
@@ -1003,10 +936,7 @@ async function loadSeriesByOrganizzatore(idOrg) {
     .select("id_event_series, es_title")
     .eq("id_organizzatore", idOrg)
     .order("es_title");
-  if (error) {
-    console.error("STEP SERIES - errore:", error);
-    return;
-  }
+  if (error) {console.error("STEP SERIES - errore:", error); return;}
     if (data.length === 0) {
         select.innerHTML = "";
         select.disabled = true;
@@ -1027,9 +957,7 @@ async function loadSeriesByOrganizzatore(idOrg) {
 /* Carica i Comuni */  
 async function loadComuni() {
   const { data } = await supabase.from('comuni').select('*');
-  (data || []).forEach(c => {
-    comuniMap[c.id_comune] = c.co_descrizione;
-  });
+  (data || []).forEach(c => {comuniMap[c.id_comune] = c.co_descrizione;});
 }
 
 /* Carica Luoghi dei Comuni */  
@@ -1037,8 +965,7 @@ window.filterLuoghi = async (selectedId = null) => {
   const idComune = id_comune_evento_hidden.value;
   id_luogo.innerHTML = "";
   id_luogo.value = "";
-    if (!idComune) {
-    id_luogo.disabled = true;
+    if (!idComune) {id_luogo.disabled = true;
     updateLuogoSelect();
     return;
   }
@@ -1055,16 +982,8 @@ window.filterLuoghi = async (selectedId = null) => {
     updateLuogoSelect();
     return;
   }
-  (data || []).forEach(l => {
-    id_luogo.innerHTML += `
-      <option value="${l.id_luogo}">
-        ${l.lu_location}${l.lu_descrizione ? ' • ' + l.lu_descrizione : ''}
-      </option>
-    `;
-  });
-  if (selectedId) {
-    id_luogo.value = selectedId;
-  }
+  (data || []).forEach(l => {id_luogo.innerHTML += ` <option value="${l.id_luogo}"> ${l.lu_location}${l.lu_descrizione ? ' • ' + l.lu_descrizione : ''} </option> `;});
+  if (selectedId) {id_luogo.value = selectedId;}
   updateLuogoSelect();
 };
 
@@ -1169,18 +1088,13 @@ function isComplete(){
 window.requestBack = async () => {
   if (!isComplete()) {
     updateGuide();
-    showWarning(
-        "The event is incomplete.\n\nComplete the highlighted required fields before saving."
-    );
+    showWarning("The event is incomplete.\n\nComplete the highlighted required fields before saving.");
     return false;
 }
   if (!validateDateTime()) {
     return;
   }
-  if (!dirty) {
-    location.href = 'eventi.html';
-    return;
-  }
+  if (!dirty) {location.href = 'eventi.html'; return;}
   const choice = await askSaveDialog();
   if (choice === "cancel") return;
   if (choice === "yes") {
@@ -1189,9 +1103,7 @@ window.requestBack = async () => {
     location.href = 'eventi.html';
     return;
   }
-  if (choice === "no") {
-    location.href = 'eventi.html';
-  }
+  if (choice === "no") {location.href = 'eventi.html';}
 };
 
 /* BTN Duplica Evento */
@@ -1210,9 +1122,7 @@ window.openMapByComune = async () => {
   document.getElementById("mapModal").style.display = "block";
   await loadMapLuoghi(idComune);
   // fondamentale per Leaflet dentro modale
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 200);
+  setTimeout(() => {map.invalidateSize();}, 200);
 };
 
 /* BTN Nuovo Luogo */    
@@ -1235,18 +1145,14 @@ window.newEventSerie = function(){
 /* BTN Link WWW dell'Evento */  
 window.openEventLink = function() {
   const url = ev_link.value.trim();
-  if (url) {
-    window.open(url, "_blank");
-  }
+  if (url) {window.open(url, "_blank");}
 };
   
 /* Aggiungi un nuovo luogo sulla Mappa */  
 function initMap() {
   if (map) return;
   map = L.map('map');
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: ''
-  }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: ''}).addTo(map);
   map.on("click", (e) => {
   const { lat, lng } = e.latlng;
   const ok = confirm("Vuoi aggiungere un nuovo luogo qui?");
@@ -1277,11 +1183,8 @@ function renderMarkers(luoghiList, comune) {
   markers = [];
   const valid = luoghiList.filter(l => l.lu_lat && l.lu_lng);
     if (!valid.length) {
-      if (comune?.co_lat && comune?.co_lng) {
-        map.setView([comune.co_lat, comune.co_lng], 13);
-      } else {
-        map.setView([38.1, 13.3], 9);
-      }
+      if (comune?.co_lat && comune?.co_lng) {map.setView([comune.co_lat, comune.co_lng], 13);
+      } else {map.setView([38.1, 13.3], 9);}
       return;
     }
   const bounds = [];
@@ -1289,12 +1192,7 @@ function renderMarkers(luoghiList, comune) {
     const isCurrent = l.id_luogo == id_luogo.value;
     const marker = L.marker([l.lu_lat, l.lu_lng],
     {icon: isCurrent ? selectedIcon : defaultIcon} ).addTo(map);
-    marker.bindTooltip(
-      l.lu_descrizione
-        ? `${l.lu_location}<br><small>${l.lu_descrizione}</small>`
-        : l.lu_location,
-      { direction: "top", sticky: true }
-    );
+    marker.bindTooltip(l.lu_descrizione ? `${l.lu_location}<br><small>${l.lu_descrizione}</small>` : l.lu_location, { direction: "top", sticky: true });
     marker.on("click", () => {
       id_luogo.value = l.id_luogo;
       updateLuogoSelect();
@@ -1308,9 +1206,7 @@ function renderMarkers(luoghiList, comune) {
 }
 
 /* BTN Disabilita visualizzazione Mappa */  
-window.closeMap = () => {
-  document.getElementById("mapModal").style.display = "none";
-};
+window.closeMap = () => {document.getElementById("mapModal").style.display = "none";};
 
 /* BTN Inserimento nuovo Luogo sulla Mapa */  
 function openNewLuogoFromMap(lat, lng) {
@@ -1320,9 +1216,7 @@ function openNewLuogoFromMap(lat, lng) {
 }
 
 /* BTN Richiama Annulla */
-window.closeWarning = function() {
-  document.getElementById("warningDialog").style.display = "none";
-};  
+window.closeWarning = function() {document.getElementById("warningDialog").style.display = "none";};  
 
 /* BTN Richiama Esci senza salvare */  
  window.exitWithoutSave = function () {
@@ -1347,24 +1241,9 @@ function validateDateTime() {
   const start = new Date(inizio);
   const end = new Date(fine);
   const minuti = Math.round((end - start) / 60000);
-  if (minuti < 0) {
-    showWarning(
-      "La data di fine evento non può precedere la data di inizio"
-    );
-    return false;
-  }
-  if (minuti < 3) {
-    showWarning(
-      "La durata dell'evento è inferiore a 3 minuti. Verifica i dati inseriti."
-    );
-    return true;
-  }
-  if (minuti > 2160) {
-    showWarning(
-      "Un singolo evento non dovrebbe durare più di 36 ore."
-    );
-    return false;
-  }
+  if (minuti < 0) {showWarning("La data di fine evento non può precedere la data di inizio"); return false;}
+  if (minuti < 3) {showWarning("La durata dell'evento è inferiore a 3 minuti. Verifica i dati inseriti."); return true;}
+  if (minuti > 2160) {showWarning("Un singolo evento non dovrebbe durare più di 36 ore."); return false;}
   return true;
 }  
 
@@ -1394,14 +1273,8 @@ function updateMapButton() {
 /* Attiva/Disattiva BTN Duplicate */  
 function updateDupButton() {
   const btn = document.getElementById('btnDuplicate');
-  if (isNew) {
-    btn.disabled = true;
-    btn.style.cursor = "not-allowed";
-    btn.className = "btn-icon btn-gray";
-  } else {
-    btn.disabled = false;
-    btn.className = "btn-icon btn-blue";
-  }
+  if (isNew) {btn.disabled = true; btn.style.cursor = "not-allowed"; btn.className = "btn-icon btn-gray";
+  } else {btn.disabled = false; btn.className = "btn-icon btn-blue";}
 }
 
 document.getElementById("backBtn")
@@ -1430,10 +1303,7 @@ function verifySeries() {
 window.calcolaDurata = function() {
   const inizio = document.getElementById('ev_inizio').value;
   const fine = document.getElementById('ev_fine').value;
-  if (!inizio || !fine) {
-    ev_durata.value = '';
-    return;
-  }
+  if (!inizio || !fine) {ev_durata.value = ''; return;}
   const start = new Date(inizio);
   const end = new Date(fine);
   const minuti = Math.round((end - start) / 60000);
@@ -1459,19 +1329,14 @@ calcolaDurata()
 /// Gestione Copertina ///
 // Carica copertina 
 async function uploadCover(idEvento) {
-  if (!selectedCoverFile) {
-    return null;
-  }
+  if (!selectedCoverFile) {return null;}
   const fileName = `${idEvento}.jpg`;
   const path = `copertine/${fileName}`;
   // Verifica se il file esiste già
   const { data: files, error: listError } = await supabase.storage
     .from('eventi')
     .list('copertine');
-  if (listError) {
-    console.error("Errore lettura copertine:", listError);
-    throw listError;
-  }
+  if (listError) {console.error("Errore lettura copertine:", listError); throw listError;}
   const exists = files.some(f => f.name === fileName);
   let error;
   if (exists) {
@@ -1491,10 +1356,7 @@ async function uploadCover(idEvento) {
         contentType: 'image/jpeg'
       }));
   }
-  if (error) {
-    console.error("Errore upload copertina:", error);
-    throw error;
-  }
+  if (error) {console.error("Errore upload copertina:", error); throw error;}
   return fileName;
 }
 
@@ -1510,9 +1372,7 @@ function updateCover() {
     updateRemoveCoverButton();
     return;
   }
-  const url =
-    "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/"
-    + currentCover;
+  const url = "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/" + currentCover;
   img.src = url + "?v=" + Date.now();
   img.style.display = 'block';
   hint.style.display = 'none';
@@ -1525,9 +1385,7 @@ function updateCover() {
   const removeCoverBtn = document.getElementById('removeCoverBtn');
   const coverHint = document.getElementById('coverHint');
   const coverPreview = document.getElementById('coverPreview');
-coverBox.addEventListener('click', () => {
-  coverFileInput.click();
-});
+coverBox.addEventListener('click', () => {coverFileInput.click();});
 coverFileInput.addEventListener('change', () => {
   const file = coverFileInput.files[0];
   loadCoverPreview(file);
@@ -1562,9 +1420,7 @@ document.addEventListener('paste', e => {
 // Pulsante Rimozione Copertina
 function updateRemoveCoverButton() {
   const btn = document.getElementById("removeCoverBtn");
-  const enabled =
-    (!!currentCover || !!selectedCoverFile) &&
-    !coverDeleted;
+  const enabled = (!!currentCover || !!selectedCoverFile) && !coverDeleted;
   btn.className = `btn-icon ${enabled ? "btn-red" : "btn-gray"}`;
   btn.disabled = !enabled;
   btn.style.cursor = enabled ? "" : "not-allowed";
@@ -1578,37 +1434,23 @@ async function backupCover(fileName) {
   const { data: file, error: downloadError } = await supabase.storage
     .from('eventi')
     .download(source);
-  if (downloadError) {
-    console.error("Errore download backup:", downloadError);
-    throw downloadError;
+  if (downloadError) {console.error("Errore download backup:", downloadError); throw downloadError;
   }
   // Verifica se il backup esiste già
   const { data: files, error: listError } = await supabase.storage
     .from('eventi')
     .list('copertine/backup');
-  if (listError) {
-    console.error("Errore lettura backup:", listError);
-    throw listError;
-  }
+  if (listError) {console.error("Errore lettura backup:", listError); throw listError;}
   const exists = files.some(f => f.name === fileName);
   let error;
-  if (exists) {
-    ({ error } = await supabase.storage
+  if (exists) {({ error } = await supabase.storage
       .from('eventi')
-      .update(destination, file, {
-        contentType: 'image/jpeg'
-      }));
-  } else {
-    ({ error } = await supabase.storage
+      .update(destination, file, {contentType: 'image/jpeg'}));
+  } else {({ error } = await supabase.storage
       .from('eventi')
-      .upload(destination, file, {
-        contentType: 'image/jpeg'
-      }));
+      .upload(destination, file, {contentType: 'image/jpeg'}));
   }
-    if (error) {
-    console.error("Errore creazione backup:", error);
-    throw error;
-  }
+    if (error) {console.error("Errore creazione backup:", error); throw error;}
 }
 
 // Cancella Copertina  
@@ -1617,10 +1459,7 @@ async function deleteCover(idEvento) {
   const { error } = await supabase.storage
     .from('eventi')
     .remove([`copertine/${fileName}`]);
-  if (error) {
-    console.error("Errore eliminazione copertina:", error);
-    throw error;
-  }
+  if (error) {console.error("Errore eliminazione copertina:", error); throw error;}
 }
     
 // BTN rimuovi copertina
@@ -1642,18 +1481,12 @@ removeCoverBtn.addEventListener('click', (event) => {
 });
 
 document.addEventListener("click", e => {
-    if (!e.target.closest(".ar-select")) {
-        document
-            .querySelectorAll(".ar-select")
-            .forEach(s => s.classList.remove("open"));
-    }
+    if (!e.target.closest(".ar-select")) {document .querySelectorAll(".ar-select") .forEach(s => s.classList.remove("open"));}
 });
 
 // Preview Copertina  
 async function loadCoverPreview(file) {
-  if (!file || !file.type.startsWith('image/')) {
-    return;
-  }
+  if (!file || !file.type.startsWith('image/')) {return;}
   coverDeleted = false;
   file = await optimizeCover(file);
   selectedCoverFile = file;
@@ -1672,23 +1505,16 @@ async function loadCoverPreview(file) {
 // Backup Copertina  
 async function updateBackupCover() {
   const img = document.getElementById('coverBackupPreview');
-  if (!id) {
-    img.style.display = 'none';
-    return;
-  }
+  if (!id) {img.style.display = 'none'; return;}
   const fileName = `${id}.jpg`;
   const { data, error } = await supabase.storage
     .from('eventi')
-    .list('copertine/backup', {
-      search: fileName
-    });
+    .list('copertine/backup', {search: fileName});
   if (error || !data || !data.some(f => f.name === fileName)) {
     img.style.display = 'none';
     return;
   }
-  img.src =
-    "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/backup/"
-    + fileName + "?v=" + Date.now();
+  img.src = "https://ridtujvdsjonbbcrezdb.supabase.co/storage/v1/object/public/eventi/copertine/backup/" + fileName + "?v=" + Date.now();
   img.style.display = 'block';
 }
 
@@ -1709,15 +1535,9 @@ async function optimizeCover(file) {
         let width = img.width;
         let height = img.height;
         if (width > height) {
-          if (width > maxSize) {
-            height = Math.round(height * maxSize / width);
-            width = maxSize;
-          }
+          if (width > maxSize) {height = Math.round(height * maxSize / width); width = maxSize;}
         } else {
-          if (height > maxSize) {
-            width = Math.round(width * maxSize / height);
-            height = maxSize;
-          }
+          if (height > maxSize) {width = Math.round(width * maxSize / height); height = maxSize;}
         }
         const canvas = document.createElement('canvas');
         canvas.width = width;
@@ -1725,17 +1545,10 @@ async function optimizeCover(file) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img,0,0,width,height);
         canvas.toBlob(blob => {
-          const newFile = new File(
-            [blob],
-            "copertina.jpg",
-            {
-              type:"image/jpeg"
-            }
-          );
+          const newFile = new File([blob], "copertina.jpg", {type:"image/jpeg"});
           resolve(newFile);
         },
-        "image/jpeg",
-        0.82);
+        "image/jpeg", 0.82);
       };
       img.src = e.target.result;
     };
