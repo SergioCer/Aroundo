@@ -129,22 +129,6 @@ body{
   color: #666;
 }  
 
-.schema-button{
-  margin-top:6px;
-  padding:6px 10px;
-  border:0;
-  border-radius:20px;
-  background:#27ae60;
-  color:white;
-  cursor:pointer;
-  font-size:14px;
-  font-weight:bold
-}
-
-.schema-button:hover{
-  background:#22313f
-}
-
 .schema-details{
   display:none;
   margin-top:8px;
@@ -207,14 +191,6 @@ body{
   word-break:break-word
 }
 
-.classification-R {
-  background: #8e44ad;
-  color: white;
-  padding: 3px 7px;
-  border-radius: 10px;
-  font-weight: bold;
-}
-  
 .empty{
   padding:18px;
   background:#fafafa;
@@ -265,25 +241,80 @@ body{
 .classification-E{
   background:#27ae60;
   color:white;
-  padding:3px 7px;
-  border-radius:10px;
+  padding: 6px 6px;
   font-weight:bold
 }
 
 .classification-I{
   background:#ff8000;
   color:white;
-  padding:3px 7px;
-  border-radius:10px;
+  padding: 6px 6px;
   font-weight:bold
 }  
 
 .classification-J {
   background: #2980b9;
   color: white;
-  padding: 3px 7px;
-  border-radius: 10px;
+  padding: 6px 6px;
   font-weight: bold;
+}  
+
+.classification-R {
+  background: #8e44ad;
+  color: white;
+  padding: 6px 6px;
+  font-weight: bold;
+}
+
+ .schema-button{
+  margin-top:6px;
+  padding:6px 10px;
+  border:0;
+  border-radius:20px;
+  background:#27ae60;
+  color:white;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:bold
+}
+
+.schema-button:hover{
+  background:#22313f
+}
+
+.reconciliation-card button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.reconciliation-select-button {
+  margin-top: 6px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 20px;
+  background: #8e44ad;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.reconciliation-select-button:hover {
+  background: #6c3483;
+}  
+
+  .reconciliation-remove-button {
+  background: #e67e22;
+  color: white;
+  border: 0;
+  border-radius: 16px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.reconciliation-remove-button:hover {
+  background: #ca6f1e;
 }  
 
 .delete-button{
@@ -383,41 +414,6 @@ body{
   margin: 0;
 }
 
-.reconciliation-card button:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.reconciliation-select-button {
-  margin-top: 6px;
-  padding: 6px 10px;
-  border: 0;
-  border-radius: 20px;
-  background: #8e44ad;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.reconciliation-select-button:hover {
-  background: #6c3483;
-}  
-
-  .reconciliation-remove-button {
-  background: #e67e22;
-  color: white;
-  border: 0;
-  border-radius: 16px;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.reconciliation-remove-button:hover {
-  background: #ca6f1e;
-}
-  
 </style>
 </head>
   
@@ -427,7 +423,7 @@ body{
 </div>
   <div class="section">
 <div class="event-controls">
-  <button id="analyzeBtn" class="schema-button">ESTRAI</button>
+  <button id="analyzeBtn" class="schema-button">Estrai</button>
   <span id="analysisStatus" style="margin-left:12px"></span>
   <label for="sortBy">Ordina per:</label>
   <select id="sortBy">
@@ -445,7 +441,7 @@ body{
     <option value="previsti">Previsti</option>
     <option value="attivi-previsti">Attivi + Previsti</option>
   </select>
-  <button id="suggestBtn" class="schema-button" type="button">SUGGERISCI</button>
+  <button id="suggestBtn" class="schema-button" type="button">Suggerisci</button>
 </div>
 
 <div id="reconciliation"></div>
@@ -695,6 +691,7 @@ function eventCard(row, index, reconciliationRole = null){
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')">Delete</button>
+      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')">Pubblica</button>
       ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}</div></article>`;
 }
 
@@ -860,13 +857,13 @@ function reconciliationButton(row, role = null) {
   const id = String(row.id_site_event);
   if (role === "parent") {
     if (reconciliationChildIds.size > 0) {      
-      return `<button class="schema-button" type="button" onclick="confirmReconciliation()">RICONCILIA</button>`;}
+      return `<button class="schema-button" type="button" onclick="confirmReconciliation()">Riconcilia</button>`;}
       return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')">Deseleziona</button>`;}
   if (role === "child") {
     return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')">Deseleziona</button>`;}
   if (reconciliationParentId === null) {
-    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')">PADRE</button>`;}
-    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')">FIGLIO</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')">Padre</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')">Figlio</button>`;}
 
 async function confirmReconciliation() {
   if (reconciliationSaving) return;
@@ -910,8 +907,7 @@ async function confirmReconciliation() {
       .delete()
       .in("id_site_event", childIds);
     if (deleteError) {
-      document.getElementById("status").textContent =
-        String(loadedEvents.length);
+      document.getElementById("status").textContent = String(loadedEvents.length);
       sortEvents();
       alert("Il padre è stato salvato come Riconciliato, " +
         "ma la cancellazione dei figli non è riuscita.\n\n" +
@@ -929,8 +925,7 @@ async function confirmReconciliation() {
     reconciliationChildIds.clear();
     reconciliationSelections.clear();
     reconciliationLockedFields.clear();
-    document.getElementById("status").textContent =
-      String(loadedEvents.length);
+    document.getElementById("status").textContent = String(loadedEvents.length);
     sortEvents();
     alert("Riconciliazione completata con successo.");
   } catch (error) {console.error("Errore durante la riconciliazione:", error);
@@ -1001,6 +996,7 @@ document.getElementById("reconciliation").innerHTML = parentRow
     ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>FIGLIO</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
 // Eventi non selezionati: unica area scorrevole
 document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
+document.getElementById("status").textContent = String(eventiFiltrati.length);
 }
 
 /* Cancella l'evento selezionato */ 
@@ -1232,6 +1228,14 @@ function suggestReconciliation() {
   sortEvents();
 }
 
+/* NUOVO EVENTO DA SCHEDA */
+function nuovoEvento(idSiteEvent) {
+  const row = loadedEvents.find(evento => String(evento.id_site_event) === String(idSiteEvent));
+  if (!row) {return;}
+  sessionStorage.setItem("eventoDaViewer", JSON.stringify({id_site_event: row.id_site_event, se_schema: row.se_schema}));
+  window.location.href = "../pages/evento.html?new=1&source=viewer";
+}
+
 /* LETTURA SUPABASE */
 async function loadEvents(){
   const status = document.getElementById("status");
@@ -1244,10 +1248,8 @@ async function loadEvents(){
         .select("id_site_event, id_site_page, id_evento, se_schema, se_extracted")
         .order("id_site_event",{ascending:false});
     if(error){throw error;}
-    if(!data || data.length === 0){
-      status.textContent = "Nessun evento presente!";
-      results.innerHTML = `<div class="empty">La tabella site_events non contiene eventi. Eseguire ESTRAI</div>`;
-      return;}
+    if(!data || data.length === 0){status.textContent = "Nessun evento presente!";
+      results.innerHTML = `<div class="empty">La tabella site_events non contiene eventi. Eseguire ESTRAI</div>`; return;}
     /* Recupero degli URL delle pagine origine */
     const idsPagine = [...new Set(data .map(evento => evento.id_site_page) .filter(id => id !== null))];
     let pagine = [];
