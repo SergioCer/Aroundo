@@ -299,6 +299,7 @@ function containsCategoryTerm(text, term) {
 }
 
 
+
 /* CATEGORIA DA DIZIONARIO DB */
 function extractCategory(text, dictionary) {if (!text || !dictionary) {return null;}
   const normalizedText = normalizeCategoryTerm(text);
@@ -341,41 +342,8 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
       category.terms.push(...terms.map(item => ({ ...item, origine: "macro"})));
     }
   }
-  /* SOTTOCATEGORIE */
-  for (const item of dictionary.sub) {
-    const terms = [];
-    for (const term of item.terms) {
-      const count = countOccurrences(term);
-      if (count > 0) {terms.push({term, count});}
-    }
-    const total = terms.reduce((sum, item) => sum + item.count, 0);
-    if (total > 0) {subMatches.push({
-        id: item.id,
-        categoriaId: item.categoriaId,
-        descrizione: item.descrizione,
-        slug: item.slug,
-        count: total,
-        terms
-      });
-      if (!categoryTotals.has(item.categoriaId)) {
-        categoryTotals.set(item.categoriaId, {
-          id: item.categoriaId,
-          descrizione: null,
-          slug: null,
-          count: 0,
-          macroCount: 0,
-          subCount: 0,
-          terms: []
-        });
-      }
-      const category = categoryTotals.get(item.categoriaId);
-      category.count += total;
-      category.subCount += total;
-      category.terms.push(...terms.map(term => ({ ...term, origine: "subcategoria", idSubcategoria: item.id, descrizioneSubcategoria: item.descrizione})));
-    }
-  }
-  /* NESSUN RISULTATO */
-  if (categoryTotals.size === 0) {return null;}
+  /* NESSUNA MACRO RICONOSCIUTA */
+  if (macroMatches.length === 0) {return null;}
   /* PERCENTUALI PER MACRO-CATEGORIA */
   const totalMatches = [...categoryTotals.values()]
     .reduce((sum, category) => sum + category.count, 0);
@@ -399,10 +367,36 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     } else if (primary.percentuale >= 50) {strength = "probabile";
     }
   }
+  /* SOTTOCATEGORIE DELLA MACRO RICONOSCIUTA */
+  if (strength !== "dubbia") {
+    for (const item of dictionary.sub) {
+      if (item.categoriaId !== primary.id) {continue;}
+      const terms = [];
+      for (const term of item.terms) {
+        const count = countOccurrences(term);
+        if (count > 0) {terms.push({term, count});}
+      }
+      const total = terms.reduce((sum, item) => sum + item.count, 0);
+      if (total > 0) {subMatches.push({
+          id: item.id,
+          categoriaId: item.categoriaId,
+          descrizione: item.descrizione,
+          slug: item.slug,
+          count: total,
+          terms
+        });
+      }
+    }
+  }
+  /* SUBCATEGORIA PRINCIPALE */
+  const subPrimary = subMatches.sort((a, b) => b.count - a.count)[0] || null;
   return {
     category: primary.descrizione,
     categorySlug: primary.slug,
     categoryId: primary.id,
+    subcategory: subPrimary?.descrizione || null,
+    subcategorySlug: subPrimary?.slug || null,
+    subcategoryId: subPrimary?.id || null,
     macroMatches,
     subMatches,
     categories,
@@ -412,6 +406,7 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     strength
   };
 }
+
 
 /* LUOGO */
 function extractLocation(text) {
@@ -646,6 +641,9 @@ const internal = {
   category: categoryData.category ?? null,
   strength: categoryData.strength ?? null,
   id_categoria: categoryData.categoryId ?? null,
+  id_subcategoria: categoryData.subcategoryId ?? null,
+  subcategory: categoryData.subcategory ?? null,
+  subcategorySlug: categoryData.subcategorySlug ?? null,
   categorySlug: categoryData.categorySlug ?? null,
   macroMatches: categoryData.macroMatches ?? [],
   subMatches: categoryData.subMatches ?? [],
@@ -688,6 +686,9 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     category: categoryData.category ?? null,
     strength: categoryData.strength ?? null,
     id_categoria: categoryData.categoryId ?? null,
+    id_subcategoria: categoryData.subcategoryId ?? null,
+    subcategory: categoryData.subcategory ?? null,
+    subcategorySlug: categoryData.subcategorySlug ?? null,
     categorySlug: categoryData.categorySlug ?? null,
     macroMatches: categoryData.macroMatches ?? [],
     subMatches: categoryData.subMatches ?? [],
