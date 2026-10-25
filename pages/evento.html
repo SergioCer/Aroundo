@@ -687,11 +687,12 @@ async function loadFromViewer() {
   original = JSON.stringify({});
   ev_titolo.value = schema.name || schema.title || '';
   ev_descrizione.value = schema.description || '';
-  ev_link.value = schema.url || '';
+  id_categoria = schema.id_categoria ?? null;
   ev_inizio.value = schema.startDate ? schema.startDate.length === 10 ? `${schema.startDate}T00:00`: schema.startDate.slice(0, 16): '';
   ev_fine.value = schema.endDate ? schema.endDate.length === 10 ? `${schema.endDate}T00:00`: schema.endDate.slice(0, 16): '';
   const price = schema.offers?.price;
   ev_costo.value = price === null || price === undefined || price === '' ? 'TBA': price;
+  ev_link.value = schema.url || '';
   /* COMUNE */
   if (schema.id_comune) {
     id_comune_evento_hidden.value = schema.id_comune;
