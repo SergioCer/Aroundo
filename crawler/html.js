@@ -180,8 +180,11 @@ function extractPrice(text) {
     /\d[\d.,]*\s*(?:€|EUR|USD|GBP|CHF|JPY|CNY|CAD|AUD)\b/i
   ];
   for (const re of patterns) {
-    const match = text.match(re);
-    if (match) return match[0].match(/\d[\d.,]*/)[0];
+  const match = text.match(re);
+    if (match) {const price = match[0].match(/\d[\d.,]*/)[0];
+      if (/^0+(?:[.,]0+)*$/.test(price)) return "gratuito";
+      return price;
+    }
   }
   return null;
 }
@@ -295,65 +298,118 @@ function containsCategoryTerm(text, term) {
   return new RegExp(`\\b${escaped}\\b`, "i").test(normalizedText);
 }
 
+
 /* CATEGORIA DA DIZIONARIO DB */
-function extractCategory(text, dictionary) {
-  if (!text || !dictionary) {return null;}
+function extractCategory(text, dictionary) {if (!text || !dictionary) {return null;}
+  const normalizedText = normalizeCategoryTerm(text);
+  /* CONTA TUTTE LE OCCORRENZE DI UN TERMINE */
+  function countOccurrences(term) {const normalizedTerm = normalizeCategoryTerm(term);
+    if (!normalizedTerm) {return 0;}
+    const escaped = escapeRegExp(normalizedTerm);
+    const regex = new RegExp(`\\b${escaped}\\b`, "gi");
+    return [...normalizedText.matchAll(regex)].length;
+  }
   const macroMatches = [];
   const subMatches = [];
+  const categoryTotals = new Map();
   /* MACRO CATEGORIE */
-  for (const macro of dictionary.macro) {
-    for (const term of macro.terms) {
-      if (containsCategoryTerm(text, term)) {
-        macroMatches.push({
+  for (const macro of dictionary.macro) {const terms = [];
+    for (const term of macro.terms) {const count = countOccurrences(term);
+      if (count > 0) {terms.push({term, count});}
+    }
+    const total = terms.reduce((sum, item) => sum + item.count, 0);
+    if (total > 0) {macroMatches.push({
+        id: macro.id,
+        descrizione: macro.descrizione,
+        slug: macro.slug,
+        count: total,
+        terms
+      });
+      if (!categoryTotals.has(macro.id)) {categoryTotals.set(macro.id, {
           id: macro.id,
           descrizione: macro.descrizione,
           slug: macro.slug,
-          matchedTerm: term
+          count: 0,
+          macroCount: 0,
+          subCount: 0,
+          terms: []
         });
-        break;
       }
+      const category = categoryTotals.get(macro.id);
+      category.count += total;
+      category.macroCount += total;
+      category.terms.push(...terms.map(item => ({ ...item, origine: "macro"})));
     }
   }
   /* SOTTOCATEGORIE */
   for (const item of dictionary.sub) {
+    const terms = [];
     for (const term of item.terms) {
-      if (containsCategoryTerm(text, term)) {
-        subMatches.push({
-          id: item.id,
-          categoriaId: item.categoriaId,
-          descrizione: item.descrizione,
-          slug: item.slug,
-          matchedTerm: term
+      const count = countOccurrences(term);
+      if (count > 0) {terms.push({term, count});}
+    }
+    const total = terms.reduce((sum, item) => sum + item.count, 0);
+    if (total > 0) {subMatches.push({
+        id: item.id,
+        categoriaId: item.categoriaId,
+        descrizione: item.descrizione,
+        slug: item.slug,
+        count: total,
+        terms
+      });
+      if (!categoryTotals.has(item.categoriaId)) {
+        categoryTotals.set(item.categoriaId, {
+          id: item.categoriaId,
+          descrizione: null,
+          slug: null,
+          count: 0,
+          macroCount: 0,
+          subCount: 0,
+          terms: []
         });
-        break;
       }
+      const category = categoryTotals.get(item.categoriaId);
+      category.count += total;
+      category.subCount += total;
+      category.terms.push(...terms.map(term => ({ ...term, origine: "subcategoria", idSubcategoria: item.id, descrizioneSubcategoria: item.descrizione})));
     }
   }
   /* NESSUN RISULTATO */
-  if (
-    macroMatches.length === 0 &&
-    subMatches.length === 0
-  ) {
-    return null;
+  if (categoryTotals.size === 0) {return null;}
+  /* PERCENTUALI PER MACRO-CATEGORIA */
+  const totalMatches = [...categoryTotals.values()]
+    .reduce((sum, category) => sum + category.count, 0);
+  const categories = [...categoryTotals.values()]
+    .map(category => {
+      const macro = dictionary.macro.find(item => item.id === category.id);
+      return { ...category, descrizione: category.descrizione || macro?.descrizione || null,
+        slug: category.slug || macro?.slug || null,
+        percentuale: totalMatches > 0 ? category.count / totalMatches * 100: 0};
+    })
+    .sort((a, b) => b.count - a.count);
+  const primary = categories[0];
+  const alternatives = categories.slice(1);
+  const alternativeSignificative = alternatives.some(category => category.percentuale >= 20);
+  /* FORZA DEL RISULTATO */
+  let strength = "dubbia";
+  if (primary.count >= 2) {
+    if (primary.percentuale >= 80) {strength = "certa";
+    } else if (primary.percentuale >= 60 && !alternativeSignificative
+    ) {strength = "confermata";
+    } else if (primary.percentuale >= 50) {strength = "probabile";
+    }
   }
-  /* RISULTATO STRUTTURATO:  Non restituiamo ancora soltanto una stringa.
-    Conserviamo le evidenze perché ci serviranno per la disambiguazione. */
   return {
-    category: macroMatches.length === 1 ? macroMatches[0].descrizione: null,
-    categorySlug: macroMatches.length === 1 ? macroMatches[0].slug: null,
+    category: primary.descrizione,
+    categorySlug: primary.slug,
+    categoryId: primary.id,
     macroMatches,
     subMatches,
-    /* Rafforzamento semantico:
-      1 macro + 1 sub
-      1 macro + 2+ sub
-      2+ macro */
+    categories,
+    totalMatches,
     macroCount: macroMatches.length,
     subCount: subMatches.length,
-    strength: macroMatches.length >= 2 ? "disambiguazione" : (
-          macroMatches.length === 1 && subMatches.length >= 2 ? "forte" : (
-              macroMatches.length === 1 && subMatches.length >= 1 ? "confermato" : (
-                  macroMatches.length === 1 ? "base" : (
-                      subMatches.length >= 1 ? "sottocategoria" : null)))),
+    strength
   };
 }
 
@@ -629,12 +685,13 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     reinforcements: {},
     signals: [],
     category: categoryData.category ?? null,
+    strength: categoryData.strength ?? null,
+    id_categoria: categoryData.categoryId ?? null,
     categorySlug: categoryData.categorySlug ?? null,
     macroMatches: categoryData.macroMatches ?? [],
     subMatches: categoryData.subMatches ?? [],
     macroCount: categoryData.macroCount ?? 0,
-    subCount: categoryData.subCount ?? 0,
-    strength: categoryData.strength ?? null
+    subCount: categoryData.subCount ?? 0
   };
   return normalizeSchemaEvent(source, internal);
 }
@@ -645,7 +702,7 @@ const SCHEMA_FIELDS = [
   // Localizzazione scomposta
   "location", "address", "addressLocality", "postalCode", "addressRegion", "addressCountry",
   "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
-  "strength", "category", "categorySlug", "macroCount", "macroMatches", "subCount", "subMatches",
+  "category", "strength", "id_categoria", "categorySlug", "macroCount", "macroMatches", "subCount", "subMatches",
   "fundamentals", "reinforcements", "signals",
   "id_site_page", "id_comune", "classification",
   "subEvent", "superEvent", "eventAttendanceMode", "eventStatus", "eventSchedule", "previousStartDate",
@@ -813,7 +870,6 @@ async function processSitePage(page, categoryDictionary, supabase, eventState) {
   eventState.addKey(key);
   console.log(`[ESTRAI] Evento salvato: ${page.id_site_page} (${classification})`);
 }
-
 
 export async function runAnalysis(supabase) {
 const categoryDictionary = await loadCategoryDictionary(supabase);
