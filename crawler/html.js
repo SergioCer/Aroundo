@@ -367,6 +367,9 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     } else if (primary.percentuale >= 50) {strength = "probabile";
     }
   }
+  /* PERCENTUALE MACRO-CATEGORIA */
+  const categoryPercentuale = primary.percentuale;
+  let subcategoryPercentuale = null;
   /* SOTTOCATEGORIE DELLA MACRO RICONOSCIUTA */
   if (strength !== "dubbia") {
     for (const item of dictionary.sub) {
@@ -390,6 +393,12 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
   }
   /* SUBCATEGORIA PRINCIPALE */
   const subPrimary = subMatches.sort((a, b) => b.count - a.count)[0] || null;
+  const totalSubMatches = subMatches.reduce((sum, item) => sum + item.count, 0);
+  if (subPrimary && totalSubMatches > 0) {
+    subcategoryPercentuale = subPrimary.count / totalSubMatches * 100;
+  }
+  /* FORZA CON PERCENTUALI */
+  strength = `${strength} - ${Math.round(categoryPercentuale)}% - ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "-"}`;
   return {
     category: primary.descrizione,
     categorySlug: primary.slug,
