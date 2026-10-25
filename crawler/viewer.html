@@ -699,7 +699,8 @@ window.deleteEvent=deleteEvent;
 window.selectParent = selectParent;
 window.addReconciliationChild = addReconciliationChild;
 window.removeFromReconciliation = removeFromReconciliation;
-window.confirmReconciliation = confirmReconciliation;  
+window.confirmReconciliation = confirmReconciliation;
+window.nuovoEvento = nuovoEvento;
   
 /* APERTURA / CHIUSURA SCHEMA */
 window.toggleSchema = function(id){
@@ -1013,23 +1014,17 @@ async function deleteEvent(id) {
   sortEvents();
 }
   
-document.getElementById("sortBy").addEventListener("change", (event) => {
-  sortBy = event.target.value;
-  sortEvents();
-});
+document.getElementById("sortBy").addEventListener("change", (event) => {sortBy = event.target.value; sortEvents();});
   
 document.getElementById("sortDirection").addEventListener("click", () => {
   sortAscending = !sortAscending;
-  document.getElementById("sortDirection").textContent =
-    sortAscending ? "↑ Crescente" : "↓ Decrescente";
+  document.getElementById("sortDirection").textContent = sortAscending ? "↑ Crescente" : "↓ Decrescente";
   sortEvents();
 });
 
 filterComuni.addEventListener("change", sortEvents);
   
-document.getElementById("suggestBtn").addEventListener("click", () => {
-  suggestReconciliation();
-});
+document.getElementById("suggestBtn").addEventListener("click", () => {suggestReconciliation();});
 
 
 /* SUGGERITORE DI RICONCILIAZIONE */
@@ -1153,7 +1148,7 @@ function chooseSuggestionParent(rows) {
 }
 
 function buildSuggestionGroups() {
-  const rows = loadedEvents.filter(row => row.se_schema);
+  const rows = loadedEvents.filter(row => row.se_schema && filtraEventoPerComune(row, comuniMap, filterComuni.value));
   const groupsByKey = new Map();
   // Raggruppa prima per data: le coppie senza una data confrontabile non vengono proposte.
   const byDate = new Map();
