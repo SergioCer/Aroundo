@@ -996,17 +996,30 @@ document.getElementById("results").innerHTML = `<div class="events-grid"> ${norm
 document.getElementById("status").textContent = String(eventiFiltrati.length);
 }
 
-/* Cancella l'evento selezionato */ 
+/* Cancella l'evento selezionato */
 async function deleteEvent(id) {
   const { error } = await supabase
     .from("site_events")
     .delete()
     .eq("id_site_event", id);
   if (error) {console.error(error); alert("Errore durante l'eliminazione"); return;}
-  // Rimuove il record anche dall'array usato per l'ordinamento.
-  loadedEvents = loadedEvents.filter(row => String(row.id_site_event) !== String(id));
+  const deletedId = String(id);
+  // Rimuove il record dall'array.
+  loadedEvents = loadedEvents.filter(row => String(row.id_site_event) !== deletedId);
+  // Aggiorna lo stato della riconciliazione.
+  if (String(reconciliationParentId) === deletedId) {
+    reconciliationParentId = null;
+    reconciliationChildIds.clear();
+    reconciliationSelections.clear();
+    reconciliationLockedFields.clear();
+  } else {
+    reconciliationChildIds.delete(deletedId);
+    reconciliationSelections.delete(deletedId);
+  }
+  // Se non ci sono più figli, non serve mantenere i campi bloccati.
+  if (reconciliationChildIds.size === 0) {reconciliationLockedFields.clear();}
   // Aggiorna le schede, il conteggio e l'ordinamento.
-  document.getElementById("status").textContent = String(loadedEvents.length);
+  document.getElementById("status").textContent = String(loadedEvents.filter(row => filtraEventoPerComune(row, comuniMap, filterComuni.value)).length);
   sortEvents();
 }
   
