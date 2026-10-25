@@ -398,7 +398,7 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     subcategoryPercentuale = subPrimary.count / totalSubMatches * 100;
   }
   /* FORZA CON PERCENTUALI */
-  strength = `${strength} - ${Math.round(categoryPercentuale)}% - ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "-"}`;
+  strength = `${strength} - cat. ${Math.round(categoryPercentuale)}% - sub. ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "-"}`;
   return {
     category: primary.descrizione,
     categorySlug: primary.slug,
