@@ -293,30 +293,16 @@ body{
 <!-- DIALOG MODIFICA CATEGORIA -->
 <div id="categoryDialog" class="dialog-overlay">
     <div class="dialog">
-        <div class="dialog-title">
-            Modifica categoria
-        </div>
+        <div class="dialog-title">Modifica categoria</div>
         <div class="dialog-body">
-            <label>
-                Descrizione
-            </label>
-            <input
-                id="categoryDescrizione"
-                type="text"
-                maxlength="80">
+            <label>Descrizione</label>
+            <input id="categoryDescrizione" type="text" maxlength="80">
+            <label>Slug (termini separati da ;)</label>
+            <input id="categorySlug" type="text" maxlength="2000">
         </div>
-
         <div class="dialog-buttons">
-            <button
-                class="btn-green"
-                onclick="saveCategory()">
-                Salva
-            </button>
-            <button
-                class="btn-red"
-                onclick="closeCategory()">
-                Annulla
-            </button>
+            <button class="btn-green" onclick="saveCategory()">Salva</button>
+            <button class="btn-red" onclick="closeCategory()">Annulla</button>
         </div>
     </div>
 </div>
@@ -442,6 +428,7 @@ window.openEdit=(id_categoria)=>{
     const c=categorie.find(x=>x.id_categoria==id_categoria);
     currentCategoria=id_categoria;
     document.getElementById("categoryDescrizione").value=c.mc_descrizione||"";
+    document.getElementById("categorySlug").value=c.mc_slug||"";
     document.getElementById("categoryDialog").style.display="flex";
 };
 
@@ -452,8 +439,11 @@ window.closeCategory=()=>{
 
 window.saveCategory=async()=>{
     const descrizione=document.getElementById("categoryDescrizione").value.trim();
+    const slug=document.getElementById("categorySlug").value.trim();
     if(!descrizione){alert("La descrizione è obbligatoria.");return;}
-    await supabase.from("categorie").update({mc_descrizione:descrizione}).eq("id_categoria",currentCategoria);
+    if(!slug){alert("Lo slug è obbligatorio.");return;}
+    const {error}=await supabase.from("categorie").update({mc_descrizione:descrizione, mc_slug:slug}).eq("id_categoria",currentCategoria);
+    if(error){alert("Errore nel salvataggio: "+error.message);return;}
     closeCategory();
     load();
 };
