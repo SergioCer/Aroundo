@@ -696,7 +696,6 @@ async function loadFromViewer() {
     id_comune_evento.value = comuniMap[schema.id_comune] || '';
     await filterLuoghi();
   }
-  // CANCELLARE ?????  await loadCoverFromViewer(schema.image);
   calcolaDurata();
   setTimeout(updateGuide, 100);
   updateLinkButton();
@@ -706,23 +705,6 @@ async function loadFromViewer() {
   ev_titolo.focus();
 }
 
-/* COPERTINA DA VIEWER */
-async function loadCoverFromViewer(imageUrl) {
-  if (!imageUrl) {return;}
-  try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) {throw new Error("Immagine non disponibile");}
-    const blob = await response.blob();
-    selectedCoverFile = new File([blob], "copertina.jpg", { type: blob.type || "image/jpeg" });
-    currentCover = null;
-    coverDeleted = false;
-    updateCover();
-    updateBackupCover();
-    const hint = document.getElementById("coverHint");
-    if (hint) {hint.textContent = "Copertina importata dal viewer; verrà salvata con l'evento.";}
-  } catch (error) {console.error("Errore importazione copertina:", error);}
-}
-    
 /* SAVE */
 async function save() {
   const payload = {
