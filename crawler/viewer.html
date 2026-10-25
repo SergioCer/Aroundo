@@ -1033,6 +1033,11 @@ document.getElementById("sortDirection").addEventListener("click", () => {
 
 filterComuni.addEventListener("change", () => {
   suggestedGroupKeys.clear();
+  // Azzera la riconciliazione attiva.
+  reconciliationParentId = null;
+  reconciliationChildIds.clear();
+  reconciliationSelections.clear();
+  reconciliationLockedFields.clear();
   const suggestBtn = document.getElementById("suggestBtn");
   suggestBtn.textContent = "Suggerisci";
   suggestBtn.disabled = false;
