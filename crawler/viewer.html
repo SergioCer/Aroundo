@@ -879,14 +879,6 @@ async function confirmReconciliation() {
     row => String(row.id_site_event) === parentId
   );
   if (!parentRow) {alert("Il padre selezionato non è più disponibile."); return;}
-  if (!confirm(
-    `Confermi la riconciliazione?\n\n` +
-    `Il padre #${parentId} verrà aggiornato e ` +
-    `${childIds.length} figli verranno cancellati ` +
-    `solo dopo il salvataggio riuscito.`
-  )) {
-    return;
-  }
   reconciliationSaving = true;
   try {
     /* Prepara il JSON definitivo senza modificare preventivamente il record originale in memoria. */
@@ -928,7 +920,6 @@ async function confirmReconciliation() {
     reconciliationLockedFields.clear();
     document.getElementById("status").textContent = String(loadedEvents.length);
     sortEvents();
-    alert("Riconciliazione completata con successo.");
   } catch (error) {console.error("Errore durante la riconciliazione:", error);
     alert("Errore durante la riconciliazione.\n\n" +
       error.message
