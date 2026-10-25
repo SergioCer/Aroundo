@@ -644,12 +644,13 @@ const internal = {
       .map(([key]) => key)
   ],
   category: categoryData.category ?? null,
+  strength: categoryData.strength ?? null,
+  id_categoria: categoryData.categoryId ?? null,
   categorySlug: categoryData.categorySlug ?? null,
   macroMatches: categoryData.macroMatches ?? [],
   subMatches: categoryData.subMatches ?? [],
   macroCount: categoryData.macroCount ?? 0,
-  subCount: categoryData.subCount ?? 0,
-  strength: categoryData.strength ?? null
+  subCount: categoryData.subCount ?? 0
 };
 const source = {
   "@context": "https://schema.org",
