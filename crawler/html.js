@@ -698,13 +698,15 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   return normalizeSchemaEvent(source, internal);
 }
 
-/* CAMPI CANONICI — stesso ordine del Viewer */
+/* CAMPI CANONICI — serve per il salvataggio e la visualizzazione con lo stesso ordine del Viewer */
 const SCHEMA_FIELDS = [
   "name", "description", "startDate", "endDate", "duration", "doorTime",
   // Localizzazione scomposta
   "location", "address", "addressLocality", "postalCode", "addressRegion", "addressCountry",
   "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
-  "category", "strength", "id_categoria", "categorySlug", "macroCount", "macroMatches", "subCount", "subMatches",
+  "category", "strength", "id_categoria", "categorySlug", 
+  "id_subcategoria", "subcategory", "subcategorySlug",
+  "macroCount", "macroMatches", "subCount", "subMatches",
   "fundamentals", "reinforcements", "signals",
   "id_site_page", "id_comune", "classification",
   "subEvent", "superEvent", "eventAttendanceMode", "eventStatus", "eventSchedule", "previousStartDate",
