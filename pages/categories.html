@@ -251,7 +251,20 @@ body{
     color:white;
 }
 
+.category-slug{
+    font-size:12px;
+    font-weight:400;
+    color:#6b7280;
+    margin-top:3px;
+    overflow-wrap:anywhere;
+}
 
+.category-info{
+    flex:1;
+    min-width:0;
+}
+
+    
 /* DRAG */
 .drag-handle{
     cursor:grab;
@@ -353,7 +366,10 @@ function render(){
         <span class="arrow">${open?"▼":"▶"}</span>
         <span class="category-count">${String(list.length).padStart(2,"0")}</span>
         <span class="material-symbols-outlined">${c.mc_icona||""}</span>
-        <span class="category-title">${c.mc_descrizione}</span>
+        <span class="category-info">
+            <span class="category-title">${c.mc_descrizione}</span>
+            <span class="category-slug">${c.mc_slug||""}</span>
+        </span>
         <button class="icon-btn add-btn" onclick="event.stopPropagation();openAdd(${c.id_categoria})">+</button>
         <button class="icon-btn edit-btn" onclick="event.stopPropagation();openEdit(${c.id_categoria})">✎</button>`;
 
@@ -383,7 +399,10 @@ function render(){
                 <span class="subcategory-icons">
                     <span class="material-symbols-outlined">${s.sc_icona||""}</span>
                 </span>
-                <span class="subcategory-name">${s.sc_descrizione}</span>
+                <span class="category-info">
+                    <span class="subcategory-name">${s.sc_descrizione}</span>
+                    <span class="category-slug">${s.sc_slug||""}</span>
+                </span>
                 <span class="subcategory-state ${s.sc_attiva?"on":"off"}">${s.sc_attiva?"●":"✕"}</span>`;
 
                 row.onclick=()=>{
