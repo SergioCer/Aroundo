@@ -683,8 +683,14 @@ async function loadFromViewer() {
   }
   console.log("ID evento sorgente:", datoViewer.id_site_event);
   console.log("Schema.org ricevuto:", schema);
-  // Per ora inizializziamo la pagina come nuovo evento.
+  // Carica informazioni dal json dell'evento.
   original = JSON.stringify({});
+  ev_titolo.value = value(schema.name) || value(schema.title) || '';
+  ev_descrizione.value = value(schema.description) || '';
+  ev_link.value = value(schema.url) || '';
+  ev_inizio.value = schema.startDate ? schema.startDate.replace(' ', 'T').slice(0, 16): '';
+  ev_fine.value = schema.endDate ? schema.endDate.replace(' ', 'T').slice(0, 16): '';
+  calcolaDurata();
   setTimeout(updateGuide, 100);
   updateLinkButton();
   updateActiveButtonState();
