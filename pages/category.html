@@ -299,6 +299,74 @@ window.markDirty=function(){
   updateGuide();
 };
 
+/* CONTROLLO DUPLICATI SLUG */
+async function controllaDuplicatiSlug(slug, idSubDaEscludere = null) {const terminiNuovi = slug
+    .split(";")
+    .map(t => t.trim())
+    .filter(Boolean);
+  const normalizza = termine => termine.toLocaleLowerCase().trim();
+  const duplicati = new Map();
+  // Controlla anche termini ripetuti nello slug che stai salvando
+  const conteggioNuovi = new Map();
+  for (const termine of terminiNuovi) {
+    const chiave = normalizza(termine);
+    conteggioNuovi.set(chiave, (conteggioNuovi.get(chiave) || 0) + 1);
+    if (!duplicati.has(chiave)) {duplicati.set(chiave, {termine, presentiIn: []});}
+    if (conteggioNuovi.get(chiave) === 2) {duplicati.get(chiave).presentiIn.push("Ripetuto nello slug che stai salvando");}
+  }
+  // Legge tutti gli slug delle macro categorie
+  const { data: macro, error: erroreMacro } = await supabase
+    .from("categorie")
+    .select("id_categoria, mc_descrizione, mc_slug");
+  if (erroreMacro) {console.error("Errore controllo slug macro:", erroreMacro);
+    alert("Impossibile verificare i duplicati delle macro categorie. Salvataggio annullato.");
+    return false;
+  }
+  // Legge tutti gli slug delle sottocategorie
+  const { data: sub, error: erroreSub } = await supabase
+    .from("subcategorie")
+    .select("id_subcategoria, sc_descrizione, sc_slug");
+  if (erroreSub) {console.error("Errore controllo slug sub:", erroreSub);
+    alert("Impossibile verificare i duplicati delle sottocategorie. Salvataggio annullato.");
+    return false;
+  }
+  // Indicizza i termini già presenti in entrambe le tabelle
+  const esistenti = new Map();
+  function registraSlug(slugEsistente, posizione) {
+    if (!slugEsistente) return;
+    for (const termine of slugEsistente.split(";")) {const chiave = normalizza(termine);
+      if (!chiave) continue;
+      if (!esistenti.has(chiave)) {esistenti.set(chiave, []);}
+      esistenti.get(chiave).push({termine: termine.trim(), posizione});
+    }
+  }
+  for (const c of macro || []) {registraSlug(c.mc_slug, `Macro: ${c.mc_descrizione}`);}
+  for (const s of sub || []) {
+    // Esclude il record corrente durante la modifica
+    if (idSubDaEscludere !== null && String(s.id_subcategoria) === String(idSubDaEscludere)) {continue;}
+    registraSlug(s.sc_slug, `Sub: ${s.sc_descrizione}`);
+  }
+  // Confronta i nuovi termini con quelli già presenti
+  for (const termine of terminiNuovi) {
+    const chiave = normalizza(termine);
+    const trovati = esistenti.get(chiave) || [];
+    if (trovati.length > 0) {
+      if (!duplicati.has(chiave)) {duplicati.set(chiave, {termine, presentiIn: []});}
+      const voce = duplicati.get(chiave);
+      for (const trovato of trovati) {if (!voce.presentiIn.includes(trovato.posizione)) {voce.presentiIn.push(trovato.posizione);}}
+    }
+  }
+  // Mostra tutti i conflitti in un unico avviso
+  const conflitti = [...duplicati.values()].filter(voce => voce.presentiIn.length > 0);
+  if (conflitti.length > 0) {
+    const messaggio = conflitti.map(voce => `• "${voce.termine}"\n  Già presente in:\n  - ${voce.presentiIn.join("\n  - ")}`).join("\n\n");
+    alert("Salvataggio annullato: trovati termini duplicati.\n\n" + messaggio);
+    return false;
+  }
+  return true;
+}
+  
+
 /* SAVE */
 async function save() {
   if (!sc_descrizione.value.trim()) {
@@ -306,6 +374,9 @@ async function save() {
     sc_descrizione.focus();
     return false;
   }
+  // Controllo prima di qualsiasi INSERT o UPDATE
+  const slugValido = await controllaDuplicatiSlug(sc_slug.value.trim(), isNew ? null : id);
+  if (!slugValido) return false;
   const payload = {
     sc_descrizione: sc_descrizione.value.trim(),
     sc_slug: sc_slug.value.trim(),
