@@ -166,7 +166,9 @@ Category
 <div class="card">
 <div class="section-title">Description</div>
 <input id="sc_descrizione" oninput="markDirty()">
-<div class="section-title">Notes</div>
+  <div class="section-title">Slug / Termini di ricerca</div>
+  <textarea id="sc_slug" oninput="markDirty()" placeholder="Es. concerto; concerti; musica dal vivo"></textarea>
+  <div class="section-title">Notes</div>
 <textarea id="sc_note" oninput="markDirty()"></textarea>
 <div class="section-title">Icon</div>
 <input id="sc_icona" oninput="updateIcon();markDirty()">
@@ -225,6 +227,7 @@ async function load(){
   if(!data)return;
   original=JSON.stringify(data);
   sc_descrizione.value=data.sc_descrizione||"";
+  sc_slug.value=data.sc_slug||"";
   sc_note.value=data.sc_note||"";
   sc_icona.value=data.sc_icona||"";
   sc_colore.value=data.sc_colore||"#ffffff";
@@ -284,6 +287,7 @@ window.updateColor=function(){
 window.markDirty=function(){
   const current=JSON.stringify({
     sc_descrizione:sc_descrizione.value,
+    sc_slug:sc_slug.value,
     sc_note:sc_note.value,
     sc_icona:sc_icona.value,
     sc_colore:sc_colore.value,
@@ -304,6 +308,7 @@ async function save() {
   }
   const payload = {
     sc_descrizione: sc_descrizione.value.trim(),
+    sc_slug: sc_slug.value.trim(),
     sc_note: sc_note.value.trim(),
     sc_icona: sc_icona.value.trim(),
     sc_colore: sc_colore.value,
