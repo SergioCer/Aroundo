@@ -944,6 +944,8 @@ async function confirmReconciliation() {
   
 /* ORDINAMENTO EVENTI */
 function sortEvents() {
+  const filtro = filterComuni.value;
+  const eventiFiltrati = loadedEvents.filter(evento => filtraEventoPerComune(evento, comuniMap, filtro));
   const getDate = (row) => {
     const schema = row.se_schema || {};
     return schema.startDate || schema.data?.date || "";
@@ -952,7 +954,7 @@ const getPlace = (row) => {
   const schema = row.se_schema || {};
   return value(schema.addressLocality) || "";
 };
-  loadedEvents.sort((a, b) => {
+  eventiFiltrati.sort((a, b) => {
     const dateA = getDate(a);
     const dateB = getDate(b);
     const placeA = getPlace(a);
@@ -988,10 +990,10 @@ const getPlace = (row) => {
     }
     return sortAscending ? result : -result;
   });
-  const parentRow = loadedEvents.find(row => String(row.id_site_event) === reconciliationParentId);
-  const childRows = loadedEvents.filter(row => reconciliationChildIds.has(String(row.id_site_event)));
+  const parentRow = eventiFiltrati.find(row => String(row.id_site_event) === reconciliationParentId);
+  const childRows = eventiFiltrati.filter(row => reconciliationChildIds.has(String(row.id_site_event)));
   const selectedIds = new Set([ ...(reconciliationParentId !== null ? [reconciliationParentId] : []), ...reconciliationChildIds]);
-  const normalRows = loadedEvents.filter(row => !selectedIds.has(String(row.id_site_event)));
+  const normalRows = eventiFiltrati.filter(row => !selectedIds.has(String(row.id_site_event)));
 // Riconciliazione: fuori dall'area che scorre
 document.getElementById("reconciliation").innerHTML = parentRow
     ? `<section class="reconciliation-section"><h2>Riconciliazione</h2><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>PADRE</h3>
@@ -1027,6 +1029,7 @@ document.getElementById("sortDirection").addEventListener("click", () => {
   sortEvents();
 });
 
+filterComuni.addEventListener("change", sortEvents);
   
 document.getElementById("suggestBtn").addEventListener("click", () => {
   suggestReconciliation();
