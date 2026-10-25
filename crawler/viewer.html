@@ -1031,7 +1031,13 @@ document.getElementById("sortDirection").addEventListener("click", () => {
   sortEvents();
 });
 
-filterComuni.addEventListener("change", sortEvents);
+filterComuni.addEventListener("change", () => {
+  suggestedGroupKeys.clear();
+  const suggestBtn = document.getElementById("suggestBtn");
+  suggestBtn.textContent = "Suggerisci";
+  suggestBtn.disabled = false;
+  sortEvents();
+});
   
 document.getElementById("suggestBtn").addEventListener("click", () => {suggestReconciliation();});
 
@@ -1213,7 +1219,7 @@ function suggestReconciliation() {
   const nextGroup = groups.find(group => !suggestedGroupKeys.has(group.key));
   const button = document.getElementById("suggestBtn");
   const status = document.getElementById("analysisStatus");
-  if (!nextGroup) {button.textContent = "NON HO PROPOSTE"; button.disabled = true; if (status) status.textContent = ""; return;}
+  if (!nextGroup) {button.textContent = "Non ho proposte"; button.disabled = true; if (status) status.textContent = ""; return;}
   // Ricordiamo il gruppo proposto nella sessione corrente, per passare alla proposta successiva al prossimo clic.
   suggestedGroupKeys.add(nextGroup.key);
   // Inizializza una nuova proposta senza salvare nulla.
