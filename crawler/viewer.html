@@ -440,6 +440,7 @@ body{
     <option value="attivi">Attivi</option>
     <option value="previsti">Previsti</option>
     <option value="attivi-previsti">Attivi + Previsti</option>
+    <option value="esclusi">Esclusi</option>
   </select>
   <button id="suggestBtn" class="schema-button" type="button">Suggerisci</button>
 </div>
@@ -489,7 +490,11 @@ function filtraEventoPerComune(evento, comuniMap, filtro) {
   if (filtro === "attivi") {return comune.co_attivato != null && dataEvento >= comune.co_attivato;}
   if (filtro === "previsti") {return comune.co_previsto != null && dataEvento >= comune.co_previsto;}
   if (filtro === "attivi-previsti") {return ((comune.co_attivato != null && dataEvento >= comune.co_attivato) || (comune.co_previsto != null && dataEvento >= comune.co_previsto));}
-  return true;
+  if (filtro === "esclusi") {
+  const attivo = comune.co_attivato != null && dataEvento >= comune.co_attivato;
+  const previsto = comune.co_previsto != null && dataEvento >= comune.co_previsto;
+  return !attivo && !previsto;
+  }return true;
 }
   
 /* UTILITÀ */
