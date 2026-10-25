@@ -691,8 +691,7 @@ function eventCard(row, index, reconciliationRole = null){
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
-      <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)} - 
-      <span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
+      <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}<span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')">Delete</button>
