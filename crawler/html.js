@@ -370,7 +370,8 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
   const subPrimary = subMatches[0] || null;
   if (subPrimary && totalSubMatches > 0) {subcategoryPercentuale = subPrimary.count / totalSubMatches * 100;}
   /* FORZA CON PERCENTUALI */
-  strength = `${strength} - cat. ${categoryPercentuale !== null ? Math.round(categoryPercentuale) + "%" : "-"} - sub. ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "-"}`;
+  strength = `${strength} - cat. ${categoryPercentuale !== null ? Math.round(categoryPercentuale) + 
+    "%" : "n.d."} - sub. ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "n.d."}`;
   return {
     category: primary?.descrizione || null,
     categoryId: primary?.id ?? null,
