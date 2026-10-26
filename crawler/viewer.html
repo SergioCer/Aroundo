@@ -644,8 +644,9 @@ function formatCategoryMatches(matches, field) {
     const categoryPrefix = field === "subMatches"
       ? `(${item.categoriaId}) - `
       : "";
-    return `<div class="category-match">${categoryPrefix}(${escapeHtml(String(item.id))}) ${escapeHtml(item.descrizione || "")} — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;
-  }).join("");
+    return `<div class="category-match">${categoryPrefix}(${escapeHtml(String(item.id))}) ${escapeHtml(item.descrizione || "")}
+      — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;
+    }).join("");
 }
              
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
