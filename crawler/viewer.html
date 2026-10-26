@@ -607,11 +607,9 @@ const schemaFields = [
   /* CLASSIFICAZIONE */
   "strength",       // Forza della classificazione
   "id_categoria",   // ID della categoria riconosciuta
-  "macroCount",     // conteggio macroCategorie
   "category",       // Caegria da json
   "macroMatches",   // corrispondenze macroCategorie
   "id_subcategoria",// ID della subcategoria
-  "subCount",       // conteggio subCategorie
   "subcategory",    // subcategoria
   "subMatches",     // corrispondenze subCategorie
   /* ANALISI DELL'ESTRAZIONE */
@@ -637,13 +635,16 @@ const schemaFields = [
 ];
 
 /* FORMATTA MATCH DELLE CATEGORIE */
-function formatCategoryMatches(matches) {
+function formatCategoryMatches(matches, field) {
   if (!Array.isArray(matches)) {return escapeHtml(formatSchemaValue(matches));}
   return matches.map(item => {
     const terms = (item.terms || [])
       .map(term => `${term.term}: ${term.count}`)
       .join("; ");
-    return `<div class="category-match">(${escapeHtml(String(item.id))}) ${escapeHtml(item.descrizione || "")} — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;
+    const categoryPrefix = field === "subMatches"
+      ? `(${item.categoriaId}) - `
+      : "";
+    return `<div class="category-match">${categoryPrefix}(${escapeHtml(String(item.id))}) ${escapeHtml(item.descrizione || "")} — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;
   }).join("");
 }
              
@@ -666,10 +667,10 @@ function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
         unavailable ? "reconciliation-field-unavailable" : ""].filter(Boolean).join(" ");
       const dataAttributes = isChildField ? `data-reconciliation-field="${escapeHtml(field)}" data-child-id="${escapeHtml(rowId)}"
         title="${unavailable  ? "Deseleziona prima la fonte attuale di questo campo" : "Clicca per selezionare o deselezionare questo valore"}"`: "";
-      return `<div class="${classes}" ${dataAttributes}><div class="schema-name">${escapeHtml(field)}</div>
+      return `<div class="${classes}" ${dataAttributes}><div class="schema-name">${escapeHtml(field)} = </div>
         <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(
           field === "macroMatches" || field === "subMatches" ? "" : formatSchemaValue(v)) + (
-          field === "macroMatches" || field === "subMatches" ? formatCategoryMatches(v) : "") : "null"}</div>
+          field === "macroMatches" || field === "subMatches" ? formatCategoryMatches(v, field) : "") : "null"}</div>
         </div>`;}).join("")}</div>`;
 }
 
