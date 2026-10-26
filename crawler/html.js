@@ -344,7 +344,7 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     })
     .sort((a, b) => b.count - a.count);
   /* PERCENTUALI E ORDINAMENTO MACRO-MATCHES */
-  for (const item of macroMatches) {item.percentuale = totalMatches > 0 ? item.count / totalMatches * 100: 0;}
+  for (const item of macroMatches) {item.percentuale = totalMatches > 0 ? Math.round(item.count / totalMatches * 100): 0;}
   macroMatches.sort((a, b) => b.count - a.count);
   const primary = categories[0];
   const alternatives = categories.slice(1);
@@ -374,7 +374,7 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
   }
   /* PERCENTUALI E ORDINAMENTO SUB-MATCHES */
   const totalSubMatches = subMatches.reduce((sum, item) => sum + item.count, 0);
-  for (const item of subMatches) {item.percentuale = totalSubMatches > 0 ? item.count / totalSubMatches * 100: 0;}
+  for (const item of subMatches) {item.percentuale = totalSubMatches > 0 ? Math.round(item.count / totalSubMatches * 100): 0;}
   subMatches.sort((a, b) => b.count - a.count);
   /* SUBCATEGORIA PRINCIPALE */
   const subPrimary = subMatches[0] || null;
