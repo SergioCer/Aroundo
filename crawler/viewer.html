@@ -189,6 +189,7 @@ body{
   display:inline;
   color:#333;
   word-break:break-word
+  white-space: pre-wrap;
 }
 
 .empty{
@@ -631,7 +632,20 @@ const schemaFields = [
   "url",
   "sameAs"
 ];
-  
+
+
+/* FORMATTA MATCH DELLE CATEGORIE */
+function formatCategoryMatches(matches) {
+  if (!Array.isArray(matches)) {return formatSchemaValue(matches);}
+  return matches.map(item => {
+    const terms = (item.terms || [])
+      .map(term => `${term.term}: ${term.count}`)
+      .join("; ");
+    return `(${item.id}) ${item.descrizione} — ${Math.round(item.percentuale)}%${terms ? ` — ${terms}` : ""}`;
+  }).join("\n");
+}
+
+             
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
   Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
@@ -652,7 +666,9 @@ function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
       const dataAttributes = isChildField ? `data-reconciliation-field="${escapeHtml(field)}" data-child-id="${escapeHtml(rowId)}"
         title="${unavailable  ? "Deseleziona prima la fonte attuale di questo campo" : "Clicca per selezionare o deselezionare questo valore"}"`: "";
       return `<div class="${classes}" ${dataAttributes}><div class="schema-name">${escapeHtml(field)}</div>
-        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(formatSchemaValue(v)) : "null"}</div></div>`;}).join("")}</div>`;
+        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(
+          field === "macroMatches" || field === "subMatches" ? formatCategoryMatches(v) : formatSchemaValue(v)) : "null"}</div>
+        </div>`;}).join("")}</div>`;
 }
 
 /* SCHEDA EVENTO */
