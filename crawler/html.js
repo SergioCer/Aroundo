@@ -300,6 +300,7 @@ function containsCategoryTerm(text, term) {
 
 
 
+
 /* CATEGORIA DA DIZIONARIO DB */
 function extractCategory(text, dictionary) {if (!text || !dictionary) {return null;}
   const normalizedText = normalizeCategoryTerm(text);
@@ -318,24 +319,11 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     for (const term of macro.terms) {const count = countOccurrences(term);
       if (count > 0) {terms.push({term, count});}
     }
+    terms.sort((a, b) => b.count - a.count);
     const total = terms.reduce((sum, item) => sum + item.count, 0);
-    if (total > 0) {macroMatches.push({
-        id: macro.id,
-        descrizione: macro.descrizione,
-        slug: macro.slug,
-        count: total,
-        terms
-      });
-      if (!categoryTotals.has(macro.id)) {categoryTotals.set(macro.id, {
-          id: macro.id,
-          descrizione: macro.descrizione,
-          slug: macro.slug,
-          count: 0,
-          macroCount: 0,
-          subCount: 0,
-          terms: []
-        });
-      }
+    if (total > 0) {macroMatches.push({id: macro.id, descrizione: macro.descrizione, count: total, terms});
+      if (!categoryTotals.has(macro.id)) {
+        categoryTotals.set(macro.id, {id: macro.id, descrizione: macro.descrizione, slug: macro.slug, count: 0, macroCount: 0, subCount: 0, terms: []});}
       const category = categoryTotals.get(macro.id);
       category.count += total;
       category.macroCount += total;
@@ -355,14 +343,17 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
         percentuale: totalMatches > 0 ? category.count / totalMatches * 100: 0};
     })
     .sort((a, b) => b.count - a.count);
+  /* PERCENTUALI E ORDINAMENTO MACRO-MATCHES */
+  for (const item of macroMatches) {item.percentuale = totalMatches > 0 ? item.count / totalMatches * 100: 0;}
+  macroMatches.sort((a, b) => b.count - a.count);
   const primary = categories[0];
   const alternatives = categories.slice(1);
-  const alternativeSignificative = alternatives.some(category => category.percentuale >= 20);
+  const alternativaSignificativa = alternatives.some(category => category.percentuale >= 20);
   /* FORZA DEL RISULTATO */
   let strength = "dubbia";
   if (primary.count >= 2) {
     if (primary.percentuale >= 80) {strength = "certa";
-    } else if (primary.percentuale >= 60 && !alternativeSignificative
+    } else if (primary.percentuale >= 60 && !alternativaSignificativa
     ) {strength = "confermata";
     } else if (primary.percentuale >= 50) {strength = "probabile";
     }
@@ -375,36 +366,25 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     for (const item of dictionary.sub) {
       if (item.categoriaId !== primary.id) {continue;}
       const terms = [];
-      for (const term of item.terms) {
-        const count = countOccurrences(term);
-        if (count > 0) {terms.push({term, count});}
-      }
+      for (const term of item.terms) {const count = countOccurrences(term); if (count > 0) {terms.push({term, count});}}
+      terms.sort((a, b) => b.count - a.count);
       const total = terms.reduce((sum, item) => sum + item.count, 0);
-      if (total > 0) {subMatches.push({
-          id: item.id,
-          categoriaId: item.categoriaId,
-          descrizione: item.descrizione,
-          slug: item.slug,
-          count: total,
-          terms
-        });
-      }
+      if (total > 0) {subMatches.push({id: item.id, categoriaId: item.categoriaId, descrizione: item.descrizione, count: total, terms});}
     }
   }
-  /* SUBCATEGORIA PRINCIPALE */
-  const subPrimary = subMatches.sort((a, b) => b.count - a.count)[0] || null;
+  /* PERCENTUALI E ORDINAMENTO SUB-MATCHES */
   const totalSubMatches = subMatches.reduce((sum, item) => sum + item.count, 0);
-  if (subPrimary && totalSubMatches > 0) {
-    subcategoryPercentuale = subPrimary.count / totalSubMatches * 100;
-  }
+  for (const item of subMatches) {item.percentuale = totalSubMatches > 0 ? item.count / totalSubMatches * 100: 0;}
+  subMatches.sort((a, b) => b.count - a.count);
+  /* SUBCATEGORIA PRINCIPALE */
+  const subPrimary = subMatches[0] || null;
+  if (subPrimary && totalSubMatches > 0) {subcategoryPercentuale = subPrimary.count / totalSubMatches * 100;}
   /* FORZA CON PERCENTUALI */
   strength = `${strength} - cat. ${Math.round(categoryPercentuale)}% - sub. ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "-"}`;
   return {
     category: primary.descrizione,
-    categorySlug: primary.slug,
     categoryId: primary.id,
     subcategory: subPrimary?.descrizione || null,
-    subcategorySlug: subPrimary?.slug || null,
     subcategoryId: subPrimary?.id || null,
     macroMatches,
     subMatches,
@@ -415,7 +395,6 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     strength
   };
 }
-
 
 /* LUOGO */
 function extractLocation(text) {
@@ -652,8 +631,6 @@ const internal = {
   id_categoria: categoryData.categoryId ?? null,
   id_subcategoria: categoryData.subcategoryId ?? null,
   subcategory: categoryData.subcategory ?? null,
-  subcategorySlug: categoryData.subcategorySlug ?? null,
-  categorySlug: categoryData.categorySlug ?? null,
   macroMatches: categoryData.macroMatches ?? [],
   subMatches: categoryData.subMatches ?? [],
   macroCount: categoryData.macroCount ?? 0,
@@ -697,8 +674,6 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     id_categoria: categoryData.categoryId ?? null,
     id_subcategoria: categoryData.subcategoryId ?? null,
     subcategory: categoryData.subcategory ?? null,
-    subcategorySlug: categoryData.subcategorySlug ?? null,
-    categorySlug: categoryData.categorySlug ?? null,
     macroMatches: categoryData.macroMatches ?? [],
     subMatches: categoryData.subMatches ?? [],
     macroCount: categoryData.macroCount ?? 0,
@@ -713,8 +688,7 @@ const SCHEMA_FIELDS = [
   // Localizzazione scomposta
   "location", "address", "addressLocality", "postalCode", "addressRegion", "addressCountry",
   "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
-  "category", "strength", "id_categoria", "categorySlug", 
-  "id_subcategoria", "subcategory", "subcategorySlug",
+  "strength", "category", "id_categoria", "subcategory", "id_subcategoria",
   "macroCount", "macroMatches", "subCount", "subMatches",
   "fundamentals", "reinforcements", "signals",
   "id_site_page", "id_comune", "classification",
