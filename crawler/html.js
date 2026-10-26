@@ -298,9 +298,6 @@ function containsCategoryTerm(text, term) {
   return new RegExp(`\\b${escaped}\\b`, "i").test(normalizedText);
 }
 
-
-
-
 /* CATEGORIA DA DIZIONARIO DB */
 function extractCategory(text, dictionary) {if (!text || !dictionary) {return null;}
   const normalizedText = normalizeCategoryTerm(text);
@@ -323,15 +320,12 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     const total = terms.reduce((sum, item) => sum + item.count, 0);
     if (total > 0) {macroMatches.push({id: macro.id, descrizione: macro.descrizione, count: total, terms});
       if (!categoryTotals.has(macro.id)) {
-        categoryTotals.set(macro.id, {id: macro.id, descrizione: macro.descrizione, slug: macro.slug, count: 0, macroCount: 0, subCount: 0, terms: []});}
+        categoryTotals.set(macro.id, {id: macro.id, descrizione: macro.descrizione, slug: macro.slug, count: 0, terms: []});}
       const category = categoryTotals.get(macro.id);
       category.count += total;
-      category.macroCount += total;
       category.terms.push(...terms.map(item => ({ ...item, origine: "macro"})));
     }
   }
-  /* NESSUNA MACRO RICONOSCIUTA */
-  if (macroMatches.length === 0) {return null;}
   /* PERCENTUALI PER MACRO-CATEGORIA */
   const totalMatches = [...categoryTotals.values()]
     .reduce((sum, category) => sum + category.count, 0);
@@ -346,12 +340,12 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
   /* PERCENTUALI E ORDINAMENTO MACRO-MATCHES */
   for (const item of macroMatches) {item.percentuale = totalMatches > 0 ? Math.round(item.count / totalMatches * 100): 0;}
   macroMatches.sort((a, b) => b.count - a.count);
-  const primary = categories[0];
+  const primary = categories[0] || null;
   const alternatives = categories.slice(1);
   const alternativaSignificativa = alternatives.some(category => category.percentuale >= 20);
   /* FORZA DEL RISULTATO */
   let strength = "dubbia";
-  if (primary.count >= 2) {
+  if (primary && primary.count >= 2) {
     if (primary.percentuale >= 80) {strength = "certa";
     } else if (primary.percentuale >= 60 && !alternativaSignificativa
     ) {strength = "confermata";
@@ -359,18 +353,14 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
     }
   }
   /* PERCENTUALE MACRO-CATEGORIA */
-  const categoryPercentuale = primary.percentuale;
+  const categoryPercentuale = primary?.percentuale ?? null;
   let subcategoryPercentuale = null;
-  /* SOTTOCATEGORIE DELLA MACRO RICONOSCIUTA */
-  if (strength !== "dubbia") {
-    for (const item of dictionary.sub) {
-      if (item.categoriaId !== primary.id) {continue;}
-      const terms = [];
-      for (const term of item.terms) {const count = countOccurrences(term); if (count > 0) {terms.push({term, count});}}
-      terms.sort((a, b) => b.count - a.count);
-      const total = terms.reduce((sum, item) => sum + item.count, 0);
-      if (total > 0) {subMatches.push({id: item.id, categoriaId: item.categoriaId, descrizione: item.descrizione, count: total, terms});}
-    }
+  /* RICONOSCIMENTO DI TUTTE LE SOTTOCATEGORIE */
+  for (const item of dictionary.sub) {const terms = [];
+    for (const term of item.terms) {const count = countOccurrences(term); if (count > 0) {terms.push({term, count});}}
+    terms.sort((a, b) => b.count - a.count);
+    const total = terms.reduce((sum, item) => sum + item.count, 0);
+    if (total > 0) {subMatches.push({id: item.id, categoriaId: item.categoriaId, descrizione: item.descrizione, count: total, terms});}
   }
   /* PERCENTUALI E ORDINAMENTO SUB-MATCHES */
   const totalSubMatches = subMatches.reduce((sum, item) => sum + item.count, 0);
@@ -380,18 +370,16 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
   const subPrimary = subMatches[0] || null;
   if (subPrimary && totalSubMatches > 0) {subcategoryPercentuale = subPrimary.count / totalSubMatches * 100;}
   /* FORZA CON PERCENTUALI */
-  strength = `${strength} - cat. ${Math.round(categoryPercentuale)}% - sub. ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "-"}`;
+  strength = `${strength} - cat. ${categoryPercentuale !== null ? Math.round(categoryPercentuale) + "%" : "-"} - sub. ${subcategoryPercentuale !== null ? Math.round(subcategoryPercentuale) + "%" : "-"}`;
   return {
-    category: primary.descrizione,
-    categoryId: primary.id,
+    category: primary?.descrizione || null,
+    categoryId: primary?.id ?? null,
     subcategory: subPrimary?.descrizione || null,
-    subcategoryId: subPrimary?.id || null,
+    subcategoryId: subPrimary?.id ?? null,
     macroMatches,
     subMatches,
     categories,
     totalMatches,
-    macroCount: macroMatches.length,
-    subCount: subMatches.length,
     strength
   };
 }
@@ -633,8 +621,6 @@ const internal = {
   subcategory: categoryData.subcategory ?? null,
   macroMatches: categoryData.macroMatches ?? [],
   subMatches: categoryData.subMatches ?? [],
-  macroCount: categoryData.macroCount ?? 0,
-  subCount: categoryData.subCount ?? 0
 };
 const source = {
   "@context": "https://schema.org",
@@ -676,8 +662,6 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     subcategory: categoryData.subcategory ?? null,
     macroMatches: categoryData.macroMatches ?? [],
     subMatches: categoryData.subMatches ?? [],
-    macroCount: categoryData.macroCount ?? 0,
-    subCount: categoryData.subCount ?? 0
   };
   return normalizeSchemaEvent(source, internal);
 }
@@ -689,7 +673,7 @@ const SCHEMA_FIELDS = [
   "location", "address", "addressLocality", "postalCode", "addressRegion", "addressCountry",
   "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
   "strength", "category", "id_categoria", "subcategory", "id_subcategoria",
-  "macroCount", "macroMatches", "subCount", "subMatches",
+  "macroMatches", "subMatches",
   "fundamentals", "reinforcements", "signals",
   "id_site_page", "id_comune", "classification",
   "subEvent", "superEvent", "eventAttendanceMode", "eventStatus", "eventSchedule", "previousStartDate",
