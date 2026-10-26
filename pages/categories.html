@@ -283,11 +283,8 @@ body{
 
 <div class="topbar">
     <button class="back-btn" onclick="history.back()">←</button>
-    <div class="page-title">
-        Categories
-    </div>
+    <div class="page-title">Categories</div>
 </div>
-
 <div id="categorieContainer"></div>
 
 <!-- DIALOG MODIFICA CATEGORIA -->
@@ -335,18 +332,14 @@ function getSubcategorie(id_categoria){
 function render(){
     const container=document.getElementById("categorieContainer");
     container.innerHTML="";
-
     categorie.forEach(c=>{
         const list=getSubcategorie(c.id_categoria);
         const open=expanded.has(c.id_categoria);
-
         const box=document.createElement("div");
         box.className="category-box";
         box.dataset.id=c.id_categoria;
-
         const header=document.createElement("div");
         header.className="category-header";
-
         header.innerHTML=`
         <span class="drag-handle material-symbols-outlined">drag_indicator</span>
         <span class="arrow">${open?"▼":"▶"}</span>
@@ -358,59 +351,39 @@ function render(){
         </span>
         <button class="icon-btn add-btn" onclick="event.stopPropagation();openAdd(${c.id_categoria})">+</button>
         <button class="icon-btn edit-btn" onclick="event.stopPropagation();openEdit(${c.id_categoria})">✎</button>`;
-
         header.onclick=()=>{
-            if(expanded.has(c.id_categoria)){
-                expanded.clear();
-            }else{
-                expanded.clear();
-                expanded.add(c.id_categoria);
-            }
+            if(expanded.has(c.id_categoria)){expanded.clear();
+            }else{expanded.clear(); expanded.add(c.id_categoria);}
             render();
         };
-
         box.appendChild(header);
-
-        if(open){
-            const panel=document.createElement("div");
+        if(open){const panel=document.createElement("div");
             panel.className="category-panel";
-
             list.forEach(s=>{
                 const row=document.createElement("div");
                 row.className="subcategory-row";
                 row.dataset.id=s.id_subcategoria;
-
                 row.innerHTML=`
                 <span class="drag-handle material-symbols-outlined">drag_indicator</span>
-                <span class="subcategory-icons">
-                    <span class="material-symbols-outlined">${s.sc_icona||""}</span>
-                </span>
+                <span class="subcategory-icons"><span class="material-symbols-outlined">${s.sc_icona||""}</span></span>
                 <span class="category-info">
                     <span class="subcategory-name">${s.sc_descrizione}</span>
                     <span class="category-slug">${s.sc_slug||""}</span>
                 </span>
                 <span class="subcategory-state ${s.sc_attiva?"on":"off"}">${s.sc_attiva?"●":"✕"}</span>`;
-
-                row.onclick=()=>{
-                    window.location.href=`category.html?id=${s.id_subcategoria}`;
-                };
-
+                row.onclick=()=>{window.location.href=`category.html?id=${s.id_subcategoria}`;};
                 if(s.sc_note){
                     const note=document.createElement("div");
                     note.className="subcategory-note";
                     note.textContent=s.sc_note;
                     panel.appendChild(note);
                 }
-
                 panel.appendChild(row);
             });
-
             box.appendChild(panel);
         }
-
         container.appendChild(box);
     });
-
     initSortable();
 }
 
@@ -420,9 +393,78 @@ function initSortable(){
     document.querySelectorAll(".category-panel").forEach(panel=>{new Sortable(panel,{animation:150,handle:".drag-handle",draggable:".subcategory-row",onEnd:async()=>{const rows=[...panel.querySelectorAll(".subcategory-row")];for(let i=0;i<rows.length;i++){await supabase.from("subcategorie").update({sc_ordine:i+1}).eq("id_subcategoria",rows[i].dataset.id);}load();}});});
 }
 
-window.openAdd=(id_categoria)=>{
-    window.location.href=`category.html?new=1&id_categoria=${id_categoria}`;
-};
+/* CONTROLLO DUPLICATI SLUG */
+async function controllaDuplicatiSlug(slug, idSubDaEscludere = null, idMacroDaEscludere = null) {
+    const terminiNuovi = slug
+    .split(";")
+    .map(t => t.trim())
+    .filter(Boolean);
+  const normalizza = termine => termine.toLocaleLowerCase().trim();
+  const duplicati = new Map();
+  // Controlla anche termini ripetuti nello slug che stai salvando
+  const conteggioNuovi = new Map();
+  for (const termine of terminiNuovi) {
+    const chiave = normalizza(termine);
+    conteggioNuovi.set(chiave, (conteggioNuovi.get(chiave) || 0) + 1);
+    if (!duplicati.has(chiave)) {duplicati.set(chiave, {termine, presentiIn: []});}
+    if (conteggioNuovi.get(chiave) === 2) {duplicati.get(chiave).presentiIn.push("Ripetuto nello slug che stai salvando");}
+  }
+  // Legge tutti gli slug delle macro categorie
+  const { data: macro, error: erroreMacro } = await supabase
+    .from("categorie")
+    .select("id_categoria, mc_descrizione, mc_slug");
+  if (erroreMacro) {console.error("Errore controllo slug macro:", erroreMacro);
+    alert("Impossibile verificare i duplicati delle macro categorie. Salvataggio annullato.");
+    return false;
+  }
+  // Legge tutti gli slug delle sottocategorie
+  const { data: sub, error: erroreSub } = await supabase
+    .from("subcategorie")
+    .select("id_subcategoria, sc_descrizione, sc_slug");
+  if (erroreSub) {console.error("Errore controllo slug sub:", erroreSub);
+    alert("Impossibile verificare i duplicati delle sottocategorie. Salvataggio annullato.");
+    return false;
+  }
+  // Indicizza i termini già presenti in entrambe le tabelle
+  const esistenti = new Map();
+  function registraSlug(slugEsistente, posizione) {
+    if (!slugEsistente) return;
+    for (const termine of slugEsistente.split(";")) {const chiave = normalizza(termine);
+      if (!chiave) continue;
+      if (!esistenti.has(chiave)) {esistenti.set(chiave, []);}
+      esistenti.get(chiave).push({termine: termine.trim(), posizione});
+    }
+  }
+for (const c of macro || []) {
+    if (idMacroDaEscludere !== null && String(c.id_categoria) === String(idMacroDaEscludere)) {continue;}
+    registraSlug(c.mc_slug, `Macro: ${c.mc_descrizione}`);
+  }
+  for (const s of sub || []) {
+    // Esclude il record corrente durante la modifica
+    if (idSubDaEscludere !== null && String(s.id_subcategoria) === String(idSubDaEscludere)) {continue;}
+    registraSlug(s.sc_slug, `Sub: ${s.sc_descrizione}`);
+  }
+  // Confronta i nuovi termini con quelli già presenti
+  for (const termine of terminiNuovi) {
+    const chiave = normalizza(termine);
+    const trovati = esistenti.get(chiave) || [];
+    if (trovati.length > 0) {
+      if (!duplicati.has(chiave)) {duplicati.set(chiave, {termine, presentiIn: []});}
+      const voce = duplicati.get(chiave);
+      for (const trovato of trovati) {if (!voce.presentiIn.includes(trovato.posizione)) {voce.presentiIn.push(trovato.posizione);}}
+    }
+  }
+  // Mostra tutti i conflitti in un unico avviso
+  const conflitti = [...duplicati.values()].filter(voce => voce.presentiIn.length > 0);
+  if (conflitti.length > 0) {
+    const messaggio = conflitti.map(voce => `• "${voce.termine}"\n  Già presente in:\n  - ${voce.presentiIn.join("\n  - ")}`).join("\n\n");
+    alert("Salvataggio annullato: trovati termini duplicati.\n\n" + messaggio);
+    return false;
+  }
+  return true;
+}
+
+window.openAdd=(id_categoria)=>{window.location.href=`category.html?new=1&id_categoria=${id_categoria}`;};
 
 window.openEdit=(id_categoria)=>{
     const c=categorie.find(x=>x.id_categoria==id_categoria);
@@ -432,16 +474,15 @@ window.openEdit=(id_categoria)=>{
     document.getElementById("categoryDialog").style.display="flex";
 };
 
-window.closeCategory=()=>{
-    document.getElementById("categoryDialog").style.display="none";
-    currentCategoria=null;
-};
+window.closeCategory=()=>{document.getElementById("categoryDialog").style.display="none"; currentCategoria=null;};
 
 window.saveCategory=async()=>{
     const descrizione=document.getElementById("categoryDescrizione").value.trim();
     const slug=document.getElementById("categorySlug").value.trim();
     if(!descrizione){alert("La descrizione è obbligatoria.");return;}
     if(!slug){alert("Lo slug è obbligatorio.");return;}
+    const slugValido = await controllaDuplicatiSlug(slug, null, currentCategoria);
+    if (!slugValido) return;
     const {error}=await supabase.from("categorie").update({mc_descrizione:descrizione, mc_slug:slug}).eq("id_categoria",currentCategoria);
     if(error){alert("Errore nel salvataggio: "+error.message);return;}
     closeCategory();
