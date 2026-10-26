@@ -643,7 +643,7 @@ return normalizeSchemaEvent(source, internal);
 
 /* CONVERSIONE JSON-LD */
 function toSchemaJsonEvent(page, parsed, categoryDictionary) {
-  const source = { ...parsed, ...splitSchemaLocation(parsed.location)};
+  const source = { ...splitSchemaLocation(parsed.location), ...parsed };
   // Normalizzazione dell'organizzatore
   if (source.organizer != null) {const organizerName = typeof source.organizer === "string" ? source.organizer.trim() 
     : typeof source.organizer === "object" && !Array.isArray(source.organizer) ? (typeof source.organizer.name === "string" ? source.organizer.name.trim(): ""): "";
