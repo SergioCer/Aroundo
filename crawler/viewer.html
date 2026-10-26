@@ -189,7 +189,6 @@ body{
   display:inline;
   color:#333;
   word-break:break-word
-  white-space: pre-wrap;
 }
 
 .empty{
@@ -416,6 +415,10 @@ body{
   margin: 0;
 }
 
+.category-match {
+  display: block;
+}
+  
 </style>
 </head>
   
@@ -633,18 +636,16 @@ const schemaFields = [
   "sameAs"
 ];
 
-
 /* FORMATTA MATCH DELLE CATEGORIE */
 function formatCategoryMatches(matches) {
-  if (!Array.isArray(matches)) {return formatSchemaValue(matches);}
+  if (!Array.isArray(matches)) {return escapeHtml(formatSchemaValue(matches));}
   return matches.map(item => {
     const terms = (item.terms || [])
       .map(term => `${term.term}: ${term.count}`)
       .join("; ");
-    return `(${item.id}) ${item.descrizione} — ${Math.round(item.percentuale)}%${terms ? ` — ${terms}` : ""}`;
-  }).join("\n");
+    return `<div class="category-match">(${escapeHtml(String(item.id))}) ${escapeHtml(item.descrizione || "")} — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;
+  }).join("");
 }
-
              
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
@@ -667,7 +668,8 @@ function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
         title="${unavailable  ? "Deseleziona prima la fonte attuale di questo campo" : "Clicca per selezionare o deselezionare questo valore"}"`: "";
       return `<div class="${classes}" ${dataAttributes}><div class="schema-name">${escapeHtml(field)}</div>
         <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(
-          field === "macroMatches" || field === "subMatches" ? formatCategoryMatches(v) : formatSchemaValue(v)) : "null"}</div>
+          field === "macroMatches" || field === "subMatches" ? "" : formatSchemaValue(v)) + (
+          field === "macroMatches" || field === "subMatches" ? formatCategoryMatches(v) : "") : "null"}</div>
         </div>`;}).join("")}</div>`;
 }
 
