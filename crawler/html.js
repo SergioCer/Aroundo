@@ -390,10 +390,10 @@ function extractLocation(text) {
   if (!text) return null;
   /* PREFISSI DEI LUOGHI FISICI */
   const locationPrefixes =
-    String.raw`(?:Teatro\b|Cinema\b|Auditorium\b|Sala\b|Villa\b|Castello\b|Museo\b|Casina\b|Chiesa\b|Complesso\b|Palazzo\b|Parco\b|Duomo\b|Cattedrale\b|Basilica\b|Monastero\b|Convento\b|Castello\b|Fortezza\b|Rocca\b|Torre\b|Porto\b|Stadio\b|Arena\b|Anfiteatro\b|Area archeologica\b|Area naturale\b|Riserva naturale\b|Belvedere\b|Vetta\b|Spiaggia\b|Centro storico\b|Centro congressi\b|Polo culturale\b|Giardino\b|Orto botanico\b|Tenuta\b|Baglio\b|Masseria\b|Agriturismo\b|Hotel\b|Rifugio\b)`;
+    String.raw`(?:Teatro\b|Cinema\b|Auditorium\b|Cantieri\b|Sala\b|Villa\b|Castello\b|Museo\b|Casina\b|Chiesa\b|Complesso\b|Palazzo\b|Parco\b|Duomo\b|Cattedrale\b|Basilica\b|Monastero\b|Convento\b|Castello\b|Fortezza\b|Rocca\b|Torre\b|Porto\b|Stadio\b|Arena\b|Anfiteatro\b|Area archeologica\b|Area naturale\b|Riserva naturale\b|Belvedere\b|Vetta\b|Spiaggia\b|Centro storico\b|Centro congressi\b|Polo culturale\b|Giardino\b|Orto botanico\b|Tenuta\b|Baglio\b|Masseria\b|Agriturismo\b|Hotel\b|Rifugio\b)`;
   const patterns = [
-    new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${locationPrefixes}[^.;\n]{2,150})`,"i"),
-    new RegExp(String.raw`\b(${locationPrefixes}[^.;\n]{2,150})`,"i")
+    new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${locationPrefixes}[^.;\n]{2,50})`,"i"),
+    new RegExp(String.raw`\b(${locationPrefixes}[^.;\n]{2,50})`,"i")
   ];
   for (const re of patterns) {
     const m = text.match(re);
@@ -867,9 +867,9 @@ async function processSitePage(page, categoryDictionary, supabase, eventState) {
     eventState.removeKey(oldKey);
     eventState.addKey(key);
     existing.se_schema = schema;
-    console.log(`[ESTRAI] Evento aggiornato: ${page.id_site_page} (${classification})`); return;
+    console.log(`[E] Aggiornato: ${page.id_site_page} (${classification})`); return;
   }
-  if (isDuplicateEvent(schema, eventState.keys)) {console.log(`[ESTRAI] Duplicato ignorato: ${page.id_site_page}`); return;}
+  if (isDuplicateEvent(schema, eventState.keys)) {console.log(`[E] Duplicato: ${page.id_site_page}`); return;}
   const result = await supabase
     .from("site_events")
     .insert({id_site_page: page.id_site_page, se_schema: schema})
@@ -882,7 +882,7 @@ async function processSitePage(page, categoryDictionary, supabase, eventState) {
     se_schema: schema
   });
   eventState.addKey(key);
-  console.log(`[ESTRAI] Evento salvato: ${page.id_site_page} (${classification})`);
+  console.log(`[ESTRAI] Salvato: ${page.id_site_page} (${classification})`);
 }
 
 export async function runAnalysis(supabase) {
