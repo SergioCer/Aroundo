@@ -583,6 +583,14 @@ function cleanBlock(value) {
   return block;
 }
 
+/* PULIZIA LUOGO E INDIRIZZO RISPETTO AL COMUNE */
+function cleanPlaceField(value, city) {
+  if (!value || !city) return value;
+  const escapedCity = city.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(String.raw`(?:\s*[,–—-]?\s*(?:di|a|ad|in|nel|nella|del|della)?\s*)\b${escapedCity}\b[\s\S]*$`,"i");
+  return value.replace(re, "").trim();
+}
+
 /* SEGNALI che vengono recuperati in caso di HTML */
 function analyzeSignals(page, categoryDictionary) {
   const image = extractImage(page.sp_block, page.sp_url);
@@ -599,6 +607,9 @@ function analyzeSignals(page, categoryDictionary) {
   const category = extractCategory(text, categoryDictionary);
   const location = extractLocation(text);
   const address = extractAddress(text);
+  /* Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
+  const location = cleanPlaceField(extractLocation(text), city);
+  const address = cleanPlaceField(extractAddress(text), city);
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
