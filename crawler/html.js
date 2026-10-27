@@ -385,12 +385,15 @@ function extractCategory(text, dictionary) {if (!text || !dictionary) {return nu
   };
 }
 
-/* LUOGO */
+/* Cerca Luogo */
 function extractLocation(text) {
   if (!text) return null;
+  /* PREFISSI DEI LUOGHI FISICI */
+  const locationPrefixes =
+    String.raw`(?:Teatro\b|Cinema\b|Auditorium\b|Sala\b|Villa\b|Castello\b|Museo\b||Casina\b|Chiesa\b|Complesso\b|Palazzo\b|Parco\b|Duomo\b|Cattedrale\b|Basilica\b|Monastero\b|Convento\b|Castello\b|Fortezza\b|Rocca\b|Torre\b|Porto\b|Stadio\b|Arena\b|Anfiteatro\b|Area archeologica\b|Area naturale\b|Riserva naturale\b|Belvedere\b|Vetta\b|Spiaggia\b|Centro storico\b|Centro congressi\b|Polo culturale\b|Giardino\b|Orto botanico\b|Tenuta\b|Baglio\b|Masseria\b|Agriturismo\b|Hotel\b|Rifugio\b)`;
   const patterns = [
-    /\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+((?:Teatro|Cinema|Auditorium|Sala|Piazza|Via|Villa|Castello|Museo|Chiesa|Complesso|Palazzo|Parco|Largo|Contrada)[^.;\n]{2,150})/i,
-    /\b((?:Teatro|Cinema|Auditorium|Sala|Piazza|Via|Villa|Castello|Museo|Chiesa|Complesso|Palazzo|Parco|Largo|Contrada)[^.;\n]{2,150})/i
+    new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${locationPrefixes}[^.;\n]{2,150})`,"i"),
+    new RegExp(String.raw`\b(${locationPrefixes}[^.;\n]{2,150})`,"i")
   ];
   for (const re of patterns) {
     const m = text.match(re);
@@ -406,20 +409,58 @@ function extractLocation(text) {
     if (!value) continue;
     /* CHIUSURA SEMANTICA DEL LUOGO */
     value = value
-      .split(
-        /\s+\b(?:debutta|debutterà|presenta|presenterà|ospita|ospiterà|si\s+svolge|si\s+terrà|si\s+terra|andrà\s+in\s+scena|andra\s+in\s+scena|va\s+in\s+scena|propone|proporrà|accoglie|accoglierà)\b/i
-      )[0]
+      .split(/\s+\b(?:debutta|debutterà|presenta|presenterà|ospita|ospiterà|si\s+svolge|si\s+terrà|si\s+terra|andrà\s+in\s+scena|andra\s+in\s+scena|va\s+in\s+scena|propone|proporrà|accoglie|accoglierà)\b/i)[0]
       .trim();
-    /* NUOVA INFORMAZIONE EDITORIALE
-       Esempio:
-       Museo San Rocco di Trapani la mostra
-       “Il mondo è uno”
-       diventa:
-       Museo San Rocco di Trapani */
+    /* NUOVA INFORMAZIONE EDITORIALE */
     value = value
-      .split(
-        /\s+\b(?:la|il|lo|una|un|una)\s+(?:mostra|rassegna|esposizione|esposizioni|manifestazione|manifestazioni|presentazione|presentazioni|collezione|spettacolo|concerto|evento|iniziativa|serata|performance|personale|collettiva)\b/i
-      )[0]
+      .split(/\s+\b(?:la|il|lo|una|un)\s+(?:mostra|rassegna|esposizione|esposizioni|manifestazione|manifestazioni|presentazione|presentazioni|collezione|spettacolo|concerto|evento|iniziativa|serata|performance|personale|collettiva)\b/i)[0]
+      .trim();
+    /* ALTRE FORMULE EDITORIALI */
+    value = value
+      .split(/\s+\b(?:con|per|durante|in\s+occasione\s+di|dal|dalla|dall['’])\b/i)[0]
+      .trim();
+    /* CHIUSURA DOPO VIRGOLA */
+    value = value
+      .replace(/\s*,\s*(?:dove|qui|con|per|durante|in\s+occasione\s+di)\b[\s\S]*$/i, "")
+      .trim();
+    /* RIMOZIONE EVENTUALI ENTITÀ HTML */
+    value = value
+      .replace(/&ldquo;|&rdquo;|&quot;/gi, "")
+      .replace(/&nbsp;/gi, " ")
+      .trim();
+    if (value && value.length >= 4 && value.length <= 180) {return value;}
+  }
+  return null;
+}
+
+/* Cerca Indirizzo */
+function extractAddress(text) {
+  if (!text) return null;
+    /* Termini di ricerca con prefisso e senza prefisso, '\.' = punto (.), {2,150} compresi tra 2 e 150 chr, [^.;\n] = esclusi . ; e ritorno a capo */
+    const addressPrefixes = String.raw`(?:(?<!\bil\s)Via\b|Piazza\b|P\.zza\b|Viale\b|V\.le\b|Corso\b|C\.so\b|Largo\b|Piazzale\b|P\.le\b|Vicolo\b|Strada\b|Str\.\s*|S\.da\b|S\.S\.\s*|S\.P\.\s*|S\.C\.\s*|Contrada\b|Traversa\b|Salita\b|Discesa\b|Lungomare\b|Rotonda\b|Calata\b|Stradella\b|Prolungamento\b)`;    
+    const patterns = [
+      new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${addressPrefixes}[^.;\n]{2,150})`,"i"),
+      new RegExp(String.raw`\b(${addressPrefixes}[^.;\n]{2,150})`,"i")
+    ];
+  for (const re of patterns) {
+    const m = text.match(re);
+    if (!m) continue;
+    let value = clean(m[1] || m[0]);
+    if (!value) continue;
+    /* RIMUOVE URL E FRAMMENTI EDITORIALI */
+    value = value
+      .replace(/https?:\/\/\S+/gi, "")
+      .replace(/\s+(?:🗓️|📍|🏛️|🏷️|🏢|ℹ️|⚠️).*$/s, "")
+      .replace(/\s+\d{1,2}\s+\w+\s+\d{4}.*$/i, "")
+      .trim();
+    if (!value) continue;
+    /* CHIUSURA SEMANTICA Indirizzo */
+    value = value
+      .split(/\s+\b(?:debutta|debutterà|presenta|presenterà|ospita|ospiterà|si\s+svolge|si\s+terrà|si\s+terra|andrà\s+in\s+scena|andra\s+in\s+scena|va\s+in\s+scena|propone|proporrà|accoglie|accoglierà)\b/i)[0]
+      .trim();
+    /* NUOVA INFORMAZIONE EDITORIALE */
+    value = value
+      .split(/\s+\b(?:la|il|lo|una|un|una)\s+(?:mostra|rassegna|esposizione|esposizioni|manifestazione|manifestazioni|presentazione|presentazioni|collezione|spettacolo|concerto|evento|iniziativa|serata|performance|personale|collettiva)\b/i)[0]
       .trim();
     /* ALTRE FORMULE CHE POSSONO INIZIARE LA DESCRIZIONE */
     value = value
@@ -437,7 +478,7 @@ function extractLocation(text) {
     if (value && value.length >= 4 && value.length <= 180) {return value;}
   }
   return null;
-}
+} 
 
 /* TITOLO */
 function extractTitle(block) {
@@ -542,7 +583,7 @@ function cleanBlock(value) {
   return block;
 }
 
-/* SEGNALI */
+/* SEGNALI che vengono recuperati in caso di HTML */
 function analyzeSignals(page, categoryDictionary) {
   const image = extractImage(page.sp_block, page.sp_url);
   const block = cleanBlock(page.sp_block);
@@ -557,6 +598,7 @@ function analyzeSignals(page, categoryDictionary) {
   const creators = extractCreators(text);
   const category = extractCategory(text, categoryDictionary);
   const location = extractLocation(text);
+  const address = extractAddress(text);
   /* FONDAMENTALI */
   const fundamentals = {titolo: !!title, data: !!date, luogo: !!location || !!city};
   const fundamentalCount = Object.values(fundamentals) .filter(Boolean) .length;
@@ -580,7 +622,7 @@ function analyzeSignals(page, categoryDictionary) {
   /* INCOMPLETO: almeno 2 fondamentali + almeno 1 rafforzativo */
   else if (fundamentalCount >= 2 && reinforcementCount >= 1) {classification = "I";} // Incompleto
   return {text, title, date, times, price, organizer, creators, category,
-    location, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
+    location, address, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
 }
 
 /* CONVERSIONE SCHEMA.ORG */
@@ -588,7 +630,7 @@ function toSchemaEvent(page, s) {
   const startDate = s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
 const locationFields = {
   location: s.location || null, 
-  address: null,
+  address: s.address || null,
   addressLocality: s.city?.co_descrizione ?? null,
   postalCode: s.city?.co_cap ? String(s.city.co_cap): null,
   addressRegion: null,
