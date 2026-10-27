@@ -605,9 +605,7 @@ function analyzeSignals(page, categoryDictionary) {
   const organizer = extractOrganizer(text);
   const creators = extractCreators(text);
   const category = extractCategory(text, categoryDictionary);
-  const location = extractLocation(text);
-  const address = extractAddress(text);
-  /* Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
+  /* Estrae e Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
   const location = cleanPlaceField(extractLocation(text), city);
   const address = cleanPlaceField(extractAddress(text), city);
   /* FONDAMENTALI */
