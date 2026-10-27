@@ -586,6 +586,8 @@ function cleanBlock(value) {
 /* PULIZIA LUOGO E INDIRIZZO RISPETTO AL COMUNE */
 function cleanPlaceField(value, city) {
   if (!value || !city) return value;
+  city = String(city).trim();
+  if (!city) return value;
   const escapedCity = city.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const re = new RegExp(String.raw`(?:\s*[,–—-]?\s*(?:di|a|ad|in|nel|nella|del|della)?\s*)\b${escapedCity}\b[\s\S]*$`,"i");
   return value.replace(re, "").trim();
