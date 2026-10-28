@@ -934,6 +934,7 @@ while (true) {const { data, error } = await supabase
     .from("site_pages")
     .select(`id_site_page, sp_url, sp_date, id_comune, sp_block, comuni (co_descrizione, co_cap)`)
     .not("sp_block", "is", null)
+    .eq("sp_verified", false) // Esclude le pagine riconciliate dalla analisi
     .order("id_site_page", { ascending: true })
     .range(from, from + batchSize - 1);
   if (error) {console.error("[HTML] Errore caricamento pagine:", error); return;}
