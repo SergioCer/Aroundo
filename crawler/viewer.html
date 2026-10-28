@@ -1013,13 +1013,24 @@ document.getElementById("results").innerHTML = `<div class="events-grid"> ${norm
 document.getElementById("status").textContent = String(eventiFiltrati.length);
 }
 
-/* Cancella l'evento selezionato */
+/* Cancella l'evento selezionato e la relativa pagina sorgente */
 async function deleteEvent(id) {
-  const { error } = await supabase
+  // Recupera il riferimento alla pagina prima di eliminare l'evento.
+  const event = loadedEvents.find(row => String(row.id_site_event) === String(id));
+  if (!event) {alert("Evento non trovato"); return;}
+  const pageId = event.id_site_page;
+  // Elimina prima la scheda evento.
+  const { error: eventError } = await supabase
     .from("site_events")
     .delete()
     .eq("id_site_event", id);
-  if (error) {console.error(error); alert("Errore durante l'eliminazione"); return;}
+  if (eventError) {console.error(eventError); alert("Errore durante l'eliminazione dell'evento"); return;}
+  // Elimina la pagina sorgente, se il riferimento è disponibile.
+  if (pageId != null) {const { error: pageError } = await supabase
+      .from("site_pages")
+      .delete()
+      .eq("id_site_page", pageId);
+  if (pageError) {console.error(pageError); alert("Evento eliminato, ma errore durante l'eliminazione della pagina sorgente"); return;}}
   const deletedId = String(id);
   // Rimuove il record dall'array.
   loadedEvents = loadedEvents.filter(row => String(row.id_site_event) !== deletedId);
