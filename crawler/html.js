@@ -390,10 +390,10 @@ function extractLocation(text) {
   if (!text) return null;
   /* PREFISSI DEI LUOGHI FISICI */
   const locationPrefixes =
-    String.raw`(?:Teatro\b|Cinema\b|Auditorium\b|Cantieri\b|Sala\b|Villa\b|Castello\b|Museo\b|Casina\b|Chiesa\b|Complesso\b|Palazzo\b|Parco\b|Duomo\b|Cattedrale\b|Basilica\b|Monastero\b|Convento\b|Castello\b|Fortezza\b|Rocca\b|Torre\b|Porto\b|Stadio\b|Arena\b|Anfiteatro\b|Area archeologica\b|Area naturale\b|Riserva naturale\b|Belvedere\b|Vetta\b|Spiaggia\b|Centro storico\b|Centro congressi\b|Polo culturale\b|Giardino\b|Orto botanico\b|Tenuta\b|Baglio\b|Masseria\b|Agriturismo\b|Hotel\b|Rifugio\b)`;
+    String.raw`(?:Teatro\b|Cinema\b|Auditorium\b|Policlinico\b|Cittadella\b|Cantieri\b|Sala\b|Sede\b|Villa\b|Castello\b|Museo\b|Casina\b|Chiesa\b|Complesso\b|Palazzo\b|Palazzetto\b|Palacultura\b|Parco\b|Duomo\b|Cattedrale\b|Basilica\b|Monastero\b|Convento\b|Castello\b|Fortezza\b|Rocca\b|Torre\b|Porto\b|Stadio\b|Arena\b|Anfiteatro\b|Area archeologica\b|Area naturale\b|Riserva naturale\b|Belvedere\b|Vetta\b|Spiaggia\b|Centro storico\b|Centro congressi\b|Polo culturale\b|Giardino\b|Orto botanico\b|Tenuta\b|Baglio\b|Masseria\b|Agriturismo\b|Hotel\b|Rifugio\b)`;
   const patterns = [
-    new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${locationPrefixes}[^.;\n]{2,60})`,"i"),
-    new RegExp(String.raw`\b(${locationPrefixes}[^.;\n]{2,60})`,"i")
+    new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${locationPrefixes}[^.;\n]{2,80})`,"i"),
+    new RegExp(String.raw`\b(${locationPrefixes}[^.;\n]{2,80})`,"i")
   ];
   for (const re of patterns) {
     const m = text.match(re);
@@ -439,8 +439,8 @@ function extractAddress(text) {
     /* Termini di ricerca con prefisso e senza prefisso, '\.' = punto (.), {2,50} compresi tra 2 e 50 chr, [^.;\n] = esclusi . ; e ritorno a capo */
     const addressPrefixes = String.raw`(?:Via\b|Piazza\b|P\.zza\b|Viale\b|V\.le\b|Corso\b|C\.so\b|Largo\b|Piazzale\b|P\.le\b|Vicolo\b|Strada\b|Str\.\s*|S\.da\b|S\.S\.\s*|S\.P\.\s*|S\.C\.\s*|Contrada\b|Traversa\b|Salita\b|Discesa\b|Lungomare\b|Rotonda\b|Calata\b|Stradella\b|Prolungamento\b)`;    
     const patterns = [
-      new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${addressPrefixes}\s*(?=[A-ZÀ-ÖØ-Þ])(?:(?:[A-Z]\.\s*)+|[^.;\n]){2,60})`),
-      new RegExp(String.raw`\b(${addressPrefixes}\s*(?=[A-ZÀ-ÖØ-Þ])(?:(?:[A-Z]\.\s*)+|[^.;\n]){2,60})`)
+      new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${addressPrefixes}\s*(?=[A-ZÀ-ÖØ-Þ])(?:(?:[A-Z]\.\s*)+|[^.;\n]){2,80})`),
+      new RegExp(String.raw`\b(${addressPrefixes}\s*(?=[A-ZÀ-ÖØ-Þ])(?:(?:[A-Z]\.\s*)+|[^.;\n]){2,80})`)
     ];
   for (const re of patterns) {
     const m = text.match(re);
