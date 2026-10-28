@@ -935,7 +935,7 @@ async function saveSitePage(siteId, pageUrl, detectedAt, futureDate, idComune, b
       sp_date: futureDate,
       id_comune: idComune,
       sp_block: block,
-      sp_star: newStar
+      sp_star: newStar,
     })
     .eq("id_site_page", data.id_site_page);
   // Se l'aggiornamento fallisce, propaga l'errore al chiamante.
