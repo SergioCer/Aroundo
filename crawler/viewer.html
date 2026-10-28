@@ -916,7 +916,19 @@ async function confirmReconciliation() {
     }
     /* Aggiorna subito il padre locale: anche se la cancellazione fallisse, il padre risulterà completo. */
     parentRow.se_schema = finalSchema;
-    /* 2. Solo dopo il salvataggio riuscito, elimina i figli. */
+    /* 2. Marca come verificate le pagine dei figli. */
+    const childRows = loadedEvents.filter(row => childIds.includes(String(row.id_site_event)));
+    const childPageIds = childRows
+      .map(row => row.id_site_page)
+      .filter(id => id != null);
+    if (childPageIds.length > 0) {
+      const { error: verifyError } = await supabase
+        .from("site_pages")
+        .update({ sp_verified: true })
+        .in("id_site_page", childPageIds);
+      if (verifyError) {throw new Error(`Aggiornamento delle pagine figlie non riuscito: ${verifyError.message}`);}
+    }
+    /* 3. Solo dopo aver marcato le pagine, elimina i figli. */
     const { error: deleteError } = await supabase
       .from("site_events")
       .delete()
@@ -931,7 +943,7 @@ async function confirmReconciliation() {
       );
       return;
     }
-    /* 3. Cancellazione riuscita: aggiorna lo stato locale. */
+    /* 4. Cancellazione riuscita: aggiorna lo stato locale. */
     const deletedIds = new Set(childIds);
     loadedEvents = loadedEvents.filter(
       row => !deletedIds.has(String(row.id_site_event))
