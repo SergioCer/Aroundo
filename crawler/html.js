@@ -222,7 +222,7 @@ function extractOrganizer(text) {
   return null;
 }
 
-/* CREATOR / PERFORMER */
+/* Creator */
 function extractCreators(text) {
   if (!text) return [];
   const result = [];
@@ -257,6 +257,19 @@ function extractCreators(text) {
     }
   }
   return dedupeNames(result);
+}
+
+/* Performer */
+function extractPerformer(text) {
+  return null;
+}
+
+/* Director */
+function extractDirector(text) {if (!text) return null;
+  const pattern =
+    /\b(?:regia|regista|diretto|diretta|direttore|direzione)\b\s*(?:(?:di|da|del|della|dello|dei|degli|delle|dal|dalla|dallo|dai|dagli|dalle|per|a|al|alla|con|è|e)\s+)*([A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*)*)/;
+  const match = text.match(pattern);
+  return match ? match[1].trim() : null;
 }
 
 function dedupeNames(values) {
@@ -606,6 +619,8 @@ function analyzeSignals(page, categoryDictionary) {
   const price = extractPrice(text);
   const organizer = extractOrganizer(text);
   const creators = extractCreators(text);
+  const performer = extractPerformer(text);
+  const director = extractDirector(text);
   const category = extractCategory(text, categoryDictionary);
   /* Estrae e Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
   const location = cleanPlaceField(extractLocation(text), city);
@@ -684,8 +699,9 @@ const source = {
   startDate,
   ...locationFields,
   organizer,
-  performer: creators,
+  performer: performer,
   creator: creators,
+  director: director, 
   offers,
   image: s.image,
   url: page.sp_url,
@@ -727,9 +743,9 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
 /* CAMPI CANONICI — serve per il salvataggio e la visualizzazione con lo stesso ordine del Viewer */
 const SCHEMA_FIELDS = [
   "name", "description", "startDate", "endDate", "duration", "doorTime",
-  // Localizzazione scomposta
   "location", "address", "addressLocality", "postalCode", "addressRegion", "addressCountry",
-  "offers", "isAccessibleForFree", "organizer", "creator", "performer", "actor", "composer",
+  "offers", "isAccessibleForFree", 
+  "organizer", "creator", "performer", "actor", "composer", "director", "service",
   "strength", "category", "id_categoria", "subcategory", "id_subcategoria",
   "macroMatches", "subMatches",
   "fundamentals", "reinforcements", "signals",
