@@ -647,7 +647,7 @@ function analyzeSignals(page, categoryDictionary) {
   if (fundamentalCount === 3 && reinforcementCount >= 2) {classification = "E";} // Evento
   /* INCOMPLETO: almeno 2 fondamentali + almeno 1 rafforzativo */
   else if (fundamentalCount >= 2 && reinforcementCount >= 1) {classification = "I";} // Incompleto
-  return {text, title, date, times, price, organizer, creators, category,
+  return {text, title, date, times, price, organizer, creators,  performer, director, category,
     location, address, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
 }
 
