@@ -1386,23 +1386,21 @@ const reconciliationObserver = new MutationObserver(() => {
 reconciliationObserver.observe(reconciliationPanel, {childList: true, subtree: true, characterData: true});
 
   
+
 /* AVVIO */
 document.getElementById("analyzeBtn").addEventListener("click", async () => {
   const button = document.getElementById("analyzeBtn");
   const status = document.getElementById("analysisStatus");
   button.disabled = true;
-  status.textContent = "Analisi in corso...";
-  try {
-    await runAnalysis(supabase);
+  status.textContent = "Analisi in corso: 0 / ...";
+  try {await runAnalysis(supabase, (current, total) => {status.textContent = `Analisi in corso: ${current} / ${total}`;});
     status.textContent = "Analisi completata!";
     await loadEvents();
-  } catch (error) {
-    console.error("[HTML] Errore analisi:", error);
-    status.textContent = `Errore: ${error.message}`;
-  } finally {
-    button.disabled = false;
+  } catch (error) {console.error("[HTML] Errore analisi:", error); status.textContent = `Errore: ${error.message}`;
+  } finally {button.disabled = false;
   }
 });
+
 
 loadEvents();
 </script>
