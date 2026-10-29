@@ -1184,7 +1184,8 @@ function compareSuggestionPair(rowA, rowB) {
   const crossMatch = (crossAB >= 0.55 && hasDistinctiveWord(commonCrossAB)) || (crossBA >= 0.55 && hasDistinctiveWord(commonCrossBA));
   if (!titleMatch && !descriptionMatch && !crossMatch) {return null;}
   // Data e comune sono filtri/indizi, non punti testuali. Le differenze nei singoli campi non annullano le somiglianze testuali.
-  const textScore = Math.max(titleScore, descScore, crossAB, crossBA);
+  // vengono valutate le coincidenze tra titolo-titolo e testo-testo al 100% e tra testi e titoli al 50% ottenendo un punteggio medio
+  const textScore = (titleScore + descScore + 0.5 * crossAB + 0.5 * crossBA) / 3;
   return {score: textScore, titleMatch, descriptionMatch, crossMatch};
 }
 
@@ -1257,8 +1258,8 @@ function buildSuggestionGroups() {
     });
   });
   return [...groupsByKey.values()].sort((a, b) =>
-    b.rows.length - a.rows.length ||
     b.averageScore - a.averageScore ||
+    b.rows.length - a.rows.length ||
     Number(a.rows[0].id_site_event) - Number(b.rows[0].id_site_event)
   );
 }
