@@ -260,21 +260,94 @@ function extractCreators(text) {
 }
 
 /* Performer */
-function extractPerformer(text) {
-  return null;
+function extractPerformers(text) {
+  if (!text) return [];
+  const result = [];
+  const patterns = [
+    /\b(?:interpretato|interpretata|interpretati|interpretate)\s+da\s+([^.;\n]{3,120})/gi,
+    /\b(?:interpreta|interpretano|interpreti)\s+([^.;\n]{3,120})/gi,
+    /\b(?:con|protagonista|protagonisti|protagoniste)\s+([^.;\n]{3,120})/gi,
+    /\b(?:cast|nel\s+cast|artisti|artiste)\s*[:\-]?\s*([^.;\n]{3,120})/gi,
+    /\b(?:voce|voci)\s+di\s+([^.;\n]{3,120})/gi,
+    /\b(?:featuring|feat\.?|performed\s+by|starring)\s+([^.;\n]{3,120})/gi
+  ];
+  const personName =
+    /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
+  for (const re of patterns) {
+    for (const m of text.matchAll(re)) {
+      const segment = clean(m[1]);
+      if (!segment) continue;
+      const names = segment.match(personName);
+      if (!names) continue;
+      for (const name of names) {
+        const value = clean(name);
+        if (value && value.length >= 5 && value.length <= 80) {
+          result.push(value);
+        }
+      }
+    }
+  }
+  return dedupeNames(result);
 }
 
 /* Composer */
-function extractComposer(text) {
-  return null;
+function extractComposers(text) {
+  if (!text) return [];
+  const result = [];
+  const patterns = [
+    /\b(?:musica|musiche|composizione|composizioni)\s+(?:originale\s+)?(?:di|del|della|dello|dei|degli|delle|da)\s+([^.;\n]{3,120})/gi,
+    /\b(?:composta|composto|composte|composti)\s+da\s+([^.;\n]{3,120})/gi,
+    /\b(?:compositore|compositrice)\s+([^.;\n]{3,120})/gi,
+    /\b(?:music\s+by|composed\s+by)\s+([^.;\n]{3,120})/gi
+  ];
+  const personName =
+    /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
+  for (const re of patterns) {
+    for (const m of text.matchAll(re)) {
+      const segment = clean(m[1]);
+      if (!segment) continue;
+      const names = segment.match(personName);
+      if (!names) continue;
+      for (const name of names) {
+        const value = clean(name);
+        if (value && value.length >= 5 && value.length <= 80) {
+          result.push(value);
+        }
+      }
+    }
+  }
+  return dedupeNames(result);
 }
 
 /* Director */
-function extractDirector(text) {if (!text) return null;
-  const pattern =
-    /\b(?:regia|regista|diretto|diretta|direttore|direzione)\b\s*(?:(?:di|da|del|della|dello|dei|degli|delle|dal|dalla|dallo|dai|dagli|dalle|per|a|al|alla|con|è|e)\s+)*([A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*)*)/;
-  const match = text.match(pattern);
-  return match ? match[1].trim() : null;
+function extractDirectors(text) {
+  if (!text) return [];
+  const result = [];
+  const patterns = [
+    /\b(?:regia|regista)\s+(?:di\s+|di\s+teatro\s+)?([^.;\n]{3,120})/gi,
+    /\b(?:diretto|diretta|diretti|dirette)\s+da\s+([^.;\n]{3,120})/gi,
+    /\b(?:direzione|direttore|direttrice)\s+(?:artistica\s+)?(?:di\s+|da\s+)?([^.;\n]{3,120})/gi,
+    /\b(?:directed\s+by|direction\s+by)\s+([^.;\n]{3,120})/gi
+  ];
+  // CANCELLARE *****
+  //  /\b(?:|||||)\b\s*(?:(?:di|da|del|della|dello|dei|degli|delle|dal|dalla|dallo|dai|dagli|dalle|per|a|al|alla|con|è|e)\s+)*([A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*)*)/;
+  const personName =
+    /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
+  for (const re of patterns) {
+    for (const m of text.matchAll(re)) {
+      const segment = clean(m[1]);
+      if (!segment) continue;
+      const names = segment.match(personName);
+      if (!names) continue;
+      for (const name of names) {
+        const value = clean(name);
+        if (value && value.length >= 5 && value.length <= 80) {
+          result.push(value);
+        }
+      }
+    }
+  }
+  return dedupeNames(result);
 }
 
 function dedupeNames(values) {
@@ -728,20 +801,18 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     source.organizer = organizerName ? { ...(typeof source.organizer === "object" && !Array.isArray(source.organizer) ? source.organizer: {}), "@type": "Organization", name: organizerName}: null;}
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
   const creators = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const composers = parsed.composer ?? null;
-  const directors = parsed.director ?? null;
-  const performers = parsed.performer ?? null;  const internal = {
-    id_site_page: page.id_site_page,
+  const composers = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const directors = extractDirectors(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const performers = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    id_site_page: page.id_site_page,
     id_comune: page.id_comune,
     classification: "J", // Json
     fundamentals: {},
     reinforcements: {},
     signals: [],
-    creator: creators.map(name => ({name, "@type": "Person"})),
-    composer: composers,
-    director: directors,
-    performer: performers,
-    category: categoryData.category ?? null,
+    creator: creators.map(name => ({ name, "@type": "Person" })),
+    composer: composers.map(name => ({ name, "@type": "Person" })),
+    director: directors.map(name => ({ name, "@type": "Person" })),
+    performer: performers.map(name => ({ name, "@type": "Person" })),    category: categoryData.category ?? null,
     strength: categoryData.strength ?? null,
     id_categoria: categoryData.categoryId ?? null,
     id_subcategoria: categoryData.subcategoryId ?? null,
