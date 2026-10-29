@@ -698,8 +698,9 @@ function analyzeSignals(page, categoryDictionary) {
   const organizer = extractOrganizer(text);
   const creators = extractCreators(text);
   const performer = extractPerformers(text);
-  const director = extractDirector(text);
-  const category = extractCategory(text, categoryDictionary);
+  const composer = extractComposers(text);
+  const director = extractDirectors(text);
+    const category = extractCategory(text, categoryDictionary);
   /* Estrae e Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
   const location = cleanPlaceField(extractLocation(text), city);
   const address = cleanPlaceField(extractAddress(text), city);
@@ -801,9 +802,9 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     source.organizer = organizerName ? { ...(typeof source.organizer === "object" && !Array.isArray(source.organizer) ? source.organizer: {}), "@type": "Organization", name: organizerName}: null;}
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
   const creators = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const performers = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    
   const composers = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
   const directors = extractDirectors(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const performers = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    
     const internal = {
     id_site_page: page.id_site_page,
     id_comune: page.id_comune,
