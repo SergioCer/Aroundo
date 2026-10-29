@@ -916,7 +916,7 @@ async function processSitePage(page, categoryDictionary, supabase, eventState) {
   console.log(`[ESTRAI] Salvato: ${page.id_site_page} (${classification})`);
 }
 
-export async function runAnalysis(supabase) {
+export async function runAnalysis(supabase, onProgress) {
 const categoryDictionary = await loadCategoryDictionary(supabase);
 const {data: existingEvents, error: eventsError} = await supabase
   .from("site_events")
@@ -958,9 +958,13 @@ while (true) {const { data, error } = await supabase
   if (!data || data.length < batchSize) break;
   from += batchSize;
 }
-for (const page of pages || []) {
+const total = pages.length;
+let current = 0;
+onProgress?.(current, total);
+for (const page of pages) {
   try {await processSitePage(page, categoryDictionary, supabase, eventState);
-  } catch (error) {console.error(`[HTML] Errore pagina ${page.id_site_page}:`, error);}
+  } catch (error) {console.error(`[HTML] Errore pagina ${page.id_site_page}:`, error);
+  } finally {current++; onProgress?.(current, total);}
 }
 console.log("[HTML] Analisi completata.");
 }
