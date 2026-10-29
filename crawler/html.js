@@ -264,6 +264,11 @@ function extractPerformer(text) {
   return null;
 }
 
+/* Composer */
+function extractComposer(text) {
+  return null;
+}
+
 /* Director */
 function extractDirector(text) {if (!text) return null;
   const pattern =
@@ -710,7 +715,7 @@ const source = {
 return normalizeSchemaEvent(source, internal);
 }
 
-/* CONVERSIONE JSON-LD */
+/* CONVERSIONE dati recuperati da JSON-LD */
 function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   const source = { ...splitSchemaLocation(parsed.location), ...parsed };
   /* Estrae e Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
@@ -722,6 +727,10 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     : typeof source.organizer === "object" && !Array.isArray(source.organizer) ? (typeof source.organizer.name === "string" ? source.organizer.name.trim(): ""): "";
     source.organizer = organizerName ? { ...(typeof source.organizer === "object" && !Array.isArray(source.organizer) ? source.organizer: {}), "@type": "Organization", name: organizerName}: null;}
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
+  const creators = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const composers = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const directors = extractDirector(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const performers = extractPerformer(`${parsed.name || ""}\n${parsed.description || ""}`);
   const internal = {
     id_site_page: page.id_site_page,
     id_comune: page.id_comune,
@@ -729,6 +738,10 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     fundamentals: {},
     reinforcements: {},
     signals: [],
+    creator: creators.map(name => ({name, "@type": "Person"})),
+    composer: composers,
+    director: directors,
+    performer: performers,
     category: categoryData.category ?? null,
     strength: categoryData.strength ?? null,
     id_categoria: categoryData.categoryId ?? null,
