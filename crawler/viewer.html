@@ -1087,7 +1087,6 @@ filterComuni.addEventListener("change", () => {
   
 document.getElementById("suggestBtn").addEventListener("click", () => {suggestReconciliation();});
 
-
 /* SUGGERITORE DI RICONCILIAZIONE */
 let suggestedGroupKeys = new Set();
 function suggestionText(value) {
@@ -1131,12 +1130,16 @@ function suggestionCommonWords(textA, textB) {
   return a.filter(word => b.includes(word));
 }
 
-function suggestionDate(row) {
+function suggestionDates(row) {
   const schema = row.se_schema || {};
-  const date = schema.startDate || schema.data?.date || "";
-  // Confronta la data di calendario, ignorando ora e fuso orario.
-  const match = String(date).match(/^\d{4}-\d{2}-\d{2}/);
-  return match ? match[0] : "";
+  const dates = [schema.startDate, schema.endDate]
+    .filter(Boolean)
+    .map(value => {
+      const match = String(value).match(/^\d{4}-\d{2}-\d{2}/);
+      return match ? match[0] : "";
+    })
+    .filter(Boolean);
+  return [...new Set(dates)];
 }
 
 function suggestionMunicipality(row) {
@@ -1212,15 +1215,15 @@ function buildSuggestionGroups() {
   const rows = loadedEvents.filter(row => row.se_schema && filtraEventoPerComune(row, comuniMap, filterComuni.value));
   const groupsByKey = new Map();
   // Raggruppa prima per data: le coppie senza una data confrontabile non vengono proposte.
+  // Ogni evento viene indicizzato per tutte le sue date di calendario.
   const byDate = new Map();
-  rows.forEach(row => {const date = suggestionDate(row);
-    if (!date) return;
-    if (!byDate.has(date)) byDate.set(date, []);
-    byDate.get(date).push(row);
-  });
-  byDate.forEach(dateRows => {
+  rows.forEach(row => {const dates = suggestionDates(row);
+    dates.forEach(date => {if (!byDate.has(date)) byDate.set(date, new Map()); byDate.get(date).set(String(row.id_site_event), row);});});
+  const candidatePairs = new Map();
+  byDate.forEach(dateMap => {
+    const dateRows = [...dateMap.values()];
     if (dateRows.length < 2) return;
-    const matches = new Map();
+      const matches = new Map();
     for (let i = 0; i < dateRows.length; i++) {
       for (let j = i + 1; j < dateRows.length; j++) {
         const a = dateRows[i];
