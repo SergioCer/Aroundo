@@ -803,7 +803,8 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   const creators = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
   const composers = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
   const directors = extractDirectors(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const performers = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    id_site_page: page.id_site_page,
+  const performers = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    
+    id_site_page: page.id_site_page,
     id_comune: page.id_comune,
     classification: "J", // Json
     fundamentals: {},
