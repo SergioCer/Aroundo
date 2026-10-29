@@ -1391,6 +1391,35 @@ const reconciliationObserver = new MutationObserver(() => {
 });
 reconciliationObserver.observe(reconciliationPanel, {childList: true, subtree: true, characterData: true});
 
+/* Verifica la necessità di estrarre nuovamente gli eventi */ 
+  async function checkPendingExtraction() {
+  const button = document.getElementById("analyzeBtn");
+  const status = document.getElementById("analysisStatus");
+  const { data: lastPage, error: pageError } = await supabase
+    .from("site_pages")
+    .select("id_site_page")
+    .not("sp_block", "is", null)
+    .not("id_comune", "is", null)
+    .order("id_site_page", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (pageError) {console.error("[HTML] Errore controllo site_pages:", pageError); return;}
+  const { data: lastEvent, error: eventError } = await supabase
+    .from("site_events")
+    .select("id_site_page")
+    .not("id_site_page", "is", null)
+    .order("id_site_page", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (eventError) {console.error("[HTML] Errore controllo site_events:", eventError); return;}
+  const lastPageId = lastPage?.id_site_page ?? 0;
+  const lastEventPageId = lastEvent?.id_site_page ?? 0;
+  if (lastPageId > lastEventPageId) {button.classList.add("analysis-red"); status.textContent = "Possibili nuove pagine da analizzare";
+  } else {button.classList.remove("analysis-red"); status.textContent = "Nessuna nuova pagina rilevata";}
+}
+
+checkPendingExtraction();
+  
 /* AVVIO */
 document.getElementById("analyzeBtn").addEventListener("click", async () => {
   const button = document.getElementById("analyzeBtn");
