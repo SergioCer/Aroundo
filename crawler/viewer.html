@@ -710,9 +710,11 @@ function eventCard(row, index, reconciliationRole = null){
       ${address ? `<div class="field"><span class="label">Indirizzo:</span> ${escapeHtml(address)}</div>` : ""}
       ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
       ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
-      ${organizer ? `<div class="field"><span class="label">Organizzatore: </span>${escapeHtml(organizer)}</div>`: ""}
-      ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>`: ""}   
-      ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>`: ""}
+      ${organizer ? `<div class="field"><span class="label">Organizer: </span>${escapeHtml(organizer)}</div>` : ""}
+      ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>` : ""}
+      ${composer ? `<div class="field"><span class="label">Composer: </span>${escapeHtml(composer)}</div>` : ""}
+      ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>` : ""}
+      ${director ? `<div class="field"><span class="label">Director: </span>${escapeHtml(director)}</div>` : ""}
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
