@@ -728,10 +728,9 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     source.organizer = organizerName ? { ...(typeof source.organizer === "object" && !Array.isArray(source.organizer) ? source.organizer: {}), "@type": "Organization", name: organizerName}: null;}
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
   const creators = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const composers = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const directors = extractDirector(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const performers = extractPerformer(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const internal = {
+  const composers = parsed.composer ?? null;
+  const directors = parsed.director ?? null;
+  const performers = parsed.performer ?? null;  const internal = {
     id_site_page: page.id_site_page,
     id_comune: page.id_comune,
     classification: "J", // Json
