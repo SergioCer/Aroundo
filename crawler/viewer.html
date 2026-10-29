@@ -413,6 +413,12 @@ body{
 .category-match {
   display: block;
 }
+
+#analyzeBtn.analysis-red {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
   
 </style>
 </head>
@@ -423,7 +429,7 @@ body{
 </div>
   <div class="section">
 <div class="event-controls">
-  <button id="analyzeBtn" class="schema-button">Estrai</button>
+  <button id="analyzeBtn" class="schema-button analyze-button">Estrai</button>
   <span id="analysisStatus" style="margin-left:12px"></span>
   <label for="sortBy">Ordina per:</label>
   <select id="sortBy">
@@ -1385,12 +1391,11 @@ const reconciliationObserver = new MutationObserver(() => {
 });
 reconciliationObserver.observe(reconciliationPanel, {childList: true, subtree: true, characterData: true});
 
-  
-
 /* AVVIO */
 document.getElementById("analyzeBtn").addEventListener("click", async () => {
   const button = document.getElementById("analyzeBtn");
   const status = document.getElementById("analysisStatus");
+  button.classList.add("analysis-red");
   button.disabled = true;
   status.textContent = "Analisi in corso: 0 / ...";
   try {await runAnalysis(supabase, (current, total) => {status.textContent = `Analisi in corso: ${current} / ${total}`;});
@@ -1400,7 +1405,6 @@ document.getElementById("analyzeBtn").addEventListener("click", async () => {
   } finally {button.disabled = false;
   }
 });
-
 
 loadEvents();
 </script>
