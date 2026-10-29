@@ -299,6 +299,11 @@ function extractComposers(text) {
     /\b(?:composta|composto|composte|composti)\s+da\s+([^.;\n]{3,120})/gi,
     /\b(?:compositore|compositrice)\s+([^.;\n]{3,120})/gi,
     /\b(?:music\s+by|composed\s+by)\s+([^.;\n]{3,120})/gi
+    // Autori di libri e opere scritte
+    /\b(?:romanzo|libro|saggio|racconto|opera|volume)\s+di\s+([^.;\n]{3,120})/gi,
+    /\b(?:scritto|scritta|scritti|scritte)\s+da\s+([^.;\n]{3,120})/gi,
+    /\b(?:autore|autrice)\s+(?:del|della|di|del libro|del romanzo)?\s*([^.;\n]{3,120})/gi,
+    /\b(?:written\s+by|book\s+by|author\s+of)\s+([^.;\n]{3,120})/gi    
   ];
   const personName =
     /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
