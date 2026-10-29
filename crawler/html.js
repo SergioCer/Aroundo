@@ -697,7 +697,7 @@ function analyzeSignals(page, categoryDictionary) {
   const price = extractPrice(text);
   const organizer = extractOrganizer(text);
   const creators = extractCreators(text);
-  const performer = extractPerformer(text);
+  const performer = extractPerformers(text);
   const director = extractDirector(text);
   const category = extractCategory(text, categoryDictionary);
   /* Estrae e Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
