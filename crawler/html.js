@@ -804,6 +804,7 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
   const composers = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
   const directors = extractDirectors(`${parsed.name || ""}\n${parsed.description || ""}`);
   const performers = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    
+    const internal = {
     id_site_page: page.id_site_page,
     id_comune: page.id_comune,
     classification: "J", // Json
@@ -813,7 +814,8 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     creator: creators.map(name => ({ name, "@type": "Person" })),
     composer: composers.map(name => ({ name, "@type": "Person" })),
     director: directors.map(name => ({ name, "@type": "Person" })),
-    performer: performers.map(name => ({ name, "@type": "Person" })),    category: categoryData.category ?? null,
+    performer: performers.map(name => ({ name, "@type": "Person" })),    
+    category: categoryData.category ?? null,
     strength: categoryData.strength ?? null,
     id_categoria: categoryData.categoryId ?? null,
     id_subcategoria: categoryData.subcategoryId ?? null,
