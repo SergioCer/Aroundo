@@ -450,7 +450,7 @@ function extractLocation(text) {
 function extractAddress(text) {
   if (!text) return null;
     /* Termini di ricerca con prefisso e senza prefisso, '\.' = punto (.), {2,50} compresi tra 2 e 50 chr, [^.;\n] = esclusi . ; e ritorno a capo */
-    const addressPrefixes = String.raw`(?:Via\b|Piazza\b|P\.zza\b|Viale\b|V\.le\b|Corso\b|C\.so\b|Largo\b|Piazzale\b|P\.le\b|Vicolo\b|Strada\b|Str\.\s*|S\.da\b|S\.S\.\s*|S\.P\.\s*|S\.C\.\s*|Contrada\b|Traversa\b|Salita\b|Discesa\b|Lungomare\b|Rotonda\b|Calata\b|Stradella\b|Prolungamento\b)`;    
+    const addressPrefixes = String.raw`(?:Via\b|Piazza\b|P\.zza\b|Viale\b|V\.le\b|Corso\b|C\.so\b|Largo\b|Piazzale\b|P\.le\b|Vicolo\b|Strada\b|Str\.\s*|S\.da\b|S\.S\.\s*|S\.P\.\s*|S\.C\.\s*|Contrada\b|Traversa\b|Salita\b|Discesa\b|Lungomare\b|Rotonda\b|Calata\b|Stradella\b|Quartiere\b|Prolungamento\b)`;    
     const patterns = [
       new RegExp(String.raw`\b(?:presso|al|alla|allo|agli|alle|nel|nella|sul|sulla)\s+(${addressPrefixes}\s*(?=[A-ZÀ-ÖØ-Þ])(?:(?:[A-Z]\.\s*)+|[^.;\n]){2,80})`),
       new RegExp(String.raw`\b(${addressPrefixes}\s*(?=[A-ZÀ-ÖØ-Þ])(?:(?:[A-Z]\.\s*)+|[^.;\n]){2,80})`)
