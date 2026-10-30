@@ -689,13 +689,15 @@ function eventCard(row, index, reconciliationRole = null){
   const address = value(event.address);
   const comune = value(event.addressLocality);
   const cap = value(event.postalCode);
-  const organizer = value(event.organizer);
   const offers = displaySchemaValue(event.offers);
   const category = displaySchemaValue(event.category);
-  const performer = displaySchemaValue(event.performer);
+  const organizer = value(event.organizer);
   const creator = displaySchemaValue(event.creator);
+  const performer = displaySchemaValue(event.performer);
+  // actor 
   const composer = displaySchemaValue(event.composer);
   const director = displaySchemaValue(event.director);
+  // service
   const image = value(event.image);
   const sourceUrl = row.site_pages && row.site_pages.sp_url ? row.site_pages.sp_url : value(event.url);
   const schemaId = `schema-${row.id_site_event || index}`;
