@@ -259,7 +259,63 @@ function extractCreators(text) {
   return dedupeNames(result);
 }
 
-/* Performer */
+/* Funzione UNICA per estrazione di Nomi e Cognomi con la ricerca tassonomica dei singoli 'performer;actor;composer;director' */
+function extractPeopleByRole(text, terms, options = {}) {
+  if (!text || !terms) return [];
+  const {
+    maxDistance = 100,
+    minLength = 5,
+    maxLength = 80,
+    maxPeople = 10
+  } = options;
+  const result = [];
+  // Particelle ammesse nei nomi e cognomi
+  const particle = String.raw`(?:De|Di|Da|Del|Della|Delle|Degli|La|Lo|O['’]|Mc\.?)`;
+  // Nome e cognome, con eventuali particelle
+  const personName = new RegExp(String.raw`\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+${particle})?(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,2}\b`, "gu");
+  const termList = terms
+    .split(";")
+    .map(term => term.trim())
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+  const escapedTerms = termList.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (!escapedTerms.length) return [];
+  const termRegex = new RegExp(String.raw`\b(?:${escapedTerms.join("|")})\b`, "giu");
+  const cleanText = text.replace(/\r/g, "\n");
+  for (const termMatch of cleanText.matchAll(termRegex)) {
+    const termStart = termMatch.index;
+    const termEnd = termStart + termMatch[0].length;
+    // Prima: termine seguito dal nome
+    const after = cleanText.slice(termEnd, Math.min(cleanText.length, termEnd + maxDistance));
+    let names = [...after.matchAll(personName)];
+    // Se non trova nomi validi, prova prima del termine
+    if (!names.length) {const before = cleanText.slice(Math.max(0, termStart - maxDistance), termStart); names = [...before.matchAll(personName)];}
+    for (const match of names) {
+      const value = clean(match[0]);
+      if (value && value.length >= minLength && value.length <= maxLength && !result.some(item => item.toLowerCase() === value.toLowerCase())
+      ) {result.push(value); if (result.length >= maxPeople) return result;}
+    }
+  }
+  return result;
+}
+
+/* Performer - nuova estrazione tassonomica */
+function extractPerformers(text) {
+  const terms = ["performer", "performers", "interprete", "interpreti", "interpretato", "interpretata", "interpretati", "interpretate", "cantante", "cantanti",
+    "musicista", "musicisti", "soprano", "mezzosoprano", "tenore", "tenori", "baritono", "baritoni", "basso", "bassi",
+    "pianoforte", "pianista", "pianisti", "violino", "violinista", "violinisti", "clarinetto", "clarinettista", "clarinettisti",
+    "flauto", "flautista", "flautisti", "chitarra", "chitarrista", "chitarristi", "batteria", "batterista", "batteristi",
+    "voce", "voci", "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
+  ].join(";");
+  return extractPeopleByRole(text, terms, {
+    maxDistance: 100,
+    minLength: 5,
+    maxLength: 80,
+    maxPeople: 10
+  });
+}
+
+/* Performer DISABILITATA 
 function extractPerformers(text) {
   if (!text) return [];
   const result = [];
