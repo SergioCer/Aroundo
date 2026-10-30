@@ -958,7 +958,7 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     source.organizer = organizerName ? { ...(typeof source.organizer === "object" && !Array.isArray(source.organizer) ? source.organizer: {}), "@type": "Organization", name: organizerName}: null;}
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
   const creator = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const performer = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    
+  const performer = extractPerformers(parsed.description || ""); // ***** Cerca solo in Descrizione.
   // actor
   const composer = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
   const director = extractDirectors(`${parsed.name || ""}\n${parsed.description || ""}`);
