@@ -263,40 +263,53 @@ function extractCreators(text) {
 function extractPeopleByRole(text, terms, options = {}) {
   if (!text || !terms) return [];
   const {
-    maxDistance = 100,
-    minLength = 5,
-    maxLength = 80,
+    maxDistance = 35,
+    minLength = 3,
+    maxLength = 32,
     maxPeople = 10
   } = options;
-  const result = [];
-  // Particelle ammesse nei nomi e cognomi
   const particle = String.raw`(?:De|Di|Da|Del|Della|Delle|Degli|La|Lo|O['’]|Mc\.?)`;
-  // Nome e cognome, con eventuali particelle
   const personName = new RegExp(String.raw`\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+${particle})?(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,2}\b`, "gu");
-  const termList = terms
-    .split(";")
-    .map(term => term.trim())
-    .filter(Boolean)
-    .sort((a, b) => b.length - a.length);
+  const termList = terms.split(";").map(term => term.trim()).filter(Boolean).sort((a, b) => b.length - a.length);
+  if (!termList.length) return [];
   const escapedTerms = termList.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  if (!escapedTerms.length) return [];
   const termRegex = new RegExp(String.raw`\b(?:${escapedTerms.join("|")})\b`, "giu");
   const cleanText = text.replace(/\r/g, "\n");
-  for (const termMatch of cleanText.matchAll(termRegex)) {
-    const termStart = termMatch.index;
-    const termEnd = termStart + termMatch[0].length;
-    // Prima: termine seguito dal nome
-    const after = cleanText.slice(termEnd, Math.min(cleanText.length, termEnd + maxDistance));
-    let names = [...after.matchAll(personName)];
-    // Se non trova nomi validi, prova prima del termine
-    if (!names.length) {const before = cleanText.slice(Math.max(0, termStart - maxDistance), termStart); names = [...before.matchAll(personName)];}
-    for (const match of names) {
-      const value = clean(match[0]);
-      if (value && value.length >= minLength && value.length <= maxLength && !result.some(item => item.toLowerCase() === value.toLowerCase())
-      ) {result.push(value); if (result.length >= maxPeople) return result;}
-    }
+  const termMatches = [...cleanText.matchAll(termRegex)].map(match => ({
+    value: match[0],
+    start: match.index,
+    end: match.index + match[0].length
+  }));
+  if (!termMatches.length) return [];
+  function findNames(term, direction) {
+    const start = direction === "normal" ? term.end : Math.max(0, term.start - maxDistance);
+    const end = direction === "normal" ? Math.min(cleanText.length, term.end + maxDistance) : term.start;
+    const segment = cleanText.slice(start, end);
+    const matches = [...segment.matchAll(personName)];
+    return matches.map(match => clean(match[0])).filter(name => name && name.length >= minLength && name.length <= maxLength);
   }
-  return result;
+  function reconcile(direction) {
+    const associations = [];
+    for (const term of termMatches) {
+      const names = findNames(term, direction);
+      if (names.length !== 1) return null;
+      associations.push(names[0]);
+    }
+    const uniqueNames = [...new Map(associations.map(name => [name.toLowerCase(), name])).values()];
+    if (uniqueNames.length > maxPeople) return null;
+    return uniqueNames;
+  }
+  // Caso singolo: un solo nominativo può riferirsi a più termini
+  const allNames = [...cleanText.matchAll(personName)].map(match => clean(match[0])).filter(name => name && name.length >= minLength && name.length <= maxLength);
+  const uniqueAllNames = [...new Map(allNames.map(name => [name.toLowerCase(), name])).values()];
+  if (uniqueAllNames.length === 1) return uniqueAllNames;
+  // Primo tentativo: termine -> nome
+  const normalResult = reconcile("normal");
+  if (normalResult) return normalResult;
+  // Secondo tentativo: nome -> termine
+  const inverseResult = reconcile("inverse");
+  if (inverseResult) return inverseResult;
+  return [];
 }
 
 /* Performer - nuova estrazione tassonomica */
@@ -308,10 +321,10 @@ function extractPerformers(text) {
     "voce", "voci", "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
   ].join(";");
   return extractPeopleByRole(text, terms, {
-    maxDistance: 100,
-    minLength: 5,
-    maxLength: 80,
-    maxPeople: 10
+    maxDistance: 35, // Distanza massima in caratteri tra il termine tassonomico ed il Cognome, Nome cercato.
+    minLength: 3, // Lunghezza minima del nome riconosciuto.
+    maxLength: 32, // Lunghezza massima del nome riconosciuto.
+    maxPeople: 10 // Numero massimo di persone restituite dalla funzione. 
   });
 }
 
