@@ -189,7 +189,7 @@ function extractPrice(text) {
   return null;
 }
 
-/* ORGANIZZATORE */
+/* Organizer */
 function extractOrganizer(text) {
   if (!text) return null;
   const patterns = [
@@ -290,6 +290,8 @@ function extractPerformers(text) {
   return dedupeNames(result);
 }
 
+/* Actor */
+
 /* Composer */
 function extractComposers(text) {
   if (!text) return [];
@@ -354,6 +356,8 @@ function extractDirectors(text) {
   }
   return dedupeNames(result);
 }
+
+/* Service */
 
 function dedupeNames(values) {
   const seen = new Set();
@@ -701,7 +705,7 @@ function analyzeSignals(page, categoryDictionary) {
   const times = extractTimes(text);
   const price = extractPrice(text);
   const organizer = extractOrganizer(text);
-  const creators = extractCreators(text);
+  const creator = extractCreators(text);
   const performer = extractPerformers(text);
   const composer = extractComposers(text);
   const director = extractDirectors(text);
@@ -731,7 +735,7 @@ function analyzeSignals(page, categoryDictionary) {
   if (fundamentalCount === 3 && reinforcementCount >= 2) {classification = "E";} // Evento
   /* INCOMPLETO: almeno 2 fondamentali + almeno 1 rafforzativo */
   else if (fundamentalCount >= 2 && reinforcementCount >= 1) {classification = "I";} // Incompleto
-  return {text, title, date, times, price, organizer, creators,  performer, director, category,
+  return {text, title, date, times, price, organizer, creator,  performer, composer, director, category,
     location, address, city, image, fundamentals, reinforcements, fundamentalCount, reinforcementCount, classification};
 }
 
@@ -806,10 +810,12 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     : typeof source.organizer === "object" && !Array.isArray(source.organizer) ? (typeof source.organizer.name === "string" ? source.organizer.name.trim(): ""): "";
     source.organizer = organizerName ? { ...(typeof source.organizer === "object" && !Array.isArray(source.organizer) ? source.organizer: {}), "@type": "Organization", name: organizerName}: null;}
   const categoryData = extractCategory(`${parsed.name || ""} ${parsed.description || ""}`, categoryDictionary) || {};
-  const creators = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const performers = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    
-  const composers = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
-  const directors = extractDirectors(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const creator = extractCreators(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const performer = extractPerformers(`${parsed.name || ""}\n${parsed.description || ""}`);    
+  // actor
+  const composer = extractComposers(`${parsed.name || ""}\n${parsed.description || ""}`);
+  const director = extractDirectors(`${parsed.name || ""}\n${parsed.description || ""}`);
+  // service
     const internal = {
     id_site_page: page.id_site_page,
     id_comune: page.id_comune,
@@ -818,9 +824,11 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     reinforcements: {},
     signals: [],
     creator: creators.map(name => ({ name, "@type": "Person" })),
-    composer: composers.map(name => ({ name, "@type": "Person" })),
-    director: directors.map(name => ({ name, "@type": "Person" })),
-    performer: performers.map(name => ({ name, "@type": "Person" })),    
+    performer: performer.map(name => ({ name, "@type": "Person" })),    
+    // actor
+    composer: composer.map(name => ({ name, "@type": "Person" })),
+    director: director.map(name => ({ name, "@type": "Person" })),
+    // service
     category: categoryData.category ?? null,
     strength: categoryData.strength ?? null,
     id_categoria: categoryData.categoryId ?? null,
