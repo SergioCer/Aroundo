@@ -300,7 +300,7 @@ function extractComposers(text) {
     /\b(?:musica|musiche|composizione|composizioni)\s+(?:originale\s+)?(?:di|del|della|dello|dei|degli|delle|da)\s+([^.;\n]{3,120})/gi,
     /\b(?:composta|composto|composte|composti)\s+da\s+([^.;\n]{3,120})/gi,
     /\b(?:compositore|compositrice)\s+([^.;\n]{3,120})/gi,
-    /\b(?:music\s+by|composed\s+by)\s+([^.;\n]{3,120})/gi
+    /\b(?:music\s+by|composed\s+by)\s+([^.;\n]{3,120})/gi,
     // Autori di libri e opere scritte
     /\b(?:romanzo|libro|saggio|racconto|opera|volume)\s+di\s+([^.;\n]{3,120})/gi,
     /\b(?:scritto|scritta|scritti|scritte)\s+da\s+([^.;\n]{3,120})/gi,
