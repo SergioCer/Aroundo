@@ -318,13 +318,18 @@ function extractPeopleByRole(text, terms, options = {}) {
   function findForward(termEnd) {
     const words = getWords(termEnd, Math.min(cleanText.length, termEnd + maxDistance + maxLength));
     if (!words.length) return null;
-    if (words[0].start - termEnd > maxDistance) return null;
-    const selected = [];
-    for (const word of words) {
-      if (selected.length && word.start - selected[selected.length - 1].end > 1) break;
-      selected.push(word);
-      const person = buildPerson(selected);
-      if (person) return person;
+    for (let i = 0; i < words.length; i++) {
+      const first = words[i];
+      if (first.start - termEnd > maxDistance) break;
+      if (!startsUpper(first.value)) continue;
+      const selected = [first];
+      for (let j = i + 1; j < words.length; j++) {
+        const next = words[j];
+        if (next.start - selected[selected.length - 1].end > 1) break;
+        selected.push(next);
+        const person = buildPerson(selected);
+        if (person) return person;
+      }
     }
     return null;
   }
@@ -334,13 +339,12 @@ function extractPeopleByRole(text, terms, options = {}) {
     if (!words.length) return null;
     for (let i = words.length - 1; i >= 0; i--) {
       const word = words[i];
-      if (word.end > termStart) continue;
-      if (termStart - word.start > maxDistance) continue;
+      if (termStart - word.end > maxDistance) break;
       if (!startsUpper(word.value)) continue;
       const selected = [word];
       for (let j = i - 1; j >= 0; j--) {
         const previous = words[j];
-        if (word.start - previous.end > 1) break;
+        if (selected[0].start - previous.end > 1) break;
         selected.unshift(previous);
         const person = buildPerson(selected);
         if (person) return person;
@@ -368,11 +372,18 @@ function extractPeopleByRole(text, terms, options = {}) {
 
 /* Performer - nuova estrazione tassonomica */
 function extractPerformers(text) {
-  const terms = ["performer", "performers", "interprete", "interpreti", "interpretato", "interpretata", "interpretati", "interpretate", "cantante", "cantanti",
-    "musicista", "musicisti", "soprano", "mezzosoprano", "tenore", "tenori", "baritono", "baritoni", "basso", "bassi",
-    "pianoforte", "pianista", "pianisti", "violino", "violinista", "violinisti", "clarinetto", "clarinettista", "clarinettisti",
-    "flauto", "flautista", "flautisti", "chitarra", "chitarrista", "chitarristi", "batteria", "batterista", "batteristi",
-    "voce", "voci", "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
+  const terms = ["performer", "performers", "interprete", "interpreti", "interpretato", "interpretata", "interpretati", "interpretate",
+    "cantante", "cantanti",
+    "musicista", "musicisti", 
+    "voce", "voci", "soprano", "soprani", "mezzosoprano", "mezzosoprani", "tenore", "tenori", "baritono", "baritoni", "basso", "bassi",
+    "pianoforte", "pianista", "pianisti", 
+    "violino", "violinista", "violinisti", "primo violino", "violoncello", "violoncelli", "violoncellista", "primo violoncello", 
+    "clarinetto", "clarinettista", "clarinettisti", "flauto", "flautista", "flautisti", 
+    "chitarra", "chitarrista", "chitarristi", 
+    "batteria", "batterista", "batteristi", "percussioni",
+    "sax", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
+    "fisarmonica", "fisarmonicista", "fisarmonicisti", "organo", 
+    "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
   ].join(";");
   return extractPeopleByRole(text, terms, {
     maxDistance: 8, // Distanza massima in caratteri tra il termine tassonomico ed il Cognome, Nome cercato.
