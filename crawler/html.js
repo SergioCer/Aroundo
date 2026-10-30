@@ -363,7 +363,7 @@ function extractPeopleByRole(text, terms, options = {}) {
       person = findBackward(termStart);
     }
     if (person) {
-      result.push(person);
+      result.push(`${person} (${match[0]})`);
       if (result.length >= maxPeople) break;
     }
   }
