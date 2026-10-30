@@ -721,7 +721,7 @@ function analyzeSignals(page, categoryDictionary) {
     ora: times.length > 0,
     prezzo: !!price,
     organizzatore: !!organizer,
-    creator: creators.length > 0,
+    creator: creator.length > 0,
     categoria: !!category
   };
   const reinforcementNames =
@@ -750,9 +750,19 @@ const locationFields = {
   addressRegion: null,
   addressCountry: null
 };
+const toPersonObjects = value => {if (!Array.isArray(value) || value.length === 0) return null;
+  return value
+    .map(item => {if (typeof item === "string") {const name = item.trim(); return name ? { "@type": "Person", name } : null;}
+      if (item && typeof item === "object") {return item;} return null;})
+    .filter(Boolean);};  
 const organizerName = typeof s.organizer === "string" ? s.organizer.trim() : typeof s.organizer?.name === "string" ? s.organizer.name.trim() : "";
 const organizer = organizerName ? { "@type": "Organization", name: organizerName } : null;
-  const creators = s.creators.length ? s.creators.map(name => ({"@type": "Person", name})) : null;
+  const creator = toPersonObjects(s.creator);
+  const performer = toPersonObjects(s.performer);
+  const actor = toPersonObjects(s.actor);
+  const composer = toPersonObjects(s.composer);
+  const director = toPersonObjects(s.director);
+// service
   const offers = s.price ? s.price === "gratuito" ? {"@type": "Offer", price: "0", description: "Gratuito"}
     : s.price === "da definire" ? {"@type": "Offer", description: "Definire"} 
     : {"@type": "Offer", price: s.price}: null;
@@ -787,9 +797,12 @@ const source = {
   startDate,
   ...locationFields,
   organizer,
-  performer: s.performer,
-  creator: creators,
-  director: s.director, 
+  creator,
+  performer,
+  actor,
+  composer,
+  director,
+  service: s.service ?? null,
   offers,
   image: s.image,
   url: page.sp_url,
@@ -823,7 +836,7 @@ function toSchemaJsonEvent(page, parsed, categoryDictionary) {
     fundamentals: {},
     reinforcements: {},
     signals: [],
-    creator: creators.map(name => ({ name, "@type": "Person" })),
+    creator: creator.map(name => ({ name, "@type": "Person" })),
     performer: performer.map(name => ({ name, "@type": "Person" })),    
     // actor
     composer: composer.map(name => ({ name, "@type": "Person" })),
