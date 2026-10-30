@@ -1002,6 +1002,7 @@ async function processSitePage(page, categoryDictionary, supabase, eventState) {
   const existing = eventState.byPage.get(pageId);
   const key = eventDuplicateKey(schema);
   if (existing) {
+      if (existing.se_schema?.classification === "R") {console.log(`[R] Riconciliato: ${page.id_site_page}`); return;}
     const oldKey = eventDuplicateKey(existing.se_schema);
     const result = await supabase
       .from("site_events")
