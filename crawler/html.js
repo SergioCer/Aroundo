@@ -263,7 +263,7 @@ function extractCreators(text) {
 function extractPeopleByRole(text, terms, options = {}) {
   if (!text || !terms) return [];
   const {
-    maxDistance = 35,
+    maxDistance = 6,
     minLength = 3,
     maxLength = 32,
     maxPeople = 10
@@ -321,7 +321,7 @@ function extractPerformers(text) {
     "voce", "voci", "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
   ].join(";");
   return extractPeopleByRole(text, terms, {
-    maxDistance: 35, // Distanza massima in caratteri tra il termine tassonomico ed il Cognome, Nome cercato.
+    maxDistance: 6, // Distanza massima in caratteri tra il termine tassonomico ed il Cognome, Nome cercato.
     minLength: 3, // Lunghezza minima del nome riconosciuto.
     maxLength: 32, // Lunghezza massima del nome riconosciuto.
     maxPeople: 10 // Numero massimo di persone restituite dalla funzione. 
