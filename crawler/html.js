@@ -381,7 +381,7 @@ function extractPerformers(text) {
     "clarinetto", "clarinettista", "clarinettisti", "flauto", "flautista", "flautisti", 
     "chitarra", "chitarrista", "chitarristi", 
     "batteria", "batterista", "batteristi", "percussioni",
-    "sax", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
+    "sax", "sassonofo", "sassofoni", "sassofonista", "sassofonisti", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
     "fisarmonica", "fisarmonicista", "fisarmonicisti", "organo", 
     "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
   ].join(";");
@@ -840,10 +840,10 @@ function analyzeSignals(page, categoryDictionary) {
   const price = extractPrice(text);
   const organizer = extractOrganizer(text);
   const creator = extractCreators(text);
-  const performer = extractPerformers(text);
+  const performer = extractPerformers(decodeHtml(page.se_schema?.description || "")); // cerca solo nella descrizione. 
   const composer = extractComposers(text);
   const director = extractDirectors(text);
-    const category = extractCategory(text, categoryDictionary);
+  const category = extractCategory(text, categoryDictionary);
   /* Estrae e Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
   const location = cleanPlaceField(extractLocation(text), city);
   const address = cleanPlaceField(extractAddress(text), city);
