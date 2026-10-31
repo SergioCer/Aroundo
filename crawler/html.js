@@ -189,7 +189,7 @@ function extractPrice(text) {
   return null;
 }
 
-/* Organizer */
+/* Organizer: termini che identificano chi organizza, promuove, produce o cura l'evento. */
 function extractOrganizer(text) {
   if (!text) return null;
   const terms = [
@@ -199,7 +199,7 @@ function extractOrganizer(text) {
     "promosso da", "promossa da", "promossi da", "promosse da",
     "a cura di",
     "realizzato da", "realizzata da", "realizzati da", "realizzate da",
-    "produzione", "produzioni",
+    "produzione", "produzioni", "prodotto da", "patrocinato da", "sostenuto da",  
     "presentato da", "presentata da", "presentati da", "presentate da",
     "opera", "evento", "iniziativa",
   ].sort((a, b) => b.length - a.length);
@@ -228,17 +228,20 @@ function extractOrganizer(text) {
   return null;
 }
 
-/* Creator */
+/* Creator: termini che identificano chi concepisce, scrive, adatta o contribuisce alla creazione dell'opera. */
 function extractCreators(text) {
   if (!text) return [];
   const result = [];
   const terms = [
     "musica", "musiche",
-    "libretto", "librettista", "librettisti", "librettiste", "librettista di", "testo del libretto",    
+    "libretto", "librettista", "librettisti", "librettiste",
     "testo", "testi", "autore", "autrice", "autori", "autrici",
-    "con", "presenta", "presentato", "presentata", "presentano",
-    "produzione", "prodotto", "prodotta", "progetto", 
-    "a cura di", "ideazione", "ideato", "ideata"
+    "drammaturgia", "drammaturgo", "drammaturga",
+    "adattamento", "adattato da", "traduzione", "tradotto da",
+    "soggetto", "sceneggiatura", "sceneggiatore", "sceneggiatrice",
+    "concept", "concepito da", "elaborazione", "rielaborato da", "rielaborazione",
+    "presenta", "presentato", "presentata", "presentano",
+    "progetto", "ideazione", "ideato", "ideata"
   ].sort((a, b) => b.length - a.length);
   const patterns = terms.map(term => {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -264,6 +267,67 @@ function extractCreators(text) {
   }
   return dedupeNames(result);
 }
+
+/* Performer: termini che identificano chi interpreta o esegue. */
+function extractPerformers(text) {
+  const terms = ["performer", "performers", "interprete", "interpreti", "interpretato", "interpretata", "interpretati", "interpretate",
+    "esecutore", "esecutrice", "esecutori", "esecutrici",
+    "cantante", "cantanti", "solosta", "solisti", "soliste", "ensamble", "coro", "corista", "coristi", "coriste",
+    "musicista", "musicisti", "orchestra", 
+    "voce", "voci", "soprano", "soprani", "mezzosoprano", "mezzosoprani", "tenore", "tenori", "baritono", "baritoni", "basso", "bassi",
+    "pianoforte", "pianista", "pianisti", 
+    "violino", "violinista", "violinisti", "primo violino", "violoncello", "violoncelli", "violoncellista", "primo violoncello", 
+    "clarinetto", "clarinettista", "clarinettisti", "flauto", "flautista", "flautisti", 
+    "chitarra", "chitarrista", "chitarristi", 
+    "batteria", "batterista", "batteristi", "percussioni",
+    "sax", "sassofono", "sassofoni", "sassofonista", "sassofonisti", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
+    "fisarmonica", "fisarmonicista", "fisarmonicisti", "organo", 
+    "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring", 
+    "danzatore", "danzatrice", "ballerino", "ballerina", "coreuta" 
+  ].join(";");
+  return extractPeopleByRole(text, terms, {
+    maxDistance: 8, // Distanza massima in caratteri tra il termine tassonomico ed il Cognome, Nome cercato.
+    minLength: 3, // Lunghezza minima del nome riconosciuto.
+    maxLength: 32, // Lunghezza massima del nome riconosciuto.
+    maxPeople: 10 // Numero massimo di persone restituite dalla funzione. 
+  });
+}
+
+/* Actor */
+
+/* Composer: termini che identificano chi compone la musica. */
+function extractComposers(text) {
+  const terms = [
+    "composto", "composta", "composti", "composte", "compositore", "compositori", "compositrice", "compositrici", "composizione", "composizioni", "composed by",
+    "musica originale", "musiche originali", "musica", "musiche", "music by", "colonna sonora", "soundtrack", 
+    "partitura", "partiture", "autore delle musiche", "autrice delle musiche", "autore della musica", "autrice della musica"
+      ].join(";");
+  return extractPeopleByRole(text, terms, {
+    maxDistance: 8,
+    minLength: 3,
+    maxLength: 32,
+    maxPeople: 4
+  });
+}
+
+/* Director:termini che identificano chi dirige o mette in scena. */
+function extractDirectors(text) {
+  const terms = [
+    "regia", "regista", "registi", "registe",
+    "diretto", "diretta", "diretti", "dirette",
+    "direzione", "direttore", "direttrice", "direttori", "direttrici",
+    "messo in scena", "allestimento", "allestito", 
+    "directed by", "direction by", "staged by"
+  ].join(";");
+  return extractPeopleByRole(text, terms, {
+    maxDistance: 12,
+    minLength: 3,
+    maxLength: 32,
+    maxPeople: 4
+  });
+}
+
+/* Service */
 
 /* Funzione UNICA per estrazione di Nomi e Cognomi con la ricerca tassonomica dei singoli 'performer;actor;composer;director' */
 function extractPeopleByRole(text, terms, options = {}) {
@@ -385,63 +449,6 @@ function extractPeopleByRole(text, terms, options = {}) {
   }
   return result;
 }
-
-/* Performer - nuova estrazione tassonomica */
-function extractPerformers(text) {
-  const terms = ["performer", "performers", "interprete", "interpreti", "interpretato", "interpretata", "interpretati", "interpretate",
-    "cantante", "cantanti",
-    "musicista", "musicisti", 
-    "voce", "voci", "soprano", "soprani", "mezzosoprano", "mezzosoprani", "tenore", "tenori", "baritono", "baritoni", "basso", "bassi",
-    "pianoforte", "pianista", "pianisti", 
-    "violino", "violinista", "violinisti", "primo violino", "violoncello", "violoncelli", "violoncellista", "primo violoncello", 
-    "clarinetto", "clarinettista", "clarinettisti", "flauto", "flautista", "flautisti", 
-    "chitarra", "chitarrista", "chitarristi", 
-    "batteria", "batterista", "batteristi", "percussioni",
-    "sax", "sassofono", "sassofoni", "sassofonista", "sassofonisti", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
-    "fisarmonica", "fisarmonicista", "fisarmonicisti", "organo", 
-    "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
-  ].join(";");
-  return extractPeopleByRole(text, terms, {
-    maxDistance: 8, // Distanza massima in caratteri tra il termine tassonomico ed il Cognome, Nome cercato.
-    minLength: 3, // Lunghezza minima del nome riconosciuto.
-    maxLength: 32, // Lunghezza massima del nome riconosciuto.
-    maxPeople: 10 // Numero massimo di persone restituite dalla funzione. 
-  });
-}
-
-/* Actor */
-
-/* Composer - nuova estrazione tassonomica */
-function extractComposers(text) {
-  const terms = [
-    "composto", "composta", "composti", "composte", "compositore", "compositori", "compositrice", "compositrici", "composizione", "composizioni", "composed by",
-    "musica originale", "musiche originali", "musica", "musiche", "music by", "autore delle musiche", "autrice delle musiche", "autore della musica", "autrice della musica"
-      ].join(";");
-  return extractPeopleByRole(text, terms, {
-    maxDistance: 8,
-    minLength: 3,
-    maxLength: 32,
-    maxPeople: 10
-  });
-}
-
-/* Director - nuova estrazione tassonomica */
-function extractDirectors(text) {
-  const terms = [
-    "regia", "regista", "registi", "registe",
-    "diretto", "diretta", "diretti", "dirette",
-    "direzione", "direttore", "direttrice", "direttori", "direttrici",
-    "directed by", "direction by"
-  ].join(";");
-  return extractPeopleByRole(text, terms, {
-    maxDistance: 8,
-    minLength: 3,
-    maxLength: 32,
-    maxPeople: 10
-  });
-}
-
-/* Service */
 
 function dedupeNames(values) {
   const seen = new Set();
