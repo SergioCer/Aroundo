@@ -192,24 +192,30 @@ function extractPrice(text) {
 /* Organizer */
 function extractOrganizer(text) {
   if (!text) return null;
+  const terms = [
+    "organizzatore", "organizzatrice", "organizzatori", "organizzatrici", "organizzazione", "organizzazioni",
+    "organizzato da", "organizzata da", "organizzati da", "organizzate da",
+    "promotore", "promotrice", "promotori", "promotrici",
+    "promosso da", "promossa da", "promossi da", "promosse da",
+    "a cura di",
+    "realizzato da", "realizzata da", "realizzati da", "realizzate da",
+    "produzione", "produzioni",
+    "presentato da", "presentata da", "presentati da", "presentate da",
+    "opera", "spettacolo", "evento", "iniziativa", "manifestazione", "rassegna", "festival"
+  ].sort((a, b) => b.length - a.length);
   const patterns = [
     /* FORME ESPLICITE */
-    /\borganizzat[oa]\s+da\s+([^.;\n]{2,150})/i,
-    /\borganizzatore\s*[:\-]\s*([^.;\n]{2,150})/i,
-    /\borganizzatrice\s*[:\-]\s*([^.;\n]{2,150})/i,
-    /\borgani(?:zza|zzato|zzata)\s+(?:da\s+)?([^.;\n]{2,150})/i,
-    /\bpromoss[oa]\s+da\s+([^.;\n]{2,150})/i,
-    /\ba\s+cura\s+di\s+([^.;\n]{2,150})/i,
-    /\brealizzat[oa]\s+da\s+([^.;\n]{2,150})/i,
-    /\bproduzione\s+(?:di|a cura di)\s+([^.;\n]{2,150})/i,
-    /* FORME SEMANTICHE INDIRETTE Esempio: "opera da camera del Luglio Musicale Trapanese" */
-    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdel\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
-    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdella\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
-    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdell['’]\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u,
-    /\b(?:opera|spettacolo|evento|iniziativa|manifestazione|rassegna|festival)\b[^.;\n]{0,100}?\bdi\s+([A-ZÀ-ÖØ-Ý][^.;\n]{2,100})/u
+    ...terms.slice(0, 23).map(term => {
+      const escaped = escapeRegExp(term);
+      return {term, regex: new RegExp(`\\b${escaped}\\s+(?:da\\s+|di\\s+)?([^.;\\n]{2,150})`, "i")};
+    }),
+    /* FORME SEMANTICHE INDIRETTE */
+    ...["opera", "spettacolo", "evento", "iniziativa", "manifestazione", "rassegna", "festival"].map(term => ({
+      term, regex: new RegExp(`\\b${term}\\b[^.;\\n]{0,100}?\\b(?:del|della|dell['’]|di)\\s+([A-ZÀ-ÖØ-Ý][^.;\\n]{2,100})`, "i")
+    }))
   ];
-  for (const re of patterns) {
-    const m = text.match(re);
+  for (const pattern of patterns) {
+    const m = text.match(pattern.regex);
     if (!m) continue;
     let value = clean(m[1]);
     if (!value) continue;
@@ -217,7 +223,7 @@ function extractOrganizer(text) {
     value = value
       .split(/\s+\b(?:con|per|che|dove|quando|sul|sulla|al|alla|allo)\b/i)[0]
       .trim();
-    if (value.length >= 3 && value.length <= 150) {return value;}
+    if (value.length >= 3 && value.length <= 150) {return `${value} (${pattern.term})`;}
   }
   return null;
 }
@@ -226,22 +232,24 @@ function extractOrganizer(text) {
 function extractCreators(text) {
   if (!text) return [];
   const result = [];
-  const patterns = [
-    /\b(?:regia|regista)\s+(?:di\s+)?([^.;\n]{3,120})/gi,
-    /\b(?:direzione|direttore|direttrice)\s+(?:di\s+)?([^.;\n]{3,120})/gi,
-    /\bmusica\s+(?:di\s+)?([^.;\n]{3,120})/gi,
-    /\bmusiche\s+(?:di\s+)?([^.;\n]{3,120})/gi,
-    /\blibretto\s+(?:di\s+)?([^.;\n]{3,120})/gi,
-    /\btesti?\s+(?:di\s+)?([^.;\n]{3,120})/gi,
-    /\bcon\s+([^.;\n]{3,120})/gi,
-    /\bpresenta(?:to|ta)?\s+(?:da\s+)?([^.;\n]{3,120})/gi
-  ];
+  const terms = [
+    "musica", "musiche",
+    "libretto", "librettista", "librettisti", "librettiste", "librettista di", "testo del libretto",    
+    "testo", "testi", "autore", "autrice", "autori", "autrici",
+    "con", "presenta", "presentato", "presentata", "presentano",
+    "produzione", "prodotto", "prodotta", "progetto", 
+    "a cura di", "ideazione", "ideato", "ideata"
+  ].sort((a, b) => b.length - a.length);
+  const patterns = terms.map(term => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${escaped}\\b\\s+(?:di\\s+|da\\s+)?([^.;\\n]{3,120})`, "gi");
+  });
   /* Nome proprio composto:
    * Alessio Pizzech
    * Orazio Sciortino
    * Guido Barbieri
    * Permettiamo anche nomi con più componenti. */
-  const personName =/\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
+  const personName = /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
   for (const re of patterns) {
     for (const m of text.matchAll(re)) {
       const segment = clean(m[1]);
@@ -250,9 +258,7 @@ function extractCreators(text) {
       if (!names) continue;
       for (const name of names) {
         const value = clean(name);
-        if (value && value.length >= 5 && value.length <= 80) {
-          result.push(value);
-        }
+        if (value && value.length >= 5 && value.length <= 80) {result.push(value);}
       }
     }
   }
@@ -410,8 +416,7 @@ function extractComposers(text) {
   const terms = [
     "composto", "composta", "composti", "composte", "compositore", "compositori", "compositrice", "compositrici", "composizione", "composizioni", "composed by",
     "musica originale", "musiche originali", "musica", "musiche", "music by", "autore delle musiche", "autrice delle musiche", "autore della musica", "autrice della musica"
-    "libretto", "librettista", "librettisti", "librettista di", "testo del libretto",
-  ].join(";");
+      ].join(";");
   return extractPeopleByRole(text, terms, {
     maxDistance: 8,
     minLength: 3,
