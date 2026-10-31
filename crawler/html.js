@@ -403,102 +403,42 @@ function extractPerformers(text) {
   });
 }
 
-/* Performer DISABILITATA 
-function extractPerformers(text) {
-  if (!text) return [];
-  const result = [];
-  const patterns = [
-    /\b(?:interpretato|interpretata|interpretati|interpretate)\s+da\s+([^.;\n]{3,120})/gi,
-    /\b(?:interpreta|interpretano|interpreti)\s+([^.;\n]{3,120})/gi,
-    /\b(?:con|protagonista|protagonisti|protagoniste)\s+([^.;\n]{3,120})/gi,
-    /\b(?:cast|nel\s+cast|artisti|artiste)\s*[:\-]?\s*([^.;\n]{3,120})/gi,
-    /\b(?:voce|voci)\s+di\s+([^.;\n]{3,120})/gi,
-    /\b(?:featuring|feat\.?|performed\s+by|starring)\s+([^.;\n]{3,120})/gi
-  ];
-  const personName =
-    /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
-  for (const re of patterns) {
-    for (const m of text.matchAll(re)) {
-      const segment = clean(m[1]);
-      if (!segment) continue;
-      const names = segment.match(personName);
-      if (!names) continue;
-      for (const name of names) {
-        const value = clean(name);
-        if (value && value.length >= 5 && value.length <= 80) {
-          result.push(value);
-        }
-      }
-    }
-  }
-  return dedupeNames(result);
-}
-
 /* Actor */
 
-/* Composer */
+/* Composer - nuova estrazione tassonomica */
 function extractComposers(text) {
-  if (!text) return [];
-  const result = [];
-  const patterns = [
-    /\b(?:musica|musiche|composizione|composizioni)\s+(?:originale\s+)?(?:di|del|della|dello|dei|degli|delle|da)\s+([^.;\n]{3,120})/gi,
-    /\b(?:composta|composto|composte|composti)\s+da\s+([^.;\n]{3,120})/gi,
-    /\b(?:compositore|compositrice)\s+([^.;\n]{3,120})/gi,
-    /\b(?:music\s+by|composed\s+by)\s+([^.;\n]{3,120})/gi,
-    // Autori di libri e opere scritte
-    /\b(?:romanzo|libro|saggio|racconto|opera|volume)\s+di\s+([^.;\n]{3,120})/gi,
-    /\b(?:scritto|scritta|scritti|scritte)\s+da\s+([^.;\n]{3,120})/gi,
-    /\b(?:autore|autrice)\s+(?:del|della|di|del libro|del romanzo)?\s*([^.;\n]{3,120})/gi,
-    /\b(?:written\s+by|book\s+by|author\s+of)\s+([^.;\n]{3,120})/gi    
-  ];
-  const personName =
-    /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
-  for (const re of patterns) {
-    for (const m of text.matchAll(re)) {
-      const segment = clean(m[1]);
-      if (!segment) continue;
-      const names = segment.match(personName);
-      if (!names) continue;
-      for (const name of names) {
-        const value = clean(name);
-        if (value && value.length >= 5 && value.length <= 80) {
-          result.push(value);
-        }
-      }
-    }
-  }
-  return dedupeNames(result);
+  const terms = [
+    "compositore", "compositori", "compositrice", "compositrici",
+    "composizione", "composizioni",
+    "musica originale", "musiche originali",
+    "musica", "musiche",
+    "composto", "composta", "composti", "composte",
+    "music by", "composed by",
+    "autore delle musiche", "autrice delle musiche",
+    "autore della musica", "autrice della musica"
+  ].join(";");
+  return extractPeopleByRole(text, terms, {
+    maxDistance: 8,
+    minLength: 3,
+    maxLength: 32,
+    maxPeople: 10
+  });
 }
 
-/* Director */
+/* Director - nuova estrazione tassonomica */
 function extractDirectors(text) {
-  if (!text) return [];
-  const result = [];
-  const patterns = [
-    /\b(?:regia|regista)\s+(?:di\s+|di\s+teatro\s+)?([^.;\n]{3,120})/gi,
-    /\b(?:diretto|diretta|diretti|dirette)\s+da\s+([^.;\n]{3,120})/gi,
-    /\b(?:direzione|direttore|direttrice)\s+(?:artistica\s+)?(?:di\s+|da\s+)?([^.;\n]{3,120})/gi,
-    /\b(?:directed\s+by|direction\s+by)\s+([^.;\n]{3,120})/gi
-  ];
-  // CANCELLARE *****
-  //  /\b(?:|||||)\b\s*(?:(?:di|da|del|della|dello|dei|degli|delle|dal|dalla|dallo|dai|dagli|dalle|per|a|al|alla|con|è|e)\s+)*([A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ'’.-]*)*)/;
-  const personName =
-    /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
-  for (const re of patterns) {
-    for (const m of text.matchAll(re)) {
-      const segment = clean(m[1]);
-      if (!segment) continue;
-      const names = segment.match(personName);
-      if (!names) continue;
-      for (const name of names) {
-        const value = clean(name);
-        if (value && value.length >= 5 && value.length <= 80) {
-          result.push(value);
-        }
-      }
-    }
-  }
-  return dedupeNames(result);
+  const terms = [
+    "regia", "regista", "registi", "registe",
+    "diretto", "diretta", "diretti", "dirette",
+    "direzione", "direttore", "direttrice", "direttori", "direttrici",
+    "directed by", "direction by"
+  ].join(";");
+  return extractPeopleByRole(text, terms, {
+    maxDistance: 8,
+    minLength: 3,
+    maxLength: 32,
+    maxPeople: 10
+  });
 }
 
 /* Service */
@@ -853,8 +793,9 @@ function analyzeSignals(page, categoryDictionary) {
   const performer = extractPerformers(description || "");
   // Invece di tutto il testo.
   // const performer = extractPerformers(text);
-  const composer = extractComposers(text);
-  const director = extractDirectors(text);
+  const composer = extractComposers(description || "");
+  const director = extractDirectors(description || "");
+  
   const category = extractCategory(text, categoryDictionary);
   /* Estrae e Rimuove in location e address da... Comune in poi incluso il comune ed il prefisso */
   const location = cleanPlaceField(extractLocation(text), city);
