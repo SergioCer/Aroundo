@@ -352,7 +352,7 @@ function extractPeopleByRole(text, terms, options = {}) {
     const selected = [words[firstIndex]];
     for (let i = firstIndex - 1; i >= 0; i--) {
       const previous = words[i];
-      if (cleanText.slice(selected[selected.length - 1].end, next.start).includes(".")) break;
+      if (cleanText.slice(previous.end, selected[0].start).includes(".")) break;
       if (selected[0].start - previous.end > 1) break;
       if (!startsUpper(previous.value) && !isParticle(previous.value)) break;
       selected.unshift(previous);
