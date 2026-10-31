@@ -209,7 +209,7 @@ function extractOrganizer(text) {
       const escaped = escapeRegExp(term);
       return {term, regex: new RegExp(`\\b${escaped}\\s+(?:da\\s+|di\\s+)?([^.;\\n]{2,150})`, "i")};
     }),
-    /* FORME SEMANTICHE INDIRETTE */
+    /* FORME SEMANTICHE INDIRETTE, ovvero precedute dai termini... di del della...*/
     ...["opera", "spettacolo", "evento", "iniziativa", "manifestazione", "rassegna", "festival"].map(term => ({
       term, regex: new RegExp(`\\b${term}\\b[^.;\\n]{0,100}?\\b(?:del|della|dell['’]|di)\\s+([A-ZÀ-ÖØ-Ý][^.;\\n]{2,100})`, "i")
     }))
@@ -242,23 +242,23 @@ function extractCreators(text) {
   ].sort((a, b) => b.length - a.length);
   const patterns = terms.map(term => {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return new RegExp(`\\b${escaped}\\b\\s+(?:di\\s+|da\\s+)?([^.;\\n]{3,120})`, "gi");
-  });
+    return {term, regex: new RegExp(`\\b${escaped}\\b\\s+(?:di\\s+|da\\s+)?([^.;\\n]{3,120})`, "gi")};
+});
   /* Nome proprio composto:
    * Alessio Pizzech
    * Orazio Sciortino
    * Guido Barbieri
    * Permettiamo anche nomi con più componenti. */
   const personName = /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
-  for (const re of patterns) {
-    for (const m of text.matchAll(re)) {
+  for (const pattern of patterns) {
+    for (const m of text.matchAll(pattern.regex)) {
       const segment = clean(m[1]);
       if (!segment) continue;
       const names = segment.match(personName);
       if (!names) continue;
       for (const name of names) {
         const value = clean(name);
-        if (value && value.length >= 5 && value.length <= 80) {result.push(value);}
+        if (value && value.length >= 5 && value.length <= 80) {result.push(`${value} (${pattern.term})`);}
       }
     }
   }
