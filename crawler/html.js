@@ -292,7 +292,7 @@ function extractPeopleByRole(text, terms, options = {}) {
   function getWords(start, end) {
     const fragment = cleanText.slice(start, end);
     const words = [];
-    const regex = /[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)?\.?/g;
+    const regex = /[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)?/g;
     for (const match of fragment.matchAll(regex)) {
       words.push({
         value: match[0],
