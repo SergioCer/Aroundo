@@ -329,6 +329,7 @@ function extractPeopleByRole(text, terms, options = {}) {
     const selected = [words[firstIndex]];
     for (let i = firstIndex + 1; i < words.length; i++) {
       const next = words[i];
+      if (cleanText.slice(selected[selected.length - 1].end, next.start).includes(".")) break;
       if (next.start - selected[selected.length - 1].end > 1) break;
       if (!startsUpper(next.value) && !isParticle(next.value)) break;
       selected.push(next);
@@ -351,6 +352,7 @@ function extractPeopleByRole(text, terms, options = {}) {
     const selected = [words[firstIndex]];
     for (let i = firstIndex - 1; i >= 0; i--) {
       const previous = words[i];
+      if (cleanText.slice(selected[selected.length - 1].end, next.start).includes(".")) break;
       if (selected[0].start - previous.end > 1) break;
       if (!startsUpper(previous.value) && !isParticle(previous.value)) break;
       selected.unshift(previous);
@@ -387,7 +389,7 @@ function extractPerformers(text) {
     "clarinetto", "clarinettista", "clarinettisti", "flauto", "flautista", "flautisti", 
     "chitarra", "chitarrista", "chitarristi", 
     "batteria", "batterista", "batteristi", "percussioni",
-    "sax", "sassonofo", "sassofoni", "sassofonista", "sassofonisti", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
+    "sax", "sassofono", "sassofoni", "sassofonista", "sassofonisti", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
     "fisarmonica", "fisarmonicista", "fisarmonicisti", "organo", 
     "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring"
   ].join(";");
@@ -846,7 +848,7 @@ function analyzeSignals(page, categoryDictionary) {
   const price = extractPrice(text);
   const organizer = extractOrganizer(text);
   const creator = extractCreators(text);
-  const performer = extractPerformers(decodeHtml(page.se_schema?.description || "")); // cerca solo nella descrizione. 
+  const performer = extractPerformers(text);
   const composer = extractComposers(text);
   const director = extractDirectors(text);
   const category = extractCategory(text, categoryDictionary);
