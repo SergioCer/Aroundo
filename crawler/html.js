@@ -319,6 +319,7 @@ function extractPeopleByRole(text, terms, options = {}) {
     const words = getWords(termEnd, Math.min(cleanText.length, termEnd + maxDistance + maxLength));
     let firstIndex = -1;
     for (let i = 0; i < words.length; i++) {
+      if (cleanText.slice(termEnd, words[i].start).includes(".")) break;
       if (words[i].start - termEnd > maxDistance) break;
       if (startsUpper(words[i].value)) {
         firstIndex = i;
@@ -342,6 +343,7 @@ function extractPeopleByRole(text, terms, options = {}) {
     const words = getWords(Math.max(0, termStart - maxDistance - maxLength), termStart);
     let firstIndex = -1;
     for (let i = words.length - 1; i >= 0; i--) {
+      if (cleanText.slice(words[i].end, termStart).includes(".")) break;
       if (termStart - words[i].end > maxDistance) break;
       if (startsUpper(words[i].value)) {
         firstIndex = i;
