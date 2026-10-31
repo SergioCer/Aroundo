@@ -201,7 +201,7 @@ function extractOrganizer(text) {
     "realizzato da", "realizzata da", "realizzati da", "realizzate da",
     "produzione", "produzioni",
     "presentato da", "presentata da", "presentati da", "presentate da",
-    "opera", "spettacolo", "evento", "iniziativa", "manifestazione", "rassegna", "festival"
+    "opera", "evento", "iniziativa",
   ].sort((a, b) => b.length - a.length);
   const patterns = [
     /* FORME ESPLICITE */
