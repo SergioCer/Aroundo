@@ -792,9 +792,7 @@ function normalizeImageUrl(value, pageUrl) {
 function extractDescription(text, title) {
   let value = clean(text);
   if (!value) return null;
-  if (title) {
-    value = value.replace(new RegExp(escapeRegExp(title), "ig"), " ");
-  }
+  if (title) {value = value.replace(new RegExp(escapeRegExp(title), "ig"), " ");}
   value = clean(value);
   if (!value || value.length < 30) {return null;}
   return value;
@@ -850,7 +848,11 @@ function analyzeSignals(page, categoryDictionary) {
   const price = extractPrice(text);
   const organizer = extractOrganizer(text);
   const creator = extractCreators(text);
-  const performer = extractPerformers(text);
+  // PROVA in caso di HTML a cercare solo nella descrizione. 
+  const description = extractDescription(text, title);
+  const performer = extractPerformers(description || "");
+  // Invece di tutto il testo.
+  // const performer = extractPerformers(text);
   const composer = extractComposers(text);
   const director = extractDirectors(text);
   const category = extractCategory(text, categoryDictionary);
