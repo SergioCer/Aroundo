@@ -408,14 +408,9 @@ function extractPerformers(text) {
 /* Composer - nuova estrazione tassonomica */
 function extractComposers(text) {
   const terms = [
-    "compositore", "compositori", "compositrice", "compositrici",
-    "composizione", "composizioni",
-    "musica originale", "musiche originali",
-    "musica", "musiche",
-    "composto", "composta", "composti", "composte",
-    "music by", "composed by",
-    "autore delle musiche", "autrice delle musiche",
-    "autore della musica", "autrice della musica"
+    "composto", "composta", "composti", "composte", "compositore", "compositori", "compositrice", "compositrici", "composizione", "composizioni", "composed by",
+    "musica originale", "musiche originali", "musica", "musiche", "music by", "autore delle musiche", "autrice delle musiche", "autore della musica", "autrice della musica"
+    "libretto", "librettista", "librettisti", "librettista di", "testo del libretto",
   ].join(";");
   return extractPeopleByRole(text, terms, {
     maxDistance: 8,
