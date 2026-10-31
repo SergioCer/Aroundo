@@ -317,53 +317,59 @@ function extractPeopleByRole(text, terms, options = {}) {
   // Ricerca diretta: termine tassonomico -> nominativo
   function findForward(termEnd) {
     const words = getWords(termEnd, Math.min(cleanText.length, termEnd + maxDistance + maxLength));
-    if (!words.length) return null;
+    let firstIndex = -1;
     for (let i = 0; i < words.length; i++) {
-      const first = words[i];
-      if (first.start - termEnd > maxDistance) break;
-      if (!startsUpper(first.value)) continue;
-      const selected = [first];
-      for (let j = i + 1; j < words.length; j++) {
-        const next = words[j];
-        if (next.start - selected[selected.length - 1].end > 1) break;
-        selected.push(next);
-        const person = buildPerson(selected);
-        if (person) return person;
+      if (words[i].start - termEnd > maxDistance) break;
+      if (startsUpper(words[i].value)) {
+        firstIndex = i;
+        break;
       }
     }
-    return null;
+    if (firstIndex === -1) return null;
+    const selected = [words[firstIndex]];
+    for (let i = firstIndex + 1; i < words.length; i++) {
+      const next = words[i];
+      if (next.start - selected[selected.length - 1].end > 1) break;
+      if (!startsUpper(next.value) && !isParticle(next.value)) break;
+      selected.push(next);
+    }
+    const person = buildPerson(selected);
+    return person ? { person, direction: "" } : null;
   }
   // Ricerca inversa: nominativo -> termine tassonomico
   function findBackward(termStart) {
     const words = getWords(Math.max(0, termStart - maxDistance - maxLength), termStart);
-    if (!words.length) return null;
+    let firstIndex = -1;
     for (let i = words.length - 1; i >= 0; i--) {
-      const word = words[i];
-      if (termStart - word.end > maxDistance) break;
-      if (!startsUpper(word.value)) continue;
-      const selected = [word];
-      for (let j = i - 1; j >= 0; j--) {
-        const previous = words[j];
-        if (selected[0].start - previous.end > 1) break;
-        selected.unshift(previous);
-        const person = buildPerson(selected);
-        if (person) return person;
+      if (termStart - words[i].end > maxDistance) break;
+      if (startsUpper(words[i].value)) {
+        firstIndex = i;
+        break;
       }
     }
-    return null;
+    if (firstIndex === -1) return null;
+    const selected = [words[firstIndex]];
+    for (let i = firstIndex - 1; i >= 0; i--) {
+      const previous = words[i];
+      if (selected[0].start - previous.end > 1) break;
+      if (!startsUpper(previous.value) && !isParticle(previous.value)) break;
+      selected.unshift(previous);
+    }
+    const person = buildPerson(selected);
+    return person ? { person, direction: "G-" } : null;
   }
   // Analizza tutte le occorrenze tassonomiche nel testo
   for (const match of cleanText.matchAll(termRegex)) {
     const termStart = match.index;
     const termEnd = termStart + match[0].length;
     // Prima prova la ricerca diretta
-    let person = findForward(termEnd);
+    let found = findForward(termEnd);
     // Se non trova un nominativo, prova la ricerca inversa
-    if (!person) {
-      person = findBackward(termStart);
+    if (!found) {
+      found = findBackward(termStart);
     }
-    if (person) {
-      result.push(`${person} (${match[0]})`);
+    if (found) {
+      result.push(`${found.person} (${found.direction}${match[0]})`);
       if (result.length >= maxPeople) break;
     }
   }
