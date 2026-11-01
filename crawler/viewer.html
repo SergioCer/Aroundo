@@ -175,8 +175,16 @@ body{
 }  
 
 .event-image.reconciliation-field-selectable {
-  cursor: pointer !important;
-  outline: 2px solid red;
+  cursor: pointer;
+}
+
+.event-image.reconciliation-field-selectable:hover {
+  outline: 2px solid #e0b52a;
+}
+
+.event-image.reconciliation-field-selected {
+  outline: 3px solid #e0b52a;
+  outline-offset: -3px;
 }
   
 /* Campi coinvolti nella riconciliazione parte SCHEDA */
