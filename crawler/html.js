@@ -190,6 +190,7 @@ function extractPrice(text) {
 }
 
 /* Organizer: termini che identificano chi organizza, promuove, produce o cura l'evento. */
+/* CANCELLARE 
 function extractOrganizer(text) {
   if (!text) return null;
   const terms = [
@@ -197,7 +198,7 @@ function extractOrganizer(text) {
     "organizzato da", "organizzata da", "organizzati da", "organizzate da",
     "promotore", "promotrice", "promotori", "promotrici",
     "promosso da", "promossa da", "promossi da", "promosse da",
-    "a cura di",
+    "a cura di", "curato da", "programma", 
     "realizzato da", "realizzata da", "realizzati da", "realizzate da",
     "produzione", "produzioni", "prodotto da", "patrocinato da", "sostenuto da",  
     "presentato da", "presentata da", "presentati da", "presentate da",
@@ -205,11 +206,13 @@ function extractOrganizer(text) {
   ].sort((a, b) => b.length - a.length);
   const patterns = [
     /* FORME ESPLICITE */
+/* 
     ...terms.slice(0, 23).map(term => {
       const escaped = escapeRegExp(term);
       return {term, regex: new RegExp(`\\b${escaped}\\s+(?:da\\s+|di\\s+)?([^.;\\n]{2,150})`, "i")};
     }),
     /* FORME SEMANTICHE INDIRETTE, ovvero precedute dai termini... di del della...*/
+/*
     ...["opera", "spettacolo", "evento", "iniziativa", "manifestazione", "rassegna", "festival"].map(term => ({
       term, regex: new RegExp(`\\b${term}\\b[^.;\\n]{0,100}?\\b(?:del|della|dell['’]|di)\\s+([A-ZÀ-ÖØ-Ý][^.;\\n]{2,100})`, "i")
     }))
@@ -220,6 +223,7 @@ function extractOrganizer(text) {
     let value = clean(m[1]);
     if (!value) continue;
     /* EVITA DI TRASCINARE LA FRASE SUCCESSIVA */
+/*
     value = value
       .split(/\s+\b(?:con|per|che|dove|quando|sul|sulla|al|alla|allo)\b/i)[0]
       .trim();
@@ -229,6 +233,7 @@ function extractOrganizer(text) {
 }
 
 /* Creator: termini che identificano chi concepisce, scrive, adatta o contribuisce alla creazione dell'opera. */
+/* CANCELLARE 
 function extractCreators(text) {
   if (!text) return [];
   const result = [];
@@ -252,6 +257,7 @@ function extractCreators(text) {
    * Orazio Sciortino
    * Guido Barbieri
    * Permettiamo anche nomi con più componenti. */
+/*
   const personName = /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
   for (const pattern of patterns) {
     for (const m of text.matchAll(pattern.regex)) {
@@ -266,6 +272,183 @@ function extractCreators(text) {
     }
   }
   return dedupeNames(result);
+}
+*/
+
+/* Organizer: termini che identificano chi organizza, promuove, produce o cura l'evento. */
+function extractOrganizer(text) {
+  const terms = [
+    "organizzatore", "organizzatrice", "organizzatori", "organizzatrici",
+    "organizzazione", "organizzazioni",
+    "organizzato", "organizzata", "organizzati", "organizzate",
+    "promotore", "promotrice", "promotori", "promotrici",
+    "promosso", "promossa", "promossi", "promosse",
+    "a cura di", "curato", "curata",
+    "realizzato", "realizzata", "realizzati", "realizzate",
+    "produzione", "produzioni", "prodotto",
+    "patrocinato", "sostenuto",
+    "presentato", "presentata", "presentati", "presentate"
+  ].join(";");
+  return extractEntitiesByRole(text, terms, {
+    maxDistance: 8,
+    minLength: 3,
+    maxLength: 80,
+    multiple: false
+  });
+}
+
+/* Creator: termini che identificano chi concepisce, scrive, adatta o contribuisce alla creazione dell'opera. */
+function extractCreators(text) {
+  const terms = [
+    "musica", "musiche",
+    "libretto", "librettista", "librettisti", "librettiste",
+    "testo", "testi", "autore", "autrice", "autori", "autrici",
+    "drammaturgia", "drammaturgo", "drammaturga",
+    "adattamento", "adattato", "adattata",
+    "traduzione", "tradotto", "tradotta",
+    "soggetto", "sceneggiatura", "sceneggiatore", "sceneggiatrice",
+    "concept", "concepito", "concepita",
+    "elaborazione", "rielaborato", "rielaborata", "rielaborazione",
+    "presenta", "presentato", "presentata", "presentano",
+    "progetto", "ideazione", "ideato", "ideata"
+  ].join(";");
+  return extractEntitiesByRole(text, terms, {
+    maxDistance: 8,
+    minLength: 3,
+    maxLength: 80,
+    multiple: false
+  });
+}
+
+/* Entities: riconosce persone, aziende, enti, associazioni e organizzazioni. */
+function extractEntitiesByRole(text, terms, options = {}) {
+  if (!text || !terms) return options.multiple ? [] : null;
+  const {
+    maxDistance = 8,
+    minLength = 3,
+    maxLength = 80,
+    maxEntities = 10,
+    multiple = false
+  } = options;
+  const connectors = new Set([
+    "di", "del", "dello", "della", "dei", "degli", "delle",
+    "da", "dal", "dallo", "dalla", "dai", "dagli", "dalle",
+    "d'", "dell'", "dall'", "e"
+  ]);
+  const cleanText = value => value.trim().replace(/\s+/g, " ");
+  const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const isCapitalized = word => /^[A-ZÀ-ÖØ-Þ]/.test(word);
+  const isConnector = word => connectors.has(word.toLowerCase());
+  const taxonomy = terms
+    .split(";")
+    .map(term => term.trim())
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+  const patterns = taxonomy.map(term => ({
+    term,
+    regex: new RegExp(`\\b${escapeRegExp(term)}\\b`, "gi")
+  }));
+  const candidates = [];
+  /* Ricostruisce una denominazione a partire dalla prima parola maiuscola. */
+  function buildEntity(source, start) {
+    const segment = source.slice(start).split(/[.,\-\n\r]/)[0];
+    const words = [...segment.matchAll(/[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)?/g)];
+    if (!words.length || words[0].index !== 0) return null;
+    if (!isCapitalized(words[0][0])) return null;
+    const selected = [words[0]];
+    let capitalizedCount = 1;
+    for (let i = 1; i < words.length; i++) {
+      const previous = selected[selected.length - 1];
+      const current = words[i];
+      const gap = segment.slice(previous.index + previous[0].length, current.index);
+      if (!/^\s+$/.test(gap)) break;
+      if (isCapitalized(current[0])) {
+        selected.push(current);
+        capitalizedCount++;
+      } else if (isConnector(current[0])) {
+        const next = words[i + 1];
+        if (!next || !isCapitalized(next[0])) break;
+        const nextGap = segment.slice(
+          current.index + current[0].length,
+          next.index
+        );
+        if (!/^\s+$/.test(nextGap)) break;
+        selected.push(current);
+      } else {break;}
+    }
+    if (capitalizedCount < 2) return null;
+    const last = selected[selected.length - 1];
+    const value = cleanText(segment.slice(0, last.index + last[0].length));
+    if (value.length < minLength || value.length > maxLength) return null;
+    return value;
+  }
+  /* Ricerca diretta: termine tassonomico → soggetto. */
+  for (const pattern of patterns) {
+    for (const match of text.matchAll(new RegExp(pattern.regex.source, "gi"))) {
+      const afterTerm = text.slice(match.index + match[0].length);
+      const words = [...afterTerm.matchAll(/[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)?/g)];
+      let firstEntityWord = null;
+      for (const word of words) {
+        const gap = afterTerm.slice(0, word.index);
+        if (!/^\s+$/.test(gap) && gap !== "") break;
+        if (isCapitalized(word[0])) {
+          firstEntityWord = word;
+          break;
+        }
+        if (!isConnector(word[0])) break;
+      }
+      if (!firstEntityWord) continue;
+      const distance = firstEntityWord.index;
+      if (distance > maxDistance) continue;
+      const value = buildEntity(afterTerm, firstEntityWord.index);
+      if (value) {candidates.push({index: match.index + match[0].length + firstEntityWord.index, value, term: pattern.term});}
+    }
+  }
+  /* Ricerca inversa: soggetto → termine tassonomico. */
+  for (const pattern of patterns) {
+    for (const match of text.matchAll(new RegExp(pattern.regex.source, "gi"))) {
+      const beforeTerm = text.slice(0, match.index);
+      const segment = beforeTerm.split(/[.,\-\n\r]/).pop();
+      const words = [...segment.matchAll(/[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)?/g)];
+      if (!words.length) continue;
+      const last = words[words.length - 1];
+      if (!isCapitalized(last[0])) continue;
+      const distance = match.index - (beforeTerm.length - segment.length + last.index + last[0].length);
+      if (distance < 0 || distance > maxDistance) continue;
+      let firstIndex = words.length - 1;
+      let capitalizedCount = 1;
+      for (let i = words.length - 2; i >= 0; i--) {
+        const current = words[i];
+        const next = words[firstIndex];
+        const gap = segment.slice(current.index + current[0].length, next.index);
+        if (!/^\s+$/.test(gap)) break;
+        if (isCapitalized(current[0])) {
+          firstIndex = i;
+          capitalizedCount++;
+        } else if (isConnector(current[0])) {
+          const previous = words[i - 1];
+          if (!previous || !isCapitalized(previous[0])) break;
+          firstIndex = i;
+        } else {break;}
+      }
+      if (capitalizedCount < 2) continue;
+      const value = cleanText(segment.slice(words[firstIndex].index, last.index + last[0].length));
+      if (value.length < minLength || value.length > maxLength) continue;
+      candidates.push({index: beforeTerm.length - segment.length + words[firstIndex].index, value, term: pattern.term});
+    }
+  }
+  /* Ordina i risultati secondo la posizione nel testo ed evita duplicati. */
+  candidates.sort((a, b) => a.index - b.index);
+  const results = [];
+  const seen = new Set();
+  for (const candidate of candidates) {
+    const key = candidate.value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    results.push(`${candidate.value} (${candidate.term})`);
+    if (!multiple || results.length >= maxEntities) break;
+  }
+  return multiple ? results : (results[0] || null);
 }
 
 /* Performer: termini che identificano chi interpreta o esegue. */
@@ -293,7 +476,7 @@ function extractPerformers(text) {
   });
 }
 
-/* Actor */
+/* Actor: attori e attrici che recitano, distinti dagli altri performer. */
 
 /* Composer: termini che identificano chi compone la musica. */
 function extractComposers(text) {
@@ -327,9 +510,9 @@ function extractDirectors(text) {
   });
 }
 
-/* Service */
+/* Service: servizi e figure professionali che contribuiscono alla realizzazione dell'evento. */
 
-/* Funzione UNICA per estrazione di Nomi e Cognomi con la ricerca tassonomica dei singoli 'performer;actor;composer;director' */
+/* People: estrazione di Nomi e Cognomi con la ricerca tassonomica dei singoli 'performer;actor;composer;director' */
 function extractPeopleByRole(text, terms, options = {}) {
   if (!text || !terms) return [];
   const {
@@ -450,6 +633,7 @@ function extractPeopleByRole(text, terms, options = {}) {
   return result;
 }
 
+/* CANCELLARE FORSE è in verifica */
 function dedupeNames(values) {
   const seen = new Set();
   const result = [];
