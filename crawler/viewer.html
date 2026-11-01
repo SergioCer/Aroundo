@@ -709,10 +709,10 @@ function formatCategoryMatches(matches, field) {
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
   Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
-  const isReconciliationCard =
-    reconciliationRole === "parent" ||
-    reconciliationRole === "child";
-  return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
+  // le righe di sotto aprivano automaticamente i dettagli dello schema
+  // const isReconciliationCard = reconciliationRole === "parent" || reconciliationRole === "child";
+  // return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
+  return `<div id="${id}" class="schema-details">
     ${fields.map(field => {
       const v = event[field];
       if (!isSchemaDisplayable(v)) return "";
