@@ -602,6 +602,13 @@ function formatDate(value){
   }catch(e){return {date:value, time:""};}
 }
 
+function splitDateTime(value) {
+  if (!value) return { date: "", time: "" };
+  const match = String(value).match(/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?))?$/);
+  if (!match) return { date: String(value), time: "" };
+  return {date: match[1], time: match[2] || ""};
+}
+  
 function eventLocation(event) {const location = event.location;
   if (!location) return "";
   if (typeof location === "string") return location;
