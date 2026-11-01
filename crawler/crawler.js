@@ -280,20 +280,6 @@ function isIgnoredUrl(url) {
   return ignoredExtensions.some(extension => pathname.endsWith(extension));
 }
 
-/* ESTRAZIONE DEGLI HREF */
-// ATTENZIONE sembra che non sia agganciata da nessuna parte ***** CANCELLARE ?????
-function extractLinks(html, pageUrl) {
-  const results = [];
-  const regex = /<a\b[^>]*\bhref\s*=\s*(['"])(.*?)\1/gi;
-  let match;
-  while ((match = regex.exec(html)) !== null) {
-    const href = match[2];
-    const normalized = normalizeUrl(href, pageUrl);
-    if (normalized && !isIgnoredUrl(normalized)) {
-      if (!results.includes(normalized)) {results.push( normalized);}
-    }}return results;
-}
-
 /* RICHIESTA HTTP */
 function fetchPage(url) {
   return new Promise((resolve, reject) => {
@@ -342,11 +328,8 @@ function fetchPage(url) {
    Nota: questa funzione non interpreta il contenuto dei tag, non applica le regole di un browser e non corregge automaticamente un HTML malformato. */
 function buildDom(html) {
     /* 1. NODO RADICE: Rappresenta l'intero documento.
-     Non corrisponde a un tag HTML reale.
-     start/end delimitano l'intera stringa HTML.
-     openEnd vale 0 perché la radice non ha un tag di apertura.
-     children conterrà i nodi principali.
-     parent è null perché la radice non ha un genitore. */
+     Non corrisponde a un tag HTML reale start/end delimitano l'intera stringa HTML.
+     openEnd vale 0 perché la radice non ha un tag di apertura, children conterrà i nodi principali, parent è null perché la radice non ha un genitore. */
   const root = {
     tag: "#root",
     start: 0,
@@ -418,6 +401,7 @@ function buildDom(html) {
   return root;
 }
 
+/* Costruisce le ricorsività trovate nel blocco */
 function foundRicorsivity(root) {
   const result = [];
   const recursivities = [];
