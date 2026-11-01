@@ -743,8 +743,8 @@ function eventCard(row, index, reconciliationRole = null){
       <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}<span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="Visualizza JSON-LD">Schema</button>
-      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella Evento">Delete</button>
-      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicate">Pubblica</button>
+      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella record Evento">Delete</button>
+      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblica</button>
       ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}</div></article>`;
 }
 
