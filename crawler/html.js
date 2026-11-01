@@ -435,7 +435,7 @@ function extractEntitiesByRole(text, terms, options = {}) {
       if (capitalizedCount < 2) continue;
       const value = cleanText(segment.slice(words[firstIndex].index, last.index + last[0].length));
       if (value.length < minLength || value.length > maxLength) continue;
-      candidates.push({index: beforeTerm.length - segment.length + words[firstIndex].index, value, term: `G-${pattern.term}`});
+      candidates.push({index: beforeTerm.length - segment.length + words[firstIndex].index, value, term: `${pattern.term}<`});
     }
   }
   /* Ordina i risultati secondo la posizione nel testo ed evita duplicati. */
@@ -614,7 +614,7 @@ function extractPeopleByRole(text, terms, options = {}) {
       selected.unshift(previous);
     }
     const person = buildPerson(selected);
-    return person ? { person, direction: "G-" } : null;
+    return person ? { person, direction: "<" } : null;
   }
   // Analizza tutte le occorrenze tassonomiche nel testo
   for (const match of cleanText.matchAll(termRegex)) {
