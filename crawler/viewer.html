@@ -1307,7 +1307,7 @@ function chooseSuggestionParent(rows) {
 }
 
 function buildSuggestionGroups() {
-  const rows = loadedEvents.filter(row => row.se_schema && filtraEventoPerComune(row, comuniMap, filterComuni.value));
+  const rows = loadedEvents.filter(row => row.se_schema && activeClassifications.has(row.se_schema.classification) && filtraEventoPerComune(row, comuniMap, filterComuni.value));
   const groupsByKey = new Map();
   // Raggruppa prima per data: le coppie senza una data confrontabile non vengono proposte.
   // Ogni evento viene indicizzato per tutte le sue date di calendario.
