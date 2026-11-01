@@ -802,7 +802,8 @@ for (const event of schemaEvents) {
        Ogni elemento fornisce gli indici start/end con cui estrarre la porzione corrispondente dell'HTML originale. */    
 for (const group of ricorsivity) {
   for (const element of group.elements) {
-    const block = result.content.slice(element.start, element.end);
+    const originalBlock = result.content.slice(element.start, element.end);
+    const block = cleanMoescoBlock(originalBlock, currentUrl); // PULISCE il blocco per MOESCO 
     // Scarta i blocchi per cui non viene individuata una data futura.
     const futureDate = findFutureDate(block);
     if (!futureDate) {continue;}
@@ -872,6 +873,61 @@ for (const match of result.content.matchAll(linkRegex)) {
   console.log("");
   console.log(`Scansione site ${site.id_site} terminata.`);
   console.log(`Pagine visitate: ${visited.size}`);
+}
+
+/* PULIZIA BLOCCHI MOESCO */
+function cleanMoescoBlock(block, pageUrl) {
+  let hostname = "";
+  try {hostname = new URL(pageUrl).hostname.toLowerCase();}
+  catch {return block;}
+  if (hostname !== "moesco.it" && !hostname.endsWith(".moesco.it")) {return block;}
+  const root = buildDom(block);
+  const removals = [];
+  function findNode(node, predicate) {
+    if (predicate(node)) return node;
+    for (const child of node.children) {
+      const found = findNode(child, predicate);
+      if (found) return found;
+    }
+    return null;
+  }
+  // Rimuove l'avviso redazionale e la relativa fonte.
+  function collectNodes(node, predicate) {
+    if (predicate(node)) {
+      removals.push(node);
+      return;
+    }
+    for (const child of node.children) {
+      collectNodes(child, predicate);
+    }
+  }
+  collectNodes(root, node => node.tag === "aside");
+  // Rimuove l'avviso finale di Moesco.
+  collectNodes(root, node =>
+    node.tag === "div" &&
+    /bg-amber-50/.test(block.slice(node.start, node.openEnd))
+  );
+  // Individua il contenitore principale della scheda.
+  const main = findNode(root, node =>
+    node.tag === "div" &&
+    /lg:col-span-2/.test(block.slice(node.start, node.openEnd))
+  );
+  if (!main) return block;
+  // Rimuove la colonna laterale, mantenendo il contenuto principale.
+  const parent = main.parent;
+  for (const child of parent.children) {
+    if (child !== main && child.start > main.start && child.end > main.end) {
+      removals.push(child);
+    }
+  }
+  // Elimina eventuali duplicati.
+  const unique = [...new Set(removals)];
+  // Rimuove prima gli intervalli più arretrati, così gli indici restano validi.
+  unique.sort((a, b) => b.start - a.start);
+  for (const node of unique) {
+    block = block.slice(0, node.start) + block.slice(node.end);
+  }
+  return block;
 }
 
 /* SALVATAGGIO SITE_PAGE */
