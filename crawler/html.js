@@ -316,7 +316,8 @@ function extractCreators(text) {
     maxDistance: 8,
     minLength: 3,
     maxLength: 80,
-    multiple: false
+    multiple: true,
+    maxEntities: 2
   });
 }
 
