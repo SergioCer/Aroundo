@@ -971,7 +971,13 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   const childValue = childSchema[field];
   if (nonReconciledFields.has(field)) return;
   if (!hasSchemaValue(childValue)) return;
-  const fields = field === "addressLocality" ? ["addressLocality", "id_comune"] : [field];
+  // Associa Comune; Categoria; Subcategoria ai relativi ID
+  const pairedFields = {
+  addressLocality: ["addressLocality", "id_comune"],
+  category: ["category", "id_categoria"],
+  subcategory: ["subcategory", "id_subcategoria"]
+  };
+  const fields = pairedFields[field] || [field];
   // Per il comune, il figlio deve avere entrambi i valori.
   if (field === "addressLocality" && !hasSchemaValue(childSchema.id_comune)
   ) {alert("Impossibile selezionare il comune: manca id_comune nel figlio."); return;}
