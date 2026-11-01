@@ -769,7 +769,8 @@ function eventCard(row, index, reconciliationRole = null){
   const sourceUrl = row.site_pages && row.site_pages.sp_url ? row.site_pages.sp_url : value(event.url);
   const schemaId = `schema-${row.id_site_event || index}`;
   return `<article class="event">
-    ${image ? reconciliationCardField("image", `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">`, reconciliationRole, row.id_site_event) : ""}
+    ${image ? `<div class="event-image ${reconciliationRole === "child" ? "reconciliation-field-selectable" : ""} ${reconciliationSelections.get("image")?.childId === String(row.id_site_event) ? "reconciliation-field-selected" : ""}"
+    ${reconciliationRole === "child" ? `data-reconciliation-field="image" data-child-id="${escapeHtml(row.id_site_event)}"` : ""}><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>` : ""}
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
     ${startDate ? reconciliationCardField("startDate", `<span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(startDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
     ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
