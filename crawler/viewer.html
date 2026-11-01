@@ -1,0 +1,1507 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+<meta charset="utf-8">
+<title>Aroundo — Eventi acquisiti</title>
+
+<style>
+html{
+  height:100%;
+  overflow:hidden
+}
+  
+body{
+  font-family:Arial,sans-serif;
+  margin:0;
+  background:#f4f6f8;
+  color:#222;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden
+}
+  
+.top{
+  background:#2980b9;
+  color:white;
+  padding:6px
+}
+
+.top h1{
+  margin:0 0 0px;
+  font-size:24px;
+  text-align: center;
+}
+
+.wrap {
+  padding: 12px;
+  margin: 0;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.section {
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 0;
+  padding: 6px;
+  box-shadow: 0 2px 8px #0001;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.events-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+  gap:10px;
+}
+
+.event{
+  background:#fff;
+  border:1px solid #ddd;
+  border-left:6px solid #27ae60;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 2px 6px #0001
+}
+
+.event-image{
+  width:100%;
+  height:220px;
+  background:#eef0f2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden
+}
+
+.event-image img{
+  width:100%;
+  height:100%;
+  object-fit:contain
+}
+
+.event-body{
+  padding:8px
+}
+
+.event h3{
+  margin:0 0 10px;
+  text-align: center;
+  font-size:20px
+}
+
+.event .field{
+  margin:4px 0;
+  line-height:1.45
+}
+
+.event .label{
+  color:#444;
+  font-weight:bold
+}
+
+.event-description{
+  margin:8px 0;
+  color:#555;
+  line-height:1.5
+}
+
+.event-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#analysisStatus {
+  font-size: 13px;
+  color: #666;
+}  
+
+.schema-details{
+  display:none;
+  margin-top:8px;
+  border-top:2px solid #ddd;
+  }
+
+.schema-details.open{
+  display:block
+}
+
+.schema-field{
+  padding:0px 0;
+  border-bottom:1px solid #eee;
+  line-height:1.4
+}
+
+.schema-field:last-child{
+  border-bottom:0
+}
+
+/* Campi coinvolti nella riconciliazione */
+.schema-field.reconciliation-field-selectable {
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.schema-field.reconciliation-field-selectable:hover {
+  background: #fff8d6;
+}
+
+.schema-field.reconciliation-field-selected {
+  background: #fff0a6;
+  border-radius: 3px;
+}
+
+.schema-field.reconciliation-field-selected .schema-name,
+.schema-field.reconciliation-field-selected .schema-value {
+  color: #664d00;
+}
+
+.schema-field.reconciliation-field-unavailable {
+  cursor: not-allowed;
+  opacity: 0.65;
+}  
+
+.schema-name{
+  display:inline;
+  font-weight:normal;
+  color:#34495e
+}
+
+.schema-value{
+  display:inline;
+  color:#333;
+  word-break:break-word
+}
+
+.empty{
+  padding:18px;
+  background:#fafafa;
+  border:1px dashed #bbb;
+  border-radius:8px;
+  color:#777
+}
+
+.error{
+  padding:18px;
+  background:#fdecea;
+  border:1px solid #e74c3c;
+  border-radius:8px;
+  color:#c0392b
+}
+
+.source{
+  margin-top:8px;
+  padding-top:10px;
+  border-top:1px solid #eee;
+  font-size:10px;
+  color:#666;
+  word-break:break-all
+}
+
+.source a{
+  color:#2980b9;
+  text-decoration:none
+}
+
+.source a:hover{
+  text-decoration:underline
+}
+
+.timestamp{
+  margin-top:4px;
+  font-size:10px;
+  color:#999
+}
+
+.record-id{
+  float:right;
+  font-size:12px;
+  color:#999;
+  font-weight:normal
+}
+
+.classification-E{
+  background:#27ae60;
+  color:white;
+  padding: 5px 5px;
+  font-weight:bold
+}
+
+.classification-I{
+  background:#ff8000;
+  color:white;
+  padding: 5px 5px;
+  font-weight:bold
+}  
+
+.classification-J {
+  background: #2980b9;
+  color: white;
+  padding: 5px 5px;
+  font-weight: bold;
+}  
+
+.classification-R {
+  background: #8e44ad;
+  color: white;
+  padding: 5px 5px;
+  font-weight: bold;
+}
+
+  .classification-filter {
+  padding: 3px 7px;
+  min-width: 25px;
+  border: none;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.classification-filter:not(.active) {
+  background: #aaa;
+  color: white;
+}
+
+ .schema-button{
+  margin-top:6px;
+  padding:6px 6px;
+  border:0;
+  border-radius:20px;
+  background:#27ae60;
+  color:white;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:bold
+}
+
+.schema-button:hover{
+  background:#22313f
+}
+
+.reconciliation-card button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.reconciliation-select-button {
+  margin-top: 6px;
+  padding: 6px 6px;
+  border: 0;
+  border-radius: 20px;
+  background: #8e44ad;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.reconciliation-select-button:hover {
+  background: #6c3483;
+}  
+
+  .reconciliation-remove-button {
+  background: #e67e22;
+  color: white;
+  border: 0;
+  border-radius: 16px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.reconciliation-remove-button:hover {
+  background: #ca6f1e;
+}  
+
+.delete-button{
+  background:#e74c3c;
+  color:white;
+  border:0;
+  border-radius:16px;
+  padding:6px 6px;
+  cursor:pointer;
+  font-size: 14px;
+  font-weight:bold
+}
+  
+.delete-button:hover{
+  background:#c0392b
+}  
+
+#reconciliation {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+#reconciliation:empty {
+  display: none;
+}
+
+#reconciliation:empty + #splitter {
+  display: none;
+}
+
+#splitter {
+  flex: 0 0 10px;
+  min-height: 10px;
+  cursor: row-resize;
+  touch-action: none;
+  user-select: none;
+  background: #2f0afb;
+  border-top: 1px solid #d0d0d0;
+  border-bottom: 1px solid #d0d0d0;
+  position: relative;
+  z-index: 20;
+}
+
+#splitter::after {
+  content: "";
+  position: absolute;
+  width: 44px;
+  height: 3px;
+  border-radius: 3px;
+  background: #999;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#splitter:hover {
+  background: #dcdcdc;
+}
+  
+.reconciliation-section {
+  margin: 6px;
+  padding: 6px;
+  border: 2px solid #8b9bb4;
+  border-radius: 6px;
+  background: #eef2f7;
+}
+
+.reconciliation-section h2 {
+  text-align: center;
+  margin: 0 0 6px;
+}
+
+.reconciliation-grid {
+  align-items: start;
+}
+
+.reconciliation-card {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ccd4df;
+}
+
+.reconciliation-card h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.reconciliation-card .event {
+  margin: 0;
+}
+
+.category-match {
+  display: block;
+}
+
+#analyzeBtn.analysis-red {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+  
+</style>
+</head>
+  
+<body>
+<div class="top">
+  <h1>Aroundo — Eventi acquisiti: <span id="status">...</span></h1>
+</div>
+  <div class="section">
+<div class="event-controls">
+  <button id="analyzeBtn" class="schema-button analyze-button" title="Estrai acquisiti">Estrai</button>
+  <span id="analysisStatus" style="margin-left:12px"></span>
+  <label for="sortBy">Ordina per:</label>
+  <select id="sortBy">
+    <option value="id">ID</option>
+    <option value="date-place">Data → Luogo</option>
+    <option value="place-date">Luogo → Data</option>
+    <option value="date">Data</option>
+    <option value="place">Luogo</option>
+  </select>
+  <button id="sortDirection" type="button">↓ Decrescente</button>
+  <label for="filterComuni">Comuni:</label>
+  <select id="filterComuni">
+    <option value="all">Tutti</option>
+    <option value="attivi">Attivi</option>
+    <option value="previsti">Previsti</option>
+    <option value="attivi-previsti">Attivi + Previsti</option>
+    <option value="esclusi">Esclusi</option>
+  </select>
+  <button class="classification-filter classification-I active" data-classification="I" title="Mostra/Nascondi Incompleti">I</button>
+  <button class="classification-filter classification-E active" data-classification="E" title="Mostra/Nascondi Eventi">E</button>
+  <button class="classification-filter classification-J active" data-classification="J" title="Mostra/Nascondi JSON">J</button>
+  <button class="classification-filter classification-R active" data-classification="R" title="Mostra/Nascondi Riconciliati">R</button>
+  <button id="suggestBtn" class="schema-button" type="button" title="Ricongiungi Eventi">Suggerisci</button>
+</div>
+
+<div id="reconciliation"></div>
+    <div
+      id="splitter"
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label="Ridimensiona le aree"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      tabindex="0"
+    ></div>
+<div class="wrap">
+    <div id="results">
+      <div class="empty">
+        Caricamento degli eventi da Supabase...
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from "../supabase.js";
+import { runAnalysis } from "./html.js";
+
+const comuni = await loadComuni();
+const comuniMap = new Map(comuni.map(comune => [comune.id_comune, comune]));
+const filterComuni = document.getElementById("filterComuni");
+  
+async function loadComuni() {const { data, error } = await supabase
+    .from("comuni")
+    .select("id_comune, co_descrizione, co_attivato, co_previsto");
+  if (error) {console.error("Errore caricamento comuni:", error); return [];}
+  return data || [];
+}
+
+function filtraEventoPerComune(evento, comuniMap, filtro) {
+  if (filtro === "all") {return true;}
+  const schema = evento.se_schema || {};
+  const locality = value(schema.addressLocality).trim().toLowerCase();
+  const comune = [...comuniMap.values()].find(c => c.co_descrizione.trim().toLowerCase() === locality);
+  if (!comune) {return false;}
+  const dataEvento = value(schema.startDate).slice(0, 10);
+  if (!dataEvento) {return false;}
+  if (filtro === "attivi") {return comune.co_attivato != null && dataEvento >= comune.co_attivato;}
+  if (filtro === "previsti") {return comune.co_previsto != null && dataEvento >= comune.co_previsto;}
+  if (filtro === "attivi-previsti") {return ((comune.co_attivato != null && dataEvento >= comune.co_attivato) || (comune.co_previsto != null && dataEvento >= comune.co_previsto));}
+  if (filtro === "esclusi") {
+  const attivo = comune.co_attivato != null && dataEvento >= comune.co_attivato;
+  const previsto = comune.co_previsto != null && dataEvento >= comune.co_previsto;
+  return !attivo && !previsto;
+  }return true;
+}
+  
+/* UTILITÀ */
+function escapeHtml(value){
+  if(value === null || value === undefined){
+    return "";
+  }
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function value(v) {
+  if (v === null || v === undefined) return "";
+  if (Array.isArray(v)) {return v.map(value).filter(Boolean).join(", ");}
+  if (typeof v === "object") {
+    if (v.name) return value(v.name);
+    if (v["@value"] !== undefined) return value(v["@value"]);
+    const address = v.address;
+    if (address) {const parts = [
+        v.name,
+        typeof address === "string" ? address : address.streetAddress,
+        typeof address === "object" ? address.addressLocality : null,
+        typeof address === "object" ? address.addressRegion : null
+      ].map(value).filter(Boolean);
+      if (parts.length) return [...new Set(parts)].join(", ");
+    }    return JSON.stringify(v);
+  }
+  return String(v).trim();
+}
+
+function formatDate(value){
+  if(!value){return {date:"", time:""};}
+  try{
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())){return {date:value, time:""};}
+    const datePart = date.toLocaleDateString("it-IT", {day:"2-digit", month:"2-digit", year:"numeric"});
+    const hasTime = /T\d{2}:\d{2}/.test(value);
+    const timePart = hasTime ? date.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"}) : "";
+    return {date:datePart, time:timePart};
+  }catch(e){return {date:value, time:""};}
+}
+
+function eventLocation(event) {const location = event.location;
+  if (!location) return "";
+  if (typeof location === "string") return location;
+  if (typeof location !== "object") return "";
+  const parts = [];
+  if (location.name) {parts.push(value(location.name));}
+  const address = location.address;
+  if (typeof address === "string") {parts.push(address);
+  } else if (address && typeof address === "object") {
+    [
+      address.streetAddress,
+      address.addressLocality,
+      address.addressRegion,
+      address.postalCode
+    ].forEach(part => {
+      const text = value(part);
+      if (text && !parts.includes(text)) parts.push(text);});
+  }
+  return [...new Set(parts)].join(", ");
+}
+
+function formatSchemaValue(value){
+  if(value === null || value === undefined || value === ""
+  ){return "";}
+  if(typeof value === "object"){return JSON.stringify(value, null, 2);}
+  return String(value);
+}
+  
+function displaySchemaValue(v){
+  if(v === null || v === undefined){return "";}
+  if(Array.isArray(v)){return v
+    .map(item => displaySchemaValue(item))
+    .filter(Boolean)
+    .join(", ");
+  }
+  if(typeof v === "object"){
+    if(v.description){return displaySchemaValue(v.description);}
+    if(v.name){return displaySchemaValue(v.name);}
+    if(v["@value"]){return displaySchemaValue(v["@value"]);}
+    if(v.price !== undefined){const currency = v.priceCurrency ? ` ${v.priceCurrency}`: ""; return `${v.price}${currency}`;}
+    return JSON.stringify(v);}
+  return String(v);
+}
+
+function isSchemaDisplayable(value) {
+  if (value === undefined || value === null) return false;
+  if (typeof value === "string") {return value.trim() !== "";}
+  if (Array.isArray(value)) {return value.some(isSchemaDisplayable);}
+  if (typeof value === "object") {return Object.values(value).some(isSchemaDisplayable);}
+  // Mantiene visibili valori validi come 0 e false.
+  return true;
+}
+
+/* CAMPI ORDINABILI di SCHEMA.ORG */
+const schemaFields = [
+  "name", "description", "startDate", "endDate", "duration", "doorTime",
+  "location", "address", "addressLocality", "postalCode",
+  "offers", "isAccessibleForFree", 
+  "organizer", "creator", "performer", "actor", "composer", "director", "service",
+  /* CLASSIFICAZIONE */
+  "strength",       // Forza della classificazione
+  "id_categoria",   // ID della categoria riconosciuta
+  "category",       // Caegria da json
+  "macroMatches",   // corrispondenze macroCategorie
+  "id_subcategoria",// ID della subcategoria
+  "subcategory",    // subcategoria
+  "subMatches",     // corrispondenze subCategorie
+  /* ANALISI DELL'ESTRAZIONE */
+  "fundamentals",   // Campi Fondamentali
+  "reinforcements", // Campi Rafforzativi
+  "signals",        // Segnali intercettati
+  /* RIFERIMENTI INTERNI */
+  "id_site_page",   // riferimento pagina sorgente
+  "id_comune",      // ID del comune
+  "classification", // Attributo: Evento / Incompleto / Json / Riconciliato( E - I - J - R )
+  /* ALTRE PROPRIETÀ SCHEMA.ORG */
+  "subEvent",
+  "superEvent",
+  "eventAttendanceMode",
+  "eventStatus",
+  "eventSchedule",
+  "previousStartDate",
+  "audience",
+  "inLanguage",
+  "image",
+  "url",
+  "sameAs"
+];
+
+/* FORMATTA MATCH DELLE CATEGORIE */
+function formatCategoryMatches(matches, field) {
+  if (!Array.isArray(matches)) {return escapeHtml(formatSchemaValue(matches));}
+  return matches.map(item => {
+    const terms = (item.terms || [])
+      .map(term => `${term.term}: ${term.count}`)
+      .join("; ");
+    const categoryPrefix = field === "subMatches"
+      ? `(${item.categoriaId}) - `
+      : "";
+    return `<div class="category-match">${categoryPrefix}(${escapeHtml(String(item.id))}) ${escapeHtml(item.descrizione || "")}
+      — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;
+    }).join("");
+}
+             
+function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
+  const fields = [...schemaFields];
+  Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
+  const isReconciliationCard =
+    reconciliationRole === "parent" ||
+    reconciliationRole === "child";
+  return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
+    ${fields.map(field => {
+      const v = event[field];
+      if (!isSchemaDisplayable(v)) return "";
+      const exists = v !== undefined && v !== null && v !== "";
+      const selection = reconciliationSelections.get(field);
+      const isSelected = !!selection && (reconciliationRole === "parent" || (reconciliationRole === "child" && selection.childId === String(rowId)));
+      const isChildField = reconciliationRole === "child" &&  exists && !nonReconciledFields.has(field);
+      const unavailable = isChildField && !!selection &&  selection.childId !== String(rowId);
+      const classes = ["schema-field", isChildField ? "reconciliation-field-selectable" : "", isSelected ? "reconciliation-field-selected" : "",
+        unavailable ? "reconciliation-field-unavailable" : ""].filter(Boolean).join(" ");
+      const dataAttributes = isChildField ? `data-reconciliation-field="${escapeHtml(field)}" data-child-id="${escapeHtml(rowId)}"
+        title="${unavailable  ? "Deseleziona prima la fonte attuale di questo campo" : "Clicca per selezionare o deselezionare questo valore"}"`: "";
+      return `<div class="${classes}" ${dataAttributes}><div class="schema-name">${escapeHtml(field)} = </div>
+        <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(
+          field === "macroMatches" || field === "subMatches" ? "" : formatSchemaValue(v)) + (
+          field === "macroMatches" || field === "subMatches" ? formatCategoryMatches(v, field) : "") : "null"}</div>
+        </div>`;}).join("")}</div>`;
+}
+
+/* Gestisce la selezione dei campi direttamente sulla scheda evento. */
+function reconciliationCardField(field, content, reconciliationRole, rowId) {
+  const exists = content !== undefined && content !== null && content !== "";
+  const selection = reconciliationSelections.get(field);
+  const childId = String(rowId);
+  const isChildField = reconciliationRole === "child" && exists && !nonReconciledFields.has(field);
+  const isSelected = !!selection && (
+    reconciliationRole === "parent" ||
+    (reconciliationRole === "child" && selection.childId === childId)
+  );
+  const unavailable = isChildField && !!selection && selection.childId !== childId;
+  const classes = [
+    "field",
+    isChildField ? "reconciliation-field-selectable" : "",
+    isSelected ? "reconciliation-field-selected" : "",
+    unavailable ? "reconciliation-field-unavailable" : ""
+  ].filter(Boolean).join(" ");
+  const attributes = isChildField
+    ? `data-reconciliation-field="${escapeHtml(field)}"
+       data-child-id="${escapeHtml(childId)}"
+       title="${unavailable ? "Deseleziona prima la fonte attuale" : "Seleziona o deseleziona questo valore"}"`
+    : "";
+  return `<div class="${classes}" ${attributes}>${content}</div>`;
+}
+  
+/* SCHEDA EVENTO */
+function eventCard(row, index, reconciliationRole = null){
+  const event = reconciliationRole === "parent" ? getReconciledSchema(row) : (row.se_schema || {});
+  const title = value(event.name) || value(event.title) || "Evento senza titolo";
+  const description = value(event.description);
+  const startDate = value(event.startDate);
+  const endDate = value(event.endDate);
+  // Campi geografici autonomi
+  const location = value(event.location);
+  const address = value(event.address);
+  const comune = value(event.addressLocality);
+  const cap = value(event.postalCode);
+  const offers = displaySchemaValue(event.offers);
+  const category = displaySchemaValue(event.category);
+  const organizer = value(event.organizer);
+  const creator = displaySchemaValue(event.creator);
+  const performer = displaySchemaValue(event.performer);
+  // actor 
+  const composer = displaySchemaValue(event.composer);
+  const director = displaySchemaValue(event.director);
+  // service
+  const image = value(event.image);
+  const sourceUrl = row.site_pages && row.site_pages.sp_url ? row.site_pages.sp_url : value(event.url);
+  const schemaId = `schema-${row.id_site_event || index}`;
+  return `<article class="event">
+      ${image ? `<div class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>`: ""}
+        <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
+  ${startDate ? reconciliationCardField("startDate",
+    `<span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(startDate).time)}` : ""}`,
+    reconciliationRole, row.id_site_event) : ""}
+      ${endDate ? `<div class="field"><span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">
+      Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}</div>` : ""}
+      ${comune ? `<div class="field"><span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}</div>` : ""}
+      ${!comune && cap ? `<div class="field"><span class="label">CAP:</span> ${escapeHtml(cap)}</div>` : ""}
+      ${location ? `<div class="field"><span class="label">Luogo:</span> ${escapeHtml(location)}</div>` : ""}
+      ${address ? `<div class="field"><span class="label">Indirizzo:</span> ${escapeHtml(address)}</div>` : ""}
+      ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
+      ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
+      ${organizer ? `<div class="field"><span class="label">Organizer: </span>${escapeHtml(organizer)}</div>` : ""}
+      ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>` : ""}
+      ${composer ? `<div class="field"><span class="label">Composer: </span>${escapeHtml(composer)}</div>` : ""}
+      ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>` : ""}
+      ${director ? `<div class="field"><span class="label">Director: </span>${escapeHtml(director)}</div>` : ""}
+      ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
+      ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
+      ${escapeHtml(sourceUrl)}</a></div>`: ""}
+      <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}<span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
+      ${reconciliationButton(row, reconciliationRole)}
+      <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="Visualizza JSON-LD">Schema</button>
+      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella record Evento">Delete</button>
+      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblica</button>
+      ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}</div></article>`;
+}
+
+window.deleteEvent=deleteEvent;
+window.selectParent = selectParent;
+window.addReconciliationChild = addReconciliationChild;
+window.removeFromReconciliation = removeFromReconciliation;
+window.confirmReconciliation = confirmReconciliation;
+window.nuovoEvento = nuovoEvento;
+  
+/* APERTURA / CHIUSURA SCHEMA */
+window.toggleSchema = function(id){
+  const element = document.getElementById(id);
+  if(!element){return;}
+  element.classList.toggle("open");
+};
+
+document.getElementById("reconciliation").addEventListener("click",
+  event => {const fieldElement = event.target.closest(".schema-field[data-reconciliation-field]");
+    if (!fieldElement) return;
+    toggleReconciliationField(fieldElement.dataset.reconciliationField, fieldElement.dataset.childId);
+  }
+);
+  
+let loadedEvents = [];
+let sortBy = "id";
+let sortAscending = true;
+let reconciliationParentId = null;
+let reconciliationSaving = false;  
+const reconciliationChildIds = new Set();
+
+/* field -> {
+ *   childId: ID del figlio fonte,
+ *   value: valore selezionato,
+ *   mode: "auto" oppure "manual"
+ * } */
+const reconciliationSelections = new Map();
+/* Campi per i quali non devono partire nuove proposte automatiche. La scelta manuale rimane comunque possibile. */
+const reconciliationLockedFields = new Set();
+/* Metadati che non devono essere ereditati automaticamente dai figli. */
+const nonReconciledFields = new Set(["classification", "id_site_page"]);
+  
+function cloneJson(value) {
+  if (value === undefined) return undefined;
+  return JSON.parse(JSON.stringify(value));
+}
+
+function hasSchemaValue(value) {
+  return value !== undefined && value !== null && value !== "";
+}
+
+function sameSchemaValue(a, b) {
+  if (a === b) return true;
+  if (a === null || b === null || a === undefined || b === undefined) {return false;}
+  if (typeof a !== "object" || typeof b !== "object") {return false;}
+  if (Array.isArray(a) !== Array.isArray(b)) {return false;}
+  if (Array.isArray(a)) {
+    return a.length === b.length && a.every((item, index) => sameSchemaValue(item, b[index]));}
+  const keysA = Object.keys(a).sort();
+  const keysB = Object.keys(b).sort();
+  return keysA.length === keysB.length &&
+    keysA.every((key, index) => key === keysB[index] && sameSchemaValue(a[key], b[key]));
+}
+
+/* Crea il JSON temporaneo da mostrare nel padre. */
+function getReconciledSchema(parentRow) {
+  const result = cloneJson(parentRow.se_schema || {});
+  reconciliationSelections.forEach((selection, field) => {result[field] = cloneJson(selection.value);});
+  return result;
+}
+
+function selectParent(id) {
+  if (reconciliationParentId !== null) return;
+  reconciliationParentId = String(id);
+  reconciliationChildIds.clear();
+  reconciliationSelections.clear();
+  reconciliationLockedFields.clear();
+  sortEvents();
+}
+
+/* L'automatismo viene eseguito soltanto all'ingresso effettivo del figlio nell'area di riconciliazione. */
+function proposeFieldsFromChild(childRow) {
+  const parentRow = loadedEvents.find(
+    row => String(row.id_site_event) === reconciliationParentId
+  );
+  if (!parentRow) return;
+  const parentSchema = parentRow.se_schema || {};
+  const childSchema = childRow.se_schema || {};
+  const childId = String(childRow.id_site_event);
+  Object.entries(childSchema).forEach(([field, childValue]) => {
+    if (nonReconciledFields.has(field)) return;
+    if (!hasSchemaValue(childValue)) return;
+    const currentSelection = reconciliationSelections.get(field);
+    /* Una selezione manuale è definitiva finché l'utente non la modifica o la deseleziona. */
+    if (currentSelection?.mode === "manual") return;
+    /* Se il padre ha già un valore originale, niente sovrascrittura automatica. */
+    if (hasSchemaValue(parentSchema[field]) && !currentSelection) {return;}
+    /* Un campo già chiuso all'automatismo non viene riproposto quando entrano altri figli. */
+    if (reconciliationLockedFields.has(field) && !currentSelection) {return;}
+    if (!currentSelection) {reconciliationSelections.set(field, {childId, value: cloneJson(childValue), mode: "auto"}); return;}
+    /* Un secondo figlio concorde non cambia la fonte. Un valore discordante ritira la proposta automatica e lascia il campo alla scelta manuale. */
+    if (!sameSchemaValue(currentSelection.value, childValue)) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
+  });
+}
+
+function addReconciliationChild(id) {
+  const childId = String(id);
+  if (reconciliationParentId === null) return;
+  if (childId === reconciliationParentId) return;
+  if (reconciliationChildIds.has(childId)) return;
+  const childRow = loadedEvents.find(row => String(row.id_site_event) === childId);
+  if (!childRow) return;
+  reconciliationChildIds.add(childId);
+  // L'unico punto in cui parte la proposta automatica.
+  proposeFieldsFromChild(childRow);
+  sortEvents();
+}
+
+function removeFromReconciliation(id, role) {
+  const eventId = String(id);
+  if (role === "parent") {
+    // Il padre si può rimuovere solo senza figli.
+    if (reconciliationChildIds.size > 0) return;
+    reconciliationParentId = null;
+    reconciliationChildIds.clear();
+    reconciliationSelections.clear();
+    reconciliationLockedFields.clear();
+  } else if (role === "child") {
+    if (!reconciliationChildIds.has(eventId)) return;
+    reconciliationChildIds.delete(eventId);
+    /* Se il figlio era fonte di campi, rimuove le sue selezioni e impedisce nuove proposte automatiche per quei campi durante questa riconciliazione. */
+    reconciliationSelections.forEach((selection, field) => {
+      if (selection.childId === eventId) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
+    });
+  }
+  sortEvents();
+}
+
+function toggleReconciliationField(field, childId) {childId = String(childId);
+  if (!reconciliationChildIds.has(childId)) return;
+  const childRow = loadedEvents.find(row => String(row.id_site_event) === childId);
+  if (!childRow) return;
+  const childSchema = childRow.se_schema || {};
+  const childValue = childSchema[field];
+  if (nonReconciledFields.has(field)) return;
+  if (!hasSchemaValue(childValue)) return;
+  const fields = field === "addressLocality" ? ["addressLocality", "id_comune"] : [field];
+  // Per il comune, il figlio deve avere entrambi i valori.
+  if (field === "addressLocality" && !hasSchemaValue(childSchema.id_comune)
+  ) {alert("Impossibile selezionare il comune: manca id_comune nel figlio."); return;}
+  const currentSelection = reconciliationSelections.get(field);
+  // Clic sulla selezione già attiva: deseleziona l'intera coppia.
+  if (currentSelection?.childId === childId) {fields.forEach(f => {const selection = reconciliationSelections.get(f);
+      if (selection?.childId === childId) {reconciliationSelections.delete(f);} reconciliationLockedFields.add(f);}); sortEvents(); return;}
+  // Se uno dei campi è assegnato a un altro figlio, non sovrascrivere.
+  const conflictingSelection = fields.some(f => {const selection = reconciliationSelections.get(f); return selection && selection.childId !== childId;});
+  if (conflictingSelection) {alert("Questo campo è già assegnato a un altro figlio. " + "Deseleziona prima il valore attuale."); return;}
+  // Selezione manuale: comune e ID vengono trasferiti insieme.
+  fields.forEach(f => {reconciliationSelections.set(f, {childId, value: cloneJson(childSchema[f]), mode: "manual"}); reconciliationLockedFields.add(f);});
+  sortEvents();
+}
+
+function reconciliationButton(row, role = null) {
+  const id = String(row.id_site_event);
+  if (role === "parent") {
+    if (reconciliationChildIds.size > 0) {      
+      return `<button class="schema-button" type="button" onclick="confirmReconciliation()" title="Esegui Riconciliazione">Riconcilia</button>`;}
+      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')" title="Rimuovi dalla Riconciliazione">Deseleziona</button>`;}
+  if (role === "child") {
+    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')" title="Rimuovi dalla Riconciliazione">Deseleziona</button>`;}
+  if (reconciliationParentId === null) {
+    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')" title="Evento Capostipite">Padre</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')" title="Evento da integrare">Figlio</button>`;}
+
+async function confirmReconciliation() {
+  if (reconciliationSaving) return;
+  if (reconciliationParentId === null ||
+      reconciliationChildIds.size === 0) {
+    alert("Seleziona un padre e almeno un figlio.");
+    return;
+  }
+  const parentId = reconciliationParentId;
+  const childIds = [...reconciliationChildIds];
+  const parentRow = loadedEvents.find(
+    row => String(row.id_site_event) === parentId
+  );
+  if (!parentRow) {alert("Il padre selezionato non è più disponibile."); return;}
+  reconciliationSaving = true;
+  try {
+    /* Prepara il JSON definitivo senza modificare preventivamente il record originale in memoria. */
+    const finalSchema = getReconciledSchema(parentRow);
+    finalSchema.classification = "R";
+    /* 1. Salva il padre. */
+    const { error: updateError } = await supabase
+      .from("site_events")
+      .update({ se_schema: finalSchema })
+      .eq("id_site_event", parentId);
+    if (updateError) {
+      throw new Error(`Salvataggio del padre non riuscito: ${updateError.message}`);
+    }
+    /* Aggiorna subito il padre locale: anche se la cancellazione fallisse, il padre risulterà completo. */
+    parentRow.se_schema = finalSchema;
+    /* 2. Marca come verificate le pagine dei figli. */
+    const childRows = loadedEvents.filter(row => childIds.includes(String(row.id_site_event)));
+    const childPageIds = childRows
+      .map(row => row.id_site_page)
+      .filter(id => id != null);
+    if (childPageIds.length > 0) {
+      const { error: verifyError } = await supabase
+        .from("site_pages")
+        .update({ sp_verified: true })
+        .in("id_site_page", childPageIds);
+      if (verifyError) {throw new Error(`Aggiornamento delle pagine figlie non riuscito: ${verifyError.message}`);}
+    }
+    /* 3. Solo dopo aver marcato le pagine, elimina i figli. */
+    const { error: deleteError } = await supabase
+      .from("site_events")
+      .delete()
+      .in("id_site_event", childIds);
+    if (deleteError) {
+      document.getElementById("status").textContent = String(loadedEvents.length);
+      sortEvents();
+      alert("Il padre è stato salvato come Riconciliato, " +
+        "ma la cancellazione dei figli non è riuscita.\n\n" +
+        "I figli sono rimasti disponibili.\n" +
+        deleteError.message
+      );
+      return;
+    }
+    /* 4. Cancellazione riuscita: aggiorna lo stato locale. */
+    const deletedIds = new Set(childIds);
+    loadedEvents = loadedEvents.filter(
+      row => !deletedIds.has(String(row.id_site_event))
+    );
+    reconciliationParentId = null;
+    reconciliationChildIds.clear();
+    reconciliationSelections.clear();
+    reconciliationLockedFields.clear();
+    document.getElementById("status").textContent = String(loadedEvents.length);
+    sortEvents();
+  } catch (error) {console.error("Errore durante la riconciliazione:", error);
+    alert("Errore durante la riconciliazione.\n\n" +
+      error.message
+    );
+  } finally {
+    reconciliationSaving = false;
+  }
+}
+  
+/* ORDINAMENTO EVENTI */
+function sortEvents() {
+  const filtro = filterComuni.value;
+  const eventiFiltrati = loadedEvents.filter(evento => activeClassifications.has(evento.se_schema?.classification) && filtraEventoPerComune(evento, comuniMap, filtro));
+  const getDate = (row) => {
+    const schema = row.se_schema || {};
+    return schema.startDate || schema.data?.date || "";
+  };
+const getPlace = (row) => {
+  const schema = row.se_schema || {};
+  return value(schema.addressLocality) || "";
+};
+  eventiFiltrati.sort((a, b) => {
+    const dateA = getDate(a);
+    const dateB = getDate(b);
+    const placeA = getPlace(a);
+    const placeB = getPlace(b);
+    let result = 0;
+    const compareDate = () => {
+      if (!dateA && !dateB) return 0;
+      if (!dateA) return 1;
+      if (!dateB) return -1;
+      return String(dateA).localeCompare(String(dateB));
+    };
+    const comparePlace = () => {
+      if (!placeA && !placeB) return 0;
+      if (!placeA) return 1;
+      if (!placeB) return -1;
+      return String(placeA).localeCompare(
+        String(placeB), "it",
+        { numeric: true, sensitivity: "base" }
+      );
+    };
+    if (sortBy === "date") {
+      result = compareDate();
+    } else if (sortBy === "place") {
+      result = comparePlace();
+    } else if (sortBy === "date-place") {
+      result = compareDate();
+      if (result === 0) result = comparePlace();
+    } else if (sortBy === "place-date") {
+      result = comparePlace();
+      if (result === 0) result = compareDate();
+    } else {
+      result = Number(a.id_site_event) - Number(b.id_site_event);
+    }
+    return sortAscending ? result : -result;
+  });
+  const parentRow = eventiFiltrati.find(row => String(row.id_site_event) === reconciliationParentId);
+  const childRows = eventiFiltrati.filter(row => reconciliationChildIds.has(String(row.id_site_event)));
+  const selectedIds = new Set([ ...(reconciliationParentId !== null ? [reconciliationParentId] : []), ...reconciliationChildIds]);
+  const normalRows = eventiFiltrati.filter(row => !selectedIds.has(String(row.id_site_event)));
+// Riconciliazione: fuori dall'area che scorre
+document.getElementById("reconciliation").innerHTML = parentRow
+    ? `<section class="reconciliation-section"><h2>Riconciliazione</h2><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>PADRE</h3>
+    ${eventCard(parentRow, 0, "parent")}</div>
+    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>FIGLIO</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
+// Eventi non selezionati: unica area scorrevole
+document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
+document.getElementById("status").textContent = String(eventiFiltrati.length);
+}
+
+/* Cancella l'evento selezionato e la relativa pagina sorgente */
+async function deleteEvent(id) {
+  // Recupera il riferimento alla pagina prima di eliminare l'evento.
+  const event = loadedEvents.find(row => String(row.id_site_event) === String(id));
+  if (!event) {alert("Evento non trovato"); return;}
+  const pageId = event.id_site_page;
+  // Elimina prima la scheda evento.
+  const { error: eventError } = await supabase
+    .from("site_events")
+    .delete()
+    .eq("id_site_event", id);
+  if (eventError) {console.error(eventError); alert("Errore durante l'eliminazione dell'evento"); return;}
+  // Elimina la pagina sorgente, se il riferimento è disponibile.
+  if (pageId != null) {const { error: pageError } = await supabase
+      .from("site_pages")
+      .delete()
+      .eq("id_site_page", pageId);
+  if (pageError) {console.error(pageError); alert("Evento eliminato, ma errore durante l'eliminazione della pagina sorgente"); return;}}
+  const deletedId = String(id);
+  // Rimuove il record dall'array.
+  loadedEvents = loadedEvents.filter(row => String(row.id_site_event) !== deletedId);
+  // Aggiorna lo stato della riconciliazione.
+  if (String(reconciliationParentId) === deletedId) {
+    reconciliationParentId = null;
+    reconciliationChildIds.clear();
+    reconciliationSelections.clear();
+    reconciliationLockedFields.clear();
+  } else {
+    reconciliationChildIds.delete(deletedId);
+    reconciliationSelections.delete(deletedId);
+  }
+  // Se non ci sono più figli, non serve mantenere i campi bloccati.
+  if (reconciliationChildIds.size === 0) {reconciliationLockedFields.clear();}
+  // Aggiorna le schede, il conteggio e l'ordinamento.
+  document.getElementById("status").textContent = String(loadedEvents.filter(row => filtraEventoPerComune(row, comuniMap, filterComuni.value)).length);
+  sortEvents();
+}
+  
+document.getElementById("sortBy").addEventListener("change", (event) => {sortBy = event.target.value; sortEvents();});
+  
+document.getElementById("sortDirection").addEventListener("click", () => {
+  sortAscending = !sortAscending;
+  document.getElementById("sortDirection").textContent = sortAscending ? "↑ Crescente" : "↓ Decrescente";
+  sortEvents();
+});
+
+filterComuni.addEventListener("change", () => {
+  suggestedGroupKeys.clear();
+  // Azzera la riconciliazione attiva.
+  reconciliationParentId = null;
+  reconciliationChildIds.clear();
+  reconciliationSelections.clear();
+  reconciliationLockedFields.clear();
+  const suggestBtn = document.getElementById("suggestBtn");
+  suggestBtn.textContent = "Suggerisci";
+  suggestBtn.disabled = false;
+  sortEvents();
+});
+
+const activeClassifications = new Set(["I", "E", "J", "R"]);
+
+document.querySelectorAll(".classification-filter").forEach(button => {
+  button.addEventListener("click", () => {
+    const classification = button.dataset.classification;
+    if (activeClassifications.has(classification)) {
+      activeClassifications.delete(classification);
+      button.classList.remove("active");
+    } else {
+      activeClassifications.add(classification);
+      button.classList.add("active");
+    }
+    sortEvents();
+  });
+});
+  
+document.getElementById("suggestBtn").addEventListener("click", () => {suggestReconciliation();});
+
+/* SUGGERITORE DI RICONCILIAZIONE */
+let suggestedGroupKeys = new Set();
+function suggestionText(value) {
+  if (typeof value !== "string") return "";
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+const suggestionStopWords = new Set([
+  "il", "lo", "la", "i", "gli", "le", "un", "uno", "una",
+  "di", "del", "della", "delle", "dei", "degli", "da", "dal",
+  "in", "nel", "nella", "per", "con", "su", "al", "alla",
+  "e", "ed", "o", "a", "che", "del", "dello",
+  "evento", "eventi", "presso", "info", "informazioni",
+  "www", "http", "https", "com", "organizzato", "organizzata",
+  "organizzazione", "ingresso", "programma"
+]);
+
+function suggestionWords(text) {
+  return [...new Set(suggestionText(text) .split(" ") .filter(word => word.length > 2 && !suggestionStopWords.has(word)))];
+}
+
+function suggestionSimilarity(textA, textB) {
+  const a = suggestionWords(textA);
+  const b = suggestionWords(textB);
+  if (!a.length || !b.length) return 0;
+  const common = a.filter(word => b.includes(word));
+  if (!common.length) return 0;
+  const overlap = common.length / Math.min(a.length, b.length);
+  const dice = (2 * common.length) / (a.length + b.length);
+  return 0.7 * overlap + 0.3 * dice;
+}
+
+function suggestionCommonWords(textA, textB) {
+  const a = suggestionWords(textA);
+  const b = suggestionWords(textB);
+  return a.filter(word => b.includes(word));
+}
+
+function suggestionDates(row) {
+  const schema = row.se_schema || {};
+  const dates = [schema.startDate, schema.endDate]
+    .filter(Boolean)
+    .map(value => {
+      const match = String(value).match(/^\d{4}-\d{2}-\d{2}/);
+      return match ? match[0] : "";
+    })
+    .filter(Boolean);
+  return [...new Set(dates)];
+}
+
+function suggestionMunicipality(row) {
+  const schema = row.se_schema || {};
+  // Se presente, l'identificativo del comune è preferibile al testo.
+  return schema.id_comune != null && schema.id_comune !== ""
+    ? "id:" + String(schema.id_comune)
+    : suggestionText(schema.addressLocality || "");
+}
+  
+function suggestionTitle(schema) {
+  const title = value(schema.name) || value(schema.title) || "";
+  if (suggestionText(title) === "evento senza titolo") {return "";}
+  return title;
+}
+  
+function suggestionDescription(schema) {
+  return schema.description || "";
+}
+
+function compareSuggestionPair(rowA, rowB) {
+  const a = rowA.se_schema || {};
+  const b = rowB.se_schema || {};
+  const titleA = suggestionTitle(a);
+  const titleB = suggestionTitle(b);
+  const descA = suggestionDescription(a);
+  const descB = suggestionDescription(b);
+  const titleScore = suggestionSimilarity(titleA, titleB);
+  const descScore = suggestionSimilarity(descA, descB);
+  const crossAB = suggestionSimilarity(titleA, descB);
+  const crossBA = suggestionSimilarity(titleB, descA);
+  const commonTitles = suggestionCommonWords(titleA, titleB);
+  const commonDescriptions = suggestionCommonWords(descA, descB);
+  const commonCrossAB = suggestionCommonWords(titleA, descB);
+  const commonCrossBA = suggestionCommonWords(titleB, descA);
+  const hasDistinctiveWord = words => words.some(word => word.length >= 6);
+  // Il titolo è un indizio forte se condivide almeno una parola distintiva.
+  const titleMatch = titleScore >= 0.45 && hasDistinctiveWord(commonTitles);
+  // Le descrizioni devono condividere più di semplici formule generiche.
+  const descriptionMatch = descScore >= 0.22 && (commonDescriptions.length >= 3 || (commonDescriptions.length >= 2 && hasDistinctiveWord(commonDescriptions)));
+  // Recupera i casi in cui il titolo manca o compare soltanto nella descrizione.
+  const crossMatch = (crossAB >= 0.55 && hasDistinctiveWord(commonCrossAB)) || (crossBA >= 0.55 && hasDistinctiveWord(commonCrossBA));
+  if (!titleMatch && !descriptionMatch && !crossMatch) {return null;}
+  // Data e comune sono filtri/indizi, non punti testuali. Le differenze nei singoli campi non annullano le somiglianze testuali.
+  // vengono valutate le coincidenze tra titolo-titolo e testo-testo al 100% e tra testi e titoli al 50% ottenendo un punteggio medio
+  const textScore = (titleScore + descScore + 0.5 * crossAB + 0.5 * crossBA) / 3;
+  return {score: textScore, titleMatch, descriptionMatch, crossMatch};
+}
+
+function suggestionCompleteness(row) {
+  const schema = row.se_schema || {};
+  const usefulFields = [
+    "name", "title", "description", "startDate", "endDate",
+    "location", "address", "addressLocality", "postalCode",
+    "addressRegion", "addressCountry", "image", "organizer",
+    "offers", "category", "url"
+  ];
+  return usefulFields.reduce((count, field) => count + (hasSchemaValue(schema[field]) ? 1 : 0), 0);
+}
+
+function chooseSuggestionParent(rows) {
+  return [...rows].sort((a, b) => {
+    const imageA = hasSchemaValue(a.se_schema?.image) ? 1 : 0;
+    const imageB = hasSchemaValue(b.se_schema?.image) ? 1 : 0;
+    if (imageA !== imageB) return imageB - imageA;
+    const completeA = suggestionCompleteness(a);
+    const completeB = suggestionCompleteness(b);
+    if (completeA !== completeB) return completeB - completeA;
+    return Number(a.id_site_event) - Number(b.id_site_event);
+  })[0];
+}
+
+function buildSuggestionGroups() {
+  const rows = loadedEvents.filter(row => row.se_schema && filtraEventoPerComune(row, comuniMap, filterComuni.value));
+  const groupsByKey = new Map();
+  // Raggruppa prima per data: le coppie senza una data confrontabile non vengono proposte.
+  // Ogni evento viene indicizzato per tutte le sue date di calendario.
+  const byDate = new Map();
+  rows.forEach(row => {const dates = suggestionDates(row);
+    dates.forEach(date => {if (!byDate.has(date)) byDate.set(date, new Map()); byDate.get(date).set(String(row.id_site_event), row);});});
+  const candidatePairs = new Map();
+  byDate.forEach(dateMap => {
+    const dateRows = [...dateMap.values()];
+    if (dateRows.length < 2) return;
+      const matches = new Map();
+    for (let i = 0; i < dateRows.length; i++) {
+      for (let j = i + 1; j < dateRows.length; j++) {
+        const a = dateRows[i];
+        const b = dateRows[j];
+        const municipalityA = suggestionMunicipality(a);
+        const municipalityB = suggestionMunicipality(b);
+        // Due identificativi comunali presenti e diversi sono un forte indizio di eventi distinti. Se manca il comune, si prosegue.
+        if (municipalityA.startsWith("id:") && municipalityB.startsWith("id:") && municipalityA !== municipalityB) {continue;}
+        // Anche i comuni testuali possono essere confrontati quando entrambi sono presenti.
+        if (municipalityA && municipalityB && !municipalityA.startsWith("id:") && !municipalityB.startsWith("id:") && municipalityA !== municipalityB) {continue;}
+        const match = compareSuggestionPair(a, b);
+        if (!match) continue;
+        matches.set(`${a.id_site_event}|${b.id_site_event}`, { a, b, score: match.score });
+      }
+    }
+    // Ogni evento genera un gruppo candidato con i record che gli somigliano direttamente: evitiamo di unire gruppi solo per catena.
+    dateRows.forEach(seed => {
+      const groupRows = [seed];
+      const scores = [];
+      matches.forEach(match => {
+        let other = null;
+        if (String(match.a.id_site_event) === String(seed.id_site_event)) {other = match.b;
+        } else if (String(match.b.id_site_event) === String(seed.id_site_event)) {other = match.a;}
+        if (other) {groupRows.push(other); scores.push(match.score);}
+      });
+      if (groupRows.length < 2) return;
+      const uniqueRows = [ ...new Map(groupRows.map(row => [String(row.id_site_event), row])).values()];
+      const ids = uniqueRows .map(row => String(row.id_site_event)) .sort((a, b) => Number(a) - Number(b));
+      const key = ids.join(",");
+      if (!groupsByKey.has(key)) {groupsByKey.set(key, {key, rows: uniqueRows, averageScore: scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0});}
+    });
+  });
+  return [...groupsByKey.values()].sort((a, b) =>
+    b.averageScore - a.averageScore ||
+    b.rows.length - a.rows.length ||
+    Number(a.rows[0].id_site_event) - Number(b.rows[0].id_site_event)
+  );
+}
+
+function suggestReconciliation() {
+  const groups = buildSuggestionGroups();
+  const nextGroup = groups.find(group => !suggestedGroupKeys.has(group.key));
+  const button = document.getElementById("suggestBtn");
+  const status = document.getElementById("analysisStatus");
+  if (!nextGroup) {button.textContent = "Non ho proposte"; button.disabled = true; if (status) status.textContent = ""; return;}
+  // Ricordiamo il gruppo proposto nella sessione corrente, per passare alla proposta successiva al prossimo clic.
+  suggestedGroupKeys.add(nextGroup.key);
+  // Inizializza una nuova proposta senza salvare nulla.
+  reconciliationParentId = null;
+  reconciliationChildIds.clear();
+  reconciliationSelections.clear();
+  reconciliationLockedFields.clear();
+  const parent = chooseSuggestionParent(nextGroup.rows);
+  reconciliationParentId = String(parent.id_site_event);
+  nextGroup.rows
+    .filter(row => String(row.id_site_event) !== reconciliationParentId)
+    .forEach(row => {addReconciliationChild(String(row.id_site_event));});
+  button.textContent = "SUGGERISCI";
+  button.disabled = false;
+  if (status) {status.textContent = `Proposta ${suggestedGroupKeys.size}: ${nextGroup.rows.length} eventi da verificare`;}
+  sortEvents();
+}
+
+
+/* NUOVO EVENTO DA SCHEDA */
+async function nuovoEvento(idSiteEvent) {
+  const row = loadedEvents.find(evento => String(evento.id_site_event) === String(idSiteEvent));
+  if (!row) {return;}
+  sessionStorage.setItem("eventoDaViewer", JSON.stringify({id_site_event: row.id_site_event, se_schema: row.se_schema}));
+  window.location.href = "../pages/evento.html?new=1&source=viewer";
+}
+
+/* LETTURA SUPABASE */
+async function loadEvents(){
+  const status = document.getElementById("status");
+  const results = document.getElementById("results");
+  try{
+    /* site_events site_pages viene utilizzata solamente per recuperare l'URL della pagina origine. */
+    const { data, error } =
+      await supabase
+        .from("site_events")
+        .select("id_site_event, id_site_page, id_evento, se_schema, se_extracted")
+        .order("id_site_event",{ascending:false});
+    if(error){throw error;}
+    if(!data || data.length === 0){status.textContent = "Nessun evento presente!";
+      results.innerHTML = `<div class="empty">La tabella site_events non contiene eventi. Eseguire ESTRAI</div>`; return;}
+    /* Recupero degli URL delle pagine origine */
+    const idsPagine = [...new Set(data .map(evento => evento.id_site_page) .filter(id => id !== null))];
+    let pagine = [];
+    if(idsPagine.length > 0){const { data: datiPagine, error: errorePagine } = await supabase
+        .from("site_pages")
+        .select("id_site_page, sp_url")
+        .in("id_site_page", idsPagine);
+      if(errorePagine) throw errorePagine;
+      pagine = datiPagine || [];
+    }
+    /* Ricostruzione della relazione usata dal viewer */
+    const mappaPagine = new Map(pagine.map(pagina => [pagina.id_site_page, pagina]));
+    loadedEvents = data.map(evento => ({ ...evento, site_pages: mappaPagine.get(evento.id_site_page) || null}));
+    status.textContent = `${data.length}`;
+    sortEvents();
+  }catch(error){
+    console.error("Errore lettura site_events:", error);
+    status.textContent = "Errore durante il caricamento.";
+    results.innerHTML = `<div class="error"><strong>Errore lettura Supabase</strong><br><br>${escapeHtml(error.message)}</div>`;}
+}
+
+/* Divisore pannelli Riconciliazione & Wrap */
+const reconciliationPanel = document.getElementById("reconciliation");
+const eventsPanel = document.querySelector(".wrap");
+const splitter = document.getElementById("splitter");
+let splitDrag = null;
+
+function resizeReconciliation(height, totalHeight) {
+  const minHeight = Math.min(120, totalHeight / 2);
+  const maxHeight = totalHeight - minHeight;
+  const newHeight = Math.max(minHeight, Math.min(maxHeight, height));
+  reconciliationPanel.style.flex = `0 0 ${newHeight}px`;
+  eventsPanel.style.flex = "1 1 0";
+}
+  
+splitter.addEventListener("pointerdown", (event) => {
+  if (!reconciliationPanel.children.length) return;
+  splitDrag = {
+    startY: event.clientY,
+    startHeight: reconciliationPanel.clientHeight,
+    totalHeight:
+      reconciliationPanel.clientHeight + eventsPanel.clientHeight
+  };
+  splitter.setPointerCapture(event.pointerId);
+  event.preventDefault();
+});
+splitter.addEventListener("pointermove", (event) => {
+  if (!splitDrag) return;
+  const deltaY = event.clientY - splitDrag.startY;
+  resizeReconciliation(splitDrag.startHeight + deltaY, splitDrag.totalHeight);
+});
+  
+function stopSplitDrag() {splitDrag = null;}
+  
+splitter.addEventListener("pointerup", stopSplitDrag);
+splitter.addEventListener("pointercancel", stopSplitDrag);
+splitter.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+  if (!reconciliationPanel.children.length) return;
+  event.preventDefault();
+  const totalHeight = reconciliationPanel.clientHeight + eventsPanel.clientHeight;
+  const delta = event.key === "ArrowUp" ? -20 : 20;
+  resizeReconciliation(reconciliationPanel.clientHeight + delta, totalHeight);
+});
+
+let reconciliationWasEmpty = !reconciliationPanel.innerHTML.trim();
+const reconciliationObserver = new MutationObserver(() => {
+  const isEmpty = !reconciliationPanel.innerHTML.trim();
+  if (reconciliationWasEmpty && !isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";}
+  if (!reconciliationWasEmpty && isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";}
+  reconciliationWasEmpty = isEmpty;
+});
+reconciliationObserver.observe(reconciliationPanel, {childList: true, subtree: true, characterData: true});
+
+/* Verifica la necessità di estrarre nuovamente gli eventi */ 
+  async function checkPendingExtraction() {
+  const button = document.getElementById("analyzeBtn");
+  const status = document.getElementById("analysisStatus");
+  const { data: lastPage, error: pageError } = await supabase
+    .from("site_pages")
+    .select("id_site_page")
+    .not("sp_block", "is", null)
+    .not("id_comune", "is", null)
+    .order("id_site_page", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (pageError) {console.error("[HTML] Errore controllo site_pages:", pageError); return;}
+  const { data: lastEvent, error: eventError } = await supabase
+    .from("site_events")
+    .select("id_site_page")
+    .not("id_site_page", "is", null)
+    .order("id_site_page", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (eventError) {console.error("[HTML] Errore controllo site_events:", eventError); return;}
+  const lastPageId = lastPage?.id_site_page ?? 0;
+  const lastEventPageId = lastEvent?.id_site_page ?? 0;
+  if (lastPageId > lastEventPageId) {button.classList.add("analysis-red"); status.textContent = "Possibili nuove pagine da analizzare";
+  } else {button.classList.remove("analysis-red"); status.textContent = "Nessuna nuova pagina rilevata";}
+}
+
+checkPendingExtraction();
+  
+/* AVVIO */
+document.getElementById("analyzeBtn").addEventListener("click", async () => {
+  const button = document.getElementById("analyzeBtn");
+  const status = document.getElementById("analysisStatus");
+  button.classList.add("analysis-red");
+  button.disabled = true;
+  status.textContent = "Analisi in corso: 0 / ...";
+  try {await runAnalysis(supabase, (current, total) => {status.textContent = `Analisi in corso: ${current} / ${total}`;});
+    status.textContent = "Analisi completata!";
+    await loadEvents();
+  } catch (error) {console.error("[HTML] Errore analisi:", error); status.textContent = `Errore: ${error.message}`;
+  } finally {button.disabled = false;
+  }
+});
+
+loadEvents();
+</script>
+</body>
+</html>
