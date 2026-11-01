@@ -789,7 +789,7 @@ window.toggleSchema = function(id){
 };
 
 document.getElementById("reconciliation").addEventListener("click",
-  event => {const fieldElement = event.target.closest(".schema-field[data-reconciliation-field]");
+  event => {const fieldElement = event.target.closest(".field[data-reconciliation-field]");
     if (!fieldElement) return;
     toggleReconciliationField(fieldElement.dataset.reconciliationField, fieldElement.dataset.childId);
   }
