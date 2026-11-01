@@ -978,13 +978,11 @@ function analyzeSignals(page, categoryDictionary) {
   const title = extractTitle(block);
   const times = extractTimes(text);
   const price = extractPrice(text);
-  const organizer = extractOrganizer(text);
-  const creator = extractCreators(text);
   // PROVA in caso di HTML a cercare solo nella descrizione. 
   const description = extractDescription(text, title);
+  const organizer = extractOrganizer(description || "");
+  const creator = extractCreators(description || "");
   const performer = extractPerformers(description || "");
-  // Invece di tutto il testo.
-  // const performer = extractPerformers(text);
   const composer = extractComposers(description || "");
   const director = extractDirectors(description || "");
   
