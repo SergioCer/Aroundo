@@ -1012,8 +1012,19 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   const childRow = loadedEvents.find(row => String(row.id_site_event) === childId);
   if (!childRow) return;
   const childSchema = childRow.se_schema || {};
-  const childValue = childSchema[field];
   if (nonReconciledFields.has(field)) return;
+  let childValue;
+  const dateTimeFields = {
+    startDate_date: { source: "startDate", part: "date" },
+    startDate_time: { source: "startDate", part: "time" },
+    endDate_date: { source: "endDate", part: "date" },
+    endDate_time: { source: "endDate", part: "time" }
+  };
+  const dateTimeField = dateTimeFields[field];
+  if (dateTimeField) {
+    const parts = splitDateTime(childSchema[dateTimeField.source]);
+    childValue = parts[dateTimeField.part];
+  } else {childValue = childSchema[field];}
   if (!hasSchemaValue(childValue)) return;
   // Associa Comune; Categoria; Subcategoria ai relativi ID
   const pairedFields = {
