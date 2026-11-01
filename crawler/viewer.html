@@ -470,6 +470,12 @@ body{
   border-color: #dc3545;
   color: white;
 }
+
+.date-time-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+}
   
 </style>
 </head>
@@ -716,10 +722,11 @@ function formatCategoryMatches(matches, field) {
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
   Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
-  // le righe di sotto aprivano automaticamente i dettagli dello schema
-  // const isReconciliationCard = reconciliationRole === "parent" || reconciliationRole === "child";
-  // return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
-  return `<div id="${id}" class="schema-details">
+  // le righe sottostanti aprono automaticamente i dettagli degli schemi.
+  const isReconciliationCard = reconciliationRole === "parent" || reconciliationRole === "child";
+  return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
+  // La riga sottostante non apre più automaticamente i dettagli degli schemi.
+  // return `<div id="${id}" class="schema-details">
     ${fields.map(field => {
       const v = event[field];
       if (!isSchemaDisplayable(v)) return "";
@@ -813,10 +820,10 @@ function eventCard(row, index, reconciliationRole = null){
   return `<article class="event">
     ${image ? reconciliationCardImage(image, title, reconciliationRole, row.id_site_event) : ""}
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
-    ${startDate.date || startDate.time ? `<div class="field">
+    ${startDate.date || startDate.time ? `<div class="date-time-row">
     ${reconciliationCardField("startDate_date", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate.date).date)}`, reconciliationRole, row.id_site_event)}
     ${reconciliationCardField("startDate_time", `<span class="label">Ora:</span> ${escapeHtml(startDate.time.slice(0, 5))}`, reconciliationRole, row.id_site_event)}</div>` : ""}
-    ${endDate.date || endDate.time ? `<div class="field">
+    ${endDate.date || endDate.time ? `<div class="date-time-row">
     ${reconciliationCardField("endDate_date", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate.date).date)}`, reconciliationRole, row.id_site_event)}
     ${reconciliationCardField("endDate_time", `<span class="label">Ora:</span> ${escapeHtml(endDate.time.slice(0, 5))}`, reconciliationRole, row.id_site_event)}</div>` : ""}
     ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
