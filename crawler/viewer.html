@@ -261,6 +261,20 @@ body{
   font-weight: bold;
 }
 
+  .classification-filter {
+  padding: 3px 7px;
+  min-width: 25px;
+  border: none;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.classification-filter:not(.active) {
+  background: #aaa;
+  color: white;
+}
+
  .schema-button{
   margin-top:6px;
   padding:6px 8px;
@@ -448,6 +462,10 @@ body{
     <option value="attivi-previsti">Attivi + Previsti</option>
     <option value="esclusi">Esclusi</option>
   </select>
+  <button class="classification-filter classification-I active" data-classification="I" title="Mostra/Nascondi Incompleti">I</button>
+  <button class="classification-filter classification-E active" data-classification="E" title="Mostra/Nascondi Eventi">E</button>
+  <button class="classification-filter classification-J active" data-classification="J" title="Mostra/Nascondi JSON">J</button>
+  <button class="classification-filter classification-R active" data-classification="R" title="Mostra/Nascondi Riconciliati">R</button>
   <button id="suggestBtn" class="schema-button" type="button">Suggerisci</button>
 </div>
 
@@ -979,7 +997,7 @@ async function confirmReconciliation() {
 /* ORDINAMENTO EVENTI */
 function sortEvents() {
   const filtro = filterComuni.value;
-  const eventiFiltrati = loadedEvents.filter(evento => filtraEventoPerComune(evento, comuniMap, filtro));
+  const eventiFiltrati = loadedEvents.filter(evento => activeClassifications.has(evento.se_schema?.classification) && filtraEventoPerComune(evento, comuniMap, filtro));
   const getDate = (row) => {
     const schema = row.se_schema || {};
     return schema.startDate || schema.data?.date || "";
@@ -1095,6 +1113,22 @@ filterComuni.addEventListener("change", () => {
   suggestBtn.textContent = "Suggerisci";
   suggestBtn.disabled = false;
   sortEvents();
+});
+
+const activeClassifications = new Set(["I", "E", "J", "R"]);
+
+document.querySelectorAll(".classification-filter").forEach(button => {
+  button.addEventListener("click", () => {
+    const classification = button.dataset.classification;
+    if (activeClassifications.has(classification)) {
+      activeClassifications.delete(classification);
+      button.classList.remove("active");
+    } else {
+      activeClassifications.add(classification);
+      button.classList.add("active");
+    }
+    sortEvents();
+  });
 });
   
 document.getElementById("suggestBtn").addEventListener("click", () => {suggestReconciliation();});
