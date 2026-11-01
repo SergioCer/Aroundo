@@ -29,7 +29,7 @@ body{
 }
 
 .top h1{
-  margin:0 0 8px;
+  margin:0 0 0px;
   font-size:24px;
   text-align: center;
 }
@@ -221,7 +221,7 @@ body{
 }
 
 .timestamp{
-  margin-top:6px;
+  margin-top:4px;
   font-size:10px;
   color:#999
 }
@@ -277,7 +277,7 @@ body{
 
  .schema-button{
   margin-top:6px;
-  padding:6px 8px;
+  padding:6px 6px;
   border:0;
   border-radius:20px;
   background:#27ae60;
@@ -298,7 +298,7 @@ body{
 
 .reconciliation-select-button {
   margin-top: 6px;
-  padding: 6px 8px;
+  padding: 6px 6px;
   border: 0;
   border-radius: 20px;
   background: #8e44ad;
@@ -331,7 +331,7 @@ body{
   color:white;
   border:0;
   border-radius:16px;
-  padding:6px 8px;
+  padding:6px 6px;
   cursor:pointer;
   font-size: 14px;
   font-weight:bold
@@ -443,7 +443,7 @@ body{
 </div>
   <div class="section">
 <div class="event-controls">
-  <button id="analyzeBtn" class="schema-button analyze-button">Estrai</button>
+  <button id="analyzeBtn" class="schema-button analyze-button title="Estrai acquisiti">Estrai</button>
   <span id="analysisStatus" style="margin-left:12px"></span>
   <label for="sortBy">Ordina per:</label>
   <select id="sortBy">
@@ -466,7 +466,7 @@ body{
   <button class="classification-filter classification-E active" data-classification="E" title="Mostra/Nascondi Eventi">E</button>
   <button class="classification-filter classification-J active" data-classification="J" title="Mostra/Nascondi JSON">J</button>
   <button class="classification-filter classification-R active" data-classification="R" title="Mostra/Nascondi Riconciliati">R</button>
-  <button id="suggestBtn" class="schema-button" type="button">Suggerisci</button>
+  <button id="suggestBtn" class="schema-button" type="button title="Ricongiungi Eventi">Suggerisci</button>
 </div>
 
 <div id="reconciliation"></div>
@@ -743,8 +743,8 @@ function eventCard(row, index, reconciliationRole = null){
       <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}<span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')">Schema</button>
-      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')">Delete</button>
-      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')">Pubblica</button>
+      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella Evento">Delete</button>
+      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')  title="Apri pagina per Pubblicate">Pubblica</button>
       ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}</div></article>`;
 }
 
@@ -911,13 +911,13 @@ function reconciliationButton(row, role = null) {
   const id = String(row.id_site_event);
   if (role === "parent") {
     if (reconciliationChildIds.size > 0) {      
-      return `<button class="schema-button" type="button" onclick="confirmReconciliation()">Riconcilia</button>`;}
-      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')">Deseleziona</button>`;}
+      return `<button class="schema-button" type="button" onclick="confirmReconciliation() title="Esegui Riconciliazione">Riconcilia</button>`;}
+      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent') title="Rimuovi dalla Riconciliazione">Deseleziona</button>`;}
   if (role === "child") {
-    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')">Deseleziona</button>`;}
+    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')  title="Rimuovi dalla Riconciliazione">Deseleziona</button>`;}
   if (reconciliationParentId === null) {
-    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')">Padre</button>`;}
-    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')">Figlio</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}') title="Evento Capostipite">Padre</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}') title="Evento da integrare">Figlio</button>`;}
 
 async function confirmReconciliation() {
   if (reconciliationSaving) return;
