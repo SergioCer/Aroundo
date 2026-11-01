@@ -149,7 +149,7 @@ body{
   border-bottom:0
 }
 
-/* CANCELLARE Campi coinvolti nella riconciliazione */
+/* Campi coinvolti nella riconciliazione parte SCHEMA */
 .schema-field.reconciliation-field-selectable {
   cursor: pointer;
   border-radius: 3px;
@@ -174,7 +174,7 @@ body{
   opacity: 0.65;
 }  
 
-/* Campi coinvolti nella riconciliazione */
+/* Campi coinvolti nella riconciliazione parte SCHEDA */
 .field.reconciliation-field-selectable {
   cursor: pointer;
   border-radius: 3px;
@@ -771,22 +771,19 @@ function eventCard(row, index, reconciliationRole = null){
   return `<article class="event">
       ${image ? `<div class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>`: ""}
         <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
-  ${startDate ? reconciliationCardField("startDate",
-    `<span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(startDate).time)}` : ""}`,
-    reconciliationRole, row.id_site_event) : ""}
-      ${endDate ? `<div class="field"><span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">
-      Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}</div>` : ""}
-      ${comune ? `<div class="field"><span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}</div>` : ""}
-      ${!comune && cap ? `<div class="field"><span class="label">CAP:</span> ${escapeHtml(cap)}</div>` : ""}
-      ${location ? `<div class="field"><span class="label">Luogo:</span> ${escapeHtml(location)}</div>` : ""}
-      ${address ? `<div class="field"><span class="label">Indirizzo:</span> ${escapeHtml(address)}</div>` : ""}
-      ${category ? `<div class="field"><span class="label">Categoria: </span>${escapeHtml(category)}</div>`: ""}
-      ${offers ? `<div class="field"> <span class="label">Prezzo:</span> ${escapeHtml(offers)}</div>`: ""}
-      ${organizer ? `<div class="field"><span class="label">Organizer: </span>${escapeHtml(organizer)}</div>` : ""}
-      ${creator ? `<div class="field"><span class="label">Creator: </span>${escapeHtml(creator)}</div>` : ""}
-      ${composer ? `<div class="field"><span class="label">Composer: </span>${escapeHtml(composer)}</div>` : ""}
-      ${performer ? `<div class="field"><span class="label">Performer: </span>${escapeHtml(performer)}</div>` : ""}
-      ${director ? `<div class="field"><span class="label">Director: </span>${escapeHtml(director)}</div>` : ""}
+    ${startDate ? reconciliationCardField("startDate", `<span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(startDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
+    ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
+    ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
+    ${!comune && cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}
+    ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
+    ${address ? reconciliationCardField("address", `<span class="label">Indirizzo:</span> ${escapeHtml(address)}`, reconciliationRole, row.id_site_event) : ""}
+    ${category ? reconciliationCardField("category", `<span class="label">Categoria:</span> ${escapeHtml(category)}`, reconciliationRole, row.id_site_event) : ""}
+    ${offers ? reconciliationCardField("offers", `<span class="label">Prezzo:</span> ${escapeHtml(offers)}`, reconciliationRole, row.id_site_event) : ""}
+    ${organizer ? reconciliationCardField("organizer", `<span class="label">Organizer:</span> ${escapeHtml(organizer)}`, reconciliationRole, row.id_site_event) : ""}
+    ${creator ? reconciliationCardField("creator", `<span class="label">Creator:</span> ${escapeHtml(creator)}`, reconciliationRole, row.id_site_event) : ""}
+    ${composer ? reconciliationCardField("composer", `<span class="label">Composer:</span> ${escapeHtml(composer)}`, reconciliationRole, row.id_site_event) : ""}
+    ${performer ? reconciliationCardField("performer", `<span class="label">Performer:</span> ${escapeHtml(performer)}`, reconciliationRole, row.id_site_event) : ""}
+    ${director ? reconciliationCardField("director", `<span class="label">Director:</span> ${escapeHtml(director)}`, reconciliationRole, row.id_site_event) : ""}      
       ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
