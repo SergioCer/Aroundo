@@ -743,6 +743,26 @@ function reconciliationCardField(field, content, reconciliationRole, rowId) {
     : "";
   return `<div class="${classes}" ${attributes}>${content}</div>`;
 }
+
+/* Gestisce l'immagine mantenendo il contenitore e le dimensioni originali. */
+function reconciliationCardImage(image, title, reconciliationRole, rowId) {
+  const childId = String(rowId);
+  const selection = reconciliationSelections.get("image");
+  const isChild = reconciliationRole === "child";
+  const selected = selection?.childId === childId;
+  const unavailable = isChild && !!selection && !selected;
+  const classes = [
+    "event-image",
+    isChild ? "reconciliation-field-selectable" : "",
+    selected ? "reconciliation-field-selected" : "",
+    unavailable ? "reconciliation-field-unavailable" : ""
+  ].filter(Boolean).join(" ");
+  return `<div class="${classes}"
+    ${isChild ? `data-reconciliation-field="image" data-child-id="${escapeHtml(childId)}"` : ""}
+    ${unavailable ? 'title="Deseleziona prima la fonte attuale"' : ""}>
+    <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">
+  </div>`;
+}
   
 /* SCHEDA EVENTO */
 function eventCard(row, index, reconciliationRole = null){
@@ -769,8 +789,7 @@ function eventCard(row, index, reconciliationRole = null){
   const sourceUrl = row.site_pages && row.site_pages.sp_url ? row.site_pages.sp_url : value(event.url);
   const schemaId = `schema-${row.id_site_event || index}`;
   return `<article class="event">
-    ${image ? `<div class="event-image ${reconciliationRole === "child" ? "reconciliation-field-selectable" : ""} ${reconciliationSelections.get("image")?.childId === String(row.id_site_event) ? "reconciliation-field-selected" : ""}"
-    ${reconciliationRole === "child" ? `data-reconciliation-field="image" data-child-id="${escapeHtml(row.id_site_event)}"` : ""}><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>` : ""}
+    ${image ? reconciliationCardImage(image, title, reconciliationRole, row.id_site_event) : ""}
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
     ${startDate ? reconciliationCardField("startDate", `<span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(startDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
     ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
