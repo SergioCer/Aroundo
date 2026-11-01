@@ -835,7 +835,7 @@ window.toggleSchema = function(id){
 };
 
 document.getElementById("reconciliation").addEventListener("click",
-  event => {const fieldElement = event.target.closest(".field[data-reconciliation-field]");
+  event => {const fieldElement = event.target.closest("[data-reconciliation-field]");
     if (!fieldElement) return;
     toggleReconciliationField(fieldElement.dataset.reconciliationField, fieldElement.dataset.childId);
   }
