@@ -791,6 +791,7 @@ function eventCard(row, index, reconciliationRole = null){
   const cap = value(event.postalCode);
   const offers = displaySchemaValue(event.offers);
   const category = displaySchemaValue(event.category);
+  const subcategory = value(event.subcategory);
   const organizer = value(event.organizer);
   const creator = displaySchemaValue(event.creator);
   const performer = displaySchemaValue(event.performer);
@@ -811,6 +812,7 @@ function eventCard(row, index, reconciliationRole = null){
     ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
     ${address ? reconciliationCardField("address", `<span class="label">Indirizzo:</span> ${escapeHtml(address)}`, reconciliationRole, row.id_site_event) : ""}
     ${category ? reconciliationCardField("category", `<span class="label">Categoria:</span> ${escapeHtml(category)}`, reconciliationRole, row.id_site_event) : ""}
+    ${subcategory ? reconciliationCardField("subcategory", `<span class="label">Sottocategoria:</span> ${escapeHtml(subcategory)}`, reconciliationRole, row.id_site_event) : ""}
     ${offers ? reconciliationCardField("offers", `<span class="label">Prezzo:</span> ${escapeHtml(offers)}`, reconciliationRole, row.id_site_event) : ""}
     ${organizer ? reconciliationCardField("organizer", `<span class="label">Organizer:</span> ${escapeHtml(organizer)}`, reconciliationRole, row.id_site_event) : ""}
     ${creator ? reconciliationCardField("creator", `<span class="label">Creator:</span> ${escapeHtml(creator)}`, reconciliationRole, row.id_site_event) : ""}
@@ -978,9 +980,10 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   subcategory: ["subcategory", "id_subcategoria"]
   };
   const fields = pairedFields[field] || [field];
-  // Per il comune, il figlio deve avere entrambi i valori.
-  if (field === "addressLocality" && !hasSchemaValue(childSchema.id_comune)
-  ) {alert("Impossibile selezionare il comune: manca id_comune nel figlio."); return;}
+  // Per Comune, Categoria e Subcategoria, il figlio deve avere entrambi i valori.
+  const requiredIds = {addressLocality: "id_comune", category: "id_categoria", subcategory: "id_subcategoria"};
+  const requiredId = requiredIds[field];
+  if (requiredId && !hasSchemaValue(childSchema[requiredId])) {alert(`Impossibile selezionare il campo: manca ${requiredId} nel figlio.`); return;}
   const currentSelection = reconciliationSelections.get(field);
   // Clic sulla selezione già attiva: deseleziona l'intera coppia.
   if (currentSelection?.childId === childId) {fields.forEach(f => {const selection = reconciliationSelections.get(f);
