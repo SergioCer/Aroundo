@@ -769,8 +769,8 @@ function eventCard(row, index, reconciliationRole = null){
   const sourceUrl = row.site_pages && row.site_pages.sp_url ? row.site_pages.sp_url : value(event.url);
   const schemaId = `schema-${row.id_site_event || index}`;
   return `<article class="event">
-      ${image ? `<div class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"></div>`: ""}
-        <div class="event-body"><h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>
+    ${image ? reconciliationCardField("image", `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">`, reconciliationRole, row.id_site_event) : ""}
+    <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
     ${startDate ? reconciliationCardField("startDate", `<span class="label">Data:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(startDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
     ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` <span class="label">Ora:</span> ${escapeHtml(formatDate(endDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
     ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
@@ -784,7 +784,7 @@ function eventCard(row, index, reconciliationRole = null){
     ${composer ? reconciliationCardField("composer", `<span class="label">Composer:</span> ${escapeHtml(composer)}`, reconciliationRole, row.id_site_event) : ""}
     ${performer ? reconciliationCardField("performer", `<span class="label">Performer:</span> ${escapeHtml(performer)}`, reconciliationRole, row.id_site_event) : ""}
     ${director ? reconciliationCardField("director", `<span class="label">Director:</span> ${escapeHtml(director)}`, reconciliationRole, row.id_site_event) : ""}      
-      ${description ? `<div class="event-description">${escapeHtml(description)}</div>`: ""}
+    ${description ? reconciliationCardField("description", escapeHtml(description), reconciliationRole, row.id_site_event) : ""}
       ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
       ${escapeHtml(sourceUrl)}</a></div>`: ""}
       <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}<span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
