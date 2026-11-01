@@ -435,7 +435,7 @@ function extractEntitiesByRole(text, terms, options = {}) {
       if (capitalizedCount < 2) continue;
       const value = cleanText(segment.slice(words[firstIndex].index, last.index + last[0].length));
       if (value.length < minLength || value.length > maxLength) continue;
-      candidates.push({index: beforeTerm.length - segment.length + words[firstIndex].index, value, term: pattern.term});
+      candidates.push({index: beforeTerm.length - segment.length + words[firstIndex].index, value, term: `G-${pattern.term}`});
     }
   }
   /* Ordina i risultati secondo la posizione nel testo ed evita duplicati. */
@@ -446,7 +446,7 @@ function extractEntitiesByRole(text, terms, options = {}) {
     const key = candidate.value.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    results.push(`${candidate.value} (${candidate.term})`);
+    results.push(`${candidate.term}: ${candidate.value}`);
     if (!multiple || results.length >= maxEntities) break;
   }
   return multiple ? results : (results[0] || null);
@@ -627,7 +627,7 @@ function extractPeopleByRole(text, terms, options = {}) {
       found = findBackward(termStart);
     }
     if (found) {
-      result.push(`${found.person} (${found.direction}${match[0]})`);
+      result.push(`${found.direction}${match[0]}: ${found.person}`);
       if (result.length >= maxPeople) break;
     }
   }
