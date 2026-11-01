@@ -722,11 +722,11 @@ function formatCategoryMatches(matches, field) {
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
   Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
+  // La riga sottostante non apre più automaticamente i dettagli degli schemi.
+  // return `<div id="${id}" class="schema-details">
   // le righe sottostanti aprono automaticamente i dettagli degli schemi.
   const isReconciliationCard = reconciliationRole === "parent" || reconciliationRole === "child";
   return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
-  // La riga sottostante non apre più automaticamente i dettagli degli schemi.
-  // return `<div id="${id}" class="schema-details">
     ${fields.map(field => {
       const v = event[field];
       if (!isSchemaDisplayable(v)) return "";
