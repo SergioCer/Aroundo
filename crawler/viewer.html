@@ -452,7 +452,7 @@ body{
 }
 
 .reconciliation-card h3 {
-  margin: 0 0 10px;
+  margin: 0 0 4px;
   font-size: 14px;
   letter-spacing: 0.04em;
 }
@@ -1128,9 +1128,9 @@ const getPlace = (row) => {
   const normalRows = eventiFiltrati.filter(row => !selectedIds.has(String(row.id_site_event)));
 // Riconciliazione: fuori dall'area che scorre
 document.getElementById("reconciliation").innerHTML = parentRow
-    ? `<section class="reconciliation-section"><h2>Riconciliazione</h2><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>PADRE</h3>
+    ? `<section class="reconciliation-section"><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>Riconciliazione: Padre</h3>
     ${eventCard(parentRow, 0, "parent")}</div>
-    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>FIGLIO</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
+    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>Riconciliazione: Figlio</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
 // Eventi non selezionati: unica area scorrevole
 document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
 document.getElementById("status").textContent = String(eventiFiltrati.length);
