@@ -456,6 +456,7 @@ function extractEntitiesByRole(text, terms, options = {}) {
 function extractPerformers(text) {
   const terms = ["performer", "performers", "interprete", "interpreti", "interpretato", "interpretata", "interpretati", "interpretate",
     "esecutore", "esecutrice", "esecutori", "esecutrici",
+    "rappresentata", "rappresenta", "rappresentano", 
     "cantante", "cantanti", "solosta", "solisti", "soliste", "ensamble", "coro", "corista", "coristi", "coriste",
     "musicista", "musicisti", "orchestra", 
     "voce", "voci", "soprano", "soprani", "mezzosoprano", "mezzosoprani", "tenore", "tenori", "baritono", "baritoni", "basso", "bassi",
@@ -1195,8 +1196,7 @@ function normalizeSchemaDate(value) {
   return value.replace(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)/, "$1T$2");
 }
 
-
-/* ECCEZIONI ESTRAZIONE */
+/* ECCEZIONI ESTRAZIONE Caso Moesco */
 const EXTRACTION_EXCEPTIONS = [
   // Moesco inserisce la propria redazione come organizzatore.
   {domain: "moesco.it", field: "organizer", name: "Redazione moesco", action: "remove"}
