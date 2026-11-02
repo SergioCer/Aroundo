@@ -961,6 +961,7 @@ function removeFromReconciliation(id, role) {
     reconciliationChildIds.clear();
     reconciliationSelections.clear();
     reconciliationLockedFields.clear();
+    reconciliationManualLocks.clear();
   } else if (role === "child") {
     if (!reconciliationChildIds.has(eventId)) return;
     reconciliationChildIds.delete(eventId);
