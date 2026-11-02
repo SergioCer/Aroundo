@@ -958,7 +958,28 @@ function proposeFieldsFromChild(childRow) {
   const parentSchema = parentRow.se_schema || {};
   const childSchema = childRow.se_schema || {};
   const childId = String(childRow.id_site_event);
+  // Estrae separatamente data e ora iniziale e finale.
+  const dateTimeFields = {};
+  ["startDate", "endDate"].forEach(field => {const parts = splitDateTime(childSchema[field]);
+    if (hasSchemaValue(parts.date)) {dateTimeFields[`${field}_date`] = parts.date;}
+    if (hasSchemaValue(parts.time)) {dateTimeFields[`${field}_time`] = parts.time;}
+  });
+  // Estrae le componenti data/ora già presenti nel padre.
+  const parentDateTimeFields = {};
+  ["startDate", "endDate"].forEach(field => {const parts = splitDateTime(parentSchema[field]);
+    if (hasSchemaValue(parts.date)) {parentDateTimeFields[`${field}_date`] = parts.date;}
+    if (hasSchemaValue(parts.time)) {parentDateTimeFields[`${field}_time`] = parts.time;}
+  });
+  Object.entries(dateTimeFields).forEach(([field, childValue]) => {if (nonReconciledFields.has(field)) return;
+  const currentSelection = reconciliationSelections.get(field);
+  if (hasSchemaValue(parentDateTimeFields[field]) && !currentSelection) return;                                                                
+  if (currentSelection?.mode === "manual") return;
+  if (reconciliationLockedFields.has(field) && !currentSelection) return;
+  if (!currentSelection) {reconciliationSelections.set(field, {childId, value: cloneJson(childValue), mode: "auto"}); return;}
+  if (!sameSchemaValue(currentSelection.value, childValue)) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
+  });
   Object.entries(childSchema).forEach(([field, childValue]) => {
+    if (field === "startDate" || field === "endDate") return;
     if (nonReconciledFields.has(field)) return;
     if (!hasSchemaValue(childValue)) return;
     const currentSelection = reconciliationSelections.get(field);
