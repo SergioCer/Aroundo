@@ -1011,14 +1011,6 @@ function proposeFieldsFromChild(childRow) {
       }
     }
   });
-  Object.entries(dateTimeFields).forEach(([field, childValue]) => {if (nonReconciledFields.has(field)) return;
-  const currentSelection = reconciliationSelections.get(field);
-  if (hasSchemaValue(parentDateTimeFields[field]) && !currentSelection) return;                                                                
-  if (currentSelection?.mode === "manual") return;
-  if (reconciliationLockedFields.has(field) && !currentSelection) return;
-  if (!currentSelection) {reconciliationSelections.set(field, {childId, value: cloneJson(childValue), mode: "auto"}); return;}
-  if (!sameSchemaValue(currentSelection.value, childValue)) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
-  });
   Object.entries(childSchema).forEach(([field, childValue]) => {
     if (field === "startDate" || field === "endDate") return;
     if (nonReconciledFields.has(field)) return;
