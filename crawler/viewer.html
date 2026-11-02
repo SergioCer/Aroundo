@@ -240,15 +240,22 @@ body{
 }
 
 .source{
-  margin-top:8px;
-  padding-top:10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top:4px;
   border-top:1px solid #eee;
   font-size:10px;
   color:#666;
-  word-break:break-all
 }
 
 .source a{
+  display: inline-block;
+  max-width: 65%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
   color:#2980b9;
   text-decoration:none
 }
@@ -822,14 +829,15 @@ function eventCard(row, index, reconciliationRole = null){
     ${performer ? reconciliationCardField("performer", `<span class="label">Performer:</span> ${escapeHtml(performer)}`, reconciliationRole, row.id_site_event) : ""}
     ${director ? reconciliationCardField("director", `<span class="label">Director:</span> ${escapeHtml(director)}`, reconciliationRole, row.id_site_event) : ""}      
     ${description ? reconciliationCardField("description", escapeHtml(description), reconciliationRole, row.id_site_event) : ""}
-      ${sourceUrl ? `<div class="source"><span class="label">Fonte:</span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">
-      ${escapeHtml(sourceUrl)}</a></div>`: ""}
-      <div class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}<span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
+    <span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="Visualizza JSON-LD">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella record Evento">Delete</button>
       <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblica</button>
-      ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}</div></article>`;
+      ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}
+    <div class="source"><span class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}</span>
+      ${sourceUrl ? ` - <span class="label">Fonte:</span> <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(sourceUrl)}">${escapeHtml(sourceUrl)}</a>` : ""}
+    </div></div></article>`;
 }
 
 window.deleteEvent=deleteEvent;
