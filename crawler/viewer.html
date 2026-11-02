@@ -777,9 +777,9 @@ function eventCard(row, index, reconciliationRole = null){
   const event = reconciliationRole === "parent" ? getReconciledSchema(row) : (row.se_schema || {});
   const title = value(event.name) || value(event.title) || "Evento senza titolo";
   const description = value(event.description);
-  // Data ed ora separate
-  const startDate = splitDateTime(value(event.startDate));
-  const endDate = splitDateTime(value(event.endDate));  
+  // Date ISO complete
+  const startDate = value(event.startDate);
+  const endDate = value(event.endDate);
   // Campi geografici autonomi
   const location = value(event.location);
   const address = value(event.address);
@@ -801,13 +801,8 @@ function eventCard(row, index, reconciliationRole = null){
   return `<article class="event">
     ${image ? reconciliationCardImage(image, title, reconciliationRole, row.id_site_event) : ""}
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
-    ${startDate.date || startDate.time ? `<div class="date-time-row">
-    ${reconciliationCardField("startDate_date", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate.date).date)}`, reconciliationRole, row.id_site_event)}
-    ${reconciliationCardField("startDate_time", `<span class="label">Ora:</span> ${escapeHtml(startDate.time.slice(0, 5))}`, reconciliationRole, row.id_site_event)}</div>` : ""}
-    ${endDate.date || endDate.time ? `<div class="date-time-row">
-    ${reconciliationCardField("endDate_date", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate.date).date)}`, reconciliationRole, row.id_site_event)}
-    ${reconciliationCardField("endDate_time", `<span class="label">Ora:</span> ${escapeHtml(endDate.time.slice(0, 5))}`, reconciliationRole, row.id_site_event)}</div>` : ""}
-    ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
+    ${startDate ? reconciliationCardField("startDate", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate).date)}${formatDate(startDate).time ? ` ${escapeHtml(formatDate(startDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
+    ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)}${formatDate(endDate).time ? ` ${escapeHtml(formatDate(endDate).time)}` : ""}`, reconciliationRole, row.id_site_event) : ""}    ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
     ${!comune && cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}
     ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
     ${address ? reconciliationCardField("address", `<span class="label">Indirizzo:</span> ${escapeHtml(address)}`, reconciliationRole, row.id_site_event) : ""}
