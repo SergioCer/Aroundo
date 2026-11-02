@@ -494,6 +494,15 @@ body{
 .location-row > * {
   display: inline-block;
 }  
+
+.classification-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 4px;
+}
   
 </style>
 </head>
@@ -812,11 +821,13 @@ function eventCard(row, index, reconciliationRole = null){
   const schemaId = `schema-${row.id_site_event || index}`;
   return `<article class="event">
     ${reconciliationCardImage(image || "", title, reconciliationRole, row.id_site_event)}
+      <div class="classification-actions">
       <span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="Visualizza JSON-LD">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella record Evento">Delete</button>
       <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblica</button>
+      </div>
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
     ${(comune || cap) ? `<div class="location-row">
       ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}`, reconciliationRole, row.id_site_event) : ""}
@@ -836,7 +847,7 @@ function eventCard(row, index, reconciliationRole = null){
     ${description ? reconciliationCardField("description", escapeHtml(description), reconciliationRole, row.id_site_event) : ""}
     ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}
     <div class="source"><span class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}</span>
-      ${sourceUrl ? ` - <span class="label">Fonte:</span> <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(sourceUrl)}">${escapeHtml(sourceUrl)}</a>` : ""}
+    ${sourceUrl ? ` <span class="label">Fonte:</span> <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(sourceUrl)}">${escapeHtml(sourceUrl)}</a>` : ""}
     </div></div></article>`;
 }
 
