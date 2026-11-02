@@ -1105,8 +1105,18 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   if (requiredId && !hasSchemaValue(childSchema[requiredId])) {alert(`Impossibile selezionare il campo: manca ${requiredId} nel figlio.`); return;}
   const currentSelection = reconciliationSelections.get(field);
   // Clic sulla selezione già attiva: deseleziona l'intera coppia.
-  if (currentSelection?.childId === childId) {fields.forEach(f => {const selection = reconciliationSelections.get(f);
-  if (selection?.childId === childId) {reconciliationSelections.delete(f);} reconciliationLockedFields.add(f); reconciliationManualLocks.add(f);
+  if (currentSelection?.childId === childId) {
+    fields.forEach(f => {
+      const selection = reconciliationSelections.get(f);
+      if (selection?.childId === childId) {
+        reconciliationSelections.delete(f);
+      }
+      reconciliationLockedFields.add(f);
+      reconciliationManualLocks.add(f);
+    });
+    sortEvents();
+    return;
+  }
   // Se uno dei campi è assegnato a un altro figlio, non sovrascrivere.
   const conflictingSelection = fields.some(f => {const selection = reconciliationSelections.get(f); return selection && selection.childId !== childId;});
   if (conflictingSelection) {alert("Questo campo è già assegnato a un altro figlio. " + "Deseleziona prima il valore attuale."); return;}
