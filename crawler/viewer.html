@@ -1015,6 +1015,32 @@ function removeFromReconciliation(id, role) {
         } else {reconciliationLockedFields.delete(field);}
       }
     });
+    // Ricalcola l'ora di Inizio in base ai figli rimasti.
+    const parentRow = loadedEvents.find(row => String(row.id_site_event) === reconciliationParentId);
+    if (parentRow) {
+      const parentStart = String(parentRow.se_schema?.startDate || "");
+      const dateMatch = parentStart.match(/^(\d{4}-\d{2}-\d{2})/);
+      const currentSelection = reconciliationSelections.get("startDate");
+      if (dateMatch && currentSelection?.mode !== "manual" && !reconciliationManualLocks.has("startDate")) {
+        const startDate = dateMatch[1];
+        const matchingStarts = [...reconciliationChildIds]
+          .map(id => loadedEvents.find(row => String(row.id_site_event) === String(id)))
+          .filter(row => row && row.se_schema?.startDate)
+          .map(row => ({childId: String(row.id_site_event), value: String(row.se_schema.startDate)}))
+          .filter(item => {
+            const date = item.value.match(/^(\d{4}-\d{2}-\d{2})/);
+            const time = item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/);
+            return date && date[1] === startDate && time;
+          });
+        const times = [...new Set(matchingStarts.map(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1]))];
+        if (times.length === 1) {
+          const source = matchingStarts.find(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1] === times[0]);
+          reconciliationSelections.set("startDate", {childId: source.childId, value: `${startDate}T${times[0]}`, mode: "auto"});
+        } else {
+          if (currentSelection?.mode === "auto") {reconciliationSelections.delete("startDate");}
+        }
+      }
+    }
   }
   sortEvents();
 }
