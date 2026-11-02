@@ -513,22 +513,8 @@ body{
 </div>
 
 <div id="reconciliation"></div>
-    <div
-      id="splitter"
-      role="separator"
-      aria-orientation="horizontal"
-      aria-label="Ridimensiona le aree"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      tabindex="0"
-    ></div>
-<div class="wrap">
-    <div id="results">
-      <div class="empty">
-        Caricamento degli eventi da Supabase...
-      </div>
-    </div>
-  </div>
+<div id="splitter" role="separator" aria-orientation="horizontal" aria-label="Ridimensiona le aree" aria-valuemin="0" aria-valuemax="100" tabindex="0"></div>
+<div class="wrap"><div id="results"><div class="empty">Caricamento degli eventi da Supabase...</div></div></div>
 </div>
 
 <script type="module">
@@ -671,28 +657,23 @@ function isSchemaDisplayable(value) {
 /* CAMPI ORDINABILI di SCHEMA.ORG */
 const schemaFields = [
   "name", "description", "startDate", "endDate", "duration", "doorTime",
-  "location", "address", "addressLocality", "postalCode",
+  "location", "id_comune", "address", "addressLocality", "postalCode",
   "offers", "isAccessibleForFree", 
   "organizer", "creator", "performer", "actor", "composer", "director", "service",
-  /* CLASSIFICAZIONE */
   "strength",       // Forza della classificazione
-  "id_categoria",   // ID della categoria riconosciuta
   "category",       // Caegria da json
+  "id_categoria",   // ID della categoria riconosciuta
   "macroMatches",   // corrispondenze macroCategorie
-  "id_subcategoria",// ID della subcategoria
   "subcategory",    // subcategoria
+  "id_subcategoria",// ID della subcategoria
   "subMatches",     // corrispondenze subCategorie
-  /* ANALISI DELL'ESTRAZIONE */
+  "signals",        // Segnali intercettati
   "fundamentals",   // Campi Fondamentali
   "reinforcements", // Campi Rafforzativi
-  "signals",        // Segnali intercettati
-  /* RIFERIMENTI INTERNI */
   "id_site_page",   // riferimento pagina sorgente
-  "id_comune",      // ID del comune
   "classification", // Attributo: Evento / Incompleto / Json / Riconciliato( E - I - J - R )
-  /* ALTRE PROPRIETÀ SCHEMA.ORG */
-  "subEvent",
   "superEvent",
+  "subEvent",
   "eventAttendanceMode",
   "eventStatus",
   "eventSchedule",
@@ -958,17 +939,77 @@ function proposeFieldsFromChild(childRow) {
   const parentSchema = parentRow.se_schema || {};
   const childSchema = childRow.se_schema || {};
   const childId = String(childRow.id_site_event);
-  // Estrae separatamente data e ora iniziale e finale.
-  const dateTimeFields = {};
-  ["startDate", "endDate"].forEach(field => {const parts = splitDateTime(childSchema[field]);
-    if (hasSchemaValue(parts.date)) {dateTimeFields[`${field}_date`] = parts.date;}
-    if (hasSchemaValue(parts.time)) {dateTimeFields[`${field}_time`] = parts.time;}
-  });
-  // Estrae le componenti data/ora già presenti nel padre.
-  const parentDateTimeFields = {};
-  ["startDate", "endDate"].forEach(field => {const parts = splitDateTime(parentSchema[field]);
-    if (hasSchemaValue(parts.date)) {parentDateTimeFields[`${field}_date`] = parts.date;}
-    if (hasSchemaValue(parts.time)) {parentDateTimeFields[`${field}_time`] = parts.time;}
+  // Valuta separatamente data e ora iniziale e finale su tutti i figli presenti.
+  ["startDate", "endDate"].forEach(field => {
+    const dateField = `${field}_date`;
+    const timeField = `${field}_time`;
+    const parentParts = splitDateTime(parentSchema[field]);
+    const childParts = [...reconciliationChildIds]
+      .map(id => {
+        const row = loadedEvents.find(
+          item => String(item.id_site_event) === String(id)
+        );
+        return row ? splitDateTime(row.se_schema?.[field]) : null;
+      })
+      .filter(parts => parts && hasSchemaValue(parts.date));
+    const dates = [...new Set(childParts.map(parts => parts.date))];
+    const datesAgree = dates.length === 1;
+    // La data è proponibile soltanto se tutti i figli concordano.
+    if (datesAgree && !hasSchemaValue(parentParts.date)) {
+      const currentSelection = reconciliationSelections.get(dateField);
+      if (currentSelection?.mode !== "manual" &&
+          !reconciliationLockedFields.has(dateField)) {
+        reconciliationSelections.set(dateField, {
+          childId: String(childRow.id_site_event),
+          value: cloneJson(dates[0]),
+          mode: "auto"
+        });
+      }
+    } else if (!datesAgree && !hasSchemaValue(parentParts.date)) {
+      const currentSelection = reconciliationSelections.get(dateField);
+
+      if (currentSelection?.mode !== "manual") {
+        reconciliationSelections.delete(dateField);
+      }
+    }
+    // L'ora è proponibile soltanto se la data è concorde
+    // e coincide con quella del padre o con quella proposta.
+    const selectedDate = hasSchemaValue(parentParts.date)
+      ? parentParts.date
+      : datesAgree
+        ? dates[0]
+        : null;
+    if (!selectedDate) return;
+    const matchingTimes = childParts
+      .filter(parts => parts.date === selectedDate && hasSchemaValue(parts.time))
+      .map(parts => parts.time);
+    const times = [...new Set(matchingTimes)];
+    const timeAgrees = times.length === 1;
+    if (timeAgrees && !hasSchemaValue(parentParts.time)) {
+      const currentSelection = reconciliationSelections.get(timeField);
+      if (currentSelection?.mode !== "manual" &&
+          !reconciliationLockedFields.has(timeField)) {
+        const sourceRow = loadedEvents.find(row =>
+          [...reconciliationChildIds].some(id =>
+            String(row.id_site_event) === String(id)
+          ) &&
+          splitDateTime(row.se_schema?.[field]).date === selectedDate &&
+          splitDateTime(row.se_schema?.[field]).time === times[0]
+        );
+        if (sourceRow) {
+          reconciliationSelections.set(timeField, {
+            childId: String(sourceRow.id_site_event),
+            value: cloneJson(times[0]),
+            mode: "auto"
+          });
+        }
+      }
+    } else if (!timeAgrees && !hasSchemaValue(parentParts.time)) {
+      const currentSelection = reconciliationSelections.get(timeField);
+      if (currentSelection?.mode !== "manual") {
+        reconciliationSelections.delete(timeField);
+      }
+    }
   });
   Object.entries(dateTimeFields).forEach(([field, childValue]) => {if (nonReconciledFields.has(field)) return;
   const currentSelection = reconciliationSelections.get(field);
