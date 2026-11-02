@@ -794,7 +794,8 @@ function eventCard(row, index, reconciliationRole = null){
   return `<article class="event">
     ${image ? reconciliationCardImage(image, title, reconciliationRole, row.id_site_event) : ""}
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
-    ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
+    ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}`, reconciliationRole, row.id_site_event) : ""}
+    ${cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}
     ${!comune && cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}
     ${startDate ? reconciliationCardField("startDate", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(startDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}
     ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(endDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}    ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
@@ -926,6 +927,7 @@ function proposeFieldsFromChild(childRow) {
     }
   }
   Object.entries(childSchema).forEach(([field, childValue]) => {
+    if (field === "startDate") return;
     if (nonReconciledFields.has(field)) return;
     if (!hasSchemaValue(childValue)) return;
     const currentSelection = reconciliationSelections.get(field);
