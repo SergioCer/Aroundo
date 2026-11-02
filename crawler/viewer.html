@@ -794,8 +794,10 @@ function eventCard(row, index, reconciliationRole = null){
   return `<article class="event">
     ${image ? reconciliationCardImage(image, title, reconciliationRole, row.id_site_event) : ""}
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
-    ${startDate ? reconciliationCardField("startDate", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(startDate).time || "Non indicata")}`, reconciliationRole, row.id_site_event) : ""}
-    ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(endDate).time || "Non indicata")}`, reconciliationRole, row.id_site_event) : ""}    ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
+    ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}${cap ? ` <span class="label">CAP:</span> ${escapeHtml(cap)}` : ""}`, reconciliationRole, row.id_site_event) : ""}
+    ${!comune && cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}
+    ${startDate ? reconciliationCardField("startDate", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(startDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}
+    ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(endDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}    ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
     ${address ? reconciliationCardField("address", `<span class="label">Indirizzo:</span> ${escapeHtml(address)}`, reconciliationRole, row.id_site_event) : ""}
     ${category ? reconciliationCardField("category", `<span class="label">Categoria:</span> ${escapeHtml(category)}`, reconciliationRole, row.id_site_event) : ""}
     ${subcategory ? reconciliationCardField("subcategory", `<span class="label">Sottocategoria:</span> ${escapeHtml(subcategory)}`, reconciliationRole, row.id_site_event) : ""}
@@ -905,6 +907,24 @@ function proposeFieldsFromChild(childRow) {
   const parentSchema = parentRow.se_schema || {};
   const childSchema = childRow.se_schema || {};
   const childId = String(childRow.id_site_event);
+    // Riconcilia automaticamente l'ora di Inizio a parità di data.
+  const parentStart = String(parentSchema.startDate || "");
+  const parentStartMatch = parentStart.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (parentStartMatch) {
+    const startDate = parentStartMatch[1];
+    const currentSelection = reconciliationSelections.get("startDate");
+    if (currentSelection?.mode !== "manual" && !reconciliationManualLocks.has("startDate")) {const matchingStarts = [...reconciliationChildIds]
+        .map(id => loadedEvents.find(row => String(row.id_site_event) === String(id)))
+        .filter(row => row && String(row.se_schema?.startDate || "").startsWith(startDate))
+        .map(row => ({childId: String(row.id_site_event), value: String(row.se_schema.startDate)}))
+        .filter(item => {const match = item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/); return !!match;});
+      const times = [...new Set(matchingStarts.map(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1]))];
+      if (times.length === 1) {
+        const source = matchingStarts.find(item => item.value.includes(`T${times[0]}`));
+        reconciliationSelections.set("startDate", {childId: source.childId, value: `${startDate}T${times[0]}`, mode: "auto"});
+      } else {if (currentSelection?.mode === "auto") {reconciliationSelections.delete("startDate");}}
+    }
+  }
   Object.entries(childSchema).forEach(([field, childValue]) => {
     if (nonReconciledFields.has(field)) return;
     if (!hasSchemaValue(childValue)) return;
