@@ -589,7 +589,8 @@ function formatDate(value){
     if(Number.isNaN(date.getTime())){return {date:value, time:""};}
     const datePart = date.toLocaleDateString("it-IT", {day:"2-digit", month:"2-digit", year:"numeric"});
     const hasTime = /T\d{2}:\d{2}/.test(value);
-    const timePart = hasTime ? date.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"}) : "";
+    const timeMatch = String(value).match(/T(\d{2}:\d{2})/);
+    const timePart = timeMatch ? timeMatch[1] : "";
     return {date:datePart, time:timePart};
   }catch(e){return {date:value, time:""};}
 }
