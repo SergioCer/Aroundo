@@ -866,6 +866,7 @@ const reconciliationChildIds = new Set();
 const reconciliationSelections = new Map();
 /* Campi per i quali non devono partire nuove proposte automatiche. La scelta manuale rimane comunque possibile. */
 const reconciliationLockedFields = new Set();
+const reconciliationManualLocks = new Set();  
 /* Metadati che non devono essere ereditati automaticamente dai figli. */
 const nonReconciledFields = new Set(["classification", "id_site_page"]);
   
@@ -958,7 +959,7 @@ function proposeFieldsFromChild(childRow) {
     if (datesAgree && !hasSchemaValue(parentParts.date)) {
       const currentSelection = reconciliationSelections.get(dateField);
       if (currentSelection?.mode !== "manual" &&
-          !reconciliationLockedFields.has(dateField)) {
+          !reconciliationManualLocks.has(dateField)) {
         reconciliationSelections.set(dateField, {
           childId: String(childRow.id_site_event),
           value: cloneJson(dates[0]),
@@ -967,19 +968,26 @@ function proposeFieldsFromChild(childRow) {
       }
     } else if (!datesAgree && !hasSchemaValue(parentParts.date)) {
       const currentSelection = reconciliationSelections.get(dateField);
-
       if (currentSelection?.mode !== "manual") {
         reconciliationSelections.delete(dateField);
+        reconciliationLockedFields.delete(dateField);
       }
     }
-    // L'ora è proponibile soltanto se la data è concorde
-    // e coincide con quella del padre o con quella proposta.
+    // L'ora richiede una data certa e compatibile con quella del padre.
     const selectedDate = hasSchemaValue(parentParts.date)
       ? parentParts.date
       : datesAgree
         ? dates[0]
         : null;
-    if (!selectedDate) return;
+    if (!selectedDate) {
+      const currentSelection = reconciliationSelections.get(timeField);
+      if (currentSelection?.mode !== "manual") {
+        reconciliationSelections.delete(timeField);
+        reconciliationLockedFields.delete(timeField);
+      }
+      return;
+    }
+    // Considera soltanto gli orari dei figli con la data selezionata.
     const matchingTimes = childParts
       .filter(parts => parts.date === selectedDate && hasSchemaValue(parts.time))
       .map(parts => parts.time);
@@ -988,7 +996,7 @@ function proposeFieldsFromChild(childRow) {
     if (timeAgrees && !hasSchemaValue(parentParts.time)) {
       const currentSelection = reconciliationSelections.get(timeField);
       if (currentSelection?.mode !== "manual" &&
-          !reconciliationLockedFields.has(timeField)) {
+          !reconciliationManualLocks.has(timeField)) {
         const sourceRow = loadedEvents.find(row =>
           [...reconciliationChildIds].some(id =>
             String(row.id_site_event) === String(id)
@@ -1008,6 +1016,7 @@ function proposeFieldsFromChild(childRow) {
       const currentSelection = reconciliationSelections.get(timeField);
       if (currentSelection?.mode !== "manual") {
         reconciliationSelections.delete(timeField);
+        reconciliationLockedFields.delete(timeField);
       }
     }
   });
@@ -1053,9 +1062,12 @@ function removeFromReconciliation(id, role) {
   } else if (role === "child") {
     if (!reconciliationChildIds.has(eventId)) return;
     reconciliationChildIds.delete(eventId);
-    /* Se il figlio era fonte di campi, rimuove le sue selezioni e impedisce nuove proposte automatiche per quei campi durante questa riconciliazione. */
+    /* Libera i campi forniti dal figlio rimosso, conservando le selezioni degli altri figli. */
     reconciliationSelections.forEach((selection, field) => {
-      if (selection.childId === eventId) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
+      if (selection.childId === eventId) {reconciliationSelections.delete(field);
+        if (reconciliationManualLocks.has(field)) {reconciliationLockedFields.add(field);
+        } else {reconciliationLockedFields.delete(field);}
+      }
     });
   }
   sortEvents();
@@ -1094,7 +1106,7 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   const currentSelection = reconciliationSelections.get(field);
   // Clic sulla selezione già attiva: deseleziona l'intera coppia.
   if (currentSelection?.childId === childId) {fields.forEach(f => {const selection = reconciliationSelections.get(f);
-      if (selection?.childId === childId) {reconciliationSelections.delete(f);} reconciliationLockedFields.add(f);}); sortEvents(); return;}
+  if (selection?.childId === childId) {reconciliationSelections.delete(f);} reconciliationLockedFields.add(f); reconciliationManualLocks.add(f);
   // Se uno dei campi è assegnato a un altro figlio, non sovrascrivere.
   const conflictingSelection = fields.some(f => {const selection = reconciliationSelections.get(f); return selection && selection.childId !== childId;});
   if (conflictingSelection) {alert("Questo campo è già assegnato a un altro figlio. " + "Deseleziona prima il valore attuale."); return;}
@@ -1102,6 +1114,7 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   fields.forEach(f => {const value = dateTimeFields[f] ? childValue : childSchema[f];
     reconciliationSelections.set(f, {childId, value: cloneJson(value), mode: "manual"});
     reconciliationLockedFields.add(f);
+    reconciliationManualLocks.add(f);
   });
   sortEvents();
 }
