@@ -1099,18 +1099,25 @@ async function confirmReconciliation() {
     if (deleteError) {
       document.getElementById("status").textContent = String(loadedEvents.length);
       sortEvents();
-      alert("The father was saved as Reconciled," + "but the erasure of the children did not succeed.\n\n" + "The children remained available.\n" + deleteError.message);
-      return;
-    }
+      alert("The father was saved as Reconciled," + "but the erasure of the children did not succeed.\n\n" + "The children remained available.\n" + deleteError.message); return;}
     /* 4. Cancellazione riuscita: aggiorna lo stato locale. */
+    const currentIndex = suggestionIndex;
     const deletedIds = new Set(childIds);
     loadedEvents = loadedEvents.filter(row => !deletedIds.has(String(row.id_site_event)));
+    // Ricalcola le proposte escludendo il padre appena riconciliato.
+    suggestionGroups = buildSuggestionGroups().filter(group =>
+      !group.rows.some(row => String(row.id_site_event) === parentId)
+    );
     reconciliationParentId = null;
     reconciliationChildIds.clear();
     reconciliationSelections.clear();
     reconciliationLockedFields.clear();
+    reconciliationManualLocks.clear();
     document.getElementById("status").textContent = String(loadedEvents.length);
-    sortEvents();
+    // Mostra la proposta successiva, se disponibile.
+    if (suggestionGroups.length > 0) {
+      showSuggestion(Math.min(currentIndex, suggestionGroups.length - 1));
+    } else {closeSuggestion();}
   } catch (error) {console.error("Errore durante la riconciliazione:", error);
     alert("Error during reconciliation.\n\n" + error.message);
   } finally {reconciliationSaving = false;}
