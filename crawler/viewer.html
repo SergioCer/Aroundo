@@ -512,7 +512,6 @@ body{
   <div class="section">
 <div class="event-controls">
   <button id="analyzeBtn" class="schema-button analyze-button" title="Estrai acquisiti">Estrai</button>
-  <span id="analysisStatus" style="margin-left:12px"></span>
   <label for="sortBy">Ordina per:</label>
   <select id="sortBy">
     <option value="id">ID</option>
@@ -534,8 +533,8 @@ body{
   <button class="classification-filter classification-E active" data-classification="E" title="Mostra/Nascondi Eventi">E</button>
   <button class="classification-filter classification-J active" data-classification="J" title="Mostra/Nascondi JSON">J</button>
   <button class="classification-filter classification-R active" data-classification="R" title="Mostra/Nascondi Riconciliati">R</button>
-  <button id="suggestBtn" class="schema-button" type="button" title="Ricongiungi Eventi">Suggerisci</button>
-</div>
+  <button id="suggestBtn" class="schema-button" type="button" title="Ricongiungi Eventi">Suggerisci</button><span id="analysisStatus"></span>
+  </div>
 
 <div id="reconciliation"></div>
 <div id="splitter" role="separator" aria-orientation="horizontal" aria-label="Ridimensiona le aree" aria-valuemin="0" aria-valuemax="100" tabindex="0"></div>
