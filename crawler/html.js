@@ -190,92 +190,6 @@ function extractPrice(text) {
 }
 
 /* Organizer: termini che identificano chi organizza, promuove, produce o cura l'evento. */
-/* CANCELLARE 
-function extractOrganizer(text) {
-  if (!text) return null;
-  const terms = [
-    "organizzatore", "organizzatrice", "organizzatori", "organizzatrici", "organizzazione", "organizzazioni",
-    "organizzato da", "organizzata da", "organizzati da", "organizzate da",
-    "promotore", "promotrice", "promotori", "promotrici",
-    "promosso da", "promossa da", "promossi da", "promosse da",
-    "a cura di", "curato da", "programma", 
-    "realizzato da", "realizzata da", "realizzati da", "realizzate da",
-    "produzione", "produzioni", "prodotto da", "patrocinato da", "sostenuto da",  
-    "presentato da", "presentata da", "presentati da", "presentate da",
-    "opera", "evento", "iniziativa",
-  ].sort((a, b) => b.length - a.length);
-  const patterns = [
-    /* FORME ESPLICITE */
-/* 
-    ...terms.slice(0, 23).map(term => {
-      const escaped = escapeRegExp(term);
-      return {term, regex: new RegExp(`\\b${escaped}\\s+(?:da\\s+|di\\s+)?([^.;\\n]{2,150})`, "i")};
-    }),
-    /* FORME SEMANTICHE INDIRETTE, ovvero precedute dai termini... di del della...*/
-/*
-    ...["opera", "spettacolo", "evento", "iniziativa", "manifestazione", "rassegna", "festival"].map(term => ({
-      term, regex: new RegExp(`\\b${term}\\b[^.;\\n]{0,100}?\\b(?:del|della|dell['’]|di)\\s+([A-ZÀ-ÖØ-Ý][^.;\\n]{2,100})`, "i")
-    }))
-  ];
-  for (const pattern of patterns) {
-    const m = text.match(pattern.regex);
-    if (!m) continue;
-    let value = clean(m[1]);
-    if (!value) continue;
-    /* EVITA DI TRASCINARE LA FRASE SUCCESSIVA */
-/*
-    value = value
-      .split(/\s+\b(?:con|per|che|dove|quando|sul|sulla|al|alla|allo)\b/i)[0]
-      .trim();
-    if (value.length >= 3 && value.length <= 150) {return `${value} (${pattern.term})`;}
-  }
-  return null;
-}
-
-/* Creator: termini che identificano chi concepisce, scrive, adatta o contribuisce alla creazione dell'opera. */
-/* CANCELLARE 
-function extractCreators(text) {
-  if (!text) return [];
-  const result = [];
-  const terms = [
-    "musica", "musiche",
-    "libretto", "librettista", "librettisti", "librettiste",
-    "testo", "testi", "autore", "autrice", "autori", "autrici",
-    "drammaturgia", "drammaturgo", "drammaturga",
-    "adattamento", "adattato da", "traduzione", "tradotto da",
-    "soggetto", "sceneggiatura", "sceneggiatore", "sceneggiatrice",
-    "concept", "concepito da", "elaborazione", "rielaborato da", "rielaborazione",
-    "presenta", "presentato", "presentata", "presentano",
-    "progetto", "ideazione", "ideato", "ideata"
-  ].sort((a, b) => b.length - a.length);
-  const patterns = terms.map(term => {
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return {term, regex: new RegExp(`\\b${escaped}\\b\\s+(?:di\\s+|da\\s+)?([^.;\\n]{3,120})`, "gi")};
-});
-  /* Nome proprio composto:
-   * Alessio Pizzech
-   * Orazio Sciortino
-   * Guido Barbieri
-   * Permettiamo anche nomi con più componenti. */
-/*
-  const personName = /\b[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}\b/g;
-  for (const pattern of patterns) {
-    for (const m of text.matchAll(pattern.regex)) {
-      const segment = clean(m[1]);
-      if (!segment) continue;
-      const names = segment.match(personName);
-      if (!names) continue;
-      for (const name of names) {
-        const value = clean(name);
-        if (value && value.length >= 5 && value.length <= 80) {result.push(`${value} (${pattern.term})`);}
-      }
-    }
-  }
-  return dedupeNames(result);
-}
-*/
-
-/* Organizer: termini che identificano chi organizza, promuove, produce o cura l'evento. */
 function extractOrganizer(text) {
   const terms = [
     "organizzatore", "organizzatrice", "organizzatori", "organizzatrici",
@@ -465,7 +379,7 @@ function extractPerformers(text) {
     "clarinetto", "clarinettista", "clarinettisti", "flauto", "flautista", "flautisti", 
     "chitarra", "chitarrista", "chitarristi", 
     "batteria", "batterista", "batteristi", "percussioni",
-    "sax", "sassofono", "sassofoni", "sassofonista", "sassofonisti", "sax alto", "sax tenore", "tromba", "trombone", "tuba", 
+    "sax", "sassofono", "sassofoni", "sassofonista", "sassofonisti", "sax alto", "sax tenore", "sax quartet", "tromba", "trombone", "tuba", 
     "fisarmonica", "fisarmonicista", "fisarmonicisti", "organo", 
     "cast", "artista", "artisti", "artiste", "protagonista", "protagonisti", "protagoniste", "featuring", "starring", 
     "danzatore", "danzatrice", "ballerino", "ballerina", "coreuta" 
