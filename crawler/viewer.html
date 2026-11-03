@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="utf-8">
-<title>Aroundo — Eventi acquisiti</title>
+<title>Aroundo — Acquired events</title>
 
 <style>
 html{
@@ -133,7 +133,7 @@ body{
 .event-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
 }
 
@@ -145,7 +145,7 @@ body{
 .schema-details{
   display:none;
   margin-top:8px;
-  border-top:2px solid #ddd;
+  border-top:4px solid #ffaeae;
   }
 
 .schema-details.open{
@@ -507,12 +507,12 @@ body{
   
 <body>
 <div class="top">
-  <h1>Aroundo — Eventi acquisiti: <span id="status">...</span></h1>
+  <h1>Aroundo — Events: <span id="status">...</span></h1>
 </div>
   <div class="section">
 <div class="event-controls">
-  <button id="analyzeBtn" class="schema-button analyze-button" title="Estrai acquisiti">Estrai</button>
-  <label for="sortBy">Ordina per:</label>
+  <button id="analyzeBtn" class="schema-button analyze-button" title="Estrai acquisiti">Extract</button>
+  <label for="sortBy">Order:</label>
   <select id="sortBy">
     <option value="id">ID</option>
     <option value="date-place">Data → Luogo</option>
@@ -520,14 +520,14 @@ body{
     <option value="date">Data</option>
     <option value="place">Luogo</option>
   </select>
-  <button id="sortDirection" type="button">↓ Decrescente</button>
-  <label for="filterComuni">Comuni:</label>
+  <button id="sortDirection" type="button">↓ A-Z</button>
+  <label for="filterComuni">Zone:</label>
   <select id="filterComuni">
-    <option value="all">Tutti</option>
-    <option value="attivi">Attivi</option>
-    <option value="previsti">Previsti</option>
-    <option value="attivi-previsti">Attivi + Previsti</option>
-    <option value="esclusi">Esclusi</option>
+    <option value="all">All</option>
+    <option value="attivi">Active</option>
+    <option value="previsti">Planned</option>
+    <option value="attivi-previsti">Active & Planned</option>
+    <option value="esclusi">Excluded</option>
   </select>
   <button class="classification-filter classification-I active" data-classification="I" title="Mostra/Nascondi Incompleti">I</button>
   <button class="classification-filter classification-E active" data-classification="E" title="Mostra/Nascondi Eventi">E</button>
@@ -721,9 +721,9 @@ function formatCategoryMatches(matches, field) {
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
   const fields = [...schemaFields];
   Object.keys(event).forEach(key => {if (!fields.includes(key)) fields.push(key);});
-  // La riga sottostante non apre più automaticamente i dettagli degli schemi.
+  // La riga sottostante non apre più automaticamente i dettagli degli schemi JSON_LD.
   // return `<div id="${id}" class="schema-details">
-  // le righe sottostanti aprono automaticamente i dettagli degli schemi.
+  // le righe sottostanti aprono automaticamente i dettagli degli schemi JSON-LD.
   const isReconciliationCard = reconciliationRole === "parent" || reconciliationRole === "child";
   return `<div id="${id}" class="schema-details ${isReconciliationCard ? "open" : ""}">
     ${fields.map(field => {
@@ -823,7 +823,7 @@ function eventCard(row, index, reconciliationRole = null){
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="Visualizza JSON-LD">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella record Evento">Delete</button>
-      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblica</button>
+      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblic</button>
       </div>
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
     ${(comune || cap) ? `<div class="location-row">
@@ -1090,7 +1090,7 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   // Per Comune, Categoria e Subcategoria, il figlio deve avere entrambi i valori.
   const requiredIds = {addressLocality: "id_comune", category: "id_categoria", subcategory: "id_subcategoria"};
   const requiredId = requiredIds[field];
-  if (requiredId && !hasSchemaValue(childSchema[requiredId])) {alert(`Impossibile selezionare il campo: manca ${requiredId} nel figlio.`); return;}
+  if (requiredId && !hasSchemaValue(childSchema[requiredId])) {alert(`Cannot select the field: it is missing ${requiredId} in the son.`); return;}
   const currentSelection = reconciliationSelections.get(field);
   // Clic sulla selezione già attiva: deseleziona l'intera coppia.
   if (currentSelection?.childId === childId) {
@@ -1107,7 +1107,7 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   }
   // Se uno dei campi è assegnato a un altro figlio, non sovrascrivere.
   const conflictingSelection = fields.some(f => {const selection = reconciliationSelections.get(f); return selection && selection.childId !== childId;});
-  if (conflictingSelection) {alert("Questo campo è già assegnato a un altro figlio. " + "Deseleziona prima il valore attuale."); return;}
+  if (conflictingSelection) {alert("This field is already assigned to another child. " + "Deselect the current value first."); return;}
   // Selezione manuale: memorizza il valore estratto oppure il campo originale.
     fields.forEach(f => {const value = childSchema[f];
     reconciliationSelections.set(f, {childId, value: cloneJson(value), mode: "manual"});
@@ -1121,13 +1121,13 @@ function reconciliationButton(row, role = null) {
   const id = String(row.id_site_event);
   if (role === "parent") {
     if (reconciliationChildIds.size > 0) {      
-      return `<button class="schema-button" type="button" onclick="confirmReconciliation()" title="Esegui Riconciliazione">Riconcilia</button>`;}
-      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')" title="Rimuovi dalla Riconciliazione">Deseleziona</button>`;}
+      return `<button class="schema-button" type="button" onclick="confirmReconciliation()" title="Esegui Riconciliazione">Reconcile</button>`;}
+      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')" title="Remove from Reconciliation">Deseleziona</button>`;}
   if (role === "child") {
-    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')" title="Rimuovi dalla Riconciliazione">Deseleziona</button>`;}
+    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')" title="Remove from Reconciliation">Deseleziona</button>`;}
   if (reconciliationParentId === null) {
-    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')" title="Evento Capostipite">Padre</button>`;}
-    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')" title="Evento da integrare">Figlio</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')" title="Foundational Event">Target</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')" title="Event to be added">Source</button>`;}
 
 async function confirmReconciliation() {
   if (reconciliationSaving) return;
@@ -1258,9 +1258,9 @@ const getPlace = (row) => {
   const normalRows = eventiFiltrati.filter(row => !selectedIds.has(String(row.id_site_event)));
 // Riconciliazione: fuori dall'area che scorre
 document.getElementById("reconciliation").innerHTML = parentRow
-    ? `<section class="reconciliation-section"><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>Riconciliazione: Padre</h3>
+    ? `<section class="reconciliation-section"><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>Target</h3>
     ${eventCard(parentRow, 0, "parent")}</div>
-    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>Riconciliazione: Figlio</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
+    ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>Source</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
 // Eventi non selezionati: unica area scorrevole
 document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
 document.getElementById("status").textContent = String(eventiFiltrati.length);
@@ -1308,7 +1308,7 @@ document.getElementById("sortBy").addEventListener("change", (event) => {sortBy 
   
 document.getElementById("sortDirection").addEventListener("click", () => {
   sortAscending = !sortAscending;
-  document.getElementById("sortDirection").textContent = sortAscending ? "↑ Crescente" : "↓ Decrescente";
+  document.getElementById("sortDirection").textContent = sortAscending ? "↑ Z-A" : "↓ A-Z";
   sortEvents();
 });
 
@@ -1653,7 +1653,7 @@ reconciliationObserver.observe(reconciliationPanel, {childList: true, subtree: t
     .order("id_site_page", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (pageError) {console.error("[HTML] Errore controllo site_pages:", pageError); return;}
+  if (pageError) {console.error("[HTML] Error control site_pages:", pageError); return;}
   const { data: lastEvent, error: eventError } = await supabase
     .from("site_events")
     .select("id_site_page")
@@ -1661,11 +1661,11 @@ reconciliationObserver.observe(reconciliationPanel, {childList: true, subtree: t
     .order("id_site_page", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (eventError) {console.error("[HTML] Errore controllo site_events:", eventError); return;}
+  if (eventError) {console.error("[HTML] Error control site_events:", eventError); return;}
   const lastPageId = lastPage?.id_site_page ?? 0;
   const lastEventPageId = lastEvent?.id_site_page ?? 0;
-  if (lastPageId > lastEventPageId) {button.classList.add("analysis-red"); status.textContent = "Possibili nuove pagine da analizzare";
-  } else {button.classList.remove("analysis-red"); status.textContent = "Nessuna nuova pagina rilevata";}
+  if (lastPageId > lastEventPageId) {button.classList.add("analysis-red"); status.textContent = "Potential new pages to analyze";
+  } else {button.classList.remove("analysis-red"); status.textContent = "No new pages detected";}
 }
 
 checkPendingExtraction();
@@ -1676,11 +1676,11 @@ document.getElementById("analyzeBtn").addEventListener("click", async () => {
   const status = document.getElementById("analysisStatus");
   button.classList.add("analysis-red");
   button.disabled = true;
-  status.textContent = "Analisi in corso: 0 / ...";
-  try {await runAnalysis(supabase, (current, total) => {status.textContent = `Analisi in corso: ${current} / ${total}`;});
-    status.textContent = "Analisi completata!";
+  status.textContent = "Analysis in progress: 0 / ...";
+  try {await runAnalysis(supabase, (current, total) => {status.textContent = `Analysis in progress: ${current} / ${total}`;});
+    status.textContent = "Analysis complete!";
     await loadEvents();
-  } catch (error) {console.error("[HTML] Errore analisi:", error); status.textContent = `Errore: ${error.message}`;
+  } catch (error) {console.error("[HTML] Errore analisi:", error); status.textContent = `Error: ${error.message}`;
   } finally {button.disabled = false;
   }
 });
