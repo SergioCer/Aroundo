@@ -1032,47 +1032,25 @@ function addReconciliationChild(id) {
 function removeFromReconciliation(id, role) {
   const eventId = String(id);
   if (role === "parent") {
-    // Il padre si può rimuovere solo senza figli.
     if (reconciliationChildIds.size > 0) return;
     reconciliationParentId = null;
     reconciliationChildIds.clear();
     reconciliationSelections.clear();
     reconciliationLockedFields.clear();
     reconciliationManualLocks.clear();
+    reconciliationConflicts.clear();
   } else if (role === "child") {
     if (!reconciliationChildIds.has(eventId)) return;
     reconciliationChildIds.delete(eventId);
-    /* Libera i campi forniti dal figlio rimosso, conservando le selezioni degli altri figli. */
-    reconciliationSelections.forEach((selection, field) => {
-      if (selection.childId === eventId) {reconciliationSelections.delete(field);
-        if (reconciliationManualLocks.has(field)) {reconciliationLockedFields.add(field);
-        } else {reconciliationLockedFields.delete(field);}
-      }
-    });
-    // Ricalcola l'ora di Inizio in base ai figli rimasti.
-    const parentRow = loadedEvents.find(row => String(row.id_site_event) === reconciliationParentId);
-    if (parentRow) {
-      const parentStart = String(parentRow.se_schema?.startDate || "");
-      const dateMatch = parentStart.match(/^(\d{4}-\d{2}-\d{2})/);
-      const currentSelection = reconciliationSelections.get("startDate");
-      if (dateMatch && currentSelection?.mode !== "manual" && !reconciliationManualLocks.has("startDate")) {
-        const startDate = dateMatch[1];
-        const matchingStarts = [...reconciliationChildIds]
-          .map(id => loadedEvents.find(row => String(row.id_site_event) === String(id)))
-          .filter(row => row && row.se_schema?.startDate)
-          .map(row => ({childId: String(row.id_site_event), value: String(row.se_schema.startDate)}))
-          .filter(item => {
-            const date = item.value.match(/^(\d{4}-\d{2}-\d{2})/);
-            const time = item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/);
-            return date && date[1] === startDate && time;
-          });
-        const times = [...new Set(matchingStarts.map(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1]))];
-        if (times.length === 1) {
-          const source = matchingStarts.find(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1] === times[0]);
-          reconciliationSelections.set("startDate", {childId: source.childId, value: `${startDate}T${times[0]}`, mode: "auto"});
-        } else {if (currentSelection?.mode === "auto") {reconciliationSelections.delete("startDate");}}
-      }
-    }
+    // Azzera tutte le proposte e i blocchi temporanei.
+    reconciliationSelections.clear();
+    reconciliationLockedFields.clear();
+    reconciliationManualLocks.clear();
+    // Ricostruisce le proposte dai figli rimasti.
+    const remainingChildren = [...reconciliationChildIds]
+      .map(id => loadedEvents.find(row => String(row.id_site_event) === String(id)))
+      .filter(Boolean);
+    remainingChildren.forEach(childRow => {proposeFieldsFromChild(childRow);});
   }
   updateReconciliationConflicts();
   sortEvents();
@@ -1127,7 +1105,8 @@ function reconciliationButton(row, role = null) {
     return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')" title="Remove from Reconciliation">Deselect</button>`;}
   if (reconciliationParentId === null) {
     return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')" title="Foundational Event">Target</button>`;}
-    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')" title="Event to be added">Source</button>`;}
+    return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')" title="Event to be added">Source</button>`;
+}
 
 async function confirmReconciliation() {
   if (reconciliationSaving) return;
