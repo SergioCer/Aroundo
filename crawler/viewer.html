@@ -538,7 +538,7 @@ body{
 
 <div id="reconciliation"></div>
 <div id="splitter" role="separator" aria-orientation="horizontal" aria-label="Ridimensiona le aree" aria-valuemin="0" aria-valuemax="100" tabindex="0"></div>
-<div class="wrap"><div id="results"><div class="empty">Caricamento degli eventi da Supabase...</div></div></div>
+<div class="wrap"><div id="results"><div class="empty">Loading events from Supabase...</div></div></div>
 </div>
 
 <script type="module">
@@ -1475,8 +1475,9 @@ const eventsPanel = document.querySelector(".wrap");
 const splitter = document.getElementById("splitter");
 let splitDrag = null;
 
+// Dimensione minima e massima della finestra di riconciliazione.
 function resizeReconciliation(height, totalHeight) {
-  const minHeight = Math.min(120, totalHeight / 2);
+  const minHeight = Math.min(100, totalHeight / 2);
   const maxHeight = totalHeight - minHeight;
   const newHeight = Math.max(minHeight, Math.min(maxHeight, height));
   reconciliationPanel.style.flex = `0 0 ${newHeight}px`;
@@ -1489,6 +1490,7 @@ splitter.addEventListener("pointerdown", (event) => {
   splitter.setPointerCapture(event.pointerId);
   event.preventDefault();
 });
+
 splitter.addEventListener("pointermove", (event) => {
   if (!splitDrag) return;
   const deltaY = event.clientY - splitDrag.startY;
@@ -1511,7 +1513,9 @@ splitter.addEventListener("keydown", (event) => {
 let reconciliationWasEmpty = !reconciliationPanel.innerHTML.trim();
 const reconciliationObserver = new MutationObserver(() => {
   const isEmpty = !reconciliationPanel.innerHTML.trim();
-  if (reconciliationWasEmpty && !isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";}
+  if (reconciliationWasEmpty && !isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";
+  requestAnimationFrame(() => {const totalHeight = reconciliationPanel.clientHeight + eventsPanel.clientHeight; resizeReconciliation(totalHeight, totalHeight);});
+  }
   if (!reconciliationWasEmpty && isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";}
   reconciliationWasEmpty = isEmpty;
 });
