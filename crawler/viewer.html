@@ -534,11 +534,12 @@ body{
   <button class="classification-filter classification-J active" data-classification="J" title="Show/Hide JSON">J</button>
   <button class="classification-filter classification-R active" data-classification="R" title="Show/Hide Reconciled">R</button>
   <button id="suggestBtn" class="schema-button" type="button" title="Detect Matching Events">Match</button>
-    <div id="suggestNavigation" style="display:none; align-items:center; gap:6px;">
+    <div id="suggestNavigation" style="display:none; align-items:center; gap:6px; flex-shrink:0;">
   <button id="suggestPrev" class="schema-button" type="button" title="Previous proposal">‹</button>
     <span id="suggestPosition">1 / 1</span>
   <button id="suggestNext" class="schema-button" type="button" title="Next proposal">›</button>
     </div>
+  <span id="analysisStatus"></span>
   </div>
 
 <div id="reconciliation"></div>
