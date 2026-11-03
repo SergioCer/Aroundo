@@ -533,7 +533,12 @@ body{
   <button class="classification-filter classification-E active" data-classification="E" title="Show/Hide Events">E</button>
   <button class="classification-filter classification-J active" data-classification="J" title="Show/Hide JSON">J</button>
   <button class="classification-filter classification-R active" data-classification="R" title="Show/Hide Reconciled">R</button>
-  <button id="suggestBtn" class="schema-button" type="button" title="Detect Matchs Events">Match</button><span id="analysisStatus"></span>
+  <button id="suggestBtn" class="schema-button" type="button" title="Detect Matching Events">Match</button>
+    <div id="suggestNavigation" style="display:none; align-items:center; gap:6px;">
+  <button id="suggestPrev" class="schema-button" type="button" title="Previous proposal">‹</button>
+    <span id="suggestPosition">1 / 1</span>
+  <button id="suggestNext" class="schema-button" type="button" title="Next proposal">›</button>
+    </div>
   </div>
 
 <div id="reconciliation"></div>
@@ -1209,7 +1214,9 @@ document.getElementById("sortDirection").addEventListener("click", () => {
 });
 
 filterComuni.addEventListener("change", () => {
-  suggestedGroupKeys.clear();
+  suggestionGroups = [];
+  suggestionIndex = -1;
+  document.getElementById("suggestNavigation").style.display = "none";
   // Azzera la riconciliazione attiva.
   reconciliationParentId = null;
   reconciliationChildIds.clear();
@@ -1232,10 +1239,22 @@ document.querySelectorAll(".classification-filter").forEach(button => {
   });
 });
   
-document.getElementById("suggestBtn").addEventListener("click", () => {suggestReconciliation();});
+document.getElementById("suggestBtn").addEventListener("click", () => {
+  if (suggestionIndex >= 0) {closeSuggestion();
+  } else {suggestReconciliation();}
+});
+
+document.getElementById("suggestPrev").addEventListener("click", () => {
+  showSuggestion(suggestionIndex - 1);
+});
+
+document.getElementById("suggestNext").addEventListener("click", () => {
+  showSuggestion(suggestionIndex + 1);
+});
 
 /* SUGGERITORE DI RICONCILIAZIONE */
-let suggestedGroupKeys = new Set();
+let suggestionGroups = [];
+let suggestionIndex = -1;
 function suggestionText(value) {
   if (typeof value !== "string") return "";
   return value
@@ -1406,30 +1425,54 @@ function buildSuggestionGroups() {
   );
 }
 
-function suggestReconciliation() {
-  const groups = buildSuggestionGroups();
-  const nextGroup = groups.find(group => !suggestedGroupKeys.has(group.key));
-  const button = document.getElementById("suggestBtn");
-  const status = document.getElementById("analysisStatus");
-  if (!nextGroup) {button.textContent = "No more suggest"; button.disabled = true; if (status) status.textContent = ""; return;}
-  // Ricordiamo il gruppo proposto nella sessione corrente, per passare alla proposta successiva al prossimo clic.
-  suggestedGroupKeys.add(nextGroup.key);
-  // Inizializza una nuova proposta senza salvare nulla.
+/* Carica una proposta specifica nell'area di riconciliazione. */
+function showSuggestion(index) {
+  if (index < 0 || index >= suggestionGroups.length) return;
+  suggestionIndex = index;
+  const group = suggestionGroups[index];
+  // Azzera la riconciliazione precedente.
   reconciliationParentId = null;
   reconciliationChildIds.clear();
   reconciliationSelections.clear();
   reconciliationLockedFields.clear();
-  const parent = chooseSuggestionParent(nextGroup.rows);
+  reconciliationManualLocks.clear();
+  // Costruisce la nuova proposta.
+  const parent = chooseSuggestionParent(group.rows);
   reconciliationParentId = String(parent.id_site_event);
-  nextGroup.rows
+  group.rows
     .filter(row => String(row.id_site_event) !== reconciliationParentId)
     .forEach(row => {addReconciliationChild(String(row.id_site_event));});
-  button.textContent = "Suggest";
-  button.disabled = false;
-  if (status) {status.textContent = `Suggestion ${suggestedGroupKeys.size}: ${nextGroup.rows.length} events to be verified`;}
+  // Aggiorna i controlli di navigazione.
+  document.getElementById("suggestBtn").textContent = "Close";
+  document.getElementById("suggestPrev").disabled = index === 0;
+  document.getElementById("suggestNext").disabled = index === suggestionGroups.length - 1;
+  document.getElementById("suggestPosition").textContent =
+    `${index + 1} / ${suggestionGroups.length}`;
+  document.getElementById("suggestNavigation").style.display = "flex";
   sortEvents();
 }
 
+/* Avvia il calcolo delle proposte. */
+function suggestReconciliation() {
+  suggestionGroups = buildSuggestionGroups();
+  suggestionIndex = -1;
+  if (suggestionGroups.length === 0) return;
+  showSuggestion(0);
+}
+
+/* Chiude la riconciliazione senza modificare i dati originali. */
+function closeSuggestion() {
+  suggestionGroups = [];
+  suggestionIndex = -1;
+  reconciliationParentId = null;
+  reconciliationChildIds.clear();
+  reconciliationSelections.clear();
+  reconciliationLockedFields.clear();
+  reconciliationManualLocks.clear();
+  document.getElementById("suggestBtn").textContent = "Match";
+  document.getElementById("suggestNavigation").style.display = "none";
+  sortEvents();
+}
 
 /* NUOVO EVENTO DA SCHEDA */
 async function nuovoEvento(idSiteEvent) {
