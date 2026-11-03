@@ -188,6 +188,7 @@ body{
 }  
   
 /* Campi coinvolti nella riconciliazione parte SCHEDA */
+
 .field.reconciliation-field-selectable {
   cursor: pointer;
   border-radius: 3px;
@@ -197,15 +198,37 @@ body{
   background: #fff8d6;
 }
 
-.field.reconciliation-field-selected {
-  background: #fff0a6;
+/* Selezione automatica: verde tenue */
+.field.reconciliation-field-auto {
+  background: #d9f0dc;
   border-radius: 3px;
 }
 
-.field.reconciliation-field-selected .label {
+.field.reconciliation-field-auto .label {
+  color: #245b30;
+}
+
+/* Selezione manuale: azzurro tenue */
+.field.reconciliation-field-manual {
+  background: #dcecff;
+  border-radius: 3px;
+}
+
+.field.reconciliation-field-manual .label {
+  color: #245078;
+}
+
+/* Valori discordanti: giallo tenue */
+.field.reconciliation-field-conflict {
+  background: #fff0b3;
+  border-radius: 3px;
+}
+
+.field.reconciliation-field-conflict .label {
   color: #664d00;
 }
 
+/* Campo già assegnato a un altro figlio */
 .field.reconciliation-field-unavailable {
   cursor: not-allowed;
   opacity: 0.45;
@@ -554,6 +577,22 @@ import { runAnalysis } from "./html.js";
 const comuni = await loadComuni();
 const comuniMap = new Map(comuni.map(comune => [comune.id_comune, comune]));
 const filterComuni = document.getElementById("filterComuni");
+const reconciliationChildIds = new Set();  
+
+/* Divisore pannelli Riconciliazione & Wrap */
+const reconciliationPanel = document.getElementById("reconciliation");
+const eventsPanel = document.querySelector(".wrap");
+const splitter = document.getElementById("splitter");
+let splitDrag = null;
+  
+let loadedEvents = [];
+let sortBy = "id";
+let sortAscending = true;
+let reconciliationParentId = null;
+let reconciliationSaving = false;  
+let suggestionGroups = [];
+let suggestionIndex = -1;  
+let reconciliationConflicts = new Set();
   
 async function loadComuni() {const { data, error } = await supabase
     .from("comuni")
@@ -746,7 +785,7 @@ function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
         </div>`;}).join("")}</div>`;
 }
 
-/* Gestisce la selezione dei campi direttamente sulla scheda evento. */
+/* Gestisce la selezione e l'evidenziazione dei campi sulla scheda evento. */
 function reconciliationCardField(field, content, reconciliationRole, rowId) {
   const exists = content !== undefined && content !== null && content !== "";
   const selection = reconciliationSelections.get(field);
@@ -754,11 +793,19 @@ function reconciliationCardField(field, content, reconciliationRole, rowId) {
   const isChildField = reconciliationRole === "child" && exists && !nonReconciledFields.has(field);
   const isSelected = !!selection && (reconciliationRole === "parent" || (reconciliationRole === "child" && selection.childId === childId));
   const unavailable = isChildField && !!selection && selection.childId !== childId;
-  const classes = ["field", isChildField ? "reconciliation-field-selectable" : "", isSelected ? "reconciliation-field-selected" : "", unavailable ? "reconciliation-field-unavailable" : ""].filter(Boolean).join(" ");
+  const isConflict = isChildField && reconciliationConflicts.has(`${field}:${childId}`) && !isSelected;
+  const classes = [
+    "field",
+    isChildField ? "reconciliation-field-selectable" : "",
+    isSelected ? "reconciliation-field-selected" : "",
+    isSelected && selection.mode === "auto" ? "reconciliation-field-auto" : "",
+    isSelected && selection.mode === "manual" ? "reconciliation-field-manual" : "",
+    isConflict ? "reconciliation-field-conflict" : "",
+    unavailable ? "reconciliation-field-unavailable" : ""
+  ].filter(Boolean).join(" ");
   const attributes = isChildField ? `data-reconciliation-field="${escapeHtml(field)}" data-child-id="${escapeHtml(childId)}" title="${unavailable ? "Deselect the current source first" : "Select or deselect this value"}"`: "";
   return `<div class="${classes}" ${attributes}>${content}</div>`;
 }
-
 /* Gestisce l'immagine mantenendo il contenitore e le dimensioni originali. */
 function reconciliationCardImage(image, title, reconciliationRole, rowId) {
   const childId = String(rowId);
@@ -843,13 +890,6 @@ document.getElementById("reconciliation").addEventListener("click",
     toggleReconciliationField(fieldElement.dataset.reconciliationField, fieldElement.dataset.childId);
   }
 );
-  
-let loadedEvents = [];
-let sortBy = "id";
-let sortAscending = true;
-let reconciliationParentId = null;
-let reconciliationSaving = false;  
-const reconciliationChildIds = new Set();
 
 /* field -> {
  *   childId: ID del figlio fonte,
@@ -869,6 +909,35 @@ function cloneJson(value) {
 }
 
 function hasSchemaValue(value) {return value !== undefined && value !== null && value !== "" && (!Array.isArray(value) || value.length > 0);}
+ /* Individua i campi discordanti tra gli eventi sorgente. */
+function updateReconciliationConflicts() {
+  reconciliationConflicts.clear();
+  const childRows = loadedEvents.filter(row => reconciliationChildIds.has(String(row.id_site_event)));
+  if (childRows.length < 2) return;
+  const fields = new Set();
+  childRows.forEach(row => {Object.keys(row.se_schema || {}).forEach(field => {
+      if (!nonReconciledFields.has(field)) {fields.add(field);}
+    });
+  });
+  fields.forEach(field => {
+    const values = childRows
+      .map(row => (row.se_schema || {})[field])
+      .filter(hasSchemaValue);
+    if (values.length < 2) return;
+    const normalizedValues = values.map(value => {
+      if (Array.isArray(value)) {
+        return JSON.stringify([...value].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))));
+      }
+      return JSON.stringify(value);
+    });
+    if (new Set(normalizedValues).size > 1) {
+      childRows.forEach(row => {
+        const value = (row.se_schema || {})[field];
+        if (hasSchemaValue(value)) {reconciliationConflicts.add(`${field}:${row.id_site_event}`);}
+      });
+    }
+  });
+} 
 
 function sameSchemaValue(a, b) {
   if (a === b) return true;
@@ -956,6 +1025,7 @@ function addReconciliationChild(id) {
   reconciliationChildIds.add(childId);
   // L'unico punto in cui parte la proposta automatica.
   proposeFieldsFromChild(childRow);
+  updateReconciliationConflicts();
   sortEvents();
 }
 
@@ -1004,6 +1074,7 @@ function removeFromReconciliation(id, role) {
       }
     }
   }
+  updateReconciliationConflicts();
   sortEvents();
 }
 
@@ -1261,8 +1332,6 @@ document.getElementById("suggestNext").addEventListener("click", () => {
 });
 
 /* SUGGERITORE DI RICONCILIAZIONE */
-let suggestionGroups = [];
-let suggestionIndex = -1;
 function suggestionText(value) {
   if (typeof value !== "string") return "";
   return value
@@ -1457,6 +1526,7 @@ function showSuggestion(index) {
   document.getElementById("suggestPosition").textContent =
     `${index + 1} / ${suggestionGroups.length}`;
   document.getElementById("suggestNavigation").style.display = "flex";
+  updateReconciliationConflicts();
   sortEvents();
 }
 
@@ -1525,12 +1595,6 @@ async function loadEvents(){
     results.innerHTML = `<div class="error"><strong>Supabase read Error</strong><br><br>${escapeHtml(error.message)}</div>`;}
 }
 
-/* Divisore pannelli Riconciliazione & Wrap */
-const reconciliationPanel = document.getElementById("reconciliation");
-const eventsPanel = document.querySelector(".wrap");
-const splitter = document.getElementById("splitter");
-let splitDrag = null;
-
 // Dimensione minima e massima della finestra di riconciliazione.
 function resizeReconciliation(height, totalHeight) {
   const minHeight = Math.min(100, totalHeight / 2);
@@ -1568,7 +1632,7 @@ splitter.addEventListener("keydown", (event) => {
 
 let reconciliationWasEmpty = !reconciliationPanel.innerHTML.trim();
 const reconciliationObserver = new MutationObserver(() => {
-  const isEmpty = !reconciliationPanel.innerHTML.trim();
+const isEmpty = !reconciliationPanel.innerHTML.trim();
   if (reconciliationWasEmpty && !isEmpty) {reconciliationPanel.style.flex = ""; eventsPanel.style.flex = "";
   requestAnimationFrame(() => {const totalHeight = reconciliationPanel.clientHeight + eventsPanel.clientHeight; resizeReconciliation(totalHeight, totalHeight);});
   }
