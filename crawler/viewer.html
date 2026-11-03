@@ -1448,8 +1448,8 @@ async function loadEvents(){
         .select("id_site_event, id_site_page, id_evento, se_schema, se_extracted")
         .order("id_site_event",{ascending:false});
     if(error){throw error;}
-    if(!data || data.length === 0){status.textContent = "Nessun evento presente!";
-      results.innerHTML = `<div class="empty">La tabella site_events non contiene eventi. Eseguire ESTRAI</div>`; return;}
+    if(!data || data.length === 0){status.textContent = "No events!";
+      results.innerHTML = `<div class="empty">The site_events table contains no events. Execute EXTRACT</div>`; return;}
     /* Recupero degli URL delle pagine origine */
     const idsPagine = [...new Set(data .map(evento => evento.id_site_page) .filter(id => id !== null))];
     let pagine = [];
@@ -1467,8 +1467,8 @@ async function loadEvents(){
     sortEvents();
   }catch(error){
     console.error("Errore lettura site_events:", error);
-    status.textContent = "Errore durante il caricamento.";
-    results.innerHTML = `<div class="error"><strong>Errore lettura Supabase</strong><br><br>${escapeHtml(error.message)}</div>`;}
+    status.textContent = "Error while loading.";
+    results.innerHTML = `<div class="error"><strong>Supabase read Error</strong><br><br>${escapeHtml(error.message)}</div>`;}
 }
 
 /* Divisore pannelli Riconciliazione & Wrap */
