@@ -515,10 +515,10 @@ body{
   <label for="sortBy">Order:</label>
   <select id="sortBy">
     <option value="id">ID</option>
-    <option value="date-place">Data → Luogo</option>
-    <option value="place-date">Luogo → Data</option>
-    <option value="date">Data</option>
-    <option value="place">Luogo</option>
+    <option value="date-place">Date → Place</option>
+    <option value="place-date">Place → Date</option>
+    <option value="date">Date</option>
+    <option value="place">Place</option>
   </select>
   <button id="sortDirection" type="button">↓ A-Z</button>
   <label for="filterComuni">Zone:</label>
@@ -529,11 +529,11 @@ body{
     <option value="attivi-previsti">Active & Planned</option>
     <option value="esclusi">Excluded</option>
   </select>
-  <button class="classification-filter classification-I active" data-classification="I" title="Mostra/Nascondi Incompleti">I</button>
-  <button class="classification-filter classification-E active" data-classification="E" title="Mostra/Nascondi Eventi">E</button>
-  <button class="classification-filter classification-J active" data-classification="J" title="Mostra/Nascondi JSON">J</button>
-  <button class="classification-filter classification-R active" data-classification="R" title="Mostra/Nascondi Riconciliati">R</button>
-  <button id="suggestBtn" class="schema-button" type="button" title="Ricongiungi Eventi">Suggerisci</button><span id="analysisStatus"></span>
+  <button class="classification-filter classification-I active" data-classification="I" title="Show/Hide Incomplete">I</button>
+  <button class="classification-filter classification-E active" data-classification="E" title="Show/Hide Events">E</button>
+  <button class="classification-filter classification-J active" data-classification="J" title="Show/Hide JSON">J</button>
+  <button class="classification-filter classification-R active" data-classification="R" title="Show/Hide Reconciled">R</button>
+  <button id="suggestBtn" class="schema-button" type="button" title="Detect Matchs Events">Match</button><span id="analysisStatus"></span>
   </div>
 
 <div id="reconciliation"></div>
@@ -552,7 +552,7 @@ const filterComuni = document.getElementById("filterComuni");
 async function loadComuni() {const { data, error } = await supabase
     .from("comuni")
     .select("id_comune, co_descrizione, co_attivato, co_previsto");
-  if (error) {console.error("Errore caricamento comuni:", error); return [];}
+  if (error) {console.error("Error loading municipalities:", error); return [];}
   return data || [];
 }
 
@@ -576,9 +576,7 @@ function filtraEventoPerComune(evento, comuniMap, filtro) {
   
 /* UTILITÀ */
 function escapeHtml(value){
-  if(value === null || value === undefined){
-    return "";
-  }
+  if(value === null || value === undefined){return "";}
   return String(value)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
@@ -710,12 +708,9 @@ function formatCategoryMatches(matches, field) {
     const terms = (item.terms || [])
       .map(term => `${term.term}: ${term.count}`)
       .join("; ");
-    const categoryPrefix = field === "subMatches"
-      ? `(${item.categoriaId}) - `
-      : "";
+    const categoryPrefix = field === "subMatches" ? `(${item.categoriaId}) - `: "";
     return `<div class="category-match">${categoryPrefix}(${escapeHtml(String(item.id))}) ${escapeHtml(item.descrizione || "")}
-      — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;
-    }).join("");
+      — ${Math.round(item.percentuale)}%${terms ? ` — ${escapeHtml(terms)}` : ""}</div>`;}).join("");
 }
              
 function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
@@ -751,22 +746,10 @@ function reconciliationCardField(field, content, reconciliationRole, rowId) {
   const selection = reconciliationSelections.get(field);
   const childId = String(rowId);
   const isChildField = reconciliationRole === "child" && exists && !nonReconciledFields.has(field);
-  const isSelected = !!selection && (
-    reconciliationRole === "parent" ||
-    (reconciliationRole === "child" && selection.childId === childId)
-  );
+  const isSelected = !!selection && (reconciliationRole === "parent" || (reconciliationRole === "child" && selection.childId === childId));
   const unavailable = isChildField && !!selection && selection.childId !== childId;
-  const classes = [
-    "field",
-    isChildField ? "reconciliation-field-selectable" : "",
-    isSelected ? "reconciliation-field-selected" : "",
-    unavailable ? "reconciliation-field-unavailable" : ""
-  ].filter(Boolean).join(" ");
-  const attributes = isChildField
-    ? `data-reconciliation-field="${escapeHtml(field)}"
-       data-child-id="${escapeHtml(childId)}"
-       title="${unavailable ? "Deseleziona prima la fonte attuale" : "Seleziona o deseleziona questo valore"}"`
-    : "";
+  const classes = ["field", isChildField ? "reconciliation-field-selectable" : "", isSelected ? "reconciliation-field-selected" : "", unavailable ? "reconciliation-field-unavailable" : ""].filter(Boolean).join(" ");
+  const attributes = isChildField ? `data-reconciliation-field="${escapeHtml(field)}" data-child-id="${escapeHtml(childId)}" title="${unavailable ? "Deselect the current source first" : "Select or deselect this value"}"`: "";
   return `<div class="${classes}" ${attributes}>${content}</div>`;
 }
 
@@ -777,17 +760,8 @@ function reconciliationCardImage(image, title, reconciliationRole, rowId) {
   const isChild = reconciliationRole === "child";
   const selected = selection?.childId === childId;
   const unavailable = isChild && !!selection && !selected;
-  const classes = [
-    "event-image",
-    isChild ? "reconciliation-field-selectable" : "",
-    selected ? "reconciliation-field-selected" : "",
-    unavailable ? "reconciliation-field-unavailable" : ""
-  ].filter(Boolean).join(" ");
-  return `<div class="${classes}"
-    ${isChild ? `data-reconciliation-field="image" data-child-id="${escapeHtml(childId)}"` : ""}
-    ${unavailable ? 'title="Deseleziona prima la fonte attuale"' : ""}>
-    ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">` : ""}
-  </div>`;
+  const classes = ["event-image", isChild ? "reconciliation-field-selectable" : "", selected ? "reconciliation-field-selected" : "", unavailable ? "reconciliation-field-unavailable" : ""].filter(Boolean).join(" ");
+  return `<div class="${classes}" ${isChild ? `data-reconciliation-field="image" data-child-id="${escapeHtml(childId)}"` : ""} ${unavailable ? 'title="Deselect the current source first"' : ""}> ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">` : ""}</div>`;
 }
   
 /* SCHEDA EVENTO */
@@ -818,18 +792,15 @@ function eventCard(row, index, reconciliationRole = null){
   const schemaId = `schema-${row.id_site_event || index}`;
   return `<article class="event">
     ${reconciliationCardImage(image || "", title, reconciliationRole, row.id_site_event)}
-      <div class="classification-actions">
-      <span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
+      <div class="classification-actions"><span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
       <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="Visualizza JSON-LD">Schema</button>
       <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella record Evento">Delete</button>
-      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblic</button>
-      </div>
+      <button class="schema-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblic</button></div>
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
     ${(comune || cap) ? `<div class="location-row">
       ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}`, reconciliationRole, row.id_site_event) : ""}
-      ${cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}
-    </div>` : ""}
+      ${cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}</div>` : ""}
     ${startDate ? reconciliationCardField("startDate", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(startDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}
     ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(endDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}    ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
     ${address ? reconciliationCardField("address", `<span class="label">Indirizzo:</span> ${escapeHtml(address)}`, reconciliationRole, row.id_site_event) : ""}
@@ -842,10 +813,8 @@ function eventCard(row, index, reconciliationRole = null){
     ${performer ? reconciliationCardField("performer", `<span class="label">Performer:</span> ${escapeHtml(performer)}`, reconciliationRole, row.id_site_event) : ""}
     ${director ? reconciliationCardField("director", `<span class="label">Director:</span> ${escapeHtml(director)}`, reconciliationRole, row.id_site_event) : ""}      
     ${description ? reconciliationCardField("description", escapeHtml(description), reconciliationRole, row.id_site_event) : ""}
-    ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)}
-    <div class="source"><span class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}</span>
-    ${sourceUrl ? ` <span class="label">Fonte:</span> <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(sourceUrl)}">${escapeHtml(sourceUrl)}</a>` : ""}
-    </div></div></article>`;
+    ${schemaDetails(event, schemaId, reconciliationRole, row.id_site_event)} <div class="source"><span class="timestamp">Del: ${escapeHtml(formatDate(row.se_extracted).date)}</span>
+    ${sourceUrl ? ` <span class="label">Fonte:</span> <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(sourceUrl)}">${escapeHtml(sourceUrl)}</a>` : ""} </div></div></article>`;
 }
 
 window.deleteEvent=deleteEvent;
@@ -913,9 +882,7 @@ function sameSchemaValue(a, b) {
 /* Crea il JSON temporaneo da mostrare nel padre. */
 function getReconciledSchema(parentRow) {
   const result = cloneJson(parentRow.se_schema || {});
-  reconciliationSelections.forEach((selection, field) => {
-    result[field] = cloneJson(selection.value);
-  });
+  reconciliationSelections.forEach((selection, field) => {result[field] = cloneJson(selection.value);});
   return result;
 }
 
@@ -930,9 +897,7 @@ function selectParent(id) {
 
 /* L'automatismo viene eseguito soltanto all'ingresso effettivo del figlio nell'area di riconciliazione. */
 function proposeFieldsFromChild(childRow) {
-  const parentRow = loadedEvents.find(
-    row => String(row.id_site_event) === reconciliationParentId
-  );
+  const parentRow = loadedEvents.find(row => String(row.id_site_event) === reconciliationParentId);
   if (!parentRow) return;
   const parentSchema = parentRow.se_schema || {};
   const childSchema = childRow.se_schema || {};
@@ -944,42 +909,20 @@ function proposeFieldsFromChild(childRow) {
   if (parentStartMatch && !parentHasTime) {
     const startDate = parentStartMatch[1];
     const currentSelection = reconciliationSelections.get("startDate");
-    if (currentSelection?.mode !== "manual" &&
-        !reconciliationManualLocks.has("startDate")) {
+    if (currentSelection?.mode !== "manual" && !reconciliationManualLocks.has("startDate")) {
       const childIds = new Set([...reconciliationChildIds, childId]);
-      const matchingStarts = [...childIds]
-        .map(id => loadedEvents.find(
-          row => String(row.id_site_event) === String(id)
-        ))
+      const matchingStarts = [...childIds] .map(id => loadedEvents.find(row => String(row.id_site_event) === String(id)))
         .filter(row => row && row.se_schema?.startDate)
-        .map(row => ({
-          childId: String(row.id_site_event),
-          value: String(row.se_schema.startDate)
-        }))
+        .map(row => ({childId: String(row.id_site_event), value: String(row.se_schema.startDate)}))
         .filter(item => {
           const dateMatch = item.value.match(/^(\d{4}-\d{2}-\d{2})/);
           const timeMatch = item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/);
-          return dateMatch &&
-            dateMatch[1] === startDate &&
-            timeMatch;
+          return dateMatch && dateMatch[1] === startDate && timeMatch;
         });
-      const times = [...new Set(
-        matchingStarts.map(item =>
-          item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1]
-        )
-      )];
-      if (times.length === 1) {
-        const source = matchingStarts.find(item =>
-          item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1] === times[0]
-        );
-        reconciliationSelections.set("startDate", {
-          childId: source.childId,
-          value: `${startDate}T${times[0]}`,
-          mode: "auto"
-        });
-      } else if (currentSelection?.mode === "auto") {
-        reconciliationSelections.delete("startDate");
-      }
+      const times = [...new Set(matchingStarts.map(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1]))];
+      if (times.length === 1) {const source = matchingStarts.find(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1] === times[0]);
+        reconciliationSelections.set("startDate", {childId: source.childId, value: `${startDate}T${times[0]}`, mode: "auto"});
+      } else if (currentSelection?.mode === "auto") {reconciliationSelections.delete("startDate");}
     }
   }
   Object.entries(childSchema).forEach(([field, childValue]) => {
@@ -993,19 +936,9 @@ function proposeFieldsFromChild(childRow) {
     if (hasSchemaValue(parentSchema[field]) && !currentSelection) {return;}
     /* Un campo già chiuso all'automatismo non viene riproposto quando entrano altri figli. */
     if (reconciliationLockedFields.has(field) && !currentSelection) {return;}
-    if (!currentSelection) {
-      reconciliationSelections.set(field, {
-        childId,
-        value: cloneJson(childValue),
-        mode: "auto"
-      });
-      return;
-    }
+    if (!currentSelection) {reconciliationSelections.set(field, {childId, value: cloneJson(childValue), mode: "auto"}); return;}
     /* Un secondo figlio concorde non cambia la fonte. Un valore discordante ritira la proposta automatica e lascia il campo alla scelta manuale. */
-    if (!sameSchemaValue(currentSelection.value, childValue)) {
-      reconciliationSelections.delete(field);
-      reconciliationLockedFields.add(field);
-    }
+    if (!sameSchemaValue(currentSelection.value, childValue)) {reconciliationSelections.delete(field); reconciliationLockedFields.add(field);}
   });
 }
 
@@ -1063,9 +996,7 @@ function removeFromReconciliation(id, role) {
         if (times.length === 1) {
           const source = matchingStarts.find(item => item.value.match(/T(\d{2}:\d{2}(?::\d{2})?)/)[1] === times[0]);
           reconciliationSelections.set("startDate", {childId: source.childId, value: `${startDate}T${times[0]}`, mode: "auto"});
-        } else {
-          if (currentSelection?.mode === "auto") {reconciliationSelections.delete("startDate");}
-        }
+        } else {if (currentSelection?.mode === "auto") {reconciliationSelections.delete("startDate");}}
       }
     }
   }
@@ -1081,11 +1012,7 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   const childValue = childSchema[field];
   if (!hasSchemaValue(childValue)) return;
   // Associa Comune; Categoria; Subcategoria ai relativi ID
-  const pairedFields = {
-  addressLocality: ["addressLocality", "id_comune"],
-  category: ["category", "id_categoria"],
-  subcategory: ["subcategory", "id_subcategoria"]
-  };
+  const pairedFields = {addressLocality: ["addressLocality", "id_comune"], category: ["category", "id_categoria"], subcategory: ["subcategory", "id_subcategoria"]};
   const fields = pairedFields[field] || [field];
   // Per Comune, Categoria e Subcategoria, il figlio deve avere entrambi i valori.
   const requiredIds = {addressLocality: "id_comune", category: "id_categoria", subcategory: "id_subcategoria"};
@@ -1096,12 +1023,10 @@ function toggleReconciliationField(field, childId) {childId = String(childId);
   if (currentSelection?.childId === childId) {
     fields.forEach(f => {
       const selection = reconciliationSelections.get(f);
-      if (selection?.childId === childId) {
-        reconciliationSelections.delete(f);
-      }
-      reconciliationLockedFields.add(f);
-      reconciliationManualLocks.add(f);
-    });
+      if (selection?.childId === childId) {reconciliationSelections.delete(f);}
+        reconciliationLockedFields.add(f);
+        reconciliationManualLocks.add(f);
+      });
     sortEvents();
     return;
   }
@@ -1132,16 +1057,11 @@ function reconciliationButton(row, role = null) {
 async function confirmReconciliation() {
   if (reconciliationSaving) return;
   if (reconciliationParentId === null ||
-      reconciliationChildIds.size === 0) {
-    alert("Seleziona un padre e almeno un figlio.");
-    return;
-  }
+      reconciliationChildIds.size === 0) {alert("Select a parent and at least one child."); return;}
   const parentId = reconciliationParentId;
   const childIds = [...reconciliationChildIds];
-  const parentRow = loadedEvents.find(
-    row => String(row.id_site_event) === parentId
-  );
-  if (!parentRow) {alert("Il padre selezionato non è più disponibile."); return;}
+  const parentRow = loadedEvents.find(row => String(row.id_site_event) === parentId);
+  if (!parentRow) {alert("The selected father is no longer available."); return;}
   reconciliationSaving = true;
   try {
     /* Prepara il JSON definitivo senza modificare preventivamente il record originale in memoria. */
@@ -1152,9 +1072,7 @@ async function confirmReconciliation() {
       .from("site_events")
       .update({ se_schema: finalSchema })
       .eq("id_site_event", parentId);
-    if (updateError) {
-      throw new Error(`Salvataggio del padre non riuscito: ${updateError.message}`);
-    }
+    if (updateError) {throw new Error(`Attempt to rescue father unsuccessful: ${updateError.message}`);}
     /* Aggiorna subito il padre locale: anche se la cancellazione fallisse, il padre risulterà completo. */
     parentRow.se_schema = finalSchema;
     /* 2. Marca come verificate le pagine dei figli. */
@@ -1167,7 +1085,7 @@ async function confirmReconciliation() {
         .from("site_pages")
         .update({ sp_verified: true })
         .in("id_site_page", childPageIds);
-      if (verifyError) {throw new Error(`Aggiornamento delle pagine figlie non riuscito: ${verifyError.message}`);}
+      if (verifyError) {throw new Error(`Update of child pages failed: ${verifyError.message}`);}
     }
     /* 3. Solo dopo aver marcato le pagine, elimina i figli. */
     const { error: deleteError } = await supabase
@@ -1177,18 +1095,12 @@ async function confirmReconciliation() {
     if (deleteError) {
       document.getElementById("status").textContent = String(loadedEvents.length);
       sortEvents();
-      alert("Il padre è stato salvato come Riconciliato, " +
-        "ma la cancellazione dei figli non è riuscita.\n\n" +
-        "I figli sono rimasti disponibili.\n" +
-        deleteError.message
-      );
+      alert("The father was saved as Reconciled," + "but the erasure of the children did not succeed.\n\n" + "The children remained available.\n" + deleteError.message);
       return;
     }
     /* 4. Cancellazione riuscita: aggiorna lo stato locale. */
     const deletedIds = new Set(childIds);
-    loadedEvents = loadedEvents.filter(
-      row => !deletedIds.has(String(row.id_site_event))
-    );
+    loadedEvents = loadedEvents.filter(row => !deletedIds.has(String(row.id_site_event)));
     reconciliationParentId = null;
     reconciliationChildIds.clear();
     reconciliationSelections.clear();
@@ -1196,12 +1108,8 @@ async function confirmReconciliation() {
     document.getElementById("status").textContent = String(loadedEvents.length);
     sortEvents();
   } catch (error) {console.error("Errore durante la riconciliazione:", error);
-    alert("Errore durante la riconciliazione.\n\n" +
-      error.message
-    );
-  } finally {
-    reconciliationSaving = false;
-  }
+    alert("Error during reconciliation.\n\n" + error.message);
+  } finally {reconciliationSaving = false;}
 }
   
 /* ORDINAMENTO EVENTI */
@@ -1232,23 +1140,15 @@ const getPlace = (row) => {
       if (!placeA && !placeB) return 0;
       if (!placeA) return 1;
       if (!placeB) return -1;
-      return String(placeA).localeCompare(
-        String(placeB), "it",
-        { numeric: true, sensitivity: "base" }
-      );
+      return String(placeA).localeCompare(String(placeB), "it", { numeric: true, sensitivity: "base" });
     };
-    if (sortBy === "date") {
-      result = compareDate();
-    } else if (sortBy === "place") {
-      result = comparePlace();
-    } else if (sortBy === "date-place") {
-      result = compareDate();
+    if (sortBy === "date") {result = compareDate();
+    } else if (sortBy === "place") {result = comparePlace();
+    } else if (sortBy === "date-place") {result = compareDate();
       if (result === 0) result = comparePlace();
-    } else if (sortBy === "place-date") {
-      result = comparePlace();
+    } else if (sortBy === "place-date") {result = comparePlace();
       if (result === 0) result = compareDate();
-    } else {
-      result = Number(a.id_site_event) - Number(b.id_site_event);
+    } else {result = Number(a.id_site_event) - Number(b.id_site_event);
     }
     return sortAscending ? result : -result;
   });
@@ -1256,15 +1156,15 @@ const getPlace = (row) => {
   const childRows = eventiFiltrati.filter(row => reconciliationChildIds.has(String(row.id_site_event)));
   const selectedIds = new Set([ ...(reconciliationParentId !== null ? [reconciliationParentId] : []), ...reconciliationChildIds]);
   const normalRows = eventiFiltrati.filter(row => !selectedIds.has(String(row.id_site_event)));
-// Riconciliazione: fuori dall'area che scorre
-document.getElementById("reconciliation").innerHTML = parentRow
+  // Riconciliazione: fuori dall'area che scorre
+  document.getElementById("reconciliation").innerHTML = parentRow
     ? `<section class="reconciliation-section"><div class="events-grid reconciliation-grid"><div class="reconciliation-card"><h3>Target</h3>
     ${eventCard(parentRow, 0, "parent")}</div>
     ${childRows.map((row, index) => `<div class="reconciliation-card"><h3>Source</h3> ${eventCard(row, index, "child")}</div>`).join("")}</div></section>`: "";
-// Eventi non selezionati: unica area scorrevole
-document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
-document.getElementById("status").textContent = String(eventiFiltrati.length);
-}
+  // Eventi non selezionati: unica area scorrevole
+  document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
+  document.getElementById("status").textContent = String(eventiFiltrati.length);
+  }
 
 /* Cancella l'evento selezionato e la relativa pagina sorgente */
 async function deleteEvent(id) {
@@ -1288,15 +1188,8 @@ async function deleteEvent(id) {
   // Rimuove il record dall'array.
   loadedEvents = loadedEvents.filter(row => String(row.id_site_event) !== deletedId);
   // Aggiorna lo stato della riconciliazione.
-  if (String(reconciliationParentId) === deletedId) {
-    reconciliationParentId = null;
-    reconciliationChildIds.clear();
-    reconciliationSelections.clear();
-    reconciliationLockedFields.clear();
-  } else {
-    reconciliationChildIds.delete(deletedId);
-    reconciliationSelections.delete(deletedId);
-  }
+  if (String(reconciliationParentId) === deletedId) {reconciliationParentId = null; reconciliationChildIds.clear(); reconciliationSelections.clear(); reconciliationLockedFields.clear();
+  } else {reconciliationChildIds.delete(deletedId); reconciliationSelections.delete(deletedId);}
   // Se non ci sono più figli, non serve mantenere i campi bloccati.
   if (reconciliationChildIds.size === 0) {reconciliationLockedFields.clear();}
   // Aggiorna le schede, il conteggio e l'ordinamento.
@@ -1330,13 +1223,8 @@ const activeClassifications = new Set(["I", "E", "J", "R"]);
 document.querySelectorAll(".classification-filter").forEach(button => {
   button.addEventListener("click", () => {
     const classification = button.dataset.classification;
-    if (activeClassifications.has(classification)) {
-      activeClassifications.delete(classification);
-      button.classList.remove("active");
-    } else {
-      activeClassifications.add(classification);
-      button.classList.add("active");
-    }
+    if (activeClassifications.has(classification)) {activeClassifications.delete(classification); button.classList.remove("active");
+    } else {activeClassifications.add(classification); button.classList.add("active");}
     sortEvents();
   });
 });
@@ -1390,10 +1278,7 @@ function suggestionDates(row) {
   const schema = row.se_schema || {};
   const dates = [schema.startDate, schema.endDate]
     .filter(Boolean)
-    .map(value => {
-      const match = String(value).match(/^\d{4}-\d{2}-\d{2}/);
-      return match ? match[0] : "";
-    })
+    .map(value => {const match = String(value).match(/^\d{4}-\d{2}-\d{2}/); return match ? match[0] : "";})
     .filter(Boolean);
   return [...new Set(dates)];
 }
@@ -1401,9 +1286,7 @@ function suggestionDates(row) {
 function suggestionMunicipality(row) {
   const schema = row.se_schema || {};
   // Se presente, l'identificativo del comune è preferibile al testo.
-  return schema.id_comune != null && schema.id_comune !== ""
-    ? "id:" + String(schema.id_comune)
-    : suggestionText(schema.addressLocality || "");
+  return schema.id_comune != null && schema.id_comune !== "" ? "id:" + String(schema.id_comune): suggestionText(schema.addressLocality || "");
 }
   
 function suggestionTitle(schema) {
@@ -1604,12 +1487,7 @@ function resizeReconciliation(height, totalHeight) {
   
 splitter.addEventListener("pointerdown", (event) => {
   if (!reconciliationPanel.children.length) return;
-  splitDrag = {
-    startY: event.clientY,
-    startHeight: reconciliationPanel.clientHeight,
-    totalHeight:
-      reconciliationPanel.clientHeight + eventsPanel.clientHeight
-  };
+  splitDrag = {startY: event.clientY, startHeight: reconciliationPanel.clientHeight, totalHeight: reconciliationPanel.clientHeight + eventsPanel.clientHeight};
   splitter.setPointerCapture(event.pointerId);
   event.preventDefault();
 });
