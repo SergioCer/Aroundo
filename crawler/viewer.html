@@ -511,7 +511,7 @@ body{
 </div>
   <div class="section">
 <div class="event-controls">
-  <button id="analyzeBtn" class="schema-button analyze-button" title="Estrai acquisiti">Extract</button>
+  <button id="analyzeBtn" class="schema-button analyze-button" title="Extract acquired items">Extract</button>
   <label for="sortBy">Order:</label>
   <select id="sortBy">
     <option value="id">ID</option>
@@ -732,7 +732,7 @@ function schemaDetails(event, id, reconciliationRole = null, rowId = null) {
       const classes = ["schema-field", isChildField ? "reconciliation-field-selectable" : "", isSelected ? "reconciliation-field-selected" : "",
         unavailable ? "reconciliation-field-unavailable" : ""].filter(Boolean).join(" ");
       const dataAttributes = isChildField ? `data-reconciliation-field="${escapeHtml(field)}" data-child-id="${escapeHtml(rowId)}"
-        title="${unavailable  ? "Deseleziona prima la fonte attuale di questo campo" : "Clicca per selezionare o deselezionare questo valore"}"`: "";
+        title="${unavailable  ? "First, deselect the current source for this field" : "Click to select or deselect this value"}"`: "";
       return `<div class="${classes}" ${dataAttributes}><div class="schema-name">${escapeHtml(field)} = </div>
         <div class="schema-value ${exists ? "" : "schema-missing"}">${exists ? escapeHtml(
           field === "macroMatches" || field === "subMatches" ? "" : formatSchemaValue(v)) + (
@@ -1047,9 +1047,9 @@ function reconciliationButton(row, role = null) {
   if (role === "parent") {
     if (reconciliationChildIds.size > 0) {      
       return `<button class="schema-button" type="button" onclick="confirmReconciliation()" title="Esegui Riconciliazione">Reconcile</button>`;}
-      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')" title="Remove from Reconciliation">Deseleziona</button>`;}
+      return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'parent')" title="Remove from Reconciliation">Deselect</button>`;}
   if (role === "child") {
-    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')" title="Remove from Reconciliation">Deseleziona</button>`;}
+    return `<button class="reconciliation-remove-button" type="button" onclick="removeFromReconciliation('${id}', 'child')" title="Remove from Reconciliation">Deselect</button>`;}
   if (reconciliationParentId === null) {
     return `<button class="reconciliation-select-button" type="button" onclick="selectParent('${id}')" title="Foundational Event">Target</button>`;}
     return `<button class="reconciliation-select-button" type="button" onclick="addReconciliationChild('${id}')" title="Event to be added">Source</button>`;}
