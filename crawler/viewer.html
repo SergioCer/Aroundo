@@ -1213,7 +1213,7 @@ filterComuni.addEventListener("change", () => {
   reconciliationSelections.clear();
   reconciliationLockedFields.clear();
   const suggestBtn = document.getElementById("suggestBtn");
-  suggestBtn.textContent = "Suggerisci";
+  suggestBtn.textContent = "Match";
   suggestBtn.disabled = false;
   sortEvents();
 });
@@ -1408,7 +1408,7 @@ function suggestReconciliation() {
   const nextGroup = groups.find(group => !suggestedGroupKeys.has(group.key));
   const button = document.getElementById("suggestBtn");
   const status = document.getElementById("analysisStatus");
-  if (!nextGroup) {button.textContent = "Non ho proposte"; button.disabled = true; if (status) status.textContent = ""; return;}
+  if (!nextGroup) {button.textContent = "No more suggest"; button.disabled = true; if (status) status.textContent = ""; return;}
   // Ricordiamo il gruppo proposto nella sessione corrente, per passare alla proposta successiva al prossimo clic.
   suggestedGroupKeys.add(nextGroup.key);
   // Inizializza una nuova proposta senza salvare nulla.
@@ -1421,9 +1421,9 @@ function suggestReconciliation() {
   nextGroup.rows
     .filter(row => String(row.id_site_event) !== reconciliationParentId)
     .forEach(row => {addReconciliationChild(String(row.id_site_event));});
-  button.textContent = "SUGGERISCI";
+  button.textContent = "Suggest";
   button.disabled = false;
-  if (status) {status.textContent = `Proposta ${suggestedGroupKeys.size}: ${nextGroup.rows.length} eventi da verificare`;}
+  if (status) {status.textContent = `Suggestion ${suggestedGroupKeys.size}: ${nextGroup.rows.length} events to be verified`;}
   sortEvents();
 }
 
