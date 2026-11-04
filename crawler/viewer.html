@@ -898,9 +898,9 @@ function eventCard(row, index, reconciliationRole = null){
     ${reconciliationCardImage(image || "", title, reconciliationRole, row.id_site_event)}
       <div class="classification-actions"><span class="classification-${escapeHtml(value(event.classification))}">${escapeHtml(value(event.classification))}</span>
       ${reconciliationButton(row, reconciliationRole)}
-      <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="Visualizza JSON-LD">Schema</button>
-      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Cancella record Evento">Delete</button>
-      <button class="publish-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Apri pagina per Pubblicare l'Evento">Pubblic</button></div>
+      <button class="schema-button" onclick="toggleSchema('${schemaId}')" title="View JSON-LD">Schema</button>
+      <button class="delete-button" onclick="deleteEvent('${row.id_site_event}')" title="Delete Event record">Delete</button>
+      <button class="publish-button" onclick="nuovoEvento('${row.id_site_event}')"  title="Open page to publish the Event">Pubblic</button></div>
     <div class="event-body">${reconciliationCardField("name", `<h3>${escapeHtml(title)}<span class="record-id">#${escapeHtml(row.id_site_event)}</span></h3>`, reconciliationRole, row.id_site_event)}
     ${(comune || cap) ? `<div class="location-row">
       ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}`, reconciliationRole, row.id_site_event) : ""}
