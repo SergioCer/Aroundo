@@ -5,8 +5,8 @@ const { supabase } = require("./supabase_node.js");
 
 /* CONFIGURAZIONE */
 const PORT = 3001;
-const MAX_PAGES_PER_SITE = 5000;
-const REQUEST_TIMEOUT = 20000;
+const MAX_PAGES_PER_SITE = 10000; // Numero di pagine massime visitate per ciascun sito.
+const REQUEST_TIMEOUT = 20000; // Timeout oltre il quale interrompe la scansione del sito. 
 const USER_AGENT = "Mozilla/5.0 Crawler/1.0";
 
 function normalizeCategoryTerm(value) {
