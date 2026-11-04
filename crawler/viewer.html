@@ -484,7 +484,32 @@ body{
 }
 
 .reconciliation-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(0, 3fr);
+  gap: 10px;
   align-items: start;
+}
+
+.reconciliation-parent {
+  min-width: 0;
+}
+
+.reconciliation-children {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.reconciliation-children-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: start;
+}
+
+.reconciliation-children-track > .reconciliation-card {
+  flex: 0 0 calc((100% - 20px) / 3);
+  min-width: 360px;
 }
 
 .reconciliation-card {
