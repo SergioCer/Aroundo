@@ -933,7 +933,7 @@ function analyzeSignals(page, categoryDictionary) {
 
 /* CONVERSIONE SCHEMA.ORG */
 function toSchemaEvent(page, s) {
-  const startDate = s.date ? `${s.date}${s.times[0] ? "T" + s.times[0].value : ""}`: null;
+const startDate = s.date ? normalizeSchemaDate(`${s.date}T${s.times[0]?.value || "00:00"}`): null;
 const locationFields = {
   location: s.location || null, 
   address: s.address || null,
@@ -1092,9 +1092,9 @@ function normalizeSchemaEvent(source, internal = {}) {
   const result = {};
   for (const field of SCHEMA_FIELDS) {
     if (Object.prototype.hasOwnProperty.call(internal, field)) {
-      result[field] = internal[field];
+      result[field] = ["startDate", "endDate", "previousStartDate", "doorTime"].includes(field) ? normalizeSchemaDate(internal[field]) : internal[field];
     } else if (Object.prototype.hasOwnProperty.call(input, field)) {
-      result[field] = ["startDate", "endDate", "previousStartDate"].includes(field) ? normalizeSchemaDate(input[field]) : input[field];
+      result[field] = ["startDate", "endDate", "previousStartDate", "doorTime"].includes(field) ? normalizeSchemaDate(input[field]) : input[field];
     } else {result[field] = null;}
   }
   // Conserva tutte le proprietà aggiuntive non canoniche.
@@ -1104,10 +1104,59 @@ function normalizeSchemaEvent(source, internal = {}) {
   return result;
 }
 
+
+/* NORMALIZZAZIONE DATE E ORARI - FUSO EUROPE/ROME */
 function normalizeSchemaDate(value) {
-  if (typeof value !== "string") return value;
-  // Converte lo spazio tra data e ora in T.
-  return value.replace(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)/, "$1T$2");
+  if (typeof value !== "string" || !value.trim()) return value;
+  const input = value.trim().replace(" ", "T");
+  // Riconosce data, ora ed eventuale fuso orario.
+  const match = input.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?)?(Z|[+-]\d{2}:\d{2})?$/i);
+  if (!match) return value;
+  let [, year, month, day, hour, minute, timezone] = match;
+  year = Number(year);
+  month = Number(month);
+  day = Number(day);
+  // Se l'ora manca o non è valida, utilizza 00:00.
+  hour = Number(hour ?? 0);
+  minute = Number(minute ?? 0);
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {hour = 0; minute = 0;}
+  // Verifica che la data di calendario sia valida.
+  const checkDate = new Date(Date.UTC(year, month - 1, day));
+  if (checkDate.getUTCFullYear() !== year || checkDate.getUTCMonth() !== month - 1 || checkDate.getUTCDate() !== day) {return value;}
+  // Formatter comune per ricavare data, ora e fuso di Roma.
+  const formatter = new Intl.DateTimeFormat("en-GB", {timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23"});
+  let localDate;
+  let localTime;
+  let referenceDate;
+  if (timezone) {
+    // Se il dato contiene già un fuso, converte l'istante in ora di Roma.
+    const instant = new Date(input);
+    if (Number.isNaN(instant.getTime())) return value;
+    const parts = formatter.formatToParts(instant);
+    const getPart = type => parts.find(part => part.type === type)?.value;
+    localDate = `${getPart("year")}-${getPart("month")}-${getPart("day")}`;
+    localTime = `${getPart("hour")}:${getPart("minute")}`;
+    referenceDate = instant;
+  } else {
+    // Se il fuso manca, considera data e ora come orario locale italiano.
+    localDate = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    localTime = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+    referenceDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
+  }
+  // Ricava l'offset corretto di Roma in base alla data e all'ora locale.
+  if (!timezone) {
+    for (let i = 0; i < 2; i++) {
+      const parts = new Intl.DateTimeFormat("en-GB", {timeZone: "Europe/Rome", timeZoneName: "longOffset"}).formatToParts(referenceDate);
+      const zone = parts.find(part => part.type === "timeZoneName")?.value || "GMT+01:00";
+      const matchOffset = zone.match(/GMT([+-])(\d{2}):(\d{2})/);
+      const offsetMinutes = matchOffset ? (matchOffset[1] === "+" ? 1 : -1) * (Number(matchOffset[2]) * 60 + Number(matchOffset[3])): 0;
+      referenceDate = new Date(Date.UTC(year, month - 1, day, hour, minute) - offsetMinutes * 60000);
+    }
+  }
+  const offsetParts = new Intl.DateTimeFormat("en-GB", {timeZone: "Europe/Rome", timeZoneName: "longOffset"}).formatToParts(referenceDate);
+  const offset = offsetParts.find(part => part.type === "timeZoneName")?.value || "GMT+01:00";
+  const isoOffset = offset === "GMT" ? "+00:00" : offset.replace("GMT", "");
+  return `${localDate}T${localTime}${isoOffset}`;
 }
 
 /* ECCEZIONI ESTRAZIONE Caso Moesco */
