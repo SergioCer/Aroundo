@@ -1595,12 +1595,22 @@ async function loadEvents(){
   const results = document.getElementById("results");
   try{
     /* site_events site_pages viene utilizzata solamente per recuperare l'URL della pagina origine. */
-    const { data, error } =
-      await supabase
+    // Lettura di tutti gli eventi a blocchi di 1000 record.
+    let data = [];
+    let from = 0;
+    const pageSize = 1000;
+    while(true){
+      const { data: batch, error } = await supabase
         .from("site_events")
         .select("id_site_event, id_site_page, id_evento, se_schema, se_extracted")
-        .order("id_site_event",{ascending:false});
-    if(error){throw error;}
+        .order("id_site_event",{ascending:false})
+        .range(from, from + pageSize - 1);
+      if(error){throw error;}
+      if(!batch || batch.length === 0) break;
+      data.push(...batch);
+      if(batch.length < pageSize) break;
+      from += pageSize;
+    }
     if(!data || data.length === 0){status.textContent = "No events!";
       results.innerHTML = `<div class="empty">The site_events table contains no events. Execute EXTRACT</div>`; return;}
     /* Recupero degli URL delle pagine origine */
