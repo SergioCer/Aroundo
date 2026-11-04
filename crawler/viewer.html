@@ -514,7 +514,7 @@ body{
 
 .reconciliation-card {
   min-width: 0;
-  padding: 12px;
+  padding: 0px;
   border-radius: 8px;
   background: #fff;
   border: 1px solid #ccd4df;
@@ -530,6 +530,55 @@ body{
   margin: 0;
 }
 
+/* FRECCE SCORRIMENTO FIGLI - CUPIDO */
+.reconciliation-children-track .classification-actions {
+  position: relative;
+}
+
+.reconciliation-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.65);
+  border-radius: 50%;
+  background: rgba(40, 50, 65, 0.72);
+  color: #fff;
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  backdrop-filter: blur(3px);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.reconciliation-arrow-left {
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.reconciliation-arrow-right {
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.reconciliation-arrow:hover {
+  background: rgba(30, 110, 170, 0.95);
+}
+
+.reconciliation-arrow-left:hover {
+  transform: translateY(-50%) scale(1.12);
+}
+
+.reconciliation-arrow-right:hover {
+  transform: translateY(-50%) scale(1.12);
+}
+  
 .category-match {
   display: block;
 }
@@ -1312,11 +1361,67 @@ document.getElementById("reconciliation").innerHTML = parentRow
         </div>
       </div>
     </section>` : "";
+  // Aggiorna le frecce di scorrimento dei figli
+  updateReconciliationArrows();
   // Eventi non selezionati: unica area scorrevole
   document.getElementById("results").innerHTML = `<div class="events-grid"> ${normalRows.map((row, index) => eventCard(row, index)).join("")}</div>`;
   document.getElementById("status").textContent = String(eventiFiltrati.length);
   }
 
+/* FRECCE SCORRIMENTO ORIZZONTALE RICONCILIAZIONE */
+function updateReconciliationArrows() {
+  const container = document.querySelector("#reconciliation .reconciliation-children");
+  const track = container?.querySelector(".reconciliation-children-track");
+  if (!container || !track) return;
+  const cards = [...track.querySelectorAll(":scope > .reconciliation-card")];
+  // Rimuove le frecce precedenti prima di ricalcolarne la posizione.
+  track.querySelectorAll(".reconciliation-arrow").forEach(arrow => arrow.remove());
+  if (cards.length === 0) return;
+  // Aggiorna le frecce durante lo scorrimento orizzontale.
+  if (!container.dataset.arrowListener) {
+    container.addEventListener("scroll", updateReconciliationArrows);
+    container.dataset.arrowListener = "true";
+  }
+  // Individua le schede che sono effettivamente visibili.
+  const viewport = container.getBoundingClientRect();
+  const visibleCards = cards.filter(card => {
+    const rect = card.getBoundingClientRect();
+    return rect.right > viewport.left + 1 && rect.left < viewport.right - 1;
+  });
+  if (visibleCards.length === 0) return;
+  const firstVisible = visibleCards[0];
+  const lastVisible = visibleCards[visibleCards.length - 1];
+  // Calcola lo spostamento corrispondente a una scheda.
+  const step = cards.length > 1
+    ? cards[1].offsetLeft - cards[0].offsetLeft
+    : cards[0].offsetWidth;
+  // Crea una freccia e la inserisce nella barra delle azioni.
+  function createArrow(card, direction) {
+    const actions = card.querySelector(".classification-actions");
+    if (!actions) return;
+    const arrow = document.createElement("button");
+    arrow.type = "button";
+    arrow.className = `reconciliation-arrow reconciliation-arrow-${direction}`;
+    arrow.textContent = direction === "left" ? "‹" : "›";
+    arrow.title = direction === "left" ? "Scheda precedente" : "Scheda successiva";
+    arrow.addEventListener("click", () => {
+      container.scrollBy({
+        left: direction === "left" ? -step : step,
+        behavior: "smooth"
+      });
+    });
+    actions.appendChild(arrow);
+  }
+  // Freccia sinistra: compare solo se è già avvenuto uno scorrimento.
+  if (container.scrollLeft > 1) {
+    createArrow(firstVisible, "left");
+  }
+  // Freccia destra: compare solo se ci sono altri figli da visualizzare.
+  if (cards.indexOf(lastVisible) < cards.length - 1) {
+    createArrow(lastVisible, "right");
+  }
+}
+  
 /* Cancella l'evento selezionato e la relativa pagina sorgente */
 async function deleteEvent(id) {
   // Recupera il riferimento alla pagina prima di eliminare l'evento.
