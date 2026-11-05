@@ -571,10 +571,10 @@ body{
 @keyframes cupidPulse {
   0%, 100% {
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    opacity: 0.85;
+    opacity: 0.75;
   }
   50% {
-    box-shadow: 0 0 10px rgba(30,110,170,0.75);
+    box-shadow: 0 0 12px rgba(30,110,170,0.75);
     opacity: 1;
   }
 }
@@ -585,11 +585,11 @@ body{
 }
 
 .reconciliation-arrow-left:hover {
-  transform: translateY(-50%) scale(1.12);
+  transform: translateY(-50%) scale(1.15);
 }
 
 .reconciliation-arrow-right:hover {
-  transform: translateY(-50%) scale(1.12);
+  transform: translateY(-50%) scale(1.15);
 }
   
 .category-match {
@@ -787,6 +787,18 @@ function value(v) {
   return String(v).trim();
 }
 
+/* VISUALIZZAZIONE DATE EVENTI - SENZA CONVERSIONI DI FUSO */
+function formatEventDate(value) {
+  if (!value) return {date: "", time: ""};
+  const input = String(value);
+  const dateMatch = input.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!dateMatch) return {date: input, time: ""};
+  const date = `${dateMatch[3]}/${dateMatch[2]}/${dateMatch[1]}`;
+  const timeMatch = input.match(/T(\d{2}:\d{2})/);
+  const time = timeMatch ? timeMatch[1] : "";
+  return {date, time};
+}
+  
 function formatDate(value){
   if(!value){return {date:"", time:""};}
   try{
@@ -992,8 +1004,9 @@ function eventCard(row, index, reconciliationRole = null){
     ${(comune || cap) ? `<div class="location-row">
       ${comune ? reconciliationCardField("addressLocality", `<span class="label">Comune:</span> ${escapeHtml(comune)}`, reconciliationRole, row.id_site_event) : ""}
       ${cap ? reconciliationCardField("postalCode", `<span class="label">CAP:</span> ${escapeHtml(cap)}`, reconciliationRole, row.id_site_event) : ""}</div>` : ""}
-    ${startDate ? reconciliationCardField("startDate", `<span class="label">Inizio:</span> ${escapeHtml(formatDate(startDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(startDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}
-    ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatDate(endDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatDate(endDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}    ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
+    ${startDate ? reconciliationCardField("startDate", `<span class="label">Inizio:</span> ${escapeHtml(formatEventDate(startDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatEventDate(startDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}
+    ${endDate ? reconciliationCardField("endDate", `<span class="label">Fine:</span> ${escapeHtml(formatEventDate(endDate).date)} <span class="label">Ore:</span> ${escapeHtml(formatEventDate(endDate).time || "-")}`, reconciliationRole, row.id_site_event) : ""}
+    ${location ? reconciliationCardField("location", `<span class="label">Luogo:</span> ${escapeHtml(location)}`, reconciliationRole, row.id_site_event) : ""}
     ${address ? reconciliationCardField("address", `<span class="label">Indirizzo:</span> ${escapeHtml(address)}`, reconciliationRole, row.id_site_event) : ""}
     ${category ? reconciliationCardField("category", `<span class="label">Categoria:</span> ${escapeHtml(category)}`, reconciliationRole, row.id_site_event) : ""}
     ${subcategory ? reconciliationCardField("subcategory", `<span class="label">Sottocategoria:</span> ${escapeHtml(subcategory)}`, reconciliationRole, row.id_site_event) : ""}
