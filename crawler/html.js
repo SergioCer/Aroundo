@@ -1116,13 +1116,15 @@ function normalizeSchemaDate(value) {
   year = Number(year);
   month = Number(month);
   day = Number(day);
-  // Se l'ora manca o non è valida, utilizza 00:00.
-  hour = Number(hour ?? 0);
-  minute = Number(minute ?? 0);
-  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {hour = 0; minute = 0;}
   // Verifica che la data di calendario sia valida.
   const checkDate = new Date(Date.UTC(year, month - 1, day));
   if (checkDate.getUTCFullYear() !== year || checkDate.getUTCMonth() !== month - 1 || checkDate.getUTCDate() !== day) {return value;}
+  // Se l'ora manca, conserva soltanto la data.
+  if (hour === undefined) {return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;}
+  // Se l'ora non è valida, conserva la data senza inventare un orario.
+  hour = Number(hour);
+  minute = Number(minute);
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;}
   // Formatter comune per ricavare data, ora e fuso di Roma.
   const formatter = new Intl.DateTimeFormat("en-GB", {timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23"});
   let localDate;
