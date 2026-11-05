@@ -933,7 +933,7 @@ function analyzeSignals(page, categoryDictionary) {
 
 /* CONVERSIONE SCHEMA.ORG */
 function toSchemaEvent(page, s) {
-const startDate = s.date ? normalizeSchemaDate(`${s.date}T${s.times[0]?.value || "00:00"}`): null;
+const startDate = s.date ? normalizeSchemaDate(s.times[0]?.value ? `${s.date}T${s.times[0].value}` : s.date) : null;
 const locationFields = {
   location: s.location || null, 
   address: s.address || null,
