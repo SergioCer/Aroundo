@@ -1110,8 +1110,14 @@ function getReconciledSchema(parentRow) {
   return result;
 }
 
+// Selezione dell'elemento Target
 function selectParent(id) {
   if (reconciliationParentId !== null) return;
+  // La selezione manuale interrompe l'eventuale proposta automatica precedente.
+  suggestionIndex = -1;
+  suggestionGroups = [];
+  document.getElementById("suggestBtn").textContent = "Match";
+  document.getElementById("suggestNavigation").style.display = "none";
   reconciliationParentId = String(id);
   reconciliationChildIds.clear();
   reconciliationSelections.clear();
@@ -1190,6 +1196,10 @@ function removeFromReconciliation(id, role) {
     reconciliationLockedFields.clear();
     reconciliationManualLocks.clear();
     reconciliationConflicts.clear();
+    suggestionGroups = [];
+    suggestionIndex = -1;
+    document.getElementById("suggestBtn").textContent = "Match";
+    document.getElementById("suggestNavigation").style.display = "none";
   } else if (role === "child") {
     if (!reconciliationChildIds.has(eventId)) return;
     reconciliationChildIds.delete(eventId);
@@ -1477,6 +1487,10 @@ async function deleteEvent(id) {
     reconciliationLockedFields.clear();
     reconciliationManualLocks.clear();
     reconciliationConflicts.clear();
+    suggestionGroups = [];
+    suggestionIndex = -1;
+    document.getElementById("suggestBtn").textContent = "Match";
+    document.getElementById("suggestNavigation").style.display = "none";
   } else if (reconciliationChildIds.has(deletedId)) {removeFromReconciliation(deletedId, "child");}
   // Aggiorna le schede, il conteggio e l'ordinamento.
   document.getElementById("status").textContent = String(loadedEvents.filter(row => filtraEventoPerComune(row, comuniMap, filterComuni.value)).length);
